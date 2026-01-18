@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-cognia_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      APP_CONFIG_CLASS: ${APP_CONFIG_CLASS:-config.settings.DevelopmentConfig}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_HOST: ${DB_HOST:-host.docker.internal}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-cognia_db}
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key}
+      MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:?set_MFA_ENCRYPTION_KEY}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:5000}
+    ports:
+      - "5000:5000"
+    command: ["/app/docker/entrypoint.sh"]
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5000/healthz').read()\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
