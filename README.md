@@ -329,6 +329,10 @@ k6 run -e BASE_URL=http://localhost:5000 -e USERNAME=testuser -e PASSWORD=P4ssw0
   - Build Docker (sin push).
 - Archivo: `.github/workflows/ci.yml`.
 
+## Contribucion
+- Lee `CONTRIBUTING.md` para flujo de ramas y checklist de PR.
+- Flujo recomendado: `dev.enddark` -> `development` -> `main`.
+
 ## Pruebas
 - Ejecutar:
   ```
