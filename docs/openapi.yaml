@@ -2,26 +2,69 @@ openapi: 3.0.3
 info:
   title: CognIA API
   version: 0.1.0
+  description: |
+    API backend para CognIA. Incluye autenticación con JWT (access + refresh),
+    refresh en cookie HttpOnly con CSRF double-submit, MFA TOTP y endpoints de
+    observabilidad (health/ready/metrics).
 servers:
   - url: http://localhost:5000
+tags:
+  - name: Health
+    description: Liveness/readiness y métricas básicas.
+  - name: Auth
+    description: Registro, login, refresh y logout.
+  - name: MFA
+    description: Setup, confirmación y desactivación de MFA.
+  - name: Predict
+    description: Inferencia de modelo (Random Forest).
 paths:
   /healthz:
     get:
+      tags: [Health]
       summary: Liveness check
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
   /readyz:
     get:
-      summary: Readiness check
+      tags: [Health]
+      summary: Readiness check (DB)
       responses:
         "200":
           description: Ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ready
+                  latency_ms:
+                    type: number
+                    example: 2.4
         "503":
           description: Not ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: not_ready
   /metrics:
     get:
-      summary: Basic metrics
+      tags: [Health]
+      summary: Basic metrics (in-memory)
       parameters:
         - in: header
           name: Authorization
@@ -32,20 +75,48 @@ paths:
       responses:
         "200":
           description: Metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
   /api/predict:
     post:
+      tags: [Predict]
       summary: Run prediction
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
+              $ref: "#/components/schemas/PredictRequest"
+            examples:
+              sample:
+                summary: Example input
+                value:
+                  age: 10
+                  sex: 1
+                  conners_inattention_score: 12.5
+                  conners_hyperactivity: 8.1
+                  cbcl_attention_score: 14.0
+                  sleep_problems: 0
       responses:
         "200":
           description: Prediction result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PredictResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
   /api/auth/register:
     post:
+      tags: [Auth]
       summary: Register user
       requestBody:
         required: true
@@ -55,10 +126,22 @@ paths:
               $ref: "#/components/schemas/RegisterRequest"
       responses:
         "201":
-          description: Created
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /api/auth/login:
     post:
+      tags: [Auth]
       summary: Login (password)
+      description: |
+        Rate limit: 5 per 15 minutes por IP.
+        Respuesta puede ser access token o challenge MFA.
       requestBody:
         required: true
         content:
@@ -67,10 +150,29 @@ paths:
               $ref: "#/components/schemas/LoginRequest"
       responses:
         "200":
-          description: Access token (or MFA challenge)
+          description: Access token o challenge MFA
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: refresh_token (HttpOnly) + csrf_refresh_token
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/AuthTokenResponse"
+                  - $ref: "#/components/schemas/MFAChallengeResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
   /api/auth/login/mfa:
     post:
+      tags: [Auth]
       summary: Complete MFA login
+      description: Rate limit: 3 per 10 minutes por IP.
       requestBody:
         required: true
         content:
@@ -80,50 +182,97 @@ paths:
       responses:
         "200":
           description: Access token
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: refresh_token (HttpOnly) + csrf_refresh_token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokenResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
   /api/auth/refresh:
     post:
+      tags: [Auth]
       summary: Refresh access token
+      description: |
+        Usa cookie HttpOnly refresh_token.
+        CSRF requerido: header X-CSRF-Token debe igualar cookie csrf_refresh_token.
       security:
         - cookieAuth: []
         - csrfHeader: []
       parameters:
-        - in: header
-          name: X-CSRF-Token
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/CsrfHeader"
       responses:
         "200":
           description: New access token
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: refresh_token rotado + csrf_refresh_token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokenResponse"
         "401":
-          description: Missing or revoked refresh token
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          description: Missing or invalid CSRF token
+          $ref: "#/components/responses/CsrfFailed"
   /api/auth/logout:
     post:
-      summary: Logout
+      tags: [Auth]
+      summary: Logout (revoca refresh tokens)
+      description: |
+        Requiere access token y CSRF header.
+        Revoca todos los refresh tokens del usuario.
       security:
         - bearerAuth: []
         - csrfHeader: []
       parameters:
-        - in: header
-          name: X-CSRF-Token
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/CsrfHeader"
       responses:
         "200":
           description: Logged out
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: cookies de auth eliminadas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogoutResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/CsrfFailed"
   /api/mfa/setup:
     post:
+      tags: [MFA]
       summary: MFA setup
       security:
         - bearerAuth: []
       responses:
         "200":
           description: MFA otpauth URI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MFASetupResponse"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/mfa/confirm:
     post:
+      tags: [MFA]
       summary: Confirm MFA
       security:
         - bearerAuth: []
@@ -135,9 +284,18 @@ paths:
               $ref: "#/components/schemas/MFAConfirmRequest"
       responses:
         "200":
-          description: Recovery codes
+          description: Recovery codes (one-time)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MFAConfirmResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
   /api/mfa/disable:
     post:
+      tags: [MFA]
       summary: Disable MFA
       security:
         - bearerAuth: []
@@ -150,7 +308,25 @@ paths:
       responses:
         "200":
           description: MFA disabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 components:
+  parameters:
+    CsrfHeader:
+      in: header
+      name: X-CSRF-Token
+      required: true
+      schema:
+        type: string
+      description: Debe ser igual a cookie csrf_refresh_token
   securitySchemes:
     bearerAuth:
       type: http
@@ -164,50 +340,243 @@ components:
       type: apiKey
       in: header
       name: X-CSRF-Token
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    CsrfFailed:
+      description: CSRF failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    RateLimited:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        msg:
+          type: string
+        error:
+          type: string
+      example:
+        msg: Invalid credentials
+        error: invalid_credentials
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: object
+      example:
+        errors:
+          age: ["Must be greater than or equal to 3."]
+    MessageResponse:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: ok
     RegisterRequest:
       type: object
       required: [username, email, password]
       properties:
         username:
           type: string
+          example: testuser
         email:
           type: string
+          example: test@example.com
         password:
           type: string
+          format: password
+          example: P4ssw0rd!
         full_name:
           type: string
+          example: Test User
+    RegisterResponse:
+      type: object
+      properties:
+        msg:
+          type: string
+          example: user created
+        user_id:
+          type: string
+          format: uuid
     LoginRequest:
       type: object
       required: [username, password]
       properties:
         username:
           type: string
+          example: testuser
         password:
           type: string
+          format: password
+          example: P4ssw0rd!
+    AuthTokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+          example: 900
+    MFAChallengeResponse:
+      type: object
+      properties:
+        mfa_required:
+          type: boolean
+          example: true
+        challenge_id:
+          type: string
+          format: uuid
+        expires_in:
+          type: integer
+          example: 300
+        error:
+          type: string
+          example: mfa_required
     LoginMFARequest:
       type: object
       required: [challenge_id]
       properties:
         challenge_id:
           type: string
+          format: uuid
         code:
           type: string
+          example: "123456"
         recovery_code:
           type: string
+          example: "a1b2c3d4"
+    LogoutResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: logged out
+    MFASetupResponse:
+      type: object
+      properties:
+        otpauth_uri:
+          type: string
+          example: otpauth://totp/CogniaApp:demo?secret=BASE32&issuer=CogniaApp
+        secret:
+          type: string
+          description: Solo en DEBUG/TESTING
     MFAConfirmRequest:
       type: object
       required: [code]
       properties:
         code:
           type: string
+          example: "123456"
+    MFAConfirmResponse:
+      type: object
+      properties:
+        recovery_codes:
+          type: array
+          items:
+            type: string
+          example: ["a1b2c3d4", "e5f6g7h8"]
     MFADisableRequest:
       type: object
       required: [password]
       properties:
         password:
           type: string
+          format: password
         code:
           type: string
         recovery_code:
           type: string
+    PredictRequest:
+      type: object
+      required:
+        - age
+        - sex
+        - conners_inattention_score
+        - conners_hyperactivity
+        - cbcl_attention_score
+        - sleep_problems
+      properties:
+        age:
+          type: integer
+          minimum: 3
+          maximum: 21
+        sex:
+          type: integer
+          enum: [0, 1]
+          description: 0=f, 1=m
+        conners_inattention_score:
+          type: number
+        conners_hyperactivity:
+          type: number
+        cbcl_attention_score:
+          type: number
+        sleep_problems:
+          type: integer
+          enum: [0, 1]
+    PredictResponse:
+      type: object
+      properties:
+        predictions:
+          type: object
+      example:
+        predictions:
+          adhd: 0.42
+    MetricsResponse:
+      type: object
+      properties:
+        uptime_seconds:
+          type: integer
+        requests_total:
+          type: integer
+        latency_ms_avg:
+          type: number
+        latency_ms_max:
+          type: number
+        status_counts:
+          type: object
