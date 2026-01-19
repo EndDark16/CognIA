@@ -53,6 +53,8 @@ class Config:
     METRICS_ENABLED = os.getenv("METRICS_ENABLED", "true").lower() == "true"
     METRICS_TOKEN = os.getenv("METRICS_TOKEN")
 
+    SWAGGER_ENABLED = os.getenv("SWAGGER_ENABLED", "true").lower() == "true"
+
 
 class DevelopmentConfig(Config):
     DEBUG = True

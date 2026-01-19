@@ -18,6 +18,7 @@ from config.settings import DevelopmentConfig
 from api.routes.predict import predict_bp
 from api.routes.auth import auth_bp
 from api.routes.mfa import mfa_bp
+from api.routes.docs import docs_bp
 from api.routes.health import health_bp
 from api.extensions import limiter
 from app.models import db, RefreshToken
@@ -72,6 +73,7 @@ def create_app(config_class=DevelopmentConfig):
     app.register_blueprint(predict_bp, url_prefix="/api")
     app.register_blueprint(auth_bp)
     app.register_blueprint(mfa_bp)
+    app.register_blueprint(docs_bp)
     app.register_blueprint(health_bp)
     app.register_blueprint(metrics_bp)
 
