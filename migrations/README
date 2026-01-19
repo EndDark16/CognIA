@@ -1,0 +1,5 @@
+This directory contains Alembic migrations.
+
+- Use `alembic revision --autogenerate -m "message"` to create new revisions.
+- Apply migrations with `alembic upgrade head`.
+- Use the `APP_CONFIG_CLASS` env var to choose the config class (default: `config.settings.DevelopmentConfig`).
