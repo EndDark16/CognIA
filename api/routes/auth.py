@@ -396,17 +396,8 @@ def logout():
     if not validate_csrf_header():
         return _error_response("Missing or invalid CSRF token", "csrf_failed", 403)
 
-    refresh_cookie = request.cookies.get("refresh_token")
-    if refresh_cookie:
-        try:
-            decoded = decode_token(refresh_cookie)
-            refresh_jti = decoded.get("jti")
-            token_entry = RefreshToken.query.filter_by(jti=refresh_jti).first()
-            if token_entry:
-                token_entry.revoked = True
-                db.session.add(token_entry)
-        except Exception:
-            pass
+    # Revoke all refresh tokens for this user (logout all sessions)
+    RefreshToken.query.filter_by(user_id=identity, revoked=False).update({"revoked": True})
 
     last_session = (
         UserSession.query.filter_by(user_id=identity, ended_at=None)
