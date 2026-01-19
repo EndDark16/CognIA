@@ -314,6 +314,14 @@ docker compose up --build
   - Puedes protegerlo con `METRICS_TOKEN` (header `Authorization: Bearer <token>`).
   - En Gunicorn multiproceso, cada worker mantiene sus propias métricas (no agregadas).
 
+## Documentación API (Swagger/OpenAPI)
+- Documentación interactiva: `GET /docs`
+- Especificación OpenAPI: `GET /openapi.yaml`
+- Postman: importa `http://localhost:5000/openapi.yaml` y tendrás todos los endpoints con ejemplos base.
+- Auth:
+  - Access: `Authorization: Bearer <access_token>`
+  - Refresh: cookie `refresh_token` + header `X-CSRF-Token` (valor de la cookie `csrf_refresh_token`)
+
 ## Pruebas de carga (k6)
 1) Crea un usuario de prueba y anota credenciales.
 2) Ejecuta:
@@ -328,6 +336,10 @@ k6 run -e BASE_URL=http://localhost:5000 -e USERNAME=testuser -e PASSWORD=P4ssw0
   - Tests con pytest.
   - Build Docker (sin push).
 - Archivo: `.github/workflows/ci.yml`.
+
+## Contribucion
+- Lee `CONTRIBUTING.md` para flujo de ramas y checklist de PR.
+- Flujo recomendado: `dev.enddark` -> `development` -> `main`.
 
 ## Pruebas
 - Ejecutar:

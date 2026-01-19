@@ -43,3 +43,17 @@ def test_metrics_endpoint():
     with app.app_context():
         db.session.remove()
         db.drop_all()
+
+
+def test_openapi_and_docs():
+    client, app = _client()
+    resp_openapi = client.get("/openapi.yaml")
+    assert resp_openapi.status_code == 200
+    assert b"openapi: 3.0.3" in resp_openapi.data
+
+    resp_docs = client.get("/docs")
+    assert resp_docs.status_code == 200
+
+    with app.app_context():
+        db.session.remove()
+        db.drop_all()
