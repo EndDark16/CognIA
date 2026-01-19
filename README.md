@@ -88,6 +88,7 @@ cognia_app/
 - MFA obligatorio para roles `ADMIN` y `PSYCHOLOGIST/PSICOLOGO`. Si no está habilitado, el login devuelve `mfa_enrollment_required` y no emite tokens. Usuarios con MFA activo deben completar login en 2 pasos (`/auth/login` -> `/auth/login/mfa`).
 - MFA usa TOTP (pyotp) con secreto cifrado (Fernet). Debes definir `MFA_ENCRYPTION_KEY` (base64 urlsafe de 32 bytes) en entorno.
 - CSRF en refresh/logout: si falta o no coincide el header `X-CSRF-Token`, responde 403 con `error: "csrf_failed"`. El valor de `csrf_refresh_token` rota en cada `/api/auth/refresh`, así que el cliente debe leer la nueva cookie después de refrescar.
+- Logout revoca todos los refresh tokens del usuario (logout all) para evitar reuso.
 - Errores estandarizados: todas las respuestas de error incluyen `{"msg": "...", "error": "<codigo>"}`. Ejemplos: `invalid_credentials`, `mfa_required`, `mfa_enrollment_required`, `csrf_failed`, `token_revoked`, `user_exists`.
 
 ## Requisitos previos
