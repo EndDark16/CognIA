@@ -1,0 +1,213 @@
+openapi: 3.0.3
+info:
+  title: CognIA API
+  version: 0.1.0
+servers:
+  - url: http://localhost:5000
+paths:
+  /healthz:
+    get:
+      summary: Liveness check
+      responses:
+        "200":
+          description: OK
+  /readyz:
+    get:
+      summary: Readiness check
+      responses:
+        "200":
+          description: Ready
+        "503":
+          description: Not ready
+  /metrics:
+    get:
+      summary: Basic metrics
+      parameters:
+        - in: header
+          name: Authorization
+          required: false
+          schema:
+            type: string
+          description: Bearer token if METRICS_TOKEN is configured
+      responses:
+        "200":
+          description: Metrics snapshot
+  /api/predict:
+    post:
+      summary: Run prediction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Prediction result
+  /api/auth/register:
+    post:
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Created
+  /api/auth/login:
+    post:
+      summary: Login (password)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Access token (or MFA challenge)
+  /api/auth/login/mfa:
+    post:
+      summary: Complete MFA login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginMFARequest"
+      responses:
+        "200":
+          description: Access token
+  /api/auth/refresh:
+    post:
+      summary: Refresh access token
+      security:
+        - cookieAuth: []
+        - csrfHeader: []
+      parameters:
+        - in: header
+          name: X-CSRF-Token
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: New access token
+        "401":
+          description: Missing or revoked refresh token
+        "403":
+          description: Missing or invalid CSRF token
+  /api/auth/logout:
+    post:
+      summary: Logout
+      security:
+        - bearerAuth: []
+        - csrfHeader: []
+      parameters:
+        - in: header
+          name: X-CSRF-Token
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Logged out
+  /api/mfa/setup:
+    post:
+      summary: MFA setup
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: MFA otpauth URI
+  /api/mfa/confirm:
+    post:
+      summary: Confirm MFA
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MFAConfirmRequest"
+      responses:
+        "200":
+          description: Recovery codes
+  /api/mfa/disable:
+    post:
+      summary: Disable MFA
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MFADisableRequest"
+      responses:
+        "200":
+          description: MFA disabled
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: refresh_token
+    csrfHeader:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        full_name:
+          type: string
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    LoginMFARequest:
+      type: object
+      required: [challenge_id]
+      properties:
+        challenge_id:
+          type: string
+        code:
+          type: string
+        recovery_code:
+          type: string
+    MFAConfirmRequest:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+    MFADisableRequest:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+        code:
+          type: string
+        recovery_code:
+          type: string
