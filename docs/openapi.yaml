@@ -172,7 +172,7 @@ paths:
     post:
       tags: [Auth]
       summary: Complete MFA login
-      description: Rate limit: 3 per 10 minutes por IP.
+      description: "Rate limit: 3 per 10 minutes por IP."
       requestBody:
         required: true
         content:
