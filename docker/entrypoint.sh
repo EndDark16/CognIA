@@ -15,7 +15,7 @@ COUNT=0
 until alembic upgrade head; do
   COUNT=$((COUNT + 1))
   if [ "$COUNT" -ge "$RETRIES" ]; then
-    echo "!! No se pudo aplicar migraciones después de $RETRIES intentos"
+    echo "!! No se pudo aplicar migraciones despuÃ©s de $RETRIES intentos"
     exit 1
   fi
   echo "Reintentando migraciones en ${SLEEP}s..."
