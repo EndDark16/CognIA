@@ -3,75 +3,96 @@ info:
   title: CognIA API
   version: 0.1.0
   description: |
-    API backend para CognIA. Incluye autenticación con JWT (access + refresh),
-    refresh en cookie HttpOnly con CSRF double-submit, MFA TOTP y endpoints de
-    observabilidad (health/ready/metrics).
+    API backend de la tesis "Aplicativo web con Random Forest para la alerta temprana
+    de cinco trastornos psicologicos en ninos de 6 a 11 anos".
+    Proyecto academico del programa de Ingenieria de Sistemas y Computacion en la
+    Universidad de Cundinamarca (grupo GISTFA).
+    Esta API genera alertas de riesgo y no representa un diagnostico clinico.
+    Trabaja solo con datos simulados o anonimizados.
+
+    Enfoque de seguridad y buenas practicas:
+    - Auth: JWT access token en JSON; refresh token en cookie HttpOnly con path
+      /api/auth/refresh.
+    - CSRF: double-submit con header X-CSRF-Token y cookie csrf_refresh_token; la
+      cookie rota en refresh.
+    - MFA: TOTP con secreto cifrado y recovery codes; obligatorio para roles
+      privilegiados.
+    - Observabilidad: /healthz (liveness), /readyz (DB readiness), /metrics (token
+      opcional, por proceso).
+
+    Notas:
+    - Si usas cookies, define CORS_ORIGINS explicitos y envia credenciales.
+    - /api/predict es experimental y puede cambiar.
+
+    Creditos:
+    - Andres Felipe Melo Chaguala (estudiante investigador)
+    - Johan Thomas Cristancho Silva (estudiante investigador)
+    - Oscar Jobany Gomez Ochoa (director)
+    - Universidad de Cundinamarca, grupo GISTFA
 servers:
+  - url: /
+    description: Same-origin (use the host that serves /docs)
+  - url: http://127.0.0.1:5000
+    description: Local development (IPv4)
   - url: http://localhost:5000
+    description: Local development (hostname)
+
 tags:
   - name: Health
-    description: Liveness/readiness y métricas básicas.
+    description: Liveness, readiness, and basic metrics.
   - name: Auth
-    description: Registro, login, refresh y logout.
+    description: Registration, login, refresh, and logout using JWT in cookies.
   - name: MFA
-    description: Setup, confirmación y desactivación de MFA.
+    description: TOTP setup, confirmation, recovery codes, and disable.
   - name: Predict
-    description: Inferencia de modelo (Random Forest).
+    description: Experimental model inference (placeholder).
+
 paths:
   /healthz:
     get:
       tags: [Health]
       summary: Liveness check
+      description: Confirms the service process is running.
+      operationId: healthz
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: ok
+                $ref: "#/components/schemas/HealthResponse"
+
   /readyz:
     get:
       tags: [Health]
       summary: Readiness check (DB)
+      description: Verifies database connectivity.
+      operationId: readyz
       responses:
         "200":
           description: Ready
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: ready
-                  latency_ms:
-                    type: number
-                    example: 2.4
+                $ref: "#/components/schemas/ReadyResponse"
         "503":
           description: Not ready
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: not_ready
+                $ref: "#/components/schemas/NotReadyResponse"
+
   /metrics:
     get:
       tags: [Health]
-      summary: Basic metrics (in-memory)
-      parameters:
-        - in: header
-          name: Authorization
-          required: false
-          schema:
-            type: string
-          description: Bearer token if METRICS_TOKEN is configured
+      summary: Metrics snapshot (in-memory)
+      description: |
+        Returns in-memory counters for the current process.
+        If METRICS_TOKEN is configured, include Authorization: Bearer <token>.
+      operationId: metrics
+      security:
+        - metricsToken: []
+        - {}
       responses:
         "200":
           description: Metrics snapshot
@@ -81,10 +102,22 @@ paths:
                 $ref: "#/components/schemas/MetricsResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Metrics disabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
   /api/predict:
     post:
       tags: [Predict]
-      summary: Run prediction
+      summary: Run prediction (experimental)
+      description: |
+        Experimental endpoint. The prediction pipeline is currently a sketch and
+        may change without notice.
+      operationId: predict
+      deprecated: true
       requestBody:
         required: true
         content:
@@ -114,10 +147,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationError"
+
   /api/auth/register:
     post:
       tags: [Auth]
       summary: Register user
+      description: |
+        Creates a new user account. Username and email must be unique.
+        Password must be at least 8 characters.
+      operationId: register
       requestBody:
         required: true
         content:
@@ -135,13 +173,17 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/ServerError"
+
   /api/auth/login:
     post:
       tags: [Auth]
       summary: Login (password)
       description: |
-        Rate limit: 5 per 15 minutes por IP.
-        Respuesta puede ser access token o challenge MFA.
+        Authenticate with username and password.
+        On success returns an access token in JSON and sets refresh_token and
+        csrf_refresh_token cookies. If MFA is enabled, returns a challenge without
+        cookies. Rate limit: 5 per 15 minutes per IP.
+      operationId: login
       requestBody:
         required: true
         content:
@@ -150,7 +192,7 @@ paths:
               $ref: "#/components/schemas/LoginRequest"
       responses:
         "200":
-          description: Access token o challenge MFA
+          description: Access token or MFA challenge
           headers:
             Set-Cookie:
               schema:
@@ -162,17 +204,37 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/AuthTokenResponse"
                   - $ref: "#/components/schemas/MFAChallengeResponse"
+              examples:
+                token:
+                  summary: Access token response
+                  value:
+                    access_token: "<jwt>"
+                    token_type: bearer
+                    expires_in: 900
+                mfa_challenge:
+                  summary: MFA challenge response
+                  value:
+                    mfa_required: true
+                    challenge_id: "<uuid>"
+                    expires_in: 300
+                    error: mfa_required
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
         "429":
           $ref: "#/components/responses/RateLimited"
+
   /api/auth/login/mfa:
     post:
       tags: [Auth]
       summary: Complete MFA login
-      description: "Rate limit: 3 per 10 minutes por IP."
+      description: |
+        Completes the MFA challenge using a TOTP code or a recovery code.
+        Rate limit: 3 per 10 minutes per IP.
+      operationId: loginMfa
       requestBody:
         required: true
         content:
@@ -191,22 +253,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthTokenResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
         "429":
           $ref: "#/components/responses/RateLimited"
+
   /api/auth/refresh:
     post:
       tags: [Auth]
       summary: Refresh access token
       description: |
-        Usa cookie HttpOnly refresh_token.
-        CSRF requerido: header X-CSRF-Token debe igualar cookie csrf_refresh_token.
+        Uses the refresh_token cookie to issue a new access token.
+        Requires a CSRF double-submit: X-CSRF-Token header must match the
+        csrf_refresh_token cookie. Refresh token is rotated on every call.
+      operationId: refresh
       security:
         - cookieAuth: []
-        - csrfHeader: []
+          csrfCookie: []
+          csrfHeader: []
       parameters:
         - $ref: "#/components/parameters/CsrfHeader"
       responses:
@@ -216,7 +284,7 @@ paths:
             Set-Cookie:
               schema:
                 type: string
-              description: refresh_token rotado + csrf_refresh_token
+              description: refresh_token rotated + csrf_refresh_token
           content:
             application/json:
               schema:
@@ -225,16 +293,19 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/CsrfFailed"
+
   /api/auth/logout:
     post:
       tags: [Auth]
-      summary: Logout (revoca refresh tokens)
+      summary: Logout (revoke refresh tokens)
       description: |
-        Requiere access token y CSRF header.
-        Revoca todos los refresh tokens del usuario.
+        Requires an access token plus CSRF header and cookie.
+        Revokes all refresh tokens for the user.
+      operationId: logout
       security:
         - bearerAuth: []
-        - csrfHeader: []
+          csrfCookie: []
+          csrfHeader: []
       parameters:
         - $ref: "#/components/parameters/CsrfHeader"
       responses:
@@ -244,7 +315,7 @@ paths:
             Set-Cookie:
               schema:
                 type: string
-              description: cookies de auth eliminadas
+              description: auth cookies cleared
           content:
             application/json:
               schema:
@@ -253,10 +324,15 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/CsrfFailed"
+
   /api/mfa/setup:
     post:
       tags: [MFA]
       summary: MFA setup
+      description: |
+        Creates or replaces the user's TOTP secret and returns an otpauth URI.
+        The plain secret is returned only in DEBUG or TESTING.
+      operationId: mfaSetup
       security:
         - bearerAuth: []
       responses:
@@ -266,14 +342,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MFASetupResponse"
-        "409":
-          $ref: "#/components/responses/Conflict"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
   /api/mfa/confirm:
     post:
       tags: [MFA]
       summary: Confirm MFA
+      description: Confirms the TOTP code and returns one-time recovery codes.
+      operationId: mfaConfirm
       security:
         - bearerAuth: []
       requestBody:
@@ -289,14 +370,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MFAConfirmResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /api/mfa/disable:
     post:
       tags: [MFA]
       summary: Disable MFA
+      description: |
+        Disables MFA after validating the password and a TOTP or recovery code.
+        Revokes all refresh tokens for the user.
+      operationId: mfaDisable
       security:
         - bearerAuth: []
       requestBody:
@@ -312,12 +400,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
 components:
   parameters:
     CsrfHeader:
@@ -326,20 +417,35 @@ components:
       required: true
       schema:
         type: string
-      description: Debe ser igual a cookie csrf_refresh_token
+      description: Must match the csrf_refresh_token cookie value.
+
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: Access token sent in the Authorization header.
     cookieAuth:
       type: apiKey
       in: cookie
       name: refresh_token
+      description: Refresh token cookie (HttpOnly).
+    csrfCookie:
+      type: apiKey
+      in: cookie
+      name: csrf_refresh_token
+      description: CSRF cookie used for double-submit validation.
     csrfHeader:
       type: apiKey
       in: header
       name: X-CSRF-Token
+      description: CSRF header used for double-submit validation.
+    metricsToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: "Bearer token for /metrics (Authorization: Bearer <token>)."
+
   responses:
     BadRequest:
       description: Bad request
@@ -372,7 +478,7 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     CsrfFailed:
-      description: CSRF failed
+      description: CSRF validation failed
       content:
         application/json:
           schema:
@@ -389,6 +495,7 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+
   schemas:
     ErrorResponse:
       type: object
@@ -415,6 +522,27 @@ components:
           type: string
       example:
         msg: ok
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+    ReadyResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ready
+        latency_ms:
+          type: number
+          example: 2.4
+    NotReadyResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: not_ready
     RegisterRequest:
       type: object
       required: [username, email, password]
@@ -480,6 +608,7 @@ components:
           example: mfa_required
     LoginMFARequest:
       type: object
+      description: Provide either code or recovery_code.
       required: [challenge_id]
       properties:
         challenge_id:
@@ -487,9 +616,11 @@ components:
           format: uuid
         code:
           type: string
+          description: TOTP code
           example: "123456"
         recovery_code:
           type: string
+          description: One-time recovery code
           example: "a1b2c3d4"
     LogoutResponse:
       type: object
@@ -505,7 +636,7 @@ components:
           example: otpauth://totp/CogniaApp:demo?secret=BASE32&issuer=CogniaApp
         secret:
           type: string
-          description: Solo en DEBUG/TESTING
+          description: Returned only in DEBUG/TESTING
     MFAConfirmRequest:
       type: object
       required: [code]
@@ -523,6 +654,7 @@ components:
           example: ["a1b2c3d4", "e5f6g7h8"]
     MFADisableRequest:
       type: object
+      description: Provide password and either code or recovery_code.
       required: [password]
       properties:
         password:
@@ -572,11 +704,21 @@ components:
       properties:
         uptime_seconds:
           type: integer
+          example: 120
         requests_total:
           type: integer
+          example: 57
         latency_ms_avg:
           type: number
+          example: 12.34
         latency_ms_max:
           type: number
+          example: 120.5
         status_counts:
           type: object
+          additionalProperties:
+            type: integer
+          example:
+            "200": 54
+            "401": 2
+            "500": 1
