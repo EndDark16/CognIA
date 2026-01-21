@@ -90,6 +90,7 @@ cognia_app/
 - CSRF en refresh/logout: si falta o no coincide el header `X-CSRF-Token`, responde 403 con `error: "csrf_failed"`. El valor de `csrf_refresh_token` rota en cada `/api/auth/refresh`, así que el cliente debe leer la nueva cookie después de refrescar.
 - Logout revoca todos los refresh tokens del usuario (logout all) para evitar reuso.
 - Errores estandarizados: todas las respuestas de error incluyen `{"msg": "...", "error": "<codigo>"}`. Ejemplos: `invalid_credentials`, `mfa_required`, `mfa_enrollment_required`, `csrf_failed`, `token_revoked`, `user_exists`.
+- Roles/RBAC: el access token incluye `roles` y las rutas sensibles deben protegerse con `roles_required(...)`. El frontend puede redirigir segun roles, pero la validacion real debe ocurrir en el backend.
 
 ## Requisitos previos
 - Python 3.12 o superior.
@@ -140,6 +141,11 @@ cognia_app/
    # METRICS_ENABLED=true
    # METRICS_TOKEN=un_token_opcional
    # RATE_LIMIT_STORAGE_URI=redis://localhost:6379/0   # opcional, para rate limiting profesional
+   # Startup
+   # AUTO_CREATE_REFRESH_TOKEN_TABLE=false
+   # APP_HOST=0.0.0.0
+   # PORT=5000
+   # DUALSTACK=true
    ```
 
 ## Ejecucion en desarrollo
@@ -151,6 +157,10 @@ cognia_app/
    - Host: 0.0.0.0
    - Puerto por defecto: 5000
 3) Verificar enviando una peticion a POST http://localhost:5000/api/predict (ver ejemplos abajo).
+
+### Nota sobre inicio y base de datos
+- Por defecto la app no fuerza conexion a la BD al arrancar. La disponibilidad real se verifica en `/readyz`.
+- Si necesitas auto-crear la tabla `refresh_token` al inicio (solo dev), activa `AUTO_CREATE_REFRESH_TOKEN_TABLE=true`.
 
 ## Ejecucion en produccion
 - Ejemplo con gunicorn (Linux/macOS):
@@ -314,6 +324,7 @@ docker compose up --build
 - `GET /metrics`: métricas básicas en memoria (por worker): `requests_total`, latencia promedio/max y conteo por status.
   - Puedes protegerlo con `METRICS_TOKEN` (header `Authorization: Bearer <token>`).
   - En Gunicorn multiproceso, cada worker mantiene sus propias métricas (no agregadas).
+  - En Swagger UI, usa el candado (Authorize) para enviar el header `Authorization`.
 
 ## Documentación API (Swagger/OpenAPI)
 - Documentación interactiva: `GET /docs`
@@ -322,6 +333,7 @@ docker compose up --build
 - Auth:
   - Access: `Authorization: Bearer <access_token>`
   - Refresh: cookie `refresh_token` + header `X-CSRF-Token` (valor de la cookie `csrf_refresh_token`)
+  - Si `localhost` falla en tu equipo (IPv6), prueba `http://127.0.0.1:5000/docs` o activa `DUALSTACK=true`.
 
 ## Pruebas de carga (k6)
 1) Crea un usuario de prueba y anota credenciales.
