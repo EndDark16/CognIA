@@ -84,11 +84,22 @@ def create_app(config_class=DevelopmentConfig):
         token = db.session.query(RefreshToken).filter_by(jti=jti).scalar()
         return token is not None and token.revoked
 
-    # Ensure refresh_token table exists in development/local environments
-    with app.app_context():
-        inspector = inspect(db.engine)
-        if inspector.has_table("app_user") and not inspector.has_table("refresh_token"):
-            db.metadata.create_all(bind=db.engine, tables=[RefreshToken.__table__])
+    # Optionally ensure refresh_token table exists (avoid blocking startup if DB is down)
+    if app.config.get("AUTO_CREATE_REFRESH_TOKEN_TABLE", False):
+        with app.app_context():
+            try:
+                inspector = inspect(db.engine)
+                if inspector.has_table("app_user") and not inspector.has_table(
+                    "refresh_token"
+                ):
+                    db.metadata.create_all(
+                        bind=db.engine, tables=[RefreshToken.__table__]
+                    )
+            except Exception:
+                app.logger.warning(
+                    "Startup DB check failed; skipping refresh_token auto-create",
+                    exc_info=True,
+                )
 
     # Configure logging
     if not app.debug:
@@ -109,7 +120,8 @@ def create_app(config_class=DevelopmentConfig):
         start = getattr(g, "_start_time", None)
         if start is not None:
             duration_ms = (time.monotonic() - start) * 1000.0
-            record_request_metrics(duration_ms, response.status_code)
+            if app.config.get("METRICS_ENABLED", True):
+                record_request_metrics(duration_ms, response.status_code)
             if app.config.get("LOG_REQUESTS", False):
                 if request.path not in app.config.get("LOG_EXCLUDE_PATHS", set()):
                     app.logger.info(
