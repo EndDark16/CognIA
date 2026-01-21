@@ -55,6 +55,11 @@ class Config:
 
     SWAGGER_ENABLED = os.getenv("SWAGGER_ENABLED", "true").lower() == "true"
 
+    # Startup behavior
+    AUTO_CREATE_REFRESH_TOKEN_TABLE = os.getenv(
+        "AUTO_CREATE_REFRESH_TOKEN_TABLE", "false"
+    ).lower() == "true"
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
