@@ -168,7 +168,7 @@ cognia_app/
   gunicorn -w 4 -b 0.0.0.0:8000 run:app
   ```
 - Recomendaciones: usar reverse proxy (Nginx), gestionar variables de entorno y certificados TLS, y agregar autenticacion/autorizacion antes de exponer publicamente. En Windows usar un servidor WSGI alternativo o contenedor Docker.
-- En Render (free tier), usa `GUNICORN_WORKERS=2` y `GUNICORN_THREADS=2-4` como punto de partida y ajusta con pruebas de carga.
+- En Render (free tier), el entrypoint ajusta workers/threads segun memoria disponible. Si necesitas forzar, usa `GUNICORN_WORKERS=1` y `GUNICORN_THREADS=2-4` como punto de partida y ajusta con pruebas de carga.
 
 ## Entrenamiento y actualizacion del modelo de IA
 - Script principal: scripts/train_model.py
@@ -341,7 +341,7 @@ docker compose up --build
 ```bash
 k6 run -e BASE_URL=http://localhost:5000 -e USERNAME=testuser -e PASSWORD=P4ssw0rd! scripts/k6_smoke.js
 ```
-3) Ajusta `GUNICORN_WORKERS/GUNICORN_THREADS` según latencia y CPU disponible.
+3) Ajusta `GUNICORN_WORKERS/GUNICORN_THREADS` segun latencia, CPU y memoria disponible (el entrypoint usa valores seguros si no se definen).
 
 ## CI/CD (GitHub Actions)
 - Pipeline básico:
