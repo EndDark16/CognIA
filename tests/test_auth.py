@@ -232,9 +232,27 @@ def test_login_requires_mfa_enrollment_for_admin(client, app):
         db.session.commit()
 
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
-    assert resp_login.status_code == 403
+    assert resp_login.status_code == 200
     assert resp_login.json.get("mfa_enrollment_required") is True
+    assert "enrollment_token" in resp_login.json
     assert not any("refresh_token=" in c for c in resp_login.headers.getlist("Set-Cookie"))
+
+    enrollment_token = resp_login.json["enrollment_token"]
+    resp_setup = client.post(
+        "/api/mfa/setup",
+        headers={"Authorization": f"Bearer {enrollment_token}"},
+    )
+    assert resp_setup.status_code == 200
+    secret = resp_setup.json["secret"]
+
+    totp = pyotp.TOTP(secret)
+    code = totp.now()
+    resp_confirm = client.post(
+        "/api/mfa/confirm",
+        headers={"Authorization": f"Bearer {enrollment_token}"},
+        json={"code": code},
+    )
+    assert resp_confirm.status_code == 200
 
 
 def test_refresh_rotation_revokes_old_token(client):

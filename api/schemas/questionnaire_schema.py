@@ -1,0 +1,26 @@
+# api/schemas/questionnaire_schema.py
+
+from marshmallow import Schema, fields, validate
+
+
+class QuestionnaireCreateSchema(Schema):
+    name = fields.String(required=True)
+    version = fields.String(required=True)
+    description = fields.String(allow_none=True)
+
+
+class QuestionnaireCloneSchema(Schema):
+    version = fields.String(required=True)
+    name = fields.String(allow_none=True)
+    description = fields.String(allow_none=True)
+
+
+class QuestionCreateSchema(Schema):
+    code = fields.String(required=True)
+    text = fields.String(required=True)
+    response_type = fields.String(
+        required=True,
+        validate=validate.OneOf(["likert", "boolean", "text", "integer"]),
+    )
+    disorder_id = fields.UUID(allow_none=True)
+    position = fields.Integer(allow_none=True)
