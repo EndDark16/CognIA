@@ -83,6 +83,13 @@ def _challenge_ttl_seconds() -> int:
         return 300
 
 
+def _enroll_ttl_seconds() -> int:
+    try:
+        return int(current_app.config.get("MFA_ENROLL_TOKEN_TTL", 600))
+    except Exception:
+        return 600
+
+
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json(silent=True) or {}
@@ -147,16 +154,25 @@ def login():
         return _error_response("Account inactive", "inactive_account", 403)
 
     if requires_mfa_enrollment(user) and not user.mfa_enabled:
+        expires_in = _enroll_ttl_seconds()
+        enrollment_token = create_access_token(
+            identity=str(user.id),
+            additional_claims={"roles": [], "mfa_enrollment": True},
+            expires_delta=timedelta(seconds=expires_in),
+        )
         log_audit(user.id, "MFA_ENROLLMENT_REQUIRED", "auth", "MFA enrollment required")
         return (
             jsonify(
                 {
                     "mfa_enrollment_required": True,
+                    "enrollment_token": enrollment_token,
+                    "token_type": "bearer",
+                    "expires_in": expires_in,
                     "msg": "MFA enrollment required",
                     "error": "mfa_enrollment_required",
                 }
             ),
-            403,
+            200,
         )
 
     if user.mfa_enabled:

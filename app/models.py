@@ -104,3 +104,83 @@ class MFALoginChallenge(db.Model):
     ip_address = db.Column(db.String)
     user_agent = db.Column(db.String)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
+
+
+class QuestionnaireTemplate(db.Model):
+    __tablename__ = "questionnaire_template"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = db.Column(db.Text, nullable=False)
+    version = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class Question(db.Model):
+    __tablename__ = "question"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    questionnaire_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("questionnaire_template.id"), nullable=False
+    )
+    code = db.Column(db.Text, nullable=False)
+    text = db.Column(db.Text, nullable=False)
+    response_type = db.Column(db.Text, nullable=False)
+    disorder_id = db.Column(UUID(as_uuid=True))
+    position = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class Subject(db.Model):
+    __tablename__ = "subject"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    external_code = db.Column(db.Text, nullable=False)
+    birth_year = db.Column(db.Integer)
+    sex = db.Column(db.Text)
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class Evaluation(db.Model):
+    __tablename__ = "evaluation"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    subject_id = db.Column(UUID(as_uuid=True), db.ForeignKey("subject.id"))
+    requested_by_user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), nullable=False)
+    psychologist_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"))
+    age_at_evaluation = db.Column(db.Integer, nullable=False)
+    context = db.Column(db.Text)
+    raw_symptoms = db.Column(db.JSON)
+    processed_features = db.Column(db.JSON)
+    evaluation_date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.Text, nullable=False)
+    is_anonymous = db.Column(db.Boolean, default=True, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    questionnaire_template_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("questionnaire_template.id"), nullable=False
+    )
+    registration_number = db.Column(db.Text, nullable=False)
+    access_key_hash = db.Column(db.Text, nullable=False)
+    access_key_created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
+    access_key_rotated_at = db.Column(db.DateTime(timezone=True))
+    access_key_failed_attempts = db.Column(db.Integer, server_default="0", nullable=False)
+    access_key_locked_until = db.Column(db.DateTime(timezone=True))
+    requires_access_key_reset = db.Column(db.Boolean, server_default="true", nullable=False)
+
+
+class EvaluationResponse(db.Model):
+    __tablename__ = "evaluation_response"
+
+    evaluation_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("evaluation.id"), primary_key=True
+    )
+    question_id = db.Column(UUID(as_uuid=True), db.ForeignKey("question.id"), primary_key=True)
+    value = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
