@@ -244,6 +244,16 @@ Consumo UI (padre/tutor):
 Registro de evaluacion:
 - Crear evaluacion: `POST /api/v1/evaluations` (siempre enlaza la plantilla activa).
 
+Tipos de respuesta permitidos:
+- `likert_0_4`: escala 0-4
+- `likert_1_5`: escala 1-5
+- `boolean`: 0/1
+- `frequency_0_3`: 0=never, 1=sometimes, 2=often, 3=always
+- `intensity_0_10`: escala 0-10
+- `count`: conteos (n veces)
+- `ordinal`: escala ordinal codificada
+- `text_context`: texto libre solo para contexto (no entra al modelo)
+
 ### Seed de cuestionario demo
 - Script: `scripts/seed_questionnaire_demo.py` (idempotente).
 - Por defecto crea la plantilla inactiva; para activarla:

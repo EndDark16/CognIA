@@ -955,6 +955,16 @@ components:
           type: string
         response_type:
           type: string
+          description: |
+            Tipos permitidos:
+            - likert_0_4: escala 0-4
+            - likert_1_5: escala 1-5
+            - boolean: 0/1
+            - frequency_0_3: 0=never,1=sometimes,2=often,3=always
+            - intensity_0_10: escala 0-10
+            - count: conteos (n veces)
+            - ordinal: escala ordinal codificada
+            - text_context: texto libre solo para contexto (no modelo)
         disorder_id:
           type: string
           format: uuid
@@ -1028,6 +1038,16 @@ components:
           type: string
         response_type:
           type: string
+          enum:
+            - likert_0_4
+            - likert_1_5
+            - boolean
+            - frequency_0_3
+            - intensity_0_10
+            - count
+            - ordinal
+            - text_context
+          description: See QuestionItem.response_type for scale details.
         disorder_id:
           type: string
           format: uuid
@@ -1056,6 +1076,9 @@ components:
           format: uuid
         value:
           type: string
+      description: |
+        value debe respetar el tipo de la pregunta.
+        text_context se guarda como texto pero no se usa en el modelo.
     EvaluationCreateRequest:
       type: object
       required: [age_at_evaluation, evaluation_date, status, responses]

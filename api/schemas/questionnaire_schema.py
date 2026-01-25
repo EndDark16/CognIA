@@ -20,7 +20,18 @@ class QuestionCreateSchema(Schema):
     text = fields.String(required=True)
     response_type = fields.String(
         required=True,
-        validate=validate.OneOf(["likert", "boolean", "text", "integer"]),
+        validate=validate.OneOf(
+            [
+                "likert_0_4",
+                "likert_1_5",
+                "boolean",
+                "frequency_0_3",
+                "intensity_0_10",
+                "count",
+                "ordinal",
+                "text_context",
+            ]
+        ),
     )
     disorder_id = fields.UUID(allow_none=True)
     position = fields.Integer(allow_none=True)
