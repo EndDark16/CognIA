@@ -95,6 +95,28 @@ def _resolve_disorder_id(entries, keys):
 def _build_questions(disorder_entries):
     questions = [
         {
+            "code": "BIO_AGE",
+            "text": "Edad del nino (en anos).",
+            "response_type": "count",
+            "response_min": 6,
+            "response_max": 11,
+            "response_step": 1,
+            "disorder_key": "multi",
+        },
+        {
+            "code": "GENERAL_01",
+            "text": "En general, el estado emocional del nino afecta su rendimiento escolar.",
+            "response_type": "likert_0_4",
+            "disorder_key": "multi",
+        },
+        {
+            "code": "GENERAL_02",
+            "text": "Nivel de preocupacion general del tutor (0=bajo, 1=medio, 2=alto).",
+            "response_type": "ordinal",
+            "response_options": [0, 1, 2],
+            "disorder_key": "multi",
+        },
+        {
             "code": "CONDUCT_01",
             "text": "En las ultimas 4 semanas, el nino ha tenido rabietas intensas.",
             "response_type": "likert_0_4",
@@ -273,7 +295,9 @@ def _build_questions(disorder_entries):
         )
         question["disorder_id"] = disorder_id
         question["position"] = idx
-        question.update(_constraints_for_type(question["response_type"]))
+        defaults = _constraints_for_type(question["response_type"])
+        for key, value in defaults.items():
+            question.setdefault(key, value)
     return questions
 
 
