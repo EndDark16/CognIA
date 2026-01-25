@@ -244,6 +244,17 @@ Consumo UI (padre/tutor):
 Registro de evaluacion:
 - Crear evaluacion: `POST /api/v1/evaluations` (siempre enlaza la plantilla activa).
 
+### Seed de cuestionario demo
+- Script: `scripts/seed_questionnaire_demo.py` (idempotente).
+- Por defecto crea la plantilla inactiva; para activarla:
+  - `SEED_TEMPLATE_ACTIVE=true`
+- Ejemplo:
+  ```bash
+  APP_CONFIG_CLASS=config.settings.DevelopmentConfig \
+  SEED_TEMPLATE_ACTIVE=true \
+  python scripts/seed_questionnaire_demo.py
+  ```
+
 ## Auth Testing
 Instrucciones rapidas para probar la autenticacion (ajusta la URL si es necesario):
 
