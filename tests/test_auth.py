@@ -534,3 +534,25 @@ def test_roles_required_enforces_claims(client, app):
         "/api/admin-only", headers={"Authorization": f"Bearer {access_token2}"}
     )
     assert resp_forbidden.status_code == 403
+
+
+def test_auth_me_returns_profile(client):
+    username = f"profile_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={"username": username, "email": email, "password": password, "full_name": "Profile User"},
+    )
+    assert resp_reg.status_code == 201
+
+    resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
+    access_token = resp_login.json["access_token"]
+
+    resp_me = client.get(
+        "/api/auth/me",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert resp_me.status_code == 200
+    assert resp_me.json["username"] == username
+    assert resp_me.json["email"] == email
