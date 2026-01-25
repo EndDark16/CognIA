@@ -57,6 +57,10 @@ def clone_template(template, *, name, version, description=None):
                 response_type=q.response_type,
                 disorder_id=q.disorder_id,
                 position=q.position,
+                response_min=q.response_min,
+                response_max=q.response_max,
+                response_step=q.response_step,
+                response_options=q.response_options,
             )
         )
     return cloned, len(questions)

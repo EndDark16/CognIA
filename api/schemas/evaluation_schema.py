@@ -5,7 +5,7 @@ from marshmallow import Schema, fields, validate
 
 class EvaluationResponseSchema(Schema):
     question_id = fields.UUID(required=True)
-    value = fields.String(required=True)
+    value = fields.Raw(required=True)
 
 
 class EvaluationCreateSchema(Schema):

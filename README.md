@@ -254,6 +254,12 @@ Tipos de respuesta permitidos:
 - `ordinal`: escala ordinal codificada
 - `text_context`: texto libre solo para contexto (no entra al modelo)
 
+Validacion data-driven (opcional por pregunta):
+- `response_min` / `response_max`: rangos numericos permitidos.
+- `response_options`: lista de valores permitidos (ordinal/codificada).
+- `response_step`: paso permitido (por ejemplo 1).
+- Si no se define constraint, se valida el rango por defecto segun `response_type`.
+
 ### Seed de cuestionario demo
 - Script: `scripts/seed_questionnaire_demo.py` (idempotente).
 - Por defecto crea la plantilla inactiva; para activarla:
