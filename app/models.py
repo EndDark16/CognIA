@@ -5,6 +5,14 @@ from sqlalchemy.sql import func
 
 db = SQLAlchemy()
 
+# Association table for multi-disorder questions
+question_disorder = db.Table(
+    "question_disorder",
+    db.Column("question_id", UUID(as_uuid=True), db.ForeignKey("question.id", ondelete="CASCADE"), primary_key=True),
+    db.Column("disorder_id", UUID(as_uuid=True), db.ForeignKey("disorder.id", ondelete="RESTRICT"), primary_key=True),
+    db.Column("created_at", db.DateTime(timezone=True), server_default=func.now(), nullable=False),
+)
+
 # Modelos existentes reutilizados
 class AppUser(db.Model):
     __tablename__ = 'app_user'
@@ -136,6 +144,7 @@ class Question(db.Model):
     response_options = db.Column(db.JSON)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    disorders = db.relationship("Disorder", secondary=question_disorder, backref="questions")
 
 
 class Disorder(db.Model):

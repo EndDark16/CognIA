@@ -19,7 +19,7 @@ from api.services.questionnaire_service import (
     get_active_template,
     get_template_questions,
 )
-from app.models import db, QuestionnaireTemplate, Question
+from app.models import db, QuestionnaireTemplate, Question, Disorder
 
 
 questionnaires_bp = Blueprint("questionnaires", __name__, url_prefix="/api/v1/questionnaires")
@@ -63,6 +63,23 @@ def _validate_question_constraints(item):
     return None
 
 
+def _normalize_disorder_ids(item):
+    disorder_ids = []
+    if item.get("disorder_id"):
+        disorder_ids.append(item["disorder_id"])
+    if item.get("disorder_ids"):
+        disorder_ids.extend(item["disorder_ids"])
+    unique = []
+    seen = set()
+    for entry in disorder_ids:
+        key = str(entry)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(entry)
+    return unique
+
+
 @questionnaires_bp.get("/active")
 def get_active_questionnaire():
     template = get_active_template()
@@ -87,6 +104,9 @@ def get_active_questionnaire():
                         "text": q.text,
                         "response_type": q.response_type,
                         "disorder_id": str(q.disorder_id) if q.disorder_id else None,
+                        "disorder_ids": [str(d.id) for d in q.disorders] or (
+                            [str(q.disorder_id)] if q.disorder_id else []
+                        ),
                         "position": q.position,
                         "response_min": float(q.response_min) if q.response_min is not None else None,
                         "response_max": float(q.response_max) if q.response_max is not None else None,
@@ -197,15 +217,30 @@ def add_questions(template_id):
             constraint_errors,
         )
 
+    disorder_ids_by_code = {}
+    for item in items:
+        disorder_ids = _normalize_disorder_ids(item)
+        if disorder_ids:
+            found = Disorder.query.filter(Disorder.id.in_(disorder_ids)).all()
+            if len(found) != len(disorder_ids):
+                return _error_response(
+                    "Disorder not found",
+                    "disorder_not_found",
+                    404,
+                    {"code": item["code"], "disorder_ids": [str(d) for d in disorder_ids]},
+                )
+            disorder_ids_by_code[item["code"]] = found
+
     questions = []
     for item in items:
+        disorder_ids = _normalize_disorder_ids(item)
         questions.append(
             Question(
                 questionnaire_id=template.id,
                 code=item["code"].strip(),
                 text=item["text"].strip(),
                 response_type=item["response_type"],
-                disorder_id=item.get("disorder_id"),
+                disorder_id=disorder_ids[0] if disorder_ids else None,
                 position=item.get("position"),
                 response_min=item.get("response_min"),
                 response_max=item.get("response_max"),
@@ -216,6 +251,10 @@ def add_questions(template_id):
 
     try:
         db.session.add_all(questions)
+        for question in questions:
+            disorders = disorder_ids_by_code.get(question.code)
+            if disorders:
+                question.disorders = disorders
         db.session.commit()
     except Exception:
         db.session.rollback()

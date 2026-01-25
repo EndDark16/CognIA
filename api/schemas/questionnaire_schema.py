@@ -34,6 +34,7 @@ class QuestionCreateSchema(Schema):
         ),
     )
     disorder_id = fields.UUID(allow_none=True)
+    disorder_ids = fields.List(fields.UUID(), allow_none=True)
     position = fields.Integer(allow_none=True)
     response_min = fields.Float(allow_none=True)
     response_max = fields.Float(allow_none=True)

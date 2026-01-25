@@ -23,7 +23,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from api.app import create_app
-from app.models import db, QuestionnaireTemplate, Question
+from app.models import db, QuestionnaireTemplate, Question, Disorder
 
 
 DEFAULT_NAME = "Cuestionario Demo Salud Mental Infantil"
@@ -40,6 +40,7 @@ DISORDER_KEYWORDS = {
     "anxiety": ["ansiedad", "anxiety"],
     "depression": ["depresion", "depression"],
 }
+MULTI_DISORDER_KEYS = ["conduct", "adhd", "elimination", "anxiety", "depression"]
 PREFIX_TO_DISORDER_KEY = {
     "CONDUCT_": "conduct",
     "ADHD_": "adhd",
@@ -290,10 +291,22 @@ def _build_questions(disorder_entries):
         return {}
 
     for idx, question in enumerate(questions, start=1):
-        disorder_id = _resolve_disorder_id(
-            disorder_entries, DISORDER_KEYWORDS.get(question["disorder_key"], [])
-        )
-        question["disorder_id"] = disorder_id
+        disorder_ids = []
+        if question["disorder_key"] == "multi":
+            for key in MULTI_DISORDER_KEYS:
+                disorder_id = _resolve_disorder_id(
+                    disorder_entries, DISORDER_KEYWORDS.get(key, [])
+                )
+                if disorder_id:
+                    disorder_ids.append(disorder_id)
+        else:
+            disorder_id = _resolve_disorder_id(
+                disorder_entries, DISORDER_KEYWORDS.get(question["disorder_key"], [])
+            )
+            if disorder_id:
+                disorder_ids.append(disorder_id)
+        question["disorder_id"] = disorder_ids[0] if disorder_ids else None
+        question["disorder_ids"] = disorder_ids
         question["position"] = idx
         defaults = _constraints_for_type(question["response_type"])
         for key, value in defaults.items():
@@ -333,16 +346,23 @@ def seed_demo(app, *, activate=False, name=DEFAULT_NAME, version=DEFAULT_VERSION
         for item in questions:
             if item["code"] in existing_codes:
                 continue
-            db.session.add(
-                Question(
-                    questionnaire_id=template.id,
-                    code=item["code"],
-                    text=item["text"],
-                    response_type=item["response_type"],
-                    disorder_id=item["disorder_id"],
-                    position=item["position"],
-                )
+            question = Question(
+                questionnaire_id=template.id,
+                code=item["code"],
+                text=item["text"],
+                response_type=item["response_type"],
+                disorder_id=item["disorder_id"],
+                position=item["position"],
+                response_min=item.get("response_min"),
+                response_max=item.get("response_max"),
+                response_step=item.get("response_step"),
+                response_options=item.get("response_options"),
             )
+            disorder_ids = item.get("disorder_ids") or []
+            if disorder_ids:
+                disorders = Disorder.query.filter(Disorder.id.in_(disorder_ids)).all()
+                question.disorders = disorders
+            db.session.add(question)
             created_questions += 1
 
         # Update disorder_id for existing questions when disorders are now available.
@@ -352,21 +372,31 @@ def seed_demo(app, *, activate=False, name=DEFAULT_NAME, version=DEFAULT_VERSION
                 questionnaire_id=template.id
             ).all()
             for question in existing_questions:
-                if question.disorder_id is not None:
+                if question.disorders:
                     continue
-                matched_key = None
-                for prefix, disorder_key in PREFIX_TO_DISORDER_KEY.items():
-                    if question.code.startswith(prefix):
-                        matched_key = disorder_key
-                        break
-                if not matched_key:
+                matched_keys = []
+                if question.code.startswith("GENERAL_") or question.code.startswith("BIO_"):
+                    matched_keys = MULTI_DISORDER_KEYS
+                else:
+                    for prefix, disorder_key in PREFIX_TO_DISORDER_KEY.items():
+                        if question.code.startswith(prefix):
+                            matched_keys = [disorder_key]
+                            break
+                if not matched_keys:
                     continue
-                disorder_id = _resolve_disorder_id(
-                    disorder_entries, DISORDER_KEYWORDS.get(matched_key, [])
-                )
-                if disorder_id is None:
+                resolved_ids = []
+                for key in matched_keys:
+                    disorder_id = _resolve_disorder_id(
+                        disorder_entries, DISORDER_KEYWORDS.get(key, [])
+                    )
+                    if disorder_id:
+                        resolved_ids.append(disorder_id)
+                if not resolved_ids:
                     continue
-                question.disorder_id = disorder_id
+                disorders = Disorder.query.filter(Disorder.id.in_(resolved_ids)).all()
+                question.disorders = disorders
+                if question.disorder_id is None:
+                    question.disorder_id = resolved_ids[0]
                 updated_questions += 1
 
         # Fill missing response constraints for existing questions when absent.
