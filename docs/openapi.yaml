@@ -972,6 +972,22 @@ components:
         position:
           type: integer
           nullable: true
+        response_min:
+          type: number
+          nullable: true
+        response_max:
+          type: number
+          nullable: true
+        response_step:
+          type: number
+          nullable: true
+        response_options:
+          type: array
+          items:
+            oneOf:
+              - type: number
+              - type: string
+          nullable: true
     ActiveQuestionnaireResponse:
       type: object
       properties:
@@ -1055,6 +1071,22 @@ components:
         position:
           type: integer
           nullable: true
+        response_min:
+          type: number
+          nullable: true
+        response_max:
+          type: number
+          nullable: true
+        response_step:
+          type: number
+          nullable: true
+        response_options:
+          type: array
+          items:
+            oneOf:
+              - type: number
+              - type: string
+          nullable: true
     QuestionCreateListRequest:
       type: array
       items:
@@ -1075,7 +1107,9 @@ components:
           type: string
           format: uuid
         value:
-          type: string
+          oneOf:
+            - type: number
+            - type: string
       description: |
         value debe respetar el tipo de la pregunta.
         text_context se guarda como texto pero no se usa en el modelo.

@@ -252,12 +252,28 @@ def _build_questions(disorder_entries):
         },
     ]
 
+    def _constraints_for_type(response_type):
+        if response_type == "likert_0_4":
+            return {"response_min": 0, "response_max": 4}
+        if response_type == "likert_1_5":
+            return {"response_min": 1, "response_max": 5}
+        if response_type == "frequency_0_3":
+            return {"response_min": 0, "response_max": 3}
+        if response_type == "intensity_0_10":
+            return {"response_min": 0, "response_max": 10}
+        if response_type == "boolean":
+            return {"response_options": [0, 1]}
+        if response_type == "count":
+            return {"response_min": 0}
+        return {}
+
     for idx, question in enumerate(questions, start=1):
         disorder_id = _resolve_disorder_id(
             disorder_entries, DISORDER_KEYWORDS.get(question["disorder_key"], [])
         )
         question["disorder_id"] = disorder_id
         question["position"] = idx
+        question.update(_constraints_for_type(question["response_type"]))
     return questions
 
 
@@ -329,6 +345,40 @@ def seed_demo(app, *, activate=False, name=DEFAULT_NAME, version=DEFAULT_VERSION
                 question.disorder_id = disorder_id
                 updated_questions += 1
 
+        # Fill missing response constraints for existing questions when absent.
+        constraint_updates = 0
+        existing_questions = Question.query.filter_by(questionnaire_id=template.id).all()
+        for question in existing_questions:
+            if any(
+                value is not None
+                for value in (
+                    question.response_min,
+                    question.response_max,
+                    question.response_step,
+                    question.response_options,
+                )
+            ):
+                continue
+            defaults = {}
+            if question.response_type == "likert_0_4":
+                defaults = {"response_min": 0, "response_max": 4}
+            elif question.response_type == "likert_1_5":
+                defaults = {"response_min": 1, "response_max": 5}
+            elif question.response_type == "frequency_0_3":
+                defaults = {"response_min": 0, "response_max": 3}
+            elif question.response_type == "intensity_0_10":
+                defaults = {"response_min": 0, "response_max": 10}
+            elif question.response_type == "boolean":
+                defaults = {"response_options": [0, 1]}
+            elif question.response_type == "count":
+                defaults = {"response_min": 0}
+            if defaults:
+                question.response_min = defaults.get("response_min")
+                question.response_max = defaults.get("response_max")
+                question.response_step = defaults.get("response_step")
+                question.response_options = defaults.get("response_options")
+                constraint_updates += 1
+
         if activate:
             QuestionnaireTemplate.query.update(
                 {QuestionnaireTemplate.is_active: False}, synchronize_session=False
@@ -342,6 +392,8 @@ def seed_demo(app, *, activate=False, name=DEFAULT_NAME, version=DEFAULT_VERSION
         print(f"Preguntas creadas: {created_questions}")
         if updated_questions:
             print(f"Preguntas actualizadas con disorder_id: {updated_questions}")
+        if constraint_updates:
+            print(f"Preguntas actualizadas con constraints: {constraint_updates}")
 
 
 def main():

@@ -13,7 +13,8 @@ from api.services.evaluation_service import (
     build_evaluation_payload,
     build_evaluation_responses,
     generate_access_key,
-    get_template_question_ids,
+    get_template_questions_map,
+    validate_response_value,
 )
 from api.services.questionnaire_service import get_active_template
 from app.models import db, Subject
@@ -64,11 +65,11 @@ def create_evaluation():
     if len(set(map(str, question_ids))) != len(question_ids):
         return _error_response("Duplicate question_id in responses", "duplicate_question_id", 400)
 
-    valid_ids = get_template_question_ids(template.id)
-    if not valid_ids:
+    question_map = get_template_questions_map(template.id)
+    if not question_map:
         return _error_response("Template has no questions", "template_empty", 409)
 
-    invalid = [qid for qid in question_ids if str(qid) not in valid_ids]
+    invalid = [qid for qid in question_ids if str(qid) not in question_map]
     if invalid:
         return _error_response(
             "Invalid question_id for template",
@@ -101,6 +102,28 @@ def create_evaluation():
         access_key = generate_access_key()
 
     evaluation_id = uuid.uuid4()
+    normalized_responses = []
+    validation_errors = []
+    for resp in responses:
+        question = question_map.get(str(resp["question_id"]))
+        ok, error_code, normalized = validate_response_value(question, resp.get("value"))
+        if not ok:
+            validation_errors.append(
+                {"question_id": str(resp["question_id"]), "error": error_code}
+            )
+        else:
+            normalized_responses.append(
+                {"question_id": resp["question_id"], "value": normalized}
+            )
+
+    if validation_errors:
+        return _error_response(
+            "Invalid response values",
+            "invalid_response_value",
+            400,
+            {"items": validation_errors},
+        )
+
     evaluation = build_evaluation_payload(
         evaluation_id=evaluation_id,
         requested_by_user_id=identity,
@@ -117,7 +140,7 @@ def create_evaluation():
     )
 
     attach_access_key(evaluation, access_key)
-    evaluation_responses = build_evaluation_responses(evaluation_id, responses)
+    evaluation_responses = build_evaluation_responses(evaluation_id, normalized_responses)
 
     try:
         db.session.add(evaluation)

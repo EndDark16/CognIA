@@ -39,6 +39,30 @@ def _error_response(message: str, error_code: str, status_code: int, details=Non
     return jsonify(payload), status_code
 
 
+def _validate_question_constraints(item):
+    response_type = item.get("response_type")
+    response_min = item.get("response_min")
+    response_max = item.get("response_max")
+    response_step = item.get("response_step")
+    response_options = item.get("response_options")
+
+    if response_type == "text_context":
+        if any(
+            value is not None
+            for value in (response_min, response_max, response_step, response_options)
+        ):
+            return "text_context_no_constraints"
+        return None
+
+    if response_min is not None and response_max is not None and response_min > response_max:
+        return "response_min_gt_max"
+    if response_step is not None and response_step <= 0:
+        return "response_step_invalid"
+    if response_options is not None and not isinstance(response_options, list):
+        return "response_options_invalid"
+    return None
+
+
 @questionnaires_bp.get("/active")
 def get_active_questionnaire():
     template = get_active_template()
@@ -64,6 +88,10 @@ def get_active_questionnaire():
                         "response_type": q.response_type,
                         "disorder_id": str(q.disorder_id) if q.disorder_id else None,
                         "position": q.position,
+                        "response_min": float(q.response_min) if q.response_min is not None else None,
+                        "response_max": float(q.response_max) if q.response_max is not None else None,
+                        "response_step": float(q.response_step) if q.response_step is not None else None,
+                        "response_options": q.response_options,
                     }
                     for q in questions
                 ],
@@ -156,6 +184,19 @@ def add_questions(template_id):
             {"codes": sorted(existing_codes)},
         )
 
+    constraint_errors = {}
+    for item in items:
+        constraint_error = _validate_question_constraints(item)
+        if constraint_error:
+            constraint_errors[item["code"]] = constraint_error
+    if constraint_errors:
+        return _error_response(
+            "Invalid question constraints",
+            "invalid_question_constraints",
+            400,
+            constraint_errors,
+        )
+
     questions = []
     for item in items:
         questions.append(
@@ -166,6 +207,10 @@ def add_questions(template_id):
                 response_type=item["response_type"],
                 disorder_id=item.get("disorder_id"),
                 position=item.get("position"),
+                response_min=item.get("response_min"),
+                response_max=item.get("response_max"),
+                response_step=item.get("response_step"),
+                response_options=item.get("response_options"),
             )
         )
 

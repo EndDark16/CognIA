@@ -130,6 +130,10 @@ class Question(db.Model):
     response_type = db.Column(db.Text, nullable=False)
     disorder_id = db.Column(UUID(as_uuid=True))
     position = db.Column(db.Integer)
+    response_min = db.Column(db.Numeric)
+    response_max = db.Column(db.Numeric)
+    response_step = db.Column(db.Numeric)
+    response_options = db.Column(db.JSON)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
