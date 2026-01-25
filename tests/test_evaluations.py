@@ -94,7 +94,7 @@ def _create_active_template(client, app):
     template_id = resp.json["id"]
 
     questions_payload = [
-        {"code": "Q1", "text": "Question 1", "response_type": "likert", "position": 1},
+        {"code": "Q1", "text": "Question 1", "response_type": "likert_0_4", "position": 1},
         {"code": "Q2", "text": "Question 2", "response_type": "boolean", "position": 2},
     ]
     resp_questions = client.post(
