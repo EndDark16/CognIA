@@ -134,6 +134,19 @@ class Question(db.Model):
     updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 
+class Disorder(db.Model):
+    __tablename__ = "disorder"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    code = db.Column(db.Text, nullable=False)
+    name = db.Column(db.Text, nullable=False)
+    dsm_code = db.Column(db.Text)
+    description = db.Column(db.Text)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
 class Subject(db.Model):
     __tablename__ = "subject"
 
