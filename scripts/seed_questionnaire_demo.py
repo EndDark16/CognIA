@@ -40,6 +40,13 @@ DISORDER_KEYWORDS = {
     "anxiety": ["ansiedad", "anxiety"],
     "depression": ["depresion", "depression"],
 }
+PREFIX_TO_DISORDER_KEY = {
+    "CONDUCT_": "conduct",
+    "ADHD_": "adhd",
+    "ELIM_": "elimination",
+    "ANX_": "anxiety",
+    "DEP_": "depression",
+}
 
 
 def get_config_class():
@@ -298,6 +305,30 @@ def seed_demo(app, *, activate=False, name=DEFAULT_NAME, version=DEFAULT_VERSION
             )
             created_questions += 1
 
+        # Update disorder_id for existing questions when disorders are now available.
+        updated_questions = 0
+        if disorder_entries:
+            existing_questions = Question.query.filter_by(
+                questionnaire_id=template.id
+            ).all()
+            for question in existing_questions:
+                if question.disorder_id is not None:
+                    continue
+                matched_key = None
+                for prefix, disorder_key in PREFIX_TO_DISORDER_KEY.items():
+                    if question.code.startswith(prefix):
+                        matched_key = disorder_key
+                        break
+                if not matched_key:
+                    continue
+                disorder_id = _resolve_disorder_id(
+                    disorder_entries, DISORDER_KEYWORDS.get(matched_key, [])
+                )
+                if disorder_id is None:
+                    continue
+                question.disorder_id = disorder_id
+                updated_questions += 1
+
         if activate:
             QuestionnaireTemplate.query.update(
                 {QuestionnaireTemplate.is_active: False}, synchronize_session=False
@@ -309,6 +340,8 @@ def seed_demo(app, *, activate=False, name=DEFAULT_NAME, version=DEFAULT_VERSION
             f"Template {'creado' if created_template else 'existente'}: {template.name} {template.version}"
         )
         print(f"Preguntas creadas: {created_questions}")
+        if updated_questions:
+            print(f"Preguntas actualizadas con disorder_id: {updated_questions}")
 
 
 def main():
