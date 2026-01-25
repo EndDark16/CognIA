@@ -435,3 +435,40 @@ def logout():
     response = jsonify({"message": "logged out"})
     clear_auth_cookies(response)
     return response, 200
+
+
+@auth_bp.route("/me", methods=["GET"])
+@jwt_required()
+def me():
+    claims = get_jwt()
+    if claims.get("mfa_enrollment"):
+        return _error_response("Enrollment token not allowed", "mfa_enrollment_only", 403)
+
+    identity = _parse_identity(get_jwt_identity())
+    if not identity:
+        return _error_response("Invalid user", "invalid_user", 401)
+
+    user = db.session.get(AppUser, identity)
+    if not user:
+        return _error_response("User not found", "user_not_found", 404)
+
+    def _fmt(dt):
+        return dt.isoformat() if dt else None
+
+    return (
+        jsonify(
+            {
+                "id": str(user.id),
+                "username": user.username,
+                "email": user.email,
+                "full_name": user.full_name,
+                "is_active": user.is_active,
+                "roles": _get_roles(user),
+                "mfa_enabled": user.mfa_enabled,
+                "mfa_confirmed_at": _fmt(user.mfa_confirmed_at),
+                "created_at": _fmt(user.created_at),
+                "updated_at": _fmt(user.updated_at),
+            }
+        ),
+        200,
+    )
