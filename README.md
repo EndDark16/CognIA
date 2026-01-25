@@ -9,6 +9,7 @@ Trabajo de grado de Ingenieria de Sistemas y Computacion en la Universidad de Cu
 - Capas: rutas/controladores (api/routes), esquemas de validacion (api/schemas), servicios de dominio (api/services), utilidades y carga de modelos (core/models), configuracion (config).
 - Modelo de ML: archivos .pkl en models/ cargados con core/models/predictor.py (ej. models/adhd_model.pkl).
 - Configuracion: clases DevelopmentConfig, ProductionConfig y TestingConfig en config/settings.py; variables .env para MONGO_URI, MODEL_PATH, SECRET_KEY.
+- Modelo de datos: ver `docs/database_schema.md` (incluye schemas Supabase y tablas public).
 
 Flujo de peticion:
 ```
