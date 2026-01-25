@@ -466,6 +466,7 @@ def me():
                 "roles": _get_roles(user),
                 "mfa_enabled": user.mfa_enabled,
                 "mfa_confirmed_at": _fmt(user.mfa_confirmed_at),
+                "mfa_method": user.mfa_method,
                 "created_at": _fmt(user.created_at),
                 "updated_at": _fmt(user.updated_at),
             }

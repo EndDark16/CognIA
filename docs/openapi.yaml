@@ -939,6 +939,9 @@ components:
           type: string
           format: date-time
           nullable: true
+        mfa_method:
+          type: string
+          nullable: true
         created_at:
           type: string
           format: date-time
