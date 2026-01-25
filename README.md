@@ -260,6 +260,10 @@ Validacion data-driven (opcional por pregunta):
 - `response_step`: paso permitido (por ejemplo 1).
 - Si no se define constraint, se valida el rango por defecto segun `response_type`.
 
+Trastornos por pregunta:
+- `disorder_id`: legado (un solo trastorno).
+- `disorder_ids`: recomendado para asociar uno o mas trastornos a la misma pregunta.
+
 ### Seed de cuestionario demo
 - Script: `scripts/seed_questionnaire_demo.py` (idempotente).
 - Por defecto crea la plantilla inactiva; para activarla:

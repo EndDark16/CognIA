@@ -49,6 +49,12 @@ def test_seed_questionnaire_demo_idempotent(app):
         first_question_count = Question.query.filter_by(
             questionnaire_id=template.id
         ).count()
+        multi_questions = (
+            Question.query.filter_by(questionnaire_id=template.id)
+            .join(Question.disorders)
+            .filter(Question.code.in_(["BIO_AGE", "GENERAL_01", "GENERAL_02"]))
+            .count()
+        )
 
     seed_demo(app, activate=False, name=DEFAULT_NAME, version=DEFAULT_VERSION)
     with app.app_context():
@@ -61,3 +67,4 @@ def test_seed_questionnaire_demo_idempotent(app):
 
     assert template_count == 1
     assert second_question_count == first_question_count
+    assert multi_questions >= 1

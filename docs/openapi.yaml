@@ -969,6 +969,12 @@ components:
           type: string
           format: uuid
           nullable: true
+        disorder_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Prefer this field for multi-disorder questions.
         position:
           type: integer
           nullable: true
@@ -1067,6 +1073,12 @@ components:
         disorder_id:
           type: string
           format: uuid
+          nullable: true
+        disorder_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
           nullable: true
         position:
           type: integer
