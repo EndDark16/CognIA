@@ -20,6 +20,8 @@ from api.routes.auth import auth_bp
 from api.routes.mfa import mfa_bp
 from api.routes.docs import docs_bp
 from api.routes.health import health_bp
+from api.routes.questionnaires import questionnaires_bp
+from api.routes.evaluations import evaluations_bp
 from api.extensions import limiter
 from app.models import db, RefreshToken
 from api.metrics import metrics_bp, record_request_metrics
@@ -76,6 +78,8 @@ def create_app(config_class=DevelopmentConfig):
     app.register_blueprint(docs_bp)
     app.register_blueprint(health_bp)
     app.register_blueprint(metrics_bp)
+    app.register_blueprint(questionnaires_bp)
+    app.register_blueprint(evaluations_bp)
 
     # Token Blocklist Callback
     @jwt.token_in_blocklist_loader

@@ -9,6 +9,7 @@ Trabajo de grado de Ingenieria de Sistemas y Computacion en la Universidad de Cu
 - Capas: rutas/controladores (api/routes), esquemas de validacion (api/schemas), servicios de dominio (api/services), utilidades y carga de modelos (core/models), configuracion (config).
 - Modelo de ML: archivos .pkl en models/ cargados con core/models/predictor.py (ej. models/adhd_model.pkl).
 - Configuracion: clases DevelopmentConfig, ProductionConfig y TestingConfig en config/settings.py; variables .env para MONGO_URI, MODEL_PATH, SECRET_KEY.
+- Modelo de datos: ver `docs/database_schema.md` (incluye schemas Supabase y tablas public).
 
 Flujo de peticion:
 ```
@@ -85,12 +86,29 @@ cognia_app/
 - Access token sigue en JSON (`access_token`). Para usar refresh/logout: enviar cookies y el header CSRF.
 - En cliente (fetch/axios): `credentials: "include"` + header `X-CSRF-Token` con el valor de `csrf_refresh_token`.
 - CORS: al usar credenciales no se permite `origins="*"`. Define `CORS_ORIGINS` (coma-separado) en .env.
-- MFA obligatorio para roles `ADMIN` y `PSYCHOLOGIST/PSICOLOGO`. Si no está habilitado, el login devuelve `mfa_enrollment_required` y no emite tokens. Usuarios con MFA activo deben completar login en 2 pasos (`/auth/login` -> `/auth/login/mfa`).
+- MFA obligatorio para roles `ADMIN` y `PSYCHOLOGIST/PSICOLOGO`. Si no esta habilitado, el login devuelve `mfa_enrollment_required` y un `enrollment_token` de vida corta para activar MFA. Usuarios con MFA activo deben completar login en 2 pasos (`/auth/login` -> `/auth/login/mfa`).
 - MFA usa TOTP (pyotp) con secreto cifrado (Fernet). Debes definir `MFA_ENCRYPTION_KEY` (base64 urlsafe de 32 bytes) en entorno.
+- Onboarding MFA (roles privilegiados): usa el `enrollment_token` solo en `/api/mfa/setup` y `/api/mfa/confirm`. Hasta completar el MFA no se emiten access/refresh tokens normales.
 - CSRF en refresh/logout: si falta o no coincide el header `X-CSRF-Token`, responde 403 con `error: "csrf_failed"`. El valor de `csrf_refresh_token` rota en cada `/api/auth/refresh`, así que el cliente debe leer la nueva cookie después de refrescar.
 - Logout revoca todos los refresh tokens del usuario (logout all) para evitar reuso.
 - Errores estandarizados: todas las respuestas de error incluyen `{"msg": "...", "error": "<codigo>"}`. Ejemplos: `invalid_credentials`, `mfa_required`, `mfa_enrollment_required`, `csrf_failed`, `token_revoked`, `user_exists`.
 - Roles/RBAC: el access token incluye `roles` y las rutas sensibles deben protegerse con `roles_required(...)`. El frontend puede redirigir segun roles, pero la validacion real debe ocurrir en el backend.
+
+### Flujo de login y MFA (resumen)
+- Login normal (usuario sin MFA requerido): `/api/auth/login` devuelve `access_token` y cookies `refresh_token` + `csrf_refresh_token`.
+- Login con MFA activo: `/api/auth/login` devuelve `mfa_required` + `challenge_id` (sin cookies); luego `/api/auth/login/mfa` emite tokens normales.
+- Login con MFA requerido pero no habilitado: `/api/auth/login` devuelve `mfa_enrollment_required` + `enrollment_token` (sin cookies). Ese token solo sirve para `/api/mfa/setup` y `/api/mfa/confirm`.
+- Tras confirmar MFA, el usuario debe volver a hacer login para obtener access/refresh tokens normales.
+
+### MFA onboarding (detallado)
+- Credenciales validas: `/api/auth/login` responde 200. El cliente decide el flujo segun el payload.
+- `access_token`: login completo + cookies refresh/csrf.
+- `mfa_required`: `challenge_id` + `expires_in` (sin cookies); continuar con `/api/auth/login/mfa`.
+- `mfa_enrollment_required`: `enrollment_token` + `expires_in` (sin cookies); solo sirve para `/api/mfa/setup` y `/api/mfa/confirm`.
+- El enrollment token incluye `mfa_enrollment=true` y `roles=[]`; no permite refresh/logout ni `/api/mfa/disable`.
+- `MFA_ENROLL_TOKEN_TTL` define la vida del enrollment token (default 600s).
+- `/api/mfa/confirm` devuelve `recovery_codes` una sola vez; guardalos offline.
+- Tras confirmar MFA, se debe hacer login de nuevo para obtener access/refresh tokens normales.
 
 ## Requisitos previos
 - Python 3.12 o superior.
@@ -131,6 +149,7 @@ cognia_app/
    # Si usas Supabase u otro servicio que exige TLS:
    # DB_SSL_MODE=require
    MFA_ENCRYPTION_KEY=base64-urlsafe-32bytes-key
+   MFA_ENROLL_TOKEN_TTL=600
    # Migraciones (rol db_migrator)
    # MIGRATION_DB_USER=db_migrator
    # MIGRATION_DB_PASSWORD=your_migrator_password
@@ -213,6 +232,50 @@ cognia_app/
 ```
 - Otros codigos: 500 en caso de error interno del servidor.
 
+### Questionnaires y evaluaciones (v1)
+Flujo recomendado (admin):
+1) Crear plantilla (inactiva): `POST /api/v1/questionnaires`
+2) Agregar preguntas: `POST /api/v1/questionnaires/{template_id}/questions`
+3) Activar plantilla: `POST /api/v1/questionnaires/{template_id}/activate`
+4) Para nueva version: `POST /api/v1/questionnaires/active/clone` y luego activar.
+
+Consumo UI (padre/tutor):
+- Obtener plantilla activa: `GET /api/v1/questionnaires/active`
+
+Registro de evaluacion:
+- Crear evaluacion: `POST /api/v1/evaluations` (siempre enlaza la plantilla activa).
+
+Tipos de respuesta permitidos:
+- `likert_0_4`: escala 0-4
+- `likert_1_5`: escala 1-5
+- `boolean`: 0/1
+- `frequency_0_3`: 0=never, 1=sometimes, 2=often, 3=always
+- `intensity_0_10`: escala 0-10
+- `count`: conteos (n veces)
+- `ordinal`: escala ordinal codificada
+- `text_context`: texto libre solo para contexto (no entra al modelo)
+
+Validacion data-driven (opcional por pregunta):
+- `response_min` / `response_max`: rangos numericos permitidos.
+- `response_options`: lista de valores permitidos (ordinal/codificada).
+- `response_step`: paso permitido (por ejemplo 1).
+- Si no se define constraint, se valida el rango por defecto segun `response_type`.
+
+Trastornos por pregunta:
+- `disorder_id`: legado (un solo trastorno).
+- `disorder_ids`: recomendado para asociar uno o mas trastornos a la misma pregunta.
+
+### Seed de cuestionario demo
+- Script: `scripts/seed_questionnaire_demo.py` (idempotente).
+- Por defecto crea la plantilla inactiva; para activarla:
+  - `SEED_TEMPLATE_ACTIVE=true`
+- Ejemplo:
+  ```bash
+  APP_CONFIG_CLASS=config.settings.DevelopmentConfig \
+  SEED_TEMPLATE_ACTIVE=true \
+  python scripts/seed_questionnaire_demo.py
+  ```
+
 ## Auth Testing
 Instrucciones rapidas para probar la autenticacion (ajusta la URL si es necesario):
 
@@ -230,6 +293,7 @@ curl -X POST http://localhost:5000/api/auth/login \
   -d '{"username":"testuser","password":"P4ssw0rd!"}'
 ```
 -> Respuesta: `access_token` en JSON y cookies `refresh_token` (HttpOnly, Path=/api/auth/refresh) y `csrf_refresh_token` (para header CSRF). Si el usuario tiene MFA activo devuelve `{ "mfa_required": true, "challenge_id": "...", "expires_in": 300 }` (sin cookies). Si el rol requiere MFA y no está habilitado devuelve `{ "mfa_enrollment_required": true }` (sin tokens).
+-> Nota: cuando las credenciales son validas, `/api/auth/login` devuelve 200 con uno de los payloads (`access_token`, `mfa_required` o `mfa_enrollment_required`). El frontend debe ramificar por campo, no por status.
 
 ### Login MFA (cuando `mfa_required: true`)
 ```bash
@@ -255,6 +319,8 @@ curl -X POST http://localhost:5000/api/auth/logout \
 ```
 
 ### MFA setup / confirm
+Nota: si el login devolvio `enrollment_token`, usa `Authorization: Bearer <enrollment_token>` en estos endpoints.
+
 ```bash
 # 1) Obtener secreto / otpauth_uri (requiere access token)
 curl -X POST http://localhost:5000/api/mfa/setup \
