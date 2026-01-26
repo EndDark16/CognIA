@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 from app.models import (
     AppUser,
@@ -113,6 +113,9 @@ def mfa_disable():
     identity = _parse_identity(get_jwt_identity())
     if not identity:
         return _error_response("Invalid user", "invalid_user", 401)
+    claims = get_jwt()
+    if claims.get("mfa_enrollment"):
+        return _error_response("Enrollment token not allowed", "mfa_enrollment_only", 403)
     data = request.get_json(silent=True) or {}
     password = data.get("password")
     code = data.get("code")
