@@ -83,6 +83,13 @@ def _challenge_ttl_seconds() -> int:
         return 300
 
 
+def _enroll_ttl_seconds() -> int:
+    try:
+        return int(current_app.config.get("MFA_ENROLL_TOKEN_TTL", 600))
+    except Exception:
+        return 600
+
+
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json(silent=True) or {}
@@ -147,16 +154,25 @@ def login():
         return _error_response("Account inactive", "inactive_account", 403)
 
     if requires_mfa_enrollment(user) and not user.mfa_enabled:
+        expires_in = _enroll_ttl_seconds()
+        enrollment_token = create_access_token(
+            identity=str(user.id),
+            additional_claims={"roles": [], "mfa_enrollment": True},
+            expires_delta=timedelta(seconds=expires_in),
+        )
         log_audit(user.id, "MFA_ENROLLMENT_REQUIRED", "auth", "MFA enrollment required")
         return (
             jsonify(
                 {
                     "mfa_enrollment_required": True,
+                    "enrollment_token": enrollment_token,
+                    "token_type": "bearer",
+                    "expires_in": expires_in,
                     "msg": "MFA enrollment required",
                     "error": "mfa_enrollment_required",
                 }
             ),
-            403,
+            200,
         )
 
     if user.mfa_enabled:
@@ -419,3 +435,41 @@ def logout():
     response = jsonify({"message": "logged out"})
     clear_auth_cookies(response)
     return response, 200
+
+
+@auth_bp.route("/me", methods=["GET"])
+@jwt_required()
+def me():
+    claims = get_jwt()
+    if claims.get("mfa_enrollment"):
+        return _error_response("Enrollment token not allowed", "mfa_enrollment_only", 403)
+
+    identity = _parse_identity(get_jwt_identity())
+    if not identity:
+        return _error_response("Invalid user", "invalid_user", 401)
+
+    user = db.session.get(AppUser, identity)
+    if not user:
+        return _error_response("User not found", "user_not_found", 404)
+
+    def _fmt(dt):
+        return dt.isoformat() if dt else None
+
+    return (
+        jsonify(
+            {
+                "id": str(user.id),
+                "username": user.username,
+                "email": user.email,
+                "full_name": user.full_name,
+                "is_active": user.is_active,
+                "roles": _get_roles(user),
+                "mfa_enabled": user.mfa_enabled,
+                "mfa_confirmed_at": _fmt(user.mfa_confirmed_at),
+                "mfa_method": user.mfa_method,
+                "created_at": _fmt(user.created_at),
+                "updated_at": _fmt(user.updated_at),
+            }
+        ),
+        200,
+    )

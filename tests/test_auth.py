@@ -232,9 +232,27 @@ def test_login_requires_mfa_enrollment_for_admin(client, app):
         db.session.commit()
 
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
-    assert resp_login.status_code == 403
+    assert resp_login.status_code == 200
     assert resp_login.json.get("mfa_enrollment_required") is True
+    assert "enrollment_token" in resp_login.json
     assert not any("refresh_token=" in c for c in resp_login.headers.getlist("Set-Cookie"))
+
+    enrollment_token = resp_login.json["enrollment_token"]
+    resp_setup = client.post(
+        "/api/mfa/setup",
+        headers={"Authorization": f"Bearer {enrollment_token}"},
+    )
+    assert resp_setup.status_code == 200
+    secret = resp_setup.json["secret"]
+
+    totp = pyotp.TOTP(secret)
+    code = totp.now()
+    resp_confirm = client.post(
+        "/api/mfa/confirm",
+        headers={"Authorization": f"Bearer {enrollment_token}"},
+        json={"code": code},
+    )
+    assert resp_confirm.status_code == 200
 
 
 def test_refresh_rotation_revokes_old_token(client):
@@ -516,3 +534,25 @@ def test_roles_required_enforces_claims(client, app):
         "/api/admin-only", headers={"Authorization": f"Bearer {access_token2}"}
     )
     assert resp_forbidden.status_code == 403
+
+
+def test_auth_me_returns_profile(client):
+    username = f"profile_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={"username": username, "email": email, "password": password, "full_name": "Profile User"},
+    )
+    assert resp_reg.status_code == 201
+
+    resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
+    access_token = resp_login.json["access_token"]
+
+    resp_me = client.get(
+        "/api/auth/me",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert resp_me.status_code == 200
+    assert resp_me.json["username"] == username
+    assert resp_me.json["email"] == email
