@@ -44,6 +44,10 @@ tags:
     description: Registration, login, refresh, and logout using JWT in cookies.
   - name: MFA
     description: TOTP setup, confirmation, recovery codes, and disable.
+  - name: Questionnaires
+    description: Questionnaire templates and active template retrieval.
+  - name: Evaluations
+    description: Create evaluations using the active questionnaire.
   - name: Predict
     description: Experimental model inference (placeholder).
 
@@ -182,7 +186,13 @@ paths:
         Authenticate with username and password.
         On success returns an access token in JSON and sets refresh_token and
         csrf_refresh_token cookies. If MFA is enabled, returns a challenge without
-        cookies. Rate limit: 5 per 15 minutes per IP.
+        cookies. If MFA enrollment is required, returns a short-lived enrollment
+        token restricted to MFA setup/confirm. For valid credentials the endpoint
+        always responds 200, with one of:
+        - access_token + cookies (login complete)
+        - mfa_required + challenge_id (no cookies)
+        - mfa_enrollment_required + enrollment_token (no cookies)
+        Rate limit: 5 per 15 minutes per IP.
       operationId: login
       requestBody:
         required: true
@@ -204,6 +214,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/AuthTokenResponse"
                   - $ref: "#/components/schemas/MFAChallengeResponse"
+                  - $ref: "#/components/schemas/MFAEnrollmentResponse"
               examples:
                 token:
                   summary: Access token response
@@ -218,6 +229,15 @@ paths:
                     challenge_id: "<uuid>"
                     expires_in: 300
                     error: mfa_required
+                mfa_enrollment:
+                  summary: MFA enrollment response
+                  value:
+                    mfa_enrollment_required: true
+                    enrollment_token: "<jwt>"
+                    token_type: bearer
+                    expires_in: 600
+                    msg: MFA enrollment required
+                    error: mfa_enrollment_required
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -233,6 +253,8 @@ paths:
       summary: Complete MFA login
       description: |
         Completes the MFA challenge using a TOTP code or a recovery code.
+        If MFA enrollment is still required, returns 403 with
+        error mfa_enrollment_required.
         Rate limit: 3 per 10 minutes per IP.
       operationId: loginMfa
       requestBody:
@@ -270,6 +292,7 @@ paths:
         Uses the refresh_token cookie to issue a new access token.
         Requires a CSRF double-submit: X-CSRF-Token header must match the
         csrf_refresh_token cookie. Refresh token is rotated on every call.
+        If MFA enrollment is required, returns 401 and clears auth cookies.
       operationId: refresh
       security:
         - cookieAuth: []
@@ -325,6 +348,28 @@ paths:
         "403":
           $ref: "#/components/responses/CsrfFailed"
 
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current user profile
+      description: Returns profile information for the authenticated user.
+      operationId: authMe
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfileResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /api/mfa/setup:
     post:
       tags: [MFA]
@@ -332,9 +377,12 @@ paths:
       description: |
         Creates or replaces the user's TOTP secret and returns an otpauth URI.
         The plain secret is returned only in DEBUG or TESTING.
+        Accepts either a full access token or a short-lived enrollment token.
+        Enrollment tokens cannot be used for other endpoints (refresh/logout/disable).
       operationId: mfaSetup
       security:
         - bearerAuth: []
+        - mfaEnrollmentToken: []
       responses:
         "200":
           description: MFA otpauth URI
@@ -353,10 +401,14 @@ paths:
     post:
       tags: [MFA]
       summary: Confirm MFA
-      description: Confirms the TOTP code and returns one-time recovery codes.
+      description: |
+        Confirms the TOTP code and returns one-time recovery codes.
+        Accepts either a full access token or a short-lived enrollment token.
+        Enrollment tokens are limited to setup/confirm only.
       operationId: mfaConfirm
       security:
         - bearerAuth: []
+        - mfaEnrollmentToken: []
       requestBody:
         required: true
         content:
@@ -384,6 +436,7 @@ paths:
       description: |
         Disables MFA after validating the password and a TOTP or recovery code.
         Revokes all refresh tokens for the user.
+        Enrollment tokens are not allowed on this endpoint.
       operationId: mfaDisable
       security:
         - bearerAuth: []
@@ -409,6 +462,214 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/v1/questionnaires/active:
+    get:
+      tags: [Questionnaires]
+      summary: Get active questionnaire template
+      description: |
+        Returns the single active template and its questions.
+        Questions are ordered by position ASC, then created_at ASC.
+        If position is null, those items appear last.
+      operationId: getActiveQuestionnaire
+      responses:
+        "200":
+          description: Active template with questions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActiveQuestionnaireResponse"
+        "404":
+          description: No active template
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/questionnaires:
+    post:
+      tags: [Questionnaires]
+      summary: Create questionnaire template
+      description: |
+        Creates a new questionnaire template. New templates are created with
+        is_active=false by default to enforce a single active template.
+      operationId: createQuestionnaire
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionnaireCreateRequest"
+      responses:
+        "201":
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionnaireCreateResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/questionnaires/{template_id}/questions:
+    post:
+      tags: [Questionnaires]
+      summary: Add questions to a template
+      description: |
+        Adds one or more questions to the template. If the template is active,
+        changes are rejected to preserve instrument stability.
+      operationId: addQuestions
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/QuestionCreateRequest"
+                - $ref: "#/components/schemas/QuestionCreateListRequest"
+      responses:
+        "201":
+          description: Questions created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionsCreatedResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/questionnaires/{template_id}/activate:
+    post:
+      tags: [Questionnaires]
+      summary: Activate a template
+      description: |
+        Activates a template and deactivates all others. Ensures exactly one
+        active template exists globally.
+      operationId: activateQuestionnaire
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Template activated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/questionnaires/active/clone:
+    post:
+      tags: [Questionnaires]
+      summary: Clone active template
+      description: |
+        Creates a new draft template by cloning the current active template.
+        Requires a new version string. The cloned template is not activated.
+      operationId: cloneActiveQuestionnaire
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionnaireCloneRequest"
+      responses:
+        "201":
+          description: Template cloned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionnaireCloneResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/evaluations:
+    post:
+      tags: [Evaluations]
+      summary: Create evaluation from active questionnaire
+      description: |
+        Creates an evaluation linked to the currently active questionnaire
+        template. Validates that all responses reference questions from the
+        active template.
+      operationId: createEvaluation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluationCreateRequest"
+      responses:
+        "201":
+          description: Evaluation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluationCreateResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
 components:
   parameters:
     CsrfHeader:
@@ -425,6 +686,11 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: Access token sent in the Authorization header.
+    mfaEnrollmentToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Short-lived token for MFA setup/confirm only (claim mfa_enrollment=true).
     cookieAuth:
       type: apiKey
       in: cookie
@@ -606,6 +872,26 @@ components:
         error:
           type: string
           example: mfa_required
+    MFAEnrollmentResponse:
+      type: object
+      properties:
+        mfa_enrollment_required:
+          type: boolean
+          example: true
+        enrollment_token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+          example: 600
+        msg:
+          type: string
+          example: MFA enrollment required
+        error:
+          type: string
+          example: mfa_enrollment_required
     LoginMFARequest:
       type: object
       description: Provide either code or recovery_code.
@@ -628,6 +914,42 @@ components:
         message:
           type: string
           example: logged out
+    UserProfileResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+        full_name:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+        mfa_enabled:
+          type: boolean
+        mfa_confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        mfa_method:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
     MFASetupResponse:
       type: object
       properties:
@@ -663,6 +985,249 @@ components:
         code:
           type: string
         recovery_code:
+          type: string
+    QuestionnaireTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+    QuestionItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        text:
+          type: string
+        response_type:
+          type: string
+          description: |
+            Tipos permitidos:
+            - likert_0_4: escala 0-4
+            - likert_1_5: escala 1-5
+            - boolean: 0/1
+            - frequency_0_3: 0=never,1=sometimes,2=often,3=always
+            - intensity_0_10: escala 0-10
+            - count: conteos (n veces)
+            - ordinal: escala ordinal codificada
+            - text_context: texto libre solo para contexto (no modelo)
+        disorder_id:
+          type: string
+          format: uuid
+          nullable: true
+        disorder_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Prefer this field for multi-disorder questions.
+        position:
+          type: integer
+          nullable: true
+        response_min:
+          type: number
+          nullable: true
+        response_max:
+          type: number
+          nullable: true
+        response_step:
+          type: number
+          nullable: true
+        response_options:
+          type: array
+          items:
+            oneOf:
+              - type: number
+              - type: string
+          nullable: true
+    ActiveQuestionnaireResponse:
+      type: object
+      properties:
+        questionnaire_template:
+          $ref: "#/components/schemas/QuestionnaireTemplate"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuestionItem"
+    QuestionnaireCreateRequest:
+      type: object
+      required: [name, version]
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+          nullable: true
+    QuestionnaireCloneRequest:
+      type: object
+      required: [version]
+      properties:
+        version:
+          type: string
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+    QuestionnaireCreateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: string
+    QuestionnaireCloneResponse:
+      type: object
+      properties:
+        template_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: string
+        is_active:
+          type: boolean
+        question_count:
+          type: integer
+    QuestionCreateRequest:
+      type: object
+      required: [code, text, response_type]
+      properties:
+        code:
+          type: string
+        text:
+          type: string
+        response_type:
+          type: string
+          enum:
+            - likert_0_4
+            - likert_1_5
+            - boolean
+            - frequency_0_3
+            - intensity_0_10
+            - count
+            - ordinal
+            - text_context
+          description: See QuestionItem.response_type for scale details.
+        disorder_id:
+          type: string
+          format: uuid
+          nullable: true
+        disorder_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+        position:
+          type: integer
+          nullable: true
+        response_min:
+          type: number
+          nullable: true
+        response_max:
+          type: number
+          nullable: true
+        response_step:
+          type: number
+          nullable: true
+        response_options:
+          type: array
+          items:
+            oneOf:
+              - type: number
+              - type: string
+          nullable: true
+    QuestionCreateListRequest:
+      type: array
+      items:
+        $ref: "#/components/schemas/QuestionCreateRequest"
+    QuestionsCreatedResponse:
+      type: object
+      properties:
+        template_id:
+          type: string
+          format: uuid
+        created:
+          type: integer
+    EvaluationResponseItem:
+      type: object
+      required: [question_id, value]
+      properties:
+        question_id:
+          type: string
+          format: uuid
+        value:
+          oneOf:
+            - type: number
+            - type: string
+      description: |
+        value debe respetar el tipo de la pregunta.
+        text_context se guarda como texto pero no se usa en el modelo.
+    EvaluationCreateRequest:
+      type: object
+      required: [age_at_evaluation, evaluation_date, status, responses]
+      properties:
+        subject_id:
+          type: string
+          format: uuid
+          nullable: true
+        age_at_evaluation:
+          type: integer
+        evaluation_date:
+          type: string
+          format: date
+        status:
+          type: string
+        is_anonymous:
+          type: boolean
+        context:
+          type: string
+          nullable: true
+        raw_symptoms:
+          type: object
+          nullable: true
+        processed_features:
+          type: object
+          nullable: true
+        access_key:
+          type: string
+          nullable: true
+        responses:
+          type: array
+          items:
+            $ref: "#/components/schemas/EvaluationResponseItem"
+    EvaluationCreateResponse:
+      type: object
+      properties:
+        evaluation_id:
+          type: string
+          format: uuid
+        registration_number:
+          type: string
+        questionnaire_template_id:
+          type: string
+          format: uuid
+        access_key:
           type: string
     PredictRequest:
       type: object

@@ -39,6 +39,7 @@ class Config:
 
     # MFA
     MFA_CHALLENGE_TTL = int(os.getenv("MFA_CHALLENGE_TTL", "300"))
+    MFA_ENROLL_TOKEN_TTL = int(os.getenv("MFA_ENROLL_TOKEN_TTL", "600"))
 
     # Logging / Metrics
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
