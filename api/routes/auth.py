@@ -1,4 +1,6 @@
 from datetime import datetime, timezone, timedelta
+import re
+import unicodedata
 import uuid
 
 from flask import Blueprint, current_app, jsonify, request
@@ -10,6 +12,7 @@ from flask_jwt_extended import (
     get_jwt_identity,
     jwt_required,
 )
+from flask_limiter.util import get_remote_address
 from sqlalchemy.exc import IntegrityError
 from api.extensions import limiter
 from api.security import (
@@ -30,6 +33,8 @@ from app.models import (
     UserMFA,
     RecoveryCode,
     MFALoginChallenge,
+    Role,
+    UserRole,
     db,
 )
 
@@ -72,8 +77,11 @@ def _build_auth_response(access_token: str):
     )
 
 
-def _error_response(message: str, error_code: str, status_code: int):
-    return jsonify({"msg": message, "error": error_code}), status_code
+def _error_response(message: str, error_code: str, status_code: int, details=None):
+    payload = {"msg": message, "error": error_code}
+    if details is not None:
+        payload["details"] = details
+    return jsonify(payload), status_code
 
 
 def _challenge_ttl_seconds() -> int:
@@ -90,37 +98,185 @@ def _enroll_ttl_seconds() -> int:
         return 600
 
 
-@auth_bp.route("/register", methods=["POST"])
-def register():
+_USER_TYPE_ALIASES = {
+    "guardian": "guardian",
+    "padre": "guardian",
+    "tutor": "guardian",
+    "padre_tutor": "guardian",
+    "parent_tutor": "guardian",
+    "psychologist": "psychologist",
+    "psicologo": "psychologist",
+}
+
+_USER_TYPE_ROLE = {
+    "guardian": "GUARDIAN",
+    "psychologist": "PSYCHOLOGIST",
+}
+
+_USERNAME_RE = re.compile(r"^[A-Za-z0-9._-]{3,32}$")
+_EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+_FULL_NAME_MAX = 120
+_EMAIL_MAX = 254
+_PASSWORD_MIN = 8
+
+
+def _normalize_user_type(raw: str | None) -> str | None:
+    if not raw:
+        return None
+    cleaned = unicodedata.normalize("NFKD", str(raw)).encode("ascii", "ignore").decode()
+    cleaned = cleaned.strip().lower()
+    cleaned = re.sub(r"[\s/\-]+", "_", cleaned)
+    cleaned = cleaned.strip("_")
+    return _USER_TYPE_ALIASES.get(cleaned)
+
+
+def _normalize_professional_card(raw: str | None) -> str | None:
+    if raw is None:
+        return None
+    card = str(raw).strip()
+    if not card:
+        return None
+    card = re.sub(r"\s+", "", card)
+    return card
+
+
+def _normalize_username(raw: str | None) -> str | None:
+    if not raw:
+        return None
+    return str(raw).strip()
+
+
+def _normalize_email(raw: str | None) -> str | None:
+    if not raw:
+        return None
+    return str(raw).strip().lower()
+
+
+def _is_valid_username(username: str) -> bool:
+    return bool(_USERNAME_RE.fullmatch(username or ""))
+
+
+def _is_valid_email(email: str) -> bool:
+    if not email or len(email) > _EMAIL_MAX:
+        return False
+    return bool(_EMAIL_RE.fullmatch(email))
+
+
+def _login_rate_key() -> str:
     data = request.get_json(silent=True) or {}
     username = data.get("username")
-    email = data.get("email")
-    password = data.get("password")
-    full_name = data.get("full_name")
+    if username:
+        return f"login:{str(username).strip()}"
+    return f"login_ip:{get_remote_address()}"
+
+
+def _mfa_rate_key() -> str:
+    data = request.get_json(silent=True) or {}
+    challenge_id = data.get("challenge_id")
+    if challenge_id:
+        return f"mfa:{str(challenge_id).strip()}"
+    return f"mfa_ip:{get_remote_address()}"
+
+
+@auth_bp.route("/register", methods=["POST"])
+@limiter.limit(lambda: current_app.config.get("REGISTER_RATE_LIMIT", "5 per 10 minutes"))
+def register():
+    data = request.get_json(silent=True) or {}
+    username = _normalize_username(data.get("username"))
+    email = _normalize_email(data.get("email"))
+    password = data.get("password") or ""
+    full_name = (data.get("full_name") or "").strip() or None
+    user_type = _normalize_user_type(data.get("user_type"))
+    professional_card_number = _normalize_professional_card(
+        data.get("professional_card_number") or data.get("colpsic_card_number")
+    )
 
     if not username or not email or not password:
         return _error_response("Missing username, email or password", "missing_fields", 400)
 
-    if len(password) < 8:
-        return _error_response("Password must be at least 8 characters", "weak_password", 400)
+    if not _is_valid_username(username):
+        return _error_response(
+            "Invalid username format",
+            "invalid_username",
+            400,
+        )
+
+    if not _is_valid_email(email):
+        return _error_response("Invalid email format", "invalid_email", 400)
+
+    if len(password) < _PASSWORD_MIN:
+        return _error_response(
+            f"Password must be at least {_PASSWORD_MIN} characters",
+            "weak_password",
+            400,
+        )
+
+    if full_name and len(full_name) > _FULL_NAME_MAX:
+        return _error_response("Full name too long", "invalid_full_name", 400)
+
+    if not user_type:
+        return _error_response("Missing or invalid user_type", "invalid_user_type", 400)
+
+    if user_type == "psychologist" and not professional_card_number:
+        return _error_response(
+            "Missing professional card number",
+            "missing_professional_card",
+            400,
+        )
+
+    if professional_card_number and not re.fullmatch(r"[A-Za-z0-9-]{4,32}", professional_card_number):
+        return _error_response(
+            "Invalid professional card number format",
+            "invalid_professional_card",
+            400,
+        )
 
     if AppUser.query.filter(
         (AppUser.username == username) | (AppUser.email == email)
     ).first():
         return _error_response("Username or email already exists", "user_exists", 400)
 
+    if professional_card_number and AppUser.query.filter_by(
+        professional_card_number=professional_card_number
+    ).first():
+        return _error_response(
+            "Professional card number already exists",
+            "professional_card_exists",
+            409,
+        )
+
+    role_name = _USER_TYPE_ROLE.get(user_type)
+    if not role_name:
+        return _error_response("Invalid user_type", "invalid_user_type", 400)
+
     hashed = hash_password(password)
     new_user = AppUser(
-        username=username, email=email, password=hashed, full_name=full_name
+        username=username,
+        email=email,
+        password=hashed,
+        full_name=full_name,
+        user_type=user_type,
+        professional_card_number=professional_card_number,
     )
 
     try:
+        role = Role.query.filter_by(name=role_name).first()
+        if not role:
+            role = Role(name=role_name, description=f"Auto-created role for {user_type} registration")
+            db.session.add(role)
+            db.session.flush()
         db.session.add(new_user)
+        db.session.flush()
+        db.session.add(UserRole(user_id=new_user.id, role_id=role.id))
         db.session.commit()
     except IntegrityError as e:
         db.session.rollback()
         current_app.logger.warning("Integrity error on register for %s/%s: %s", username, email, e)
-        return jsonify({"msg": "Username or email already exists"}), 400
+        return _error_response(
+            "Username, email or professional card already exists",
+            "user_exists",
+            400,
+        )
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Unexpected error on register: %s", e, exc_info=True)
@@ -131,16 +287,36 @@ def register():
 
 
 @auth_bp.route("/login", methods=["POST"])
-@limiter.limit("5 per 15 minutes")
+@limiter.limit(lambda: current_app.config.get("LOGIN_RATE_LIMIT", "5 per 15 minutes"), key_func=_login_rate_key)
 def login():
     data = request.get_json(silent=True) or {}
-    username = data.get("username")
-    password = data.get("password")
+    username = _normalize_username(data.get("username"))
+    password = data.get("password") or ""
 
     if not username or not password:
         return _error_response("Missing credentials", "missing_credentials", 400)
 
+    if not _is_valid_username(username):
+        return _error_response("Invalid username format", "invalid_username", 400)
+
     user = AppUser.query.filter_by(username=username).first()
+    if user:
+        now = datetime.now(timezone.utc)
+        if user.login_locked_until:
+            locked_until = user.login_locked_until
+            if locked_until.tzinfo is None:
+                locked_until = locked_until.replace(tzinfo=timezone.utc)
+            if locked_until > now:
+                retry_after = int((locked_until - now).total_seconds())
+                return _error_response(
+                    "Account locked due to failed attempts",
+                    "account_locked",
+                    423,
+                    {"retry_after_seconds": retry_after},
+                )
+            user.login_locked_until = None
+            user.failed_login_attempts = 0
+
     if not user or not check_password(password, user.password):
         log_audit(
             user.id if user else None,
@@ -148,6 +324,19 @@ def login():
             "auth",
             f"Failed login for: {username}",
         )
+        if user:
+            try:
+                user.failed_login_attempts = (user.failed_login_attempts or 0) + 1
+                user.last_failed_login_at = datetime.now(timezone.utc)
+                max_attempts = int(current_app.config.get("MAX_LOGIN_ATTEMPTS", 5))
+                if user.failed_login_attempts >= max_attempts:
+                    lock_minutes = int(current_app.config.get("LOGIN_LOCKOUT_MINUTES", 15))
+                    user.login_locked_until = datetime.now(timezone.utc) + timedelta(minutes=lock_minutes)
+                db.session.add(user)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                current_app.logger.error("Failed to update login attempts for %s: %s", username, e, exc_info=True)
         return _error_response("Invalid credentials", "invalid_credentials", 401)
 
     if not user.is_active:
@@ -225,7 +414,11 @@ def login():
     )
 
     try:
+        user.failed_login_attempts = 0
+        user.last_failed_login_at = None
+        user.login_locked_until = None
         db.session.add_all([db_refresh_token, user_session])
+        db.session.add(user)
         db.session.commit()
     except Exception as e:
         db.session.rollback()
@@ -239,7 +432,7 @@ def login():
 
 
 @auth_bp.route("/login/mfa", methods=["POST"])
-@limiter.limit("3 per 10 minutes")
+@limiter.limit(lambda: current_app.config.get("LOGIN_MFA_RATE_LIMIT", "5 per 10 minutes"), key_func=_mfa_rate_key)
 def login_mfa():
     data = request.get_json(silent=True) or {}
     challenge_raw = data.get("challenge_id")
@@ -293,7 +486,13 @@ def login_mfa():
         valid = True
         user_mfa.last_used_at = datetime.now(timezone.utc)
     elif recovery_code:
-        recovery_entries = RecoveryCode.query.filter_by(user_id=user.id, used_at=None).all()
+        max_days = int(current_app.config.get("RECOVERY_CODE_MAX_AGE_DAYS", 90))
+        cutoff = datetime.now(timezone.utc) - timedelta(days=max_days)
+        recovery_entries = (
+            RecoveryCode.query.filter_by(user_id=user.id, used_at=None)
+            .filter(RecoveryCode.created_at >= cutoff)
+            .all()
+        )
         for entry in recovery_entries:
             if check_password(recovery_code, entry.code_hash):
                 entry.used_at = datetime.now(timezone.utc)
@@ -395,6 +594,7 @@ def refresh():
         db.session.commit()
     except Exception:
         db.session.rollback()
+        current_app.logger.error("Database error on refresh for user %s", identity, exc_info=True)
         return jsonify({"msg": "Database error"}), 500
 
     response = _build_auth_response(new_access_token)
@@ -413,7 +613,12 @@ def logout():
         return _error_response("Missing or invalid CSRF token", "csrf_failed", 403)
 
     # Revoke all refresh tokens for this user (logout all sessions)
-    RefreshToken.query.filter_by(user_id=identity, revoked=False).update({"revoked": True})
+    try:
+        RefreshToken.query.filter_by(user_id=identity, revoked=False).update({"revoked": True})
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Database error revoking refresh tokens for %s: %s", identity, e, exc_info=True)
+        return jsonify({"msg": "Database error"}), 500
 
     last_session = (
         UserSession.query.filter_by(user_id=identity, ended_at=None)
@@ -462,6 +667,8 @@ def me():
                 "username": user.username,
                 "email": user.email,
                 "full_name": user.full_name,
+                "user_type": user.user_type,
+                "professional_card_number": user.professional_card_number,
                 "is_active": user.is_active,
                 "roles": _get_roles(user),
                 "mfa_enabled": user.mfa_enabled,
