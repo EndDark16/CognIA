@@ -35,20 +35,37 @@ WORKERS=${GUNICORN_WORKERS:-${WEB_CONCURRENCY:-$DEFAULT_WORKERS}}
 THREADS=${GUNICORN_THREADS:-$DEFAULT_THREADS}
 BIND="0.0.0.0:${PORT:-5000}"
 
-echo "==> Esperando base de datos y aplicando migraciones..."
-RETRIES=${DB_RETRIES:-10}
-SLEEP=${DB_RETRY_SLEEP:-3}
-COUNT=0
-until alembic upgrade head; do
-  COUNT=$((COUNT + 1))
-  if [ "$COUNT" -ge "$RETRIES" ]; then
-    echo "!! No se pudo aplicar migraciones despuÃ©s de $RETRIES intentos"
-    exit 1
+should_run_migrations() {
+  local run_flag="${RUN_MIGRATIONS:-1}"
+  local skip_flag="${SKIP_MIGRATIONS:-0}"
+
+  if [[ "$skip_flag" =~ ^(1|true|TRUE|yes|YES)$ ]]; then
+    return 1
   fi
-  echo "Reintentando migraciones en ${SLEEP}s..."
-  sleep "$SLEEP"
-done
-echo "==> Migraciones listas."
+  if [[ "$run_flag" =~ ^(0|false|FALSE|no|NO)$ ]]; then
+    return 1
+  fi
+  return 0
+}
+
+if should_run_migrations; then
+  echo "==> Esperando base de datos y aplicando migraciones..."
+  RETRIES=${DB_RETRIES:-10}
+  SLEEP=${DB_RETRY_SLEEP:-3}
+  COUNT=0
+  until alembic upgrade head; do
+    COUNT=$((COUNT + 1))
+    if [ "$COUNT" -ge "$RETRIES" ]; then
+      echo "!! No se pudo aplicar migraciones despues de $RETRIES intentos"
+      exit 1
+    fi
+    echo "Reintentando migraciones en ${SLEEP}s..."
+    sleep "$SLEEP"
+  done
+  echo "==> Migraciones listas."
+else
+  echo "==> Migraciones deshabilitadas (RUN_MIGRATIONS=false o SKIP_MIGRATIONS=true)."
+fi
 
 echo "==> Iniciando Gunicorn en ${BIND} con ${WORKERS} workers y ${THREADS} threads"
 exec gunicorn -w "$WORKERS" --threads "$THREADS" -b "$BIND" run:app

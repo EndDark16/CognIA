@@ -44,6 +44,8 @@ tags:
     description: Registration, login, refresh, and logout using JWT in cookies.
   - name: MFA
     description: TOTP setup, confirmation, recovery codes, and disable.
+  - name: Users
+    description: Admin user management.
   - name: Questionnaires
     description: Questionnaire templates and active template retrieval.
   - name: Evaluations
@@ -159,6 +161,9 @@ paths:
       description: |
         Creates a new user account. Username and email must be unique.
         Password must be at least 8 characters.
+        user_type must be guardian or psychologist. If psychologist, provide
+        professional_card_number (COLPSIC).
+        Username is case-sensitive and must match ^[A-Za-z0-9._-]{3,32}$.
       operationId: register
       requestBody:
         required: true
@@ -670,6 +675,168 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
+  /api/v1/users:
+    get:
+      tags: [Users]
+      summary: List users (admin)
+      description: Paginated list of users. Requires ADMIN role.
+      operationId: listUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+          required: false
+        - in: query
+          name: page_size
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          required: false
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [Users]
+      summary: Create user (admin)
+      description: Create a new user with optional roles. Requires ADMIN role.
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserItem"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/users/{user_id}:
+    get:
+      tags: [Users]
+      summary: Get user (admin)
+      operationId: getUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserItem"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Users]
+      summary: Update user (admin)
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateRequest"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserItem"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    delete:
+      tags: [Users]
+      summary: Deactivate user (admin)
+      operationId: deactivateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User deactivated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
 components:
   parameters:
     CsrfHeader:
@@ -811,13 +978,17 @@ components:
           example: not_ready
     RegisterRequest:
       type: object
-      required: [username, email, password]
+      required: [username, email, password, user_type]
       properties:
         username:
           type: string
+          minLength: 3
+          maxLength: 32
+          pattern: "^[A-Za-z0-9._-]{3,32}$"
           example: testuser
         email:
           type: string
+          maxLength: 254
           example: test@example.com
         password:
           type: string
@@ -826,6 +997,15 @@ components:
         full_name:
           type: string
           example: Test User
+        user_type:
+          type: string
+          enum: [guardian, psychologist]
+          description: guardian=padre/tutor, psychologist=psicologo
+          example: guardian
+        professional_card_number:
+          type: string
+          description: Required when user_type=psychologist (COLPSIC)
+          example: "123456"
     RegisterResponse:
       type: object
       properties:
@@ -927,6 +1107,12 @@ components:
         full_name:
           type: string
           nullable: true
+        user_type:
+          type: string
+          nullable: true
+        professional_card_number:
+          type: string
+          nullable: true
         is_active:
           type: boolean
         roles:
@@ -950,6 +1136,107 @@ components:
           type: string
           format: date-time
           nullable: true
+    UserItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+        full_name:
+          type: string
+          nullable: true
+        user_type:
+          type: string
+        professional_card_number:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    UserListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserItem"
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total:
+          type: integer
+    UserCreateRequest:
+      type: object
+      required: [username, email, password, user_type]
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 32
+          pattern: "^[A-Za-z0-9._-]{3,32}$"
+        email:
+          type: string
+          maxLength: 254
+        password:
+          type: string
+          format: password
+          minLength: 8
+        full_name:
+          type: string
+          nullable: true
+        user_type:
+          type: string
+          enum: [guardian, psychologist]
+        professional_card_number:
+          type: string
+          nullable: true
+        roles:
+          type: array
+          items:
+            type: string
+          nullable: true
+        is_active:
+          type: boolean
+    UserUpdateRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          format: password
+        full_name:
+          type: string
+          nullable: true
+        user_type:
+          type: string
+          enum: [guardian, psychologist]
+        professional_card_number:
+          type: string
+          nullable: true
+        roles:
+          type: array
+          items:
+            type: string
+          nullable: true
+        is_active:
+          type: boolean
     MFASetupResponse:
       type: object
       properties:
@@ -1114,8 +1401,11 @@ components:
       properties:
         code:
           type: string
+          pattern: "^[A-Za-z0-9_-]{2,64}$"
         text:
           type: string
+          minLength: 3
+          maxLength: 500
         response_type:
           type: string
           enum:
@@ -1193,11 +1483,14 @@ components:
           nullable: true
         age_at_evaluation:
           type: integer
+          minimum: 6
+          maximum: 11
         evaluation_date:
           type: string
           format: date
         status:
           type: string
+          enum: [draft, submitted, completed]
         is_anonymous:
           type: boolean
         context:

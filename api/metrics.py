@@ -46,9 +46,17 @@ def metrics():
         return jsonify({"msg": "Metrics disabled"}), 404
 
     token = current_app.config.get("METRICS_TOKEN")
-    if token:
-        auth = request.headers.get("Authorization", "")
-        if auth != f"Bearer {token}":
-            return jsonify({"msg": "Unauthorized"}), 401
+    token_required = current_app.config.get("METRICS_TOKEN_REQUIRED", False)
+    if token_required and not token:
+        return jsonify({"msg": "Metrics token not configured", "error": "metrics_token_required"}), 500
 
-    return jsonify(_snapshot_metrics()), 200
+    if token or token_required:
+        auth = request.headers.get("Authorization", "")
+        if not token or auth != f"Bearer {token}":
+            return jsonify({"msg": "Unauthorized", "error": "unauthorized"}), 401
+
+    try:
+        return jsonify(_snapshot_metrics()), 200
+    except Exception:
+        current_app.logger.error("Metrics snapshot failed", exc_info=True)
+        return jsonify({"msg": "Metrics error", "error": "metrics_error"}), 500

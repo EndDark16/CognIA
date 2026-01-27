@@ -60,6 +60,10 @@ def _validate_question_constraints(item):
         return "response_step_invalid"
     if response_options is not None and not isinstance(response_options, list):
         return "response_options_invalid"
+    if response_options is not None and isinstance(response_options, list) and len(response_options) == 0:
+        return "response_options_empty"
+    if response_type == "ordinal" and not response_options:
+        return "response_options_required_for_ordinal"
     return None
 
 
@@ -282,6 +286,8 @@ def activate_questionnaire(template_id):
     template = QuestionnaireTemplate.query.filter_by(id=template_uuid).first()
     if not template:
         return _error_response("Template not found", "template_not_found", 404)
+    if Question.query.filter_by(questionnaire_id=template.id).count() == 0:
+        return _error_response("Template has no questions", "template_empty", 409)
 
     try:
         deactivate_all_templates()
