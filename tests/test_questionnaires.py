@@ -36,7 +36,7 @@ def _admin_token(client, app):
     password = "StrongPassword123!"
     client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "Admin"},
+        json={"username": username, "email": email, "password": password, "full_name": "Admin", "user_type": "guardian"},
     )
     with app.app_context():
         role = Role(name="ADMIN")
@@ -91,6 +91,18 @@ def test_activate_template_disables_others(client, app):
     template_a = resp_a.json["id"]
     template_b = resp_b.json["id"]
 
+    payload = [{"code": "Q1", "text": "Question 1", "response_type": "likert_0_4", "position": 1}]
+    client.post(
+        f"/api/v1/questionnaires/{template_a}/questions",
+        json=payload,
+        headers=headers,
+    )
+    client.post(
+        f"/api/v1/questionnaires/{template_b}/questions",
+        json=payload,
+        headers=headers,
+    )
+
     resp_activate_a = client.post(
         f"/api/v1/questionnaires/{template_a}/activate",
         headers=headers,
@@ -143,6 +155,24 @@ def test_get_active_returns_sorted_questions(client, app):
     assert resp_active.status_code == 200
     codes = [q["code"] for q in resp_active.json["questions"]]
     assert codes == ["Q1", "Q2", "Q3"]
+
+
+def test_activate_without_questions_rejected(client, app):
+    token = _admin_token(client, app)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    resp = client.post(
+        "/api/v1/questionnaires",
+        json={"name": "Template Empty", "version": "v1", "description": None},
+        headers=headers,
+    )
+    template_id = resp.json["id"]
+
+    resp_activate = client.post(
+        f"/api/v1/questionnaires/{template_id}/activate",
+        headers=headers,
+    )
+    assert resp_activate.status_code == 409
 
 
 def test_clone_active_template_creates_draft(client, app):

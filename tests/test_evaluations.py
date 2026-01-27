@@ -36,7 +36,7 @@ def _admin_token(client, app):
     password = "StrongPassword123!"
     client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "Admin"},
+        json={"username": username, "email": email, "password": password, "full_name": "Admin", "user_type": "guardian"},
     )
     with app.app_context():
         role = Role(name="ADMIN")
@@ -77,7 +77,7 @@ def _user_token(client):
     password = "StrongPassword123!"
     client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "User"},
+        json={"username": username, "email": email, "password": password, "full_name": "User", "user_type": "guardian"},
     )
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
     return resp_login.json["access_token"]
@@ -158,6 +158,27 @@ def test_create_evaluation_rejects_invalid_question(client, app):
             "evaluation_date": "2025-01-02",
             "status": "submitted",
             "responses": [{"question_id": bad_question_id, "value": "1"}],
+        },
+        headers=headers,
+    )
+    assert resp_eval.status_code == 400
+
+
+def test_create_evaluation_rejects_age_out_of_range(client, app):
+    _create_active_template(client, app)
+    token = _user_token(client)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    resp_active = client.get("/api/v1/questionnaires/active")
+    question_ids = [q["id"] for q in resp_active.json["questions"]]
+
+    resp_eval = client.post(
+        "/api/v1/evaluations",
+        json={
+            "age_at_evaluation": 3,
+            "evaluation_date": "2025-01-02",
+            "status": "submitted",
+            "responses": [{"question_id": question_ids[0], "value": "1"}],
         },
         headers=headers,
     )
