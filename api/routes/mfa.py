@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
@@ -25,6 +25,7 @@ from api.security import (
 )
 from api.routes.auth import _parse_identity, _error_response
 from flask import current_app
+from api.extensions import limiter
 
 mfa_bp = Blueprint("mfa", __name__, url_prefix="/api/mfa")
 
@@ -40,13 +41,16 @@ def _validate_challenge(challenge_id: str, user_id) -> MFALoginChallenge | None:
 
 @mfa_bp.route("/setup", methods=["POST"])
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("MFA_SETUP_RATE_LIMIT", "3 per 10 minutes"))
 def mfa_setup():
     identity = _parse_identity(get_jwt_identity())
     if not identity:
-        return jsonify({"msg": "Invalid user"}), 401
+        return _error_response("Invalid user", "invalid_user", 401)
     user = db.session.get(AppUser, identity)
     if not user:
         return _error_response("User not found", "user_not_found", 404)
+    if not user.is_active:
+        return _error_response("Account inactive", "inactive_account", 403)
     if user.mfa_enabled:
         return _error_response("MFA already enabled", "mfa_already_enabled", 409)
 
@@ -59,7 +63,12 @@ def mfa_setup():
     else:
         existing.secret_encrypted = secret_enc
         existing.method = "totp"
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Database error on MFA setup for %s: %s", identity, e, exc_info=True)
+        return _error_response("Database error", "db_error", 500)
 
     uri = build_totp_uri(secret, user.username, issuer="CogniaApp")
     resp = {"otpauth_uri": uri}
@@ -71,6 +80,7 @@ def mfa_setup():
 
 @mfa_bp.route("/confirm", methods=["POST"])
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("MFA_CONFIRM_RATE_LIMIT", "5 per 10 minutes"))
 def mfa_confirm():
     identity = _parse_identity(get_jwt_identity())
     if not identity:
@@ -83,6 +93,8 @@ def mfa_confirm():
     user = db.session.get(AppUser, identity)
     if not user:
         return _error_response("User not found", "user_not_found", 404)
+    if not user.is_active:
+        return _error_response("Account inactive", "inactive_account", 403)
     user_mfa = UserMFA.query.filter_by(user_id=identity).first()
     if not user_mfa:
         return _error_response("MFA not initialized", "mfa_not_initialized", 400)
@@ -102,13 +114,19 @@ def mfa_confirm():
         rc = RecoveryCode(user_id=identity, code_hash=hash_password(c))
         db.session.add(rc)
 
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Database error on MFA confirm for %s: %s", identity, e, exc_info=True)
+        return _error_response("Database error", "db_error", 500)
     log_audit(identity, "MFA_ENABLED", "auth", "MFA enabled")
     return jsonify({"recovery_codes": codes_plain}), 200
 
 
 @mfa_bp.route("/disable", methods=["POST"])
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("MFA_DISABLE_RATE_LIMIT", "3 per 10 minutes"))
 def mfa_disable():
     identity = _parse_identity(get_jwt_identity())
     if not identity:
@@ -123,6 +141,8 @@ def mfa_disable():
     user = db.session.get(AppUser, identity)
     if not user:
         return _error_response("User not found", "user_not_found", 404)
+    if not user.is_active:
+        return _error_response("Account inactive", "inactive_account", 403)
     if not check_password(password or "", user.password):
         return _error_response("Invalid credentials", "invalid_credentials", 401)
     if not user.mfa_enabled:
@@ -137,7 +157,13 @@ def mfa_disable():
         if not validate_totp(secret, code):
             return _error_response("Invalid code", "invalid_mfa_code", 401)
     elif recovery:
-        rc = RecoveryCode.query.filter_by(user_id=identity, used_at=None).all()
+        max_days = int(current_app.config.get("RECOVERY_CODE_MAX_AGE_DAYS", 90))
+        cutoff = datetime.now(timezone.utc) - timedelta(days=max_days)
+        rc = (
+            RecoveryCode.query.filter_by(user_id=identity, used_at=None)
+            .filter(RecoveryCode.created_at >= cutoff)
+            .all()
+        )
         ok = False
         for item in rc:
             if check_password(recovery, item.code_hash):
@@ -158,7 +184,12 @@ def mfa_disable():
     # revoke refresh tokens
     RefreshToken.query.filter_by(user_id=identity, revoked=False).update({"revoked": True})
     MFALoginChallenge.query.filter_by(user_id=identity, used_at=None).update({"used_at": datetime.now(timezone.utc)})
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Database error on MFA disable for %s: %s", identity, e, exc_info=True)
+        return _error_response("Database error", "db_error", 500)
     log_audit(identity, "MFA_DISABLED", "auth", "MFA disabled")
     response = jsonify({"msg": "MFA disabled"})
     clear_auth_cookies(response)

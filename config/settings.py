@@ -40,6 +40,23 @@ class Config:
     # MFA
     MFA_CHALLENGE_TTL = int(os.getenv("MFA_CHALLENGE_TTL", "300"))
     MFA_ENROLL_TOKEN_TTL = int(os.getenv("MFA_ENROLL_TOKEN_TTL", "600"))
+    RECOVERY_CODE_MAX_AGE_DAYS = int(os.getenv("RECOVERY_CODE_MAX_AGE_DAYS", "90"))
+
+    # Auth hardening
+    MAX_LOGIN_ATTEMPTS = int(os.getenv("MAX_LOGIN_ATTEMPTS", "5"))
+    LOGIN_LOCKOUT_MINUTES = int(os.getenv("LOGIN_LOCKOUT_MINUTES", "15"))
+    REGISTER_RATE_LIMIT = os.getenv("REGISTER_RATE_LIMIT", "5 per 10 minutes")
+    LOGIN_RATE_LIMIT = os.getenv("LOGIN_RATE_LIMIT", "5 per 15 minutes")
+    LOGIN_MFA_RATE_LIMIT = os.getenv("LOGIN_MFA_RATE_LIMIT", "5 per 10 minutes")
+    MFA_SETUP_RATE_LIMIT = os.getenv("MFA_SETUP_RATE_LIMIT", "3 per 10 minutes")
+    MFA_CONFIRM_RATE_LIMIT = os.getenv("MFA_CONFIRM_RATE_LIMIT", "5 per 10 minutes")
+    MFA_DISABLE_RATE_LIMIT = os.getenv("MFA_DISABLE_RATE_LIMIT", "3 per 10 minutes")
+
+    # Evaluations
+    EVALUATION_MIN_AGE = int(os.getenv("EVALUATION_MIN_AGE", "6"))
+    EVALUATION_MAX_AGE = int(os.getenv("EVALUATION_MAX_AGE", "11"))
+    _allowed_status = os.getenv("EVALUATION_ALLOWED_STATUSES", "draft,submitted,completed")
+    EVALUATION_ALLOWED_STATUSES = [s.strip() for s in _allowed_status.split(",") if s.strip()]
 
     # Logging / Metrics
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
@@ -53,6 +70,7 @@ class Config:
 
     METRICS_ENABLED = os.getenv("METRICS_ENABLED", "true").lower() == "true"
     METRICS_TOKEN = os.getenv("METRICS_TOKEN")
+    METRICS_TOKEN_REQUIRED = os.getenv("METRICS_TOKEN_REQUIRED", "false").lower() == "true"
 
     SWAGGER_ENABLED = os.getenv("SWAGGER_ENABLED", "true").lower() == "true"
 
@@ -83,3 +101,4 @@ class TestingConfig(Config):
     # Usa SQLite en memoria para no tocar la base real durante pruebas
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     LOG_REQUESTS = False
+    RATELIMIT_ENABLED = False

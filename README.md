@@ -35,6 +35,7 @@ HTTP POST /api/predict
 - Autenticacion JWT (Access/Refresh Tokens) y RBAC implementados.
 - Base de usuarios y sesiones en PostgreSQL.
 - Hash de contraseñas con bcrypt.
+- Validaciones de registro (formato de email/username) y bloqueo temporal por intentos fallidos de login.
 
 ### Gestion de evaluaciones
 - El endpoint disponible procesa una evaluacion simulada via POST /api/predict y retorna probabilidades de riesgo (actualmente TDAH). Campos requeridos: age, sex, conners_inattention_score, conners_hyperactivity, cbcl_attention_score, sleep_problems. No se almacenan datos; se espera uso anonimo/simulado.
@@ -150,15 +151,32 @@ cognia_app/
    # DB_SSL_MODE=require
    MFA_ENCRYPTION_KEY=base64-urlsafe-32bytes-key
    MFA_ENROLL_TOKEN_TTL=600
-   # Migraciones (rol db_migrator)
-   # MIGRATION_DB_USER=db_migrator
-   # MIGRATION_DB_PASSWORD=your_migrator_password
-   # Logging/Metrics
-   # LOG_LEVEL=INFO
-   # LOG_REQUESTS=true
-   # LOG_EXCLUDE_PATHS=/healthz,/readyz,/metrics
-   # METRICS_ENABLED=true
-   # METRICS_TOKEN=un_token_opcional
+  # Migraciones (rol db_migrator)
+  # MIGRATION_DB_USER=db_migrator
+  # MIGRATION_DB_PASSWORD=your_migrator_password
+  # RUN_MIGRATIONS=false   # opcional: deshabilita migraciones en arranque (Render)
+  # Logging/Metrics
+  # LOG_LEVEL=INFO
+  # LOG_REQUESTS=true
+  # LOG_EXCLUDE_PATHS=/healthz,/readyz,/metrics
+  # METRICS_ENABLED=true
+  # METRICS_TOKEN=un_token_opcional
+  # METRICS_TOKEN_REQUIRED=false
+  # Auth hardening
+  # MAX_LOGIN_ATTEMPTS=5
+  # LOGIN_LOCKOUT_MINUTES=15
+  # RECOVERY_CODE_MAX_AGE_DAYS=90
+  # Rate limits
+  # REGISTER_RATE_LIMIT=5 per 10 minutes
+  # LOGIN_RATE_LIMIT=5 per 15 minutes
+  # LOGIN_MFA_RATE_LIMIT=5 per 10 minutes
+  # MFA_SETUP_RATE_LIMIT=3 per 10 minutes
+  # MFA_CONFIRM_RATE_LIMIT=5 per 10 minutes
+  # MFA_DISABLE_RATE_LIMIT=3 per 10 minutes
+  # Evaluations
+  # EVALUATION_MIN_AGE=6
+  # EVALUATION_MAX_AGE=11
+  # EVALUATION_ALLOWED_STATUSES=draft,submitted,completed
    # RATE_LIMIT_STORAGE_URI=redis://localhost:6379/0   # opcional, para rate limiting profesional
    # Startup
    # AUTO_CREATE_REFRESH_TOKEN_TABLE=false
@@ -283,8 +301,9 @@ Instrucciones rapidas para probar la autenticacion (ajusta la URL si es necesari
 ```bash
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"username":"testuser","email":"t@t.com","password":"P4ssw0rd!","full_name":"Test User"}'
+  -d '{"username":"testuser","email":"t@t.com","password":"P4ssw0rd!","full_name":"Test User","user_type":"guardian"}'
 ```
+-> Nota: si `user_type` es `psychologist`, debes enviar `professional_card_number` (Tarjeta Profesional COLPSIC).
 
 ### Login
 ```bash
@@ -334,6 +353,19 @@ curl -X POST http://localhost:5000/api/mfa/confirm \
 ```
 -> Devuelve recovery codes (guárdalos en un lugar seguro, se entregan una sola vez).
 
+### Administracion de usuarios (RBAC)
+Requiere rol `ADMIN` (Bearer access token).
+
+- Listar usuarios: `GET /api/v1/users?page=1&page_size=20`
+- Obtener usuario: `GET /api/v1/users/{user_id}`
+- Crear usuario: `POST /api/v1/users`
+- Actualizar usuario: `PATCH /api/v1/users/{user_id}`
+- Desactivar usuario (soft delete): `DELETE /api/v1/users/{user_id}`
+
+Notas:
+- `user_type` es obligatorio en alta. Si es `psychologist`, debes enviar `professional_card_number`.
+- `roles` es opcional; si se envia, se reemplaza el set de roles del usuario.
+
 ## Despliegue en Docker
 
 ### Build local
@@ -360,6 +392,7 @@ docker compose up --build
 ```
 - Servicio `db`: Postgres 16 con credenciales de `DB_USER/DB_PASSWORD/DB_NAME`.
 - Servicio `app`: expone puerto 5000, aplica migraciones Alembic al arrancar y lanza Gunicorn. Por defecto usa `DB_HOST=host.docker.internal` para conectar a tu Postgres del host. Si quieres usar el Postgres del compose, exporta `DB_HOST=db` antes de levantar.
+  - Para evitar migraciones automáticas (p. ej. en Render), define `RUN_MIGRATIONS=false` o `SKIP_MIGRATIONS=true`.
 
 ### Notas de seguridad en contenedores
 - No incluyas `.env` en la imagen (está en `.dockerignore`).
