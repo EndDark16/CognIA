@@ -1,0 +1,8 @@
+Hola{% if full_name %} {{ full_name }}{% endif %},
+
+Te damos la bienvenida a CognIA. Desde aquí podrás gestionar evaluaciones y acceder a reportes
+de manera segura y ordenada.
+
+Si tienes preguntas, responde a este correo o contacta al equipo administrador.
+
+Este mensaje fue enviado automáticamente. Evita compartir tus credenciales con terceros.

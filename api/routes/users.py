@@ -9,6 +9,7 @@ from marshmallow import ValidationError, Schema, fields, validate
 
 from api.decorators import roles_required
 from api.security import hash_password, log_audit
+from api.services.email_service import send_welcome_email
 from api.routes.auth import (
     _normalize_user_type,
     _normalize_professional_card,
@@ -208,6 +209,10 @@ def create_user():
         return _error_response("Database error", "db_error", 500)
 
     log_audit(user.id, "USER_CREATED", "users", {"user_id": str(user.id)})
+    try:
+        send_welcome_email(to_email=user.email, full_name=user.full_name)
+    except Exception:
+        current_app.logger.error("Failed to schedule welcome email for %s", user.email, exc_info=True)
     return jsonify(_user_payload(user)), 201
 
 

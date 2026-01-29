@@ -72,6 +72,20 @@ class Config:
     METRICS_TOKEN = os.getenv("METRICS_TOKEN")
     METRICS_TOKEN_REQUIRED = os.getenv("METRICS_TOKEN_REQUIRED", "false").lower() == "true"
 
+    # Email (SMTP)
+    EMAIL_ENABLED = os.getenv("EMAIL_ENABLED", "false").lower() == "true"
+    EMAIL_SEND_ASYNC = os.getenv("EMAIL_SEND_ASYNC", "true").lower() == "true"
+    EMAIL_FROM = os.getenv("EMAIL_FROM", "no-reply@example.com")
+    EMAIL_REPLY_TO = os.getenv("EMAIL_REPLY_TO")
+    EMAIL_LIST_UNSUBSCRIBE = os.getenv("EMAIL_LIST_UNSUBSCRIBE")
+    SMTP_HOST = os.getenv("SMTP_HOST")
+    SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USER = os.getenv("SMTP_USER")
+    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+    SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() == "true"
+    SMTP_USE_SSL = os.getenv("SMTP_USE_SSL", "false").lower() == "true"
+    SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", "10"))
+
     SWAGGER_ENABLED = os.getenv("SWAGGER_ENABLED", "true").lower() == "true"
 
     # Startup behavior
@@ -102,3 +116,4 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     LOG_REQUESTS = False
     RATELIMIT_ENABLED = False
+    EMAIL_ENABLED = False
