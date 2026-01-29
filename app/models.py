@@ -353,6 +353,19 @@ class EmailLog(db.Model):
     updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 
+class EmailDeliveryLog(db.Model):
+    __tablename__ = "email_delivery_log"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    template = db.Column(db.Text, nullable=False)
+    recipient_email = db.Column(db.Text, nullable=False)
+    subject = db.Column(db.Text, nullable=False)
+    status = db.Column(db.Text, nullable=False)
+    error_message = db.Column(db.Text)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
+    sent_at = db.Column(db.DateTime(timezone=True))
+
+
 class PsychologistFeedback(db.Model):
     __tablename__ = "psychologist_feedback"
 

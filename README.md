@@ -162,6 +162,19 @@ cognia_app/
   # METRICS_ENABLED=true
   # METRICS_TOKEN=un_token_opcional
   # METRICS_TOKEN_REQUIRED=false
+  # Email (SMTP)
+  # EMAIL_ENABLED=false
+  # EMAIL_SEND_ASYNC=true
+  # EMAIL_FROM="CognIA <no-reply@tu-dominio.com>"
+  # EMAIL_REPLY_TO="soporte@tu-dominio.com"
+  # EMAIL_LIST_UNSUBSCRIBE="<mailto:unsubscribe@tu-dominio.com>"
+  # SMTP_HOST=smtp.tu-proveedor.com
+  # SMTP_PORT=587
+  # SMTP_USER=tu_usuario
+  # SMTP_PASSWORD=tu_password
+  # SMTP_USE_TLS=true
+  # SMTP_USE_SSL=false
+  # SMTP_TIMEOUT=10
   # Auth hardening
   # MAX_LOGIN_ATTEMPTS=5
   # LOGIN_LOCKOUT_MINUTES=15
@@ -365,6 +378,11 @@ Requiere rol `ADMIN` (Bearer access token).
 Notas:
 - `user_type` es obligatorio en alta. Si es `psychologist`, debes enviar `professional_card_number`.
 - `roles` es opcional; si se envia, se reemplaza el set de roles del usuario.
+
+### Emails transaccionales
+- Actualmente se envia un **correo de bienvenida** al registrar usuarios (via SMTP).
+- Recomendado en produccion: configurar SPF/DKIM/DMARC en tu dominio para evitar spam.
+- En entornos de pruebas puedes dejar `EMAIL_ENABLED=false`.
 
 ## Despliegue en Docker
 

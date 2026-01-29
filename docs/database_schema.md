@@ -19,6 +19,7 @@ entorno de tesis y auditoria tecnica.
 
 ### Acceso y auditoria
 - `app_user`: usuarios locales (no usa `auth.users`); incluye `user_type` (guardian/psychologist), `professional_card_number` (COLPSIC) y campos de bloqueo de login (`failed_login_attempts`, `login_locked_until`).
+- `email_delivery_log`: log de envio de emails transaccionales (template, status, error, timestamps).
 - `role`, `user_role`: RBAC.
 - `user_session`: sesiones de app.
 - `audit_log`: eventos auditables.

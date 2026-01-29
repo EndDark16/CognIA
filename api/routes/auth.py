@@ -26,6 +26,7 @@ from api.security import (
     decrypt_mfa_secret,
     validate_totp,
 )
+from api.services.email_service import send_welcome_email
 from app.models import (
     AppUser,
     RefreshToken,
@@ -283,6 +284,10 @@ def register():
         return jsonify({"msg": "Could not create user"}), 500
 
     log_audit(new_user.id, "register", "auth", f"User registered: {username}")
+    try:
+        send_welcome_email(to_email=new_user.email, full_name=new_user.full_name)
+    except Exception:
+        current_app.logger.error("Failed to schedule welcome email for %s", new_user.email, exc_info=True)
     return jsonify({"msg": "user created", "user_id": new_user.id}), 201
 
 
