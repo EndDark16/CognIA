@@ -27,6 +27,7 @@ class AppUser(db.Model):
     failed_login_attempts = db.Column(db.Integer, nullable=False, server_default="0")
     last_failed_login_at = db.Column(db.DateTime(timezone=True))
     login_locked_until = db.Column(db.DateTime(timezone=True))
+    password_changed_at = db.Column(db.DateTime(timezone=True))
     is_active = db.Column(db.Boolean, default=True)
     mfa_enabled = db.Column(db.Boolean, default=False, nullable=False)
     mfa_confirmed_at = db.Column(db.DateTime(timezone=True))
@@ -364,6 +365,19 @@ class EmailDeliveryLog(db.Model):
     error_message = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
     sent_at = db.Column(db.DateTime(timezone=True))
+
+
+class PasswordResetToken(db.Model):
+    __tablename__ = "password_reset_token"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), nullable=False, index=True)
+    token_hash = db.Column(db.String, nullable=False, index=True)
+    expires_at = db.Column(db.DateTime(timezone=True), nullable=False, index=True)
+    used_at = db.Column(db.DateTime(timezone=True))
+    request_ip = db.Column(db.String)
+    user_agent = db.Column(db.String)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
 class PsychologistFeedback(db.Model):

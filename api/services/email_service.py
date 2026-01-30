@@ -144,3 +144,33 @@ def send_welcome_email(*, to_email: str, full_name: str | None):
             html_body=html_body,
             text_body=text_body,
         )
+
+
+def send_password_reset(*, to_email: str, reset_link: str, full_name: str | None):
+    subject = "Restablecer contraseña"
+    html_body = render_template(
+        "email/password_reset.html",
+        full_name=full_name or "",
+        reset_link=reset_link,
+    )
+    text_body = render_template(
+        "email/password_reset.txt",
+        full_name=full_name or "",
+        reset_link=reset_link,
+    )
+    if current_app.config.get("EMAIL_SEND_ASYNC", True):
+        send_email_async(
+            template="password_reset",
+            subject=subject,
+            to_email=to_email,
+            html_body=html_body,
+            text_body=text_body,
+        )
+    else:
+        send_email(
+            template="password_reset",
+            subject=subject,
+            to_email=to_email,
+            html_body=html_body,
+            text_body=text_body,
+        )
