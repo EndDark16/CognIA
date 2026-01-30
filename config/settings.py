@@ -75,6 +75,7 @@ class Config:
     # Email (SMTP)
     EMAIL_ENABLED = os.getenv("EMAIL_ENABLED", "false").lower() == "true"
     EMAIL_SEND_ASYNC = os.getenv("EMAIL_SEND_ASYNC", "true").lower() == "true"
+    EMAIL_SANDBOX = os.getenv("EMAIL_SANDBOX", "false").lower() == "true"
     EMAIL_FROM = os.getenv("EMAIL_FROM", "no-reply@example.com")
     EMAIL_REPLY_TO = os.getenv("EMAIL_REPLY_TO")
     EMAIL_LIST_UNSUBSCRIBE = os.getenv("EMAIL_LIST_UNSUBSCRIBE")
