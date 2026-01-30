@@ -375,6 +375,104 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/auth/password/change:
+    post:
+      tags: [Auth]
+      summary: Change password (authenticated)
+      operationId: changePassword
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordChangeRequest"
+      responses:
+        "200":
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/auth/password/forgot:
+    post:
+      tags: [Auth]
+      summary: Request password reset (public)
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordForgotRequest"
+      responses:
+        "200":
+          description: Generic response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/auth/password/reset:
+    post:
+      tags: [Auth]
+      summary: Reset password with token (public)
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordResetRequest"
+      responses:
+        "200":
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/auth/password/reset/verify:
+    get:
+      tags: [Auth]
+      summary: Verify password reset token
+      operationId: verifyResetToken
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Token valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PasswordResetVerifyResponse"
+        "400":
+          description: Token invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PasswordResetVerifyResponse"
+
   /api/mfa/setup:
     post:
       tags: [MFA]
@@ -1273,6 +1371,45 @@ components:
           type: string
         recovery_code:
           type: string
+    PasswordChangeRequest:
+      type: object
+      required: [currentPassword, newPassword, confirmNewPassword]
+      properties:
+        currentPassword:
+          type: string
+          maxLength: 200
+        newPassword:
+          type: string
+          maxLength: 200
+          minLength: 10
+        confirmNewPassword:
+          type: string
+          maxLength: 200
+    PasswordForgotRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          maxLength: 254
+    PasswordResetRequest:
+      type: object
+      required: [token, newPassword, confirmNewPassword]
+      properties:
+        token:
+          type: string
+        newPassword:
+          type: string
+          maxLength: 200
+          minLength: 10
+        confirmNewPassword:
+          type: string
+          maxLength: 200
+    PasswordResetVerifyResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
     QuestionnaireTemplate:
       type: object
       properties:

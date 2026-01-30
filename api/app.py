@@ -3,7 +3,7 @@
 import os
 import sys
 import time
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 from sqlalchemy import inspect
 
 # Ensure project root is on path when running this file directly
@@ -24,7 +24,7 @@ from api.routes.questionnaires import questionnaires_bp
 from api.routes.evaluations import evaluations_bp
 from api.routes.users import users_bp
 from api.extensions import limiter
-from app.models import db, RefreshToken
+from app.models import db, RefreshToken, AppUser
 from api.metrics import metrics_bp, record_request_metrics
 import logging
 
@@ -88,7 +88,24 @@ def create_app(config_class=DevelopmentConfig):
     def check_if_token_revoked(jwt_header, jwt_payload):
         jti = jwt_payload["jti"]
         token = db.session.query(RefreshToken).filter_by(jti=jti).scalar()
-        return token is not None and token.revoked
+        if token is not None and token.revoked:
+            return True
+
+        try:
+            identity = jwt_payload.get("sub")
+            user = db.session.get(AppUser, identity)
+            if user and user.password_changed_at:
+                iat = jwt_payload.get("iat")
+                if iat:
+                    issued_at = datetime.fromtimestamp(iat, timezone.utc)
+                    pwd_changed = user.password_changed_at
+                    if pwd_changed.tzinfo is None:
+                        pwd_changed = pwd_changed.replace(tzinfo=timezone.utc)
+                    if issued_at <= pwd_changed:
+                        return True
+        except Exception:
+            return False
+        return False
 
     # Optionally ensure refresh_token table exists (avoid blocking startup if DB is down)
     if app.config.get("AUTO_CREATE_REFRESH_TOKEN_TABLE", False):

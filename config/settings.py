@@ -41,6 +41,11 @@ class Config:
     MFA_CHALLENGE_TTL = int(os.getenv("MFA_CHALLENGE_TTL", "300"))
     MFA_ENROLL_TOKEN_TTL = int(os.getenv("MFA_ENROLL_TOKEN_TTL", "600"))
     RECOVERY_CODE_MAX_AGE_DAYS = int(os.getenv("RECOVERY_CODE_MAX_AGE_DAYS", "90"))
+    PASSWORD_MIN_LENGTH = int(os.getenv("PASSWORD_MIN_LENGTH", "10"))
+    PASSWORD_INPUT_MAX = int(os.getenv("PASSWORD_INPUT_MAX", "200"))
+    PASSWORD_RESET_TOKEN_TTL_MINUTES = int(os.getenv("PASSWORD_RESET_TOKEN_TTL_MINUTES", "30"))
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    PASSWORD_RESET_PATH = os.getenv("PASSWORD_RESET_PATH", "/reset-password")
 
     # Auth hardening
     MAX_LOGIN_ATTEMPTS = int(os.getenv("MAX_LOGIN_ATTEMPTS", "5"))
@@ -51,6 +56,10 @@ class Config:
     MFA_SETUP_RATE_LIMIT = os.getenv("MFA_SETUP_RATE_LIMIT", "3 per 10 minutes")
     MFA_CONFIRM_RATE_LIMIT = os.getenv("MFA_CONFIRM_RATE_LIMIT", "5 per 10 minutes")
     MFA_DISABLE_RATE_LIMIT = os.getenv("MFA_DISABLE_RATE_LIMIT", "3 per 10 minutes")
+    PASSWORD_CHANGE_RATE_LIMIT = os.getenv("PASSWORD_CHANGE_RATE_LIMIT", "5 per 10 minutes")
+    PASSWORD_FORGOT_RATE_LIMIT = os.getenv("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes")
+    PASSWORD_RESET_RATE_LIMIT = os.getenv("PASSWORD_RESET_RATE_LIMIT", "5 per 10 minutes")
+    PASSWORD_VERIFY_RATE_LIMIT = os.getenv("PASSWORD_VERIFY_RATE_LIMIT", "20 per 10 minutes")
 
     # Evaluations
     EVALUATION_MIN_AGE = int(os.getenv("EVALUATION_MIN_AGE", "6"))
@@ -71,6 +80,7 @@ class Config:
     METRICS_ENABLED = os.getenv("METRICS_ENABLED", "true").lower() == "true"
     METRICS_TOKEN = os.getenv("METRICS_TOKEN")
     METRICS_TOKEN_REQUIRED = os.getenv("METRICS_TOKEN_REQUIRED", "false").lower() == "true"
+    RATELIMIT_ENABLED = os.getenv("RATELIMIT_ENABLED", "true").lower() == "true"
 
     # Email (SMTP)
     EMAIL_ENABLED = os.getenv("EMAIL_ENABLED", "false").lower() == "true"

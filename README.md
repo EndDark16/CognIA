@@ -180,6 +180,12 @@ cognia_app/
   # MAX_LOGIN_ATTEMPTS=5
   # LOGIN_LOCKOUT_MINUTES=15
   # RECOVERY_CODE_MAX_AGE_DAYS=90
+  # Password reset
+  # PASSWORD_MIN_LENGTH=10
+  # PASSWORD_INPUT_MAX=200
+  # PASSWORD_RESET_TOKEN_TTL_MINUTES=30
+  # FRONTEND_URL=http://localhost:3000
+  # PASSWORD_RESET_PATH=/reset-password
   # Rate limits
   # REGISTER_RATE_LIMIT=5 per 10 minutes
   # LOGIN_RATE_LIMIT=5 per 15 minutes
@@ -187,6 +193,10 @@ cognia_app/
   # MFA_SETUP_RATE_LIMIT=3 per 10 minutes
   # MFA_CONFIRM_RATE_LIMIT=5 per 10 minutes
   # MFA_DISABLE_RATE_LIMIT=3 per 10 minutes
+  # PASSWORD_CHANGE_RATE_LIMIT=5 per 10 minutes
+  # PASSWORD_FORGOT_RATE_LIMIT=5 per 10 minutes
+  # PASSWORD_RESET_RATE_LIMIT=5 per 10 minutes
+  # PASSWORD_VERIFY_RATE_LIMIT=20 per 10 minutes
   # Evaluations
   # EVALUATION_MIN_AGE=6
   # EVALUATION_MAX_AGE=11
@@ -349,6 +359,21 @@ curl -X POST http://localhost:5000/api/auth/logout \
   -H "Authorization: Bearer <access_token>" \
   -H "X-CSRF-Token: <csrf_refresh_token_from_cookie>" \
   --cookie "refresh_token=<refresh_token_cookie>; csrf_refresh_token=<csrf_refresh_token_from_cookie>"
+```
+
+### Password reset
+Flujo recomendado:
+1) Solicitar link:
+```bash
+curl -X POST http://localhost:5000/api/auth/password/forgot \
+  -H "Content-Type: application/json" \
+  -d '{"email":"t@t.com"}'
+```
+2) Reset con token recibido:
+```bash
+curl -X POST http://localhost:5000/api/auth/password/reset \
+  -H "Content-Type: application/json" \
+  -d '{"token":"<token>","newPassword":"NuevaClaveSegura123","confirmNewPassword":"NuevaClaveSegura123"}'
 ```
 
 ### MFA setup / confirm
