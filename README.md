@@ -165,6 +165,7 @@ cognia_app/
   # Email (SMTP)
   # EMAIL_ENABLED=false
   # EMAIL_SEND_ASYNC=true
+  # EMAIL_SANDBOX=false
   # EMAIL_FROM="CognIA <no-reply@tu-dominio.com>"
   # EMAIL_REPLY_TO="soporte@tu-dominio.com"
   # EMAIL_LIST_UNSUBSCRIBE="<mailto:unsubscribe@tu-dominio.com>"
@@ -382,7 +383,7 @@ Notas:
 ### Emails transaccionales
 - Actualmente se envia un **correo de bienvenida** al registrar usuarios (via SMTP).
 - Recomendado en produccion: configurar SPF/DKIM/DMARC en tu dominio para evitar spam.
-- En entornos de pruebas puedes dejar `EMAIL_ENABLED=false`.
+- En entornos de pruebas puedes dejar `EMAIL_ENABLED=false` o activar `EMAIL_SANDBOX=true`.
 
 ## Despliegue en Docker
 

@@ -2,6 +2,7 @@ import smtplib
 import threading
 from datetime import datetime, timezone
 from email.message import EmailMessage
+from email.utils import parseaddr
 
 from flask import current_app, render_template
 
@@ -9,10 +10,16 @@ from app.models import EmailDeliveryLog, db
 
 
 def _build_message(*, subject: str, to_email: str, html_body: str, text_body: str) -> EmailMessage:
+    from_addr = current_app.config.get("EMAIL_FROM")
+    if not from_addr or "@" not in parseaddr(from_addr)[1]:
+        raise RuntimeError("EMAIL_FROM is not configured or invalid")
+    if not to_email or "@" not in parseaddr(to_email)[1]:
+        raise RuntimeError("Recipient email is invalid")
+
     msg = EmailMessage()
     msg["Subject"] = subject
     msg["To"] = to_email
-    msg["From"] = current_app.config.get("EMAIL_FROM")
+    msg["From"] = from_addr
     reply_to = current_app.config.get("EMAIL_REPLY_TO")
     if reply_to:
         msg["Reply-To"] = reply_to
@@ -66,12 +73,20 @@ def _log_delivery(template: str, to_email: str, subject: str, status: str, error
         sent_at=datetime.now(timezone.utc) if status == "sent" else None,
     )
     db.session.add(log)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
 
 
 def send_email(*, template: str, subject: str, to_email: str, html_body: str, text_body: str) -> None:
     if not current_app.config.get("EMAIL_ENABLED", False):
         current_app.logger.info("Email disabled; skipping %s to %s", template, to_email)
+        return
+
+    if current_app.config.get("EMAIL_SANDBOX", False):
+        current_app.logger.info("Email sandbox enabled; logging only (%s to %s)", template, to_email)
+        _log_delivery(template, to_email, subject, "sandboxed")
         return
 
     message = _build_message(
