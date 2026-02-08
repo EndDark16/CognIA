@@ -26,6 +26,7 @@ from api.security import (
     requires_mfa_enrollment,
     decrypt_mfa_secret,
     validate_totp,
+    password_policy_errors,
 )
 from api.services.email_service import send_welcome_email, send_password_reset
 from api.services.password_reset_service import (
@@ -251,11 +252,14 @@ def register():
     if not _is_valid_email(email):
         return _error_response("Invalid email format", "invalid_email", 400)
 
-    if len(password) < _PASSWORD_MIN:
+    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", _PASSWORD_MIN))
+    pwd_errors = password_policy_errors(password, min_len)
+    if pwd_errors:
         return _error_response(
-            f"Password must be at least {_PASSWORD_MIN} characters",
+            "Weak password",
             "weak_password",
             400,
+            {"requirements": pwd_errors},
         )
 
     if full_name and len(full_name) > _FULL_NAME_MAX:
@@ -772,9 +776,10 @@ def change_password():
         return _error_response("New password must be different", "invalid_password", 400)
     if new_password != confirm_password:
         return _error_response("Passwords do not match", "password_mismatch", 400)
-    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", 10))
-    if len(new_password) < min_len:
-        return _error_response("Weak password", "weak_password", 400)
+    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", _PASSWORD_MIN))
+    pwd_errors = password_policy_errors(new_password, min_len)
+    if pwd_errors:
+        return _error_response("Weak password", "weak_password", 400, {"requirements": pwd_errors})
 
     if not check_password(current_password, user.password):
         return _error_response("Invalid credentials", "invalid_credentials", 400)
@@ -851,8 +856,8 @@ def reset_password():
         return _error_response("Invalid token or password", "invalid_token", 400)
     if new_password != confirm_password:
         return _error_response("Invalid token or password", "invalid_token", 400)
-    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", 10))
-    if len(new_password) < min_len:
+    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", _PASSWORD_MIN))
+    if password_policy_errors(new_password, min_len):
         return _error_response("Invalid token or password", "invalid_token", 400)
 
     entry = lookup_valid_token(token)

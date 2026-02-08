@@ -11,7 +11,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from flask import Flask, g, request
+from flask import Flask, g, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from config.settings import DevelopmentConfig
@@ -20,6 +20,7 @@ from api.routes.auth import auth_bp
 from api.routes.mfa import mfa_bp
 from api.routes.docs import docs_bp
 from api.routes.health import health_bp
+from api.routes.email import email_bp
 from api.routes.questionnaires import questionnaires_bp
 from api.routes.evaluations import evaluations_bp
 from api.routes.users import users_bp
@@ -27,10 +28,18 @@ from api.extensions import limiter
 from app.models import db, RefreshToken, AppUser
 from api.metrics import metrics_bp, record_request_metrics
 import logging
+from werkzeug.exceptions import HTTPException
+from sqlalchemy.exc import SQLAlchemyError, OperationalError, DBAPIError
+from flask_limiter.errors import RateLimitExceeded
+from marshmallow import ValidationError
 
 
 def create_app(config_class=DevelopmentConfig):
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        template_folder=os.path.join(PROJECT_ROOT, "templates"),
+        static_folder=os.path.join(PROJECT_ROOT, "static"),
+    )
     app.config.from_object(config_class)
 
     def _to_timedelta(value, default_seconds: int) -> timedelta:
@@ -72,6 +81,50 @@ def create_app(config_class=DevelopmentConfig):
     # Enable CORS with credentials
     CORS(app, origins=app.config.get("CORS_ORIGINS"), supports_credentials=True)
 
+    def _json_error(message: str, error_code: str, status_code: int, details=None):
+        payload = {"msg": message, "error": error_code}
+        if details is not None:
+            payload["details"] = details
+        return jsonify(payload), status_code
+    
+    def _safe_rollback():
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
+
+    @app.errorhandler(RateLimitExceeded)
+    def handle_rate_limit(exc):
+        return _json_error("Too many requests", "rate_limited", 429)
+
+    @app.errorhandler(ValidationError)
+    def handle_validation_error(exc):
+        return _json_error("Validation error", "validation_error", 400, exc.messages)
+
+    @app.errorhandler(OperationalError)
+    @app.errorhandler(DBAPIError)
+    def handle_db_unavailable(exc):
+        _safe_rollback()
+        app.logger.error("Database connection error: %s", exc, exc_info=True)
+        return _json_error("Service unavailable", "db_unavailable", 503)
+
+    @app.errorhandler(SQLAlchemyError)
+    def handle_db_error(exc):
+        _safe_rollback()
+        app.logger.error("Database error: %s", exc, exc_info=True)
+        return _json_error("Database error", "db_error", 500)
+
+    @app.errorhandler(HTTPException)
+    def handle_http_error(exc):
+        code = exc.code or 500
+        name = (exc.name or "http_error").lower().replace(" ", "_")
+        return _json_error(exc.description, name, code)
+
+    @app.errorhandler(Exception)
+    def handle_unexpected_error(exc):
+        app.logger.error("Unhandled error: %s", exc, exc_info=True)
+        return _json_error("Internal server error", "server_error", 500)
+
     # Register blueprints
     app.register_blueprint(predict_bp, url_prefix="/api")
     app.register_blueprint(auth_bp)
@@ -82,6 +135,7 @@ def create_app(config_class=DevelopmentConfig):
     app.register_blueprint(questionnaires_bp)
     app.register_blueprint(evaluations_bp)
     app.register_blueprint(users_bp)
+    app.register_blueprint(email_bp)
 
     # Token Blocklist Callback
     @jwt.token_in_blocklist_loader

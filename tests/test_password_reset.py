@@ -181,3 +181,23 @@ def test_rate_limit_basic_for_forgot(client, app):
     resp2 = rate_client.post("/api/auth/password/forgot", json={"email": "test@example.com"})
     assert resp1.status_code == 200
     assert resp2.status_code == 429
+
+
+def test_verify_reset_token_valid_and_invalid(client, app):
+    username = f"user_{uuid.uuid4().hex[:6]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+    _register_user(client, username, email, password)
+
+    from api.services.password_reset_service import create_reset_token
+    with app.app_context():
+        user = AppUser.query.filter_by(email=email).first()
+        token = create_reset_token(user_id=user.id, request_ip=None, user_agent=None)
+
+    resp_ok = client.get(f"/api/auth/password/reset/verify?token={token}")
+    assert resp_ok.status_code == 200
+    assert resp_ok.json.get("valid") is True
+
+    resp_bad = client.get("/api/auth/password/reset/verify?token=badtoken")
+    assert resp_bad.status_code == 400
+    assert resp_bad.json.get("valid") is False

@@ -132,6 +132,35 @@ def test_register_and_login(client):
     assert resp_no_cookie.status_code == 401
 
 
+def test_register_sends_welcome_email(client, monkeypatch):
+    called = {}
+
+    def _fake_send(to_email, full_name):
+        called["to_email"] = to_email
+        called["full_name"] = full_name
+
+    monkeypatch.setattr("api.routes.auth.send_welcome_email", _fake_send)
+
+    username = f"testuser_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={
+            "username": username,
+            "email": email,
+            "password": password,
+            "full_name": "Test User",
+            "user_type": "guardian",
+        },
+    )
+
+    assert resp_reg.status_code == 201
+    assert called["to_email"] == email
+    assert called["full_name"] == "Test User"
+
+
 def test_register_psychologist_requires_card(client):
     username = f"psych_{uuid.uuid4().hex[:8]}"
     email = f"{username}@example.com"
