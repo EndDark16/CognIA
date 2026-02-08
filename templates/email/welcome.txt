@@ -1,0 +1,20 @@
+Hola {{ user_name }},
+
+Te damos la bienvenida a CognIA. Nos alegra que formes parte de la plataforma.
+
+CognIA está diseñada para acompañarte en la detección temprana de señales relacionadas con el desarrollo emocional infantil,
+ofreciéndote un entorno seguro, claro y organizado para gestionar evaluaciones y consultar reportes cuando lo necesites.
+
+Desde aquí podrás acceder a la información de manera responsable, con el respaldo de herramientas basadas en inteligencia artificial
+que apoyan -pero no sustituyen- el criterio humano y profesional.
+
+Si en algún momento tienes preguntas o necesitas orientación sobre el uso de la plataforma, puedes escribirnos a
+{{ EMAIL_REPLY_TO }} o contactar al equipo administrador. Estaremos atentos para ayudarte.
+
+{% if frontend_url %}
+Empezar cuestionario: {{ frontend_url }}/padre/cuestionario
+Sobre nuestro sistema: {{ frontend_url }}/nuestro-sistema
+{% endif %}
+
+© {{ year }} CognIA. Todos los derechos reservados.
+Este mensaje fue enviado automáticamente. Evita compartir tus credenciales con terceros.

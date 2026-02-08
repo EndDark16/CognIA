@@ -13,6 +13,7 @@ from flask_jwt_extended import (
     jwt_required,
 )
 from flask_limiter.util import get_remote_address
+from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 from api.extensions import limiter
 from api.security import (
@@ -25,6 +26,18 @@ from api.security import (
     requires_mfa_enrollment,
     decrypt_mfa_secret,
     validate_totp,
+    password_policy_errors,
+)
+from api.services.email_service import send_welcome_email, send_password_reset
+from api.services.password_reset_service import (
+    create_reset_token,
+    lookup_valid_token,
+    mark_token_used,
+)
+from api.schemas.password_schema import (
+    PasswordChangeSchema,
+    PasswordForgotSchema,
+    PasswordResetSchema,
 )
 from app.models import (
     AppUser,
@@ -74,6 +87,12 @@ def _build_auth_response(access_token: str):
             "token_type": "bearer",
             "expires_in": _access_expires(),
         }
+    )
+
+
+def _revoke_refresh_tokens(user_id: uuid.UUID) -> None:
+    RefreshToken.query.filter_by(user_id=user_id, revoked=False).update(
+        {"revoked": True}, synchronize_session=False
     )
 
 
@@ -178,6 +197,35 @@ def _mfa_rate_key() -> str:
     return f"mfa_ip:{get_remote_address()}"
 
 
+def _password_change_rate_key() -> str:
+    identity = _parse_identity(get_jwt_identity())
+    if identity:
+        return f"pwd_change:{identity}:{get_remote_address()}"
+    return f"pwd_change_ip:{get_remote_address()}"
+
+
+def _password_forgot_rate_key() -> str:
+    data = request.get_json(silent=True) or {}
+    email = _normalize_email(data.get("email"))
+    if email:
+        return f"pwd_forgot:{email}:{get_remote_address()}"
+    return f"pwd_forgot_ip:{get_remote_address()}"
+
+
+def _password_forgot_email_key() -> str:
+    data = request.get_json(silent=True) or {}
+    email = _normalize_email(data.get("email"))
+    return f"pwd_forgot_email:{email}" if email else f"pwd_forgot_email:{get_remote_address()}"
+
+
+def _password_reset_rate_key() -> str:
+    data = request.get_json(silent=True) or {}
+    token = data.get("token")
+    if token:
+        return f"pwd_reset:{str(token)[:12]}:{get_remote_address()}"
+    return f"pwd_reset_ip:{get_remote_address()}"
+
+
 @auth_bp.route("/register", methods=["POST"])
 @limiter.limit(lambda: current_app.config.get("REGISTER_RATE_LIMIT", "5 per 10 minutes"))
 def register():
@@ -204,11 +252,14 @@ def register():
     if not _is_valid_email(email):
         return _error_response("Invalid email format", "invalid_email", 400)
 
-    if len(password) < _PASSWORD_MIN:
+    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", _PASSWORD_MIN))
+    pwd_errors = password_policy_errors(password, min_len)
+    if pwd_errors:
         return _error_response(
-            f"Password must be at least {_PASSWORD_MIN} characters",
+            "Weak password",
             "weak_password",
             400,
+            {"requirements": pwd_errors},
         )
 
     if full_name and len(full_name) > _FULL_NAME_MAX:
@@ -283,6 +334,10 @@ def register():
         return jsonify({"msg": "Could not create user"}), 500
 
     log_audit(new_user.id, "register", "auth", f"User registered: {username}")
+    try:
+        send_welcome_email(to_email=new_user.email, full_name=new_user.full_name)
+    except Exception:
+        current_app.logger.error("Failed to schedule welcome email for %s", new_user.email, exc_info=True)
     return jsonify({"msg": "user created", "user_id": new_user.id}), 201
 
 
@@ -300,6 +355,11 @@ def login():
         return _error_response("Invalid username format", "invalid_username", 400)
 
     user = AppUser.query.filter_by(username=username).first()
+    if user:
+        try:
+            db.session.refresh(user)
+        except Exception:
+            db.session.rollback()
     if user:
         now = datetime.now(timezone.utc)
         if user.login_locked_until:
@@ -680,3 +740,157 @@ def me():
         ),
         200,
     )
+
+
+@auth_bp.post("/password/change")
+@jwt_required()
+@limiter.limit(lambda: current_app.config.get("PASSWORD_CHANGE_RATE_LIMIT", "5 per 10 minutes"), key_func=_password_change_rate_key)
+def change_password():
+    claims = get_jwt()
+    if claims.get("mfa_enrollment"):
+        return _error_response("Enrollment token not allowed", "mfa_enrollment_only", 403)
+
+    identity = _parse_identity(get_jwt_identity())
+    if not identity:
+        return _error_response("Invalid user", "invalid_user", 401)
+    user = db.session.get(AppUser, identity)
+    if not user or not user.is_active:
+        return _error_response("User not found or inactive", "user_not_found", 404)
+
+    schema = PasswordChangeSchema()
+    try:
+        data = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
+
+    current_password = data.get("current_password") or ""
+    new_password = data.get("new_password") or ""
+    confirm_password = data.get("confirm_new_password") or ""
+    max_len = int(current_app.config.get("PASSWORD_INPUT_MAX", 200))
+
+    if not current_password or not new_password or not confirm_password:
+        return _error_response("Missing fields", "missing_fields", 400)
+    if len(current_password) > max_len or len(new_password) > max_len or len(confirm_password) > max_len:
+        return _error_response("Input too long", "invalid_input", 400)
+    if new_password == current_password:
+        return _error_response("New password must be different", "invalid_password", 400)
+    if new_password != confirm_password:
+        return _error_response("Passwords do not match", "password_mismatch", 400)
+    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", _PASSWORD_MIN))
+    pwd_errors = password_policy_errors(new_password, min_len)
+    if pwd_errors:
+        return _error_response("Weak password", "weak_password", 400, {"requirements": pwd_errors})
+
+    if not check_password(current_password, user.password):
+        return _error_response("Invalid credentials", "invalid_credentials", 400)
+
+    user.password = hash_password(new_password)
+    user.password_changed_at = datetime.now(timezone.utc)
+
+    try:
+        _revoke_refresh_tokens(user.id)
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Database error on password change for %s: %s", user.id, e, exc_info=True)
+        return jsonify({"msg": "Database error"}), 500
+
+    log_audit(user.id, "PASSWORD_CHANGED", "auth", "Password changed")
+    return jsonify({"message": "Password updated"}), 200
+
+
+@auth_bp.post("/password/forgot")
+@limiter.limit(lambda: current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes"), key_func=get_remote_address)
+@limiter.limit(lambda: current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes"), key_func=_password_forgot_email_key)
+def forgot_password():
+    schema = PasswordForgotSchema()
+    try:
+        data = schema.load(request.get_json(silent=True) or {})
+    except ValidationError:
+        return jsonify({"message": "If the email exists, a reset link has been sent"}), 200
+
+    email = _normalize_email(data.get("email"))
+    if not email or not _is_valid_email(email):
+        return jsonify({"message": "If the email exists, a reset link has been sent"}), 200
+
+    user = AppUser.query.filter_by(email=email).first()
+    if user and user.is_active:
+        try:
+            token = create_reset_token(
+                user_id=user.id,
+                request_ip=request.remote_addr,
+                user_agent=request.user_agent.string,
+            )
+            base_url = current_app.config.get("FRONTEND_URL", "").rstrip("/")
+            if not base_url:
+                current_app.logger.warning("FRONTEND_URL not configured; skipping password reset email")
+            else:
+                path = current_app.config.get("PASSWORD_RESET_PATH", "/reset-password")
+                reset_link = f"{base_url}{path}?token={token}"
+                send_password_reset(to_email=user.email, reset_link=reset_link, full_name=user.full_name)
+        except Exception as e:
+            current_app.logger.error("Password reset flow failed for %s: %s", email, e, exc_info=True)
+
+    return jsonify({"message": "If the email exists, a reset link has been sent"}), 200
+
+
+@auth_bp.post("/password/reset")
+@limiter.limit(lambda: current_app.config.get("PASSWORD_RESET_RATE_LIMIT", "5 per 10 minutes"), key_func=get_remote_address)
+@limiter.limit(lambda: current_app.config.get("PASSWORD_RESET_RATE_LIMIT", "5 per 10 minutes"), key_func=_password_reset_rate_key)
+def reset_password():
+    schema = PasswordResetSchema()
+    try:
+        data = schema.load(request.get_json(silent=True) or {})
+    except ValidationError:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+
+    token = data.get("token")
+    new_password = data.get("new_password") or ""
+    confirm_password = data.get("confirm_new_password") or ""
+    max_len = int(current_app.config.get("PASSWORD_INPUT_MAX", 200))
+
+    if not token or not new_password or not confirm_password:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+    if len(new_password) > max_len or len(confirm_password) > max_len:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+    if new_password != confirm_password:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", _PASSWORD_MIN))
+    if password_policy_errors(new_password, min_len):
+        return _error_response("Invalid token or password", "invalid_token", 400)
+
+    entry = lookup_valid_token(token)
+    if not entry:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+
+    user = db.session.get(AppUser, entry.user_id)
+    if not user or not user.is_active:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+
+    try:
+        user.password = hash_password(new_password)
+        user.password_changed_at = datetime.now(timezone.utc)
+        mark_token_used(entry)
+        _revoke_refresh_tokens(user.id)
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Password reset failed for %s: %s", user.id, e, exc_info=True)
+        return jsonify({"msg": "Database error"}), 500
+
+    log_audit(user.id, "PASSWORD_RESET_COMPLETED", "auth", "Password reset completed")
+    return jsonify({"message": "Password updated"}), 200
+
+
+@auth_bp.get("/password/reset/verify")
+@limiter.limit(lambda: current_app.config.get("PASSWORD_VERIFY_RATE_LIMIT", "20 per 10 minutes"), key_func=get_remote_address)
+def verify_reset_token():
+    token = request.args.get("token")
+    if not token:
+        return jsonify({"valid": False}), 400
+    entry = lookup_valid_token(token)
+    if not entry:
+        return jsonify({"valid": False}), 400
+    return jsonify({"valid": True}), 200
