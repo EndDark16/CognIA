@@ -162,10 +162,38 @@ cognia_app/
   # METRICS_ENABLED=true
   # METRICS_TOKEN=un_token_opcional
   # METRICS_TOKEN_REQUIRED=false
+  # Email (SMTP)
+  # EMAIL_ENABLED=false
+  # EMAIL_SEND_ASYNC=true
+  # EMAIL_SANDBOX=false
+  # EMAIL_FROM="CognIA <no-reply@tu-dominio.com>"
+  # EMAIL_REPLY_TO="soporte@tu-dominio.com"
+  # EMAIL_LIST_UNSUBSCRIBE="<mailto:unsubscribe@tu-dominio.com>"
+  # EMAIL_ASSET_BASE_URL=https://static.tu-dominio.com/email
+  # EMAIL_UNSUBSCRIBE_URL=https://api.tu-dominio.com/api/email/unsubscribe
+  # EMAIL_UNSUBSCRIBE_SECRET=una_llave_secreta_opcional
+  # EMAIL_UNSUBSCRIBE_TOKEN_TTL_DAYS=365
+  # EMAIL_UNSUBSCRIBE_RATE_LIMIT=10 per 10 minutes
+  # SMTP_HOST=smtp.tu-proveedor.com
+  # SMTP_PORT=587
+  # SMTP_PORT__SSL=465
+  # SMTP_PORT__TLS=587
+  # SMTP_USER=tu_usuario
+  # SMTP_PASSWORD=tu_password
+  # SMTP_USE_TLS=true
+  # SMTP_USE_SSL=false
+  # SMTP_TIMEOUT=10
   # Auth hardening
   # MAX_LOGIN_ATTEMPTS=5
   # LOGIN_LOCKOUT_MINUTES=15
   # RECOVERY_CODE_MAX_AGE_DAYS=90
+  # Password reset
+  # PASSWORD_MIN_LENGTH=8
+  # Passwords also require: uppercase, lowercase, number, special character
+  # PASSWORD_INPUT_MAX=200
+  # PASSWORD_RESET_TOKEN_TTL_MINUTES=30
+  # FRONTEND_URL=http://localhost:3000
+  # PASSWORD_RESET_PATH=/reset-password
   # Rate limits
   # REGISTER_RATE_LIMIT=5 per 10 minutes
   # LOGIN_RATE_LIMIT=5 per 15 minutes
@@ -173,6 +201,10 @@ cognia_app/
   # MFA_SETUP_RATE_LIMIT=3 per 10 minutes
   # MFA_CONFIRM_RATE_LIMIT=5 per 10 minutes
   # MFA_DISABLE_RATE_LIMIT=3 per 10 minutes
+  # PASSWORD_CHANGE_RATE_LIMIT=5 per 10 minutes
+  # PASSWORD_FORGOT_RATE_LIMIT=5 per 10 minutes
+  # PASSWORD_RESET_RATE_LIMIT=5 per 10 minutes
+  # PASSWORD_VERIFY_RATE_LIMIT=20 per 10 minutes
   # Evaluations
   # EVALUATION_MIN_AGE=6
   # EVALUATION_MAX_AGE=11
@@ -337,6 +369,21 @@ curl -X POST http://localhost:5000/api/auth/logout \
   --cookie "refresh_token=<refresh_token_cookie>; csrf_refresh_token=<csrf_refresh_token_from_cookie>"
 ```
 
+### Password reset
+Flujo recomendado:
+1) Solicitar link:
+```bash
+curl -X POST http://localhost:5000/api/auth/password/forgot \
+  -H "Content-Type: application/json" \
+  -d '{"email":"t@t.com"}'
+```
+2) Reset con token recibido:
+```bash
+curl -X POST http://localhost:5000/api/auth/password/reset \
+  -H "Content-Type: application/json" \
+  -d '{"token":"<token>","newPassword":"NuevaClaveSegura123","confirmNewPassword":"NuevaClaveSegura123"}'
+```
+
 ### MFA setup / confirm
 Nota: si el login devolvio `enrollment_token`, usa `Authorization: Bearer <enrollment_token>` en estos endpoints.
 
@@ -365,6 +412,14 @@ Requiere rol `ADMIN` (Bearer access token).
 Notas:
 - `user_type` es obligatorio en alta. Si es `psychologist`, debes enviar `professional_card_number`.
 - `roles` es opcional; si se envia, se reemplaza el set de roles del usuario.
+
+### Emails transaccionales
+- Actualmente se envia un **correo de bienvenida** al registrar usuarios (via SMTP).
+- Recomendado en produccion: configurar SPF/DKIM/DMARC en tu dominio para evitar spam.
+- En entornos de pruebas puedes dejar `EMAIL_ENABLED=false` o activar `EMAIL_SANDBOX=true`.
+- Los assets de email (logos/iconos) viven en `static/email/` y deben servirse desde HTTPS publico. Configura `EMAIL_ASSET_BASE_URL` para construir las URLs en los templates.
+- Baja de emails: el endpoint `GET/POST /api/email/unsubscribe?token=...` admite **one-click unsubscribe**. Configura `EMAIL_UNSUBSCRIBE_URL` para que el header `List-Unsubscribe` incluya la URL firmada.
+- Para probar templates por SMTP sin iniciar la app: `python scripts/send_test_email.py --template welcome --to <destino>`. Usa `TEST_SMTP_TO` si no pasas `--to`.
 
 ## Despliegue en Docker
 

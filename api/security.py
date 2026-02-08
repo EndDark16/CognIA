@@ -1,4 +1,5 @@
 import bcrypt
+import re
 from app.models import db, AuditLog, AppUser
 from flask import request
 from flask_jwt_extended import set_refresh_cookies
@@ -16,6 +17,28 @@ def hash_password(plain_password: str) -> str:
 def check_password(plain_password: str, hashed_password: str) -> bool:
     """Check a password against a hash."""
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+
+
+_PWD_UPPER_RE = re.compile(r"[A-Z]")
+_PWD_LOWER_RE = re.compile(r"[a-z]")
+_PWD_DIGIT_RE = re.compile(r"\d")
+_PWD_SPECIAL_RE = re.compile(r"[^A-Za-z0-9]")
+
+
+def password_policy_errors(password: str, min_length: int = 8) -> list[str]:
+    """Return list of missing password requirements."""
+    errors = []
+    if len(password) < min_length:
+        errors.append(f"min_length:{min_length}")
+    if not _PWD_UPPER_RE.search(password or ""):
+        errors.append("uppercase")
+    if not _PWD_LOWER_RE.search(password or ""):
+        errors.append("lowercase")
+    if not _PWD_DIGIT_RE.search(password or ""):
+        errors.append("number")
+    if not _PWD_SPECIAL_RE.search(password or ""):
+        errors.append("special")
+    return errors
 
 def log_audit(user_id, action, section=None, details=None):
     """Helper to log audit events."""
