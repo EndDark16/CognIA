@@ -367,6 +367,20 @@ class EmailDeliveryLog(db.Model):
     sent_at = db.Column(db.DateTime(timezone=True))
 
 
+class EmailUnsubscribe(db.Model):
+    __tablename__ = "email_unsubscribe"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email = db.Column(db.String, unique=True, nullable=False, index=True)
+    reason = db.Column(db.Text)
+    source = db.Column(db.String)
+    request_ip = db.Column(db.String)
+    user_agent = db.Column(db.String)
+    unsubscribed_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+
 class PasswordResetToken(db.Model):
     __tablename__ = "password_reset_token"
 

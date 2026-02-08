@@ -44,6 +44,8 @@ tags:
     description: Registration, login, refresh, and logout using JWT in cookies.
   - name: MFA
     description: TOTP setup, confirmation, recovery codes, and disable.
+  - name: Email
+    description: Email unsubscribe utilities.
   - name: Users
     description: Admin user management.
   - name: Questionnaires
@@ -472,6 +474,68 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PasswordResetVerifyResponse"
+
+  /api/email/unsubscribe:
+    get:
+      tags: [Email]
+      summary: Unsubscribe from emails (token)
+      description: |
+        One-click unsubscribe endpoint. The token is signed and does not expose
+        the email address. Returns a generic success message when valid.
+      operationId: emailUnsubscribeGet
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: reason
+          required: false
+          schema:
+            type: string
+            maxLength: 200
+      responses:
+        "200":
+          description: Unsubscribed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+    post:
+      tags: [Email]
+      summary: Unsubscribe from emails (token, one-click)
+      description: |
+        Supports List-Unsubscribe one-click POST. Token can be passed in the
+        query string or body. Returns a generic success message when valid.
+      operationId: emailUnsubscribePost
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                reason:
+                  type: string
+                  maxLength: 200
+      responses:
+        "200":
+          description: Unsubscribed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /api/mfa/setup:
     post:

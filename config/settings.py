@@ -41,7 +41,7 @@ class Config:
     MFA_CHALLENGE_TTL = int(os.getenv("MFA_CHALLENGE_TTL", "300"))
     MFA_ENROLL_TOKEN_TTL = int(os.getenv("MFA_ENROLL_TOKEN_TTL", "600"))
     RECOVERY_CODE_MAX_AGE_DAYS = int(os.getenv("RECOVERY_CODE_MAX_AGE_DAYS", "90"))
-    PASSWORD_MIN_LENGTH = int(os.getenv("PASSWORD_MIN_LENGTH", "10"))
+    PASSWORD_MIN_LENGTH = int(os.getenv("PASSWORD_MIN_LENGTH", "8"))
     PASSWORD_INPUT_MAX = int(os.getenv("PASSWORD_INPUT_MAX", "200"))
     PASSWORD_RESET_TOKEN_TTL_MINUTES = int(os.getenv("PASSWORD_RESET_TOKEN_TTL_MINUTES", "30"))
     FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
@@ -76,6 +76,7 @@ class Config:
     LOG_REQUESTS = os.getenv("LOG_REQUESTS", "true").lower() == "true"
     _exclude = os.getenv("LOG_EXCLUDE_PATHS", "/healthz,/readyz,/metrics")
     LOG_EXCLUDE_PATHS = {p.strip() for p in _exclude.split(",") if p.strip()}
+    PROPAGATE_EXCEPTIONS = os.getenv("PROPAGATE_EXCEPTIONS", "false").lower() == "true"
 
     METRICS_ENABLED = os.getenv("METRICS_ENABLED", "true").lower() == "true"
     METRICS_TOKEN = os.getenv("METRICS_TOKEN")
@@ -89,8 +90,25 @@ class Config:
     EMAIL_FROM = os.getenv("EMAIL_FROM", "no-reply@example.com")
     EMAIL_REPLY_TO = os.getenv("EMAIL_REPLY_TO")
     EMAIL_LIST_UNSUBSCRIBE = os.getenv("EMAIL_LIST_UNSUBSCRIBE")
+    EMAIL_ASSET_BASE_URL = os.getenv("EMAIL_ASSET_BASE_URL", "")
+    EMAIL_UNSUBSCRIBE_URL = os.getenv("EMAIL_UNSUBSCRIBE_URL")
+    EMAIL_UNSUBSCRIBE_SECRET = os.getenv("EMAIL_UNSUBSCRIBE_SECRET")
+    _email_unsub_ttl = os.getenv("EMAIL_UNSUBSCRIBE_TOKEN_TTL_DAYS")
+    try:
+        EMAIL_UNSUBSCRIBE_TOKEN_TTL_DAYS = int(_email_unsub_ttl) if _email_unsub_ttl else None
+    except ValueError:
+        EMAIL_UNSUBSCRIBE_TOKEN_TTL_DAYS = None
+    EMAIL_UNSUBSCRIBE_RATE_LIMIT = os.getenv("EMAIL_UNSUBSCRIBE_RATE_LIMIT", "10 per 10 minutes")
+    def _int_env(name: str, default: int | None) -> int | None:
+        value = os.getenv(name)
+        if value is None or value == "":
+            return default
+        return int(value) if str(value).isdigit() else default
+
     SMTP_HOST = os.getenv("SMTP_HOST")
-    SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_PORT = _int_env("SMTP_PORT", 587)
+    SMTP_PORT_SSL = _int_env("SMTP_PORT__SSL", None)
+    SMTP_PORT_TLS = _int_env("SMTP_PORT__TLS", None)
     SMTP_USER = os.getenv("SMTP_USER")
     SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
     SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() == "true"

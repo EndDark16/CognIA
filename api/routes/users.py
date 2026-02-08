@@ -8,7 +8,7 @@ from flask_jwt_extended import get_jwt, get_jwt_identity
 from marshmallow import ValidationError, Schema, fields, validate
 
 from api.decorators import roles_required
-from api.security import hash_password, log_audit
+from api.security import hash_password, log_audit, password_policy_errors
 from api.services.email_service import send_welcome_email
 from api.routes.auth import (
     _normalize_user_type,
@@ -169,7 +169,8 @@ def create_user():
         return _error_response("Invalid username format", "invalid_username", 400)
     if not email or not _is_valid_email(email):
         return _error_response("Invalid email format", "invalid_email", 400)
-    if len(password) < _PASSWORD_MIN:
+    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", _PASSWORD_MIN))
+    if password_policy_errors(password, min_len):
         return _error_response("Weak password", "weak_password", 400)
     if full_name and len(full_name) > 120:
         return _error_response("Full name too long", "invalid_full_name", 400)
@@ -247,7 +248,8 @@ def update_user(user_id):
         user.email = email
 
     if "password" in data and data["password"]:
-        if len(data["password"]) < _PASSWORD_MIN:
+        min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", _PASSWORD_MIN))
+        if password_policy_errors(data["password"], min_len):
             return _error_response("Weak password", "weak_password", 400)
         user.password = hash_password(data["password"])
 

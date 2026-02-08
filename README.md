@@ -169,8 +169,15 @@ cognia_app/
   # EMAIL_FROM="CognIA <no-reply@tu-dominio.com>"
   # EMAIL_REPLY_TO="soporte@tu-dominio.com"
   # EMAIL_LIST_UNSUBSCRIBE="<mailto:unsubscribe@tu-dominio.com>"
+  # EMAIL_ASSET_BASE_URL=https://static.tu-dominio.com/email
+  # EMAIL_UNSUBSCRIBE_URL=https://api.tu-dominio.com/api/email/unsubscribe
+  # EMAIL_UNSUBSCRIBE_SECRET=una_llave_secreta_opcional
+  # EMAIL_UNSUBSCRIBE_TOKEN_TTL_DAYS=365
+  # EMAIL_UNSUBSCRIBE_RATE_LIMIT=10 per 10 minutes
   # SMTP_HOST=smtp.tu-proveedor.com
   # SMTP_PORT=587
+  # SMTP_PORT__SSL=465
+  # SMTP_PORT__TLS=587
   # SMTP_USER=tu_usuario
   # SMTP_PASSWORD=tu_password
   # SMTP_USE_TLS=true
@@ -181,7 +188,8 @@ cognia_app/
   # LOGIN_LOCKOUT_MINUTES=15
   # RECOVERY_CODE_MAX_AGE_DAYS=90
   # Password reset
-  # PASSWORD_MIN_LENGTH=10
+  # PASSWORD_MIN_LENGTH=8
+  # Passwords also require: uppercase, lowercase, number, special character
   # PASSWORD_INPUT_MAX=200
   # PASSWORD_RESET_TOKEN_TTL_MINUTES=30
   # FRONTEND_URL=http://localhost:3000
@@ -409,6 +417,9 @@ Notas:
 - Actualmente se envia un **correo de bienvenida** al registrar usuarios (via SMTP).
 - Recomendado en produccion: configurar SPF/DKIM/DMARC en tu dominio para evitar spam.
 - En entornos de pruebas puedes dejar `EMAIL_ENABLED=false` o activar `EMAIL_SANDBOX=true`.
+- Los assets de email (logos/iconos) viven en `static/email/` y deben servirse desde HTTPS publico. Configura `EMAIL_ASSET_BASE_URL` para construir las URLs en los templates.
+- Baja de emails: el endpoint `GET/POST /api/email/unsubscribe?token=...` admite **one-click unsubscribe**. Configura `EMAIL_UNSUBSCRIBE_URL` para que el header `List-Unsubscribe` incluya la URL firmada.
+- Para probar templates por SMTP sin iniciar la app: `python scripts/send_test_email.py --template welcome --to <destino>`. Usa `TEST_SMTP_TO` si no pasas `--to`.
 
 ## Despliegue en Docker
 

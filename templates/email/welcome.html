@@ -1,42 +1,298 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Bienvenido a CognIA</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        supported-color-schemes: light dark;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background: #F7F0F0;
+        font-family: "Inter", "Open Sans", Arial, sans-serif;
+        color: #1F2937;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      .wrapper {
+        background: #F7F0F0;
+        width: 100%;
+      }
+      .card {
+        max-width: 600px;
+        background: #FFFFFF;
+        border: 1px solid #E6E6E6;
+        border-radius: 14px;
+      }
+      .pad-header {
+        padding: 28px 28px 12px;
+      }
+      .pad-body {
+        padding: 18px 28px 0;
+      }
+      .pad-footer {
+        padding: 18px 28px 28px;
+      }
+      .header {
+        background: #E9F3FF;
+        border-bottom: 1px solid #E6E6E6;
+        border-radius: 14px 14px 0 0;
+      }
+      .title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1790E9;
+        margin: 18px 0 6px 0;
+      }
+      .subtitle {
+        font-size: 15px;
+        font-weight: 600;
+        color: #215F8F;
+        margin: 0 0 20px 0;
+      }
+      .text {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #1F2937;
+        margin: 0 0 14px 0;
+      }
+      .footer {
+        font-size: 12px;
+        color: #6B7280;
+        text-align: center;
+        padding-top: 18px;
+      }
+      .footer-divider {
+        border-top: 1px solid #E6E6E6;
+        padding-top: 18px;
+      }
+      .btn {
+        display: inline-block;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 15px;
+        padding: 12px 18px;
+        border-radius: 10px;
+      }
+      .btn-primary {
+        background: #1790E9;
+        color: #FFFFFF;
+      }
+      .btn-ghost {
+        background: #F1F5F9;
+        color: #1F2937;
+        border: 1px solid #E2E8F0;
+        font-weight: 600;
+      }
+      .brand-text {
+        font-size: 19px;
+        font-weight: 700;
+        color: #0F0E0E;
+      }
+      .brand-accent {
+        color: #1790E9;
+      }
+      .brand-isotype {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        text-align: center;
+        background: #1790E9;
+        color: #FFFFFF;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 16px;
+      }
+      .brand-isotype-img {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+      }
+      /* Dark mode: keep defined blocks to avoid full inversion in Gmail */
+      .isotype-light {
+        display: inline-block;
+      }
+      .isotype-dark {
+        display: none;
+      }
+      @media (max-width: 600px) {
+        .pad-header {
+          padding: 22px 22px 12px !important;
+        }
+        .pad-body {
+          padding: 0 22px !important;
+        }
+        .pad-footer {
+          padding: 18px 22px 22px !important;
+        }
+        .brand-isotype,
+        .brand-isotype-img {
+          width: 28px !important;
+          height: 28px !important;
+          line-height: 28px !important;
+          font-size: 14px !important;
+        }
+        .brand-text {
+          font-size: 18px !important;
+        }
+      }
+      @media (prefers-color-scheme: dark) {
+        body,
+        .wrapper {
+          background: #0F0E0E !important;
+        }
+        .card {
+          background: #2A2D34 !important;
+          border-color: #3A3D45 !important;
+        }
+        .header {
+          background: #0F172A !important;
+          border-bottom: 1px solid #3A3D45 !important;
+        }
+        .text,
+        .footer {
+          color: #E8EAED !important;
+        }
+        .title {
+          color: #51C2F4 !important;
+        }
+        .subtitle {
+          color: #51C2F4 !important;
+        }
+        .footer-divider {
+          border-top: 1px solid #3A3D45 !important;
+        }
+        .btn-primary {
+          background: #51C2F4 !important;
+          color: #0F0E0E !important;
+        }
+        .btn-ghost {
+          background: #1F2937 !important;
+          color: #E8EAED !important;
+          border-color: #3A3D45 !important;
+        }
+        .brand-text {
+          color: #E8EAED !important;
+        }
+        .brand-accent {
+          color: #8AF3FF !important;
+        }
+        .isotype-light {
+          display: none !important;
+        }
+        .isotype-dark {
+          display: inline-block !important;
+        }
+      }
+      /* Outlook mobile dark mode support */
+      [data-ogsc] .header {
+        background: #0F172A !important;
+      }
+      [data-ogsc] .brand-text {
+        color: #E8EAED !important;
+      }
+      [data-ogsc] .brand-accent {
+        color: #8AF3FF !important;
+      }
+    </style>
   </head>
-  <body style="margin:0;padding:0;background:#f5f7fb;">
-    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f7fb;padding:24px 0;">
+  <body>
+    <table role="presentation" class="wrapper" width="100%" cellspacing="0" cellpadding="0">
       <tr>
-        <td align="center">
-          <table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(16,24,40,0.08);">
+        <td align="center" style="padding:24px 12px;">
+          <!-- Table layout for broad email client compatibility -->
+          <table role="presentation" class="card" width="100%" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF" style="padding:0;border-radius:14px;overflow:hidden;border:1px solid #E6E6E6;">
             <tr>
-              <td style="padding:28px 32px;background:linear-gradient(135deg,#0f172a,#1e293b);color:#ffffff;">
-                <h1 style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:22px;letter-spacing:0.2px;">CognIA</h1>
-                <p style="margin:8px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;opacity:0.85;">Plataforma de apoyo para alerta temprana</p>
+              <td align="left" class="header pad-header" bgcolor="#E9F3FF" style="padding:28px 28px 12px;background:#E9F3FF;border-radius:14px 14px 0 0;">
+                <!-- Compact brand lockup -->
+                <table role="presentation" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td valign="middle">
+                      {% if asset_base_url %}
+                      <img
+                        src="{{ asset_base_url }}/{{ logo_light_path }}"
+                        alt="CognIA"
+                        width="32"
+                        height="32"
+                        style="display:block;border:0;outline:none;text-decoration:none;"
+                        class="brand-isotype-img isotype-light"
+                      />
+                      <img
+                        src="{{ asset_base_url }}/{{ logo_dark_path }}"
+                        alt="CognIA"
+                        width="32"
+                        height="32"
+                        style="display:none;border:0;outline:none;text-decoration:none;"
+                        class="brand-isotype-img isotype-dark"
+                      />
+                      {% else %}
+                      <span class="brand-isotype">C</span>
+                      {% endif %}
+                    </td>
+                    <td class="brand-text" valign="middle" style="padding-left:10px;color:#0F0E0E;">
+                      Cogn<span class="brand-accent">IA</span>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
             <tr>
-              <td style="padding:32px 32px 8px 32px;">
-                <p style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-size:16px;color:#0f172a;">
-                  Hola{% if full_name %} {{ full_name }}{% endif %},
+              <td class="pad-body" style="padding:8px 28px 0;">
+                <p class="title">Bienvenido/a</p>
+                <p class="subtitle">Plataforma de apoyo para alerta temprana</p>
+                <p class="text">Hola {{ user_name }},</p>
+                <p class="text">
+                  Te damos la bienvenida a CognIA. Nos alegra que formes parte de la plataforma.
                 </p>
-                <p style="margin:0 0 16px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#334155;line-height:1.6;">
-                  Te damos la bienvenida a CognIA. Desde aquí podrás gestionar evaluaciones y acceder a reportes
-                  de manera segura y ordenada.
+                <p class="text">
+                  CognIA está diseñada para acompañarte en la detección temprana de señales relacionadas con el desarrollo emocional
+                  infantil, ofreciéndote un entorno seguro, claro y organizado para gestionar evaluaciones y consultar reportes cuando lo necesites.
                 </p>
-                <p style="margin:0 0 20px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#334155;line-height:1.6;">
-                  Si tienes preguntas, responde a este correo o contacta al equipo administrador.
+                <p class="text">
+                  Desde aquí podrás acceder a la información de manera responsable, con el respaldo de herramientas basadas en
+                  inteligencia artificial que apoyan -pero no sustituyen- el criterio humano y profesional.
                 </p>
+                <p class="text">
+                  Si en algún momento tienes preguntas o necesitas orientación sobre el uso de la plataforma, puedes escribirnos a
+                  {{ EMAIL_REPLY_TO }} o contactar al equipo administrador. Estaremos atentos para ayudarte.
+                </p>
+                {% if frontend_url %}
+                <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:6px;margin-bottom:16px;">
+                  <tr>
+                    <td>
+                      <a
+                        href="{{ frontend_url }}/padre/cuestionario"
+                        class="btn btn-primary"
+                        style="display:inline-block;background:#1790E9;color:#FFFFFF;text-decoration:none;font-weight:700;font-size:15px;padding:12px 18px;border-radius:10px;"
+                      >
+                        Empezar cuestionario
+                      </a>
+                    </td>
+                    <td style="width:10px;"></td>
+                    <td>
+                      <a
+                        href="{{ frontend_url }}/nuestro-sistema"
+                        class="btn btn-ghost"
+                        style="display:inline-block;background:#F1F5F9;color:#1F2937;text-decoration:none;font-weight:600;font-size:15px;padding:12px 18px;border-radius:10px;border:1px solid #E2E8F0;"
+                      >
+                        Sobre nuestro sistema
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                {% endif %}
               </td>
             </tr>
             <tr>
-              <td style="padding:0 32px 32px 32px;">
-                <div style="border-top:1px solid #e2e8f0;padding-top:16px;">
-                  <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#64748b;line-height:1.5;">
-                    Este mensaje fue enviado automáticamente. Evita compartir tus credenciales con terceros.
-                  </p>
-                </div>
+              <td class="footer footer-divider pad-footer" style="padding:18px 28px 28px;">
+                © {{ year }} CognIA. Todos los derechos reservados.<br />
+                Este mensaje fue enviado automáticamente. Evita compartir tus credenciales con terceros.
               </td>
             </tr>
           </table>
