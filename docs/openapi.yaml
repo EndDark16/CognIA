@@ -44,6 +44,8 @@ tags:
     description: Registration, login, refresh, and logout using JWT in cookies.
   - name: MFA
     description: TOTP setup, confirmation, recovery codes, and disable.
+  - name: Email
+    description: Email unsubscribe utilities.
   - name: Users
     description: Admin user management.
   - name: Questionnaires
@@ -374,6 +376,166 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+
+  /api/auth/password/change:
+    post:
+      tags: [Auth]
+      summary: Change password (authenticated)
+      operationId: changePassword
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordChangeRequest"
+      responses:
+        "200":
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/auth/password/forgot:
+    post:
+      tags: [Auth]
+      summary: Request password reset (public)
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordForgotRequest"
+      responses:
+        "200":
+          description: Generic response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/auth/password/reset:
+    post:
+      tags: [Auth]
+      summary: Reset password with token (public)
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordResetRequest"
+      responses:
+        "200":
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/auth/password/reset/verify:
+    get:
+      tags: [Auth]
+      summary: Verify password reset token
+      operationId: verifyResetToken
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Token valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PasswordResetVerifyResponse"
+        "400":
+          description: Token invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PasswordResetVerifyResponse"
+
+  /api/email/unsubscribe:
+    get:
+      tags: [Email]
+      summary: Unsubscribe from emails (token)
+      description: |
+        One-click unsubscribe endpoint. The token is signed and does not expose
+        the email address. Returns a generic success message when valid.
+      operationId: emailUnsubscribeGet
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: reason
+          required: false
+          schema:
+            type: string
+            maxLength: 200
+      responses:
+        "200":
+          description: Unsubscribed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+    post:
+      tags: [Email]
+      summary: Unsubscribe from emails (token, one-click)
+      description: |
+        Supports List-Unsubscribe one-click POST. Token can be passed in the
+        query string or body. Returns a generic success message when valid.
+      operationId: emailUnsubscribePost
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                reason:
+                  type: string
+                  maxLength: 200
+      responses:
+        "200":
+          description: Unsubscribed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 
   /api/mfa/setup:
     post:
@@ -1273,6 +1435,45 @@ components:
           type: string
         recovery_code:
           type: string
+    PasswordChangeRequest:
+      type: object
+      required: [currentPassword, newPassword, confirmNewPassword]
+      properties:
+        currentPassword:
+          type: string
+          maxLength: 200
+        newPassword:
+          type: string
+          maxLength: 200
+          minLength: 10
+        confirmNewPassword:
+          type: string
+          maxLength: 200
+    PasswordForgotRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          maxLength: 254
+    PasswordResetRequest:
+      type: object
+      required: [token, newPassword, confirmNewPassword]
+      properties:
+        token:
+          type: string
+        newPassword:
+          type: string
+          maxLength: 200
+          minLength: 10
+        confirmNewPassword:
+          type: string
+          maxLength: 200
+    PasswordResetVerifyResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
     QuestionnaireTemplate:
       type: object
       properties:
