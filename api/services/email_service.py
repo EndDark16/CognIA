@@ -260,3 +260,43 @@ def send_password_reset(*, to_email: str, reset_link: str, full_name: str | None
             html_body=html_body,
             text_body=text_body,
         )
+
+
+def send_psychologist_rejected_email(*, to_email: str, full_name: str | None, reject_reason: str):
+    subject = "Verificación pendiente - CognIA"
+    asset_base_url = (current_app.config.get("EMAIL_ASSET_BASE_URL") or "").rstrip("/")
+    html_body = render_template(
+        "email/psychologist_rejected.html",
+        user_name=full_name or "usuario",
+        reject_reason=reject_reason,
+        year=datetime.now(timezone.utc).year,
+        EMAIL_REPLY_TO=current_app.config.get("EMAIL_REPLY_TO") or "soporte@cognia.app",
+        asset_base_url=asset_base_url,
+        logo_light_path="logo/cognia-logo-light.png",
+        logo_dark_path="logo/cognia-logo-dark.png",
+        signature_light_path="logo/cognia-signature.png",
+        signature_dark_path="logo/cognia-signature.png",
+    )
+    text_body = render_template(
+        "email/psychologist_rejected.txt",
+        user_name=full_name or "usuario",
+        reject_reason=reject_reason,
+        year=datetime.now(timezone.utc).year,
+        EMAIL_REPLY_TO=current_app.config.get("EMAIL_REPLY_TO") or "soporte@cognia.app",
+    )
+    if current_app.config.get("EMAIL_SEND_ASYNC", True):
+        send_email_async(
+            template="psychologist_rejected",
+            subject=subject,
+            to_email=to_email,
+            html_body=html_body,
+            text_body=text_body,
+        )
+    else:
+        send_email(
+            template="psychologist_rejected",
+            subject=subject,
+            to_email=to_email,
+            html_body=html_body,
+            text_body=text_body,
+        )
