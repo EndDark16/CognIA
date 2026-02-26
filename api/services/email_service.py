@@ -95,12 +95,21 @@ def _send_via_smtp(message: EmailMessage) -> None:
     password = current_app.config.get("SMTP_PASSWORD")
     use_tls = current_app.config.get("SMTP_USE_TLS")
     use_ssl = current_app.config.get("SMTP_USE_SSL")
+    smtp_debug = current_app.config.get("SMTP_DEBUG", False)
     timeout = current_app.config.get("SMTP_TIMEOUT", 10)
 
     if not host:
         raise RuntimeError("SMTP_HOST is not configured")
 
     port, use_tls, use_ssl = _resolve_smtp_mode(host, port, use_tls, use_ssl, port_ssl, port_tls)
+    current_app.logger.info(
+        "SMTP attempt host=%s port=%s tls=%s ssl=%s user_configured=%s",
+        host,
+        port,
+        use_tls,
+        use_ssl,
+        bool(user and password),
+    )
 
     if use_ssl:
         server = smtplib.SMTP_SSL(host, port, timeout=timeout)
@@ -108,6 +117,8 @@ def _send_via_smtp(message: EmailMessage) -> None:
         server = smtplib.SMTP(host, port, timeout=timeout)
 
     try:
+        if smtp_debug:
+            server.set_debuglevel(1)
         server.ehlo()
         if use_tls and not use_ssl:
             server.starttls()
@@ -154,10 +165,17 @@ def send_email(*, template: str, subject: str, to_email: str, html_body: str, te
         html_body=html_body,
         text_body=text_body,
     )
+    current_app.logger.info(
+        "Email dispatch template=%s recipient=%s async=%s",
+        template,
+        to_email,
+        bool(current_app.config.get("EMAIL_SEND_ASYNC", True)),
+    )
 
     try:
         _send_via_smtp(message)
         _log_delivery(template, to_email, subject, "sent")
+        current_app.logger.info("Email sent template=%s recipient=%s", template, to_email)
     except Exception as exc:
         current_app.logger.error("Email send failed (%s -> %s): %s", template, to_email, exc, exc_info=True)
         try:
