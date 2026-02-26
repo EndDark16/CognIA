@@ -21,6 +21,7 @@ from api.routes.mfa import mfa_bp
 from api.routes.docs import docs_bp
 from api.routes.health import health_bp
 from api.routes.email import email_bp
+from api.routes.admin import admin_bp
 from api.routes.questionnaires import questionnaires_bp
 from api.routes.evaluations import evaluations_bp
 from api.routes.users import users_bp
@@ -136,6 +137,7 @@ def create_app(config_class=DevelopmentConfig):
     app.register_blueprint(evaluations_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(email_bp)
+    app.register_blueprint(admin_bp)
 
     # Token Blocklist Callback
     @jwt.token_in_blocklist_loader
@@ -156,6 +158,15 @@ def create_app(config_class=DevelopmentConfig):
                     if pwd_changed.tzinfo is None:
                         pwd_changed = pwd_changed.replace(tzinfo=timezone.utc)
                     if issued_at <= pwd_changed:
+                        return True
+            if user and user.sessions_revoked_at:
+                iat = jwt_payload.get("iat")
+                if iat:
+                    issued_at = datetime.fromtimestamp(iat, timezone.utc)
+                    revoked_at = user.sessions_revoked_at
+                    if revoked_at.tzinfo is None:
+                        revoked_at = revoked_at.replace(tzinfo=timezone.utc)
+                    if issued_at <= revoked_at:
                         return True
         except Exception:
             return False
