@@ -81,6 +81,7 @@ cognia_app/
 - Crear nueva revision: `alembic revision --autogenerate -m "mensaje"`
 - Aplicar migraciones: `alembic upgrade head`
 - Baseline incluida: crea la tabla `refresh_token` si falta (segura en entornos donde ya existe).
+- Nueva migracion `20260208_01_add_colpsic_verification_fields.py`: agrega verificacion COLPSIC en `app_user`, `sessions_revoked_at` y flags `is_archived/archived_at` en `questionnaire_template`. Los psicologos existentes quedan con `colpsic_verified=false` y no podran iniciar sesion hasta ser aprobados via Admin API.
 
 ## Auth con cookies (refresh) y MFA
 - El refresh token nunca viaja en el body. Se devuelve como cookie HttpOnly `refresh_token` (Path=/api/auth/refresh) protegida con CSRF doble submit (`csrf_refresh_token` cookie y header `X-CSRF-Token`).
@@ -94,6 +95,7 @@ cognia_app/
 - Logout revoca todos los refresh tokens del usuario (logout all) para evitar reuso.
 - Errores estandarizados: todas las respuestas de error incluyen `{"msg": "...", "error": "<codigo>"}`. Ejemplos: `invalid_credentials`, `mfa_required`, `mfa_enrollment_required`, `csrf_failed`, `token_revoked`, `user_exists`.
 - Roles/RBAC: el access token incluye `roles` y las rutas sensibles deben protegerse con `roles_required(...)`. El frontend puede redirigir segun roles, pero la validacion real debe ocurrir en el backend.
+- COLPSIC: si `user_type=psychologist` y `colpsic_verified=false`, el login responde 403 con `error: "colpsic_pending"` (mensaje generico).
 
 ### Flujo de login y MFA (resumen)
 - Login normal (usuario sin MFA requerido): `/api/auth/login` devuelve `access_token` y cookies `refresh_token` + `csrf_refresh_token`.
@@ -174,6 +176,11 @@ cognia_app/
   # EMAIL_UNSUBSCRIBE_SECRET=una_llave_secreta_opcional
   # EMAIL_UNSUBSCRIBE_TOKEN_TTL_DAYS=365
   # EMAIL_UNSUBSCRIBE_RATE_LIMIT=10 per 10 minutes
+  # ADMIN_LIST_RATE_LIMIT=60 per minute
+  # ADMIN_MUTATION_RATE_LIMIT=20 per minute
+  # ADMIN_SECURITY_RATE_LIMIT=10 per minute
+  # ADMIN_AUDIT_RATE_LIMIT=30 per minute
+  # ADMIN_IMPERSONATION_TTL_SECONDS=900
   # SMTP_HOST=smtp.tu-proveedor.com
   # SMTP_PORT=587
   # SMTP_PORT__SSL=465
@@ -412,6 +419,41 @@ Requiere rol `ADMIN` (Bearer access token).
 Notas:
 - `user_type` es obligatorio en alta. Si es `psychologist`, debes enviar `professional_card_number`.
 - `roles` es opcional; si se envia, se reemplaza el set de roles del usuario.
+
+### Admin API (operaciones sensibles)
+Requiere rol `ADMIN` (Bearer access token). Se recomienda MFA habilitado para admins.
+
+Endpoints clave:
+- `GET /api/admin/users` (filtros + paginacion)
+- `PATCH /api/admin/users/{id}` (activar/bloquear, roles, user_type)
+- `POST /api/admin/users/{id}/password-reset` (invalida sesiones)
+- `POST /api/admin/users/{id}/mfa/reset`
+- `GET /api/admin/audit-logs`
+- `POST /api/admin/questionnaires/{id}/publish`
+- `POST /api/admin/questionnaires/{id}/archive`
+- `POST /api/admin/psychologists/{id}/approve`
+- `POST /api/admin/psychologists/{id}/reject`
+
+Ejemplos (curl):
+```bash
+# Listar usuarios con filtros
+curl -X GET "http://localhost:5000/api/admin/users?page=1&page_size=20&role=PSYCHOLOGIST&colpsic_verified=false" \
+  -H "Authorization: Bearer <admin_access_token>"
+
+# Aprobar psicologo (COLPSIC)
+curl -X POST http://localhost:5000/api/admin/psychologists/<user_id>/approve \
+  -H "Authorization: Bearer <admin_access_token>"
+
+# Rechazar psicologo (COLPSIC) con motivo
+curl -X POST http://localhost:5000/api/admin/psychologists/<user_id>/reject \
+  -H "Authorization: Bearer <admin_access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"reason":"Documento incompleto o ilegible."}'
+
+# Forzar reset de password (invalida sesiones)
+curl -X POST http://localhost:5000/api/admin/users/<user_id>/password-reset \
+  -H "Authorization: Bearer <admin_access_token>"
+```
 
 ### Emails transaccionales
 - Actualmente se envia un **correo de bienvenida** al registrar usuarios (via SMTP).

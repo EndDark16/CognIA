@@ -170,6 +170,8 @@ def add_questions(template_id):
     template = QuestionnaireTemplate.query.filter_by(id=template_uuid).first()
     if not template:
         return _error_response("Template not found", "template_not_found", 404)
+    if template.is_archived:
+        return _error_response("Template archived", "template_archived", 409)
     if template.is_active:
         return _error_response("Template is active", "template_active", 409)
 
@@ -286,6 +288,8 @@ def activate_questionnaire(template_id):
     template = QuestionnaireTemplate.query.filter_by(id=template_uuid).first()
     if not template:
         return _error_response("Template not found", "template_not_found", 404)
+    if template.is_archived:
+        return _error_response("Template archived", "template_archived", 409)
     if Question.query.filter_by(questionnaire_id=template.id).count() == 0:
         return _error_response("Template has no questions", "template_empty", 409)
 
