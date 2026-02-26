@@ -7,7 +7,7 @@ from app.models import db, QuestionnaireTemplate, Question
 
 def get_active_template():
     return (
-        QuestionnaireTemplate.query.filter_by(is_active=True)
+        QuestionnaireTemplate.query.filter_by(is_active=True, is_archived=False)
         .order_by(
             desc(QuestionnaireTemplate.updated_at).nullslast(),
             desc(QuestionnaireTemplate.created_at).nullslast(),
