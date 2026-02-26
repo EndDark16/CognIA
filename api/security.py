@@ -1,6 +1,7 @@
 import bcrypt
 import re
-from app.models import db, AuditLog, AppUser
+from app.models import db, AuditLog, AppUser, RefreshToken
+from datetime import datetime, timezone
 from flask import request
 from flask_jwt_extended import set_refresh_cookies
 from cryptography.fernet import Fernet, InvalidToken
@@ -54,6 +55,21 @@ def log_audit(user_id, action, section=None, details=None):
     except Exception as e:
         print(f"Failed to write audit log: {e}")
         db.session.rollback()
+
+
+def revoke_user_sessions(user: AppUser) -> None:
+    """Revoke refresh tokens and mark access tokens as revoked for a user."""
+    now = datetime.now(timezone.utc)
+    try:
+        RefreshToken.query.filter_by(user_id=user.id, revoked=False).update(
+            {"revoked": True}, synchronize_session=False
+        )
+        user.sessions_revoked_at = now
+        db.session.add(user)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def set_refresh_cookie(response, refresh_token: str) -> None:

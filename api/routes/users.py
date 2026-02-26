@@ -110,6 +110,7 @@ def _user_payload(user: AppUser):
         "full_name": user.full_name,
         "user_type": user.user_type,
         "professional_card_number": user.professional_card_number,
+        "colpsic_verified": user.colpsic_verified,
         "is_active": user.is_active,
         "roles": [role.name for role in user.roles],
         "created_at": user.created_at.isoformat() if user.created_at else None,

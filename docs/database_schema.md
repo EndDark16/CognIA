@@ -18,7 +18,7 @@ entorno de tesis y auditoria tecnica.
 ## public: tablas principales por dominio
 
 ### Acceso y auditoria
-- `app_user`: usuarios locales (no usa `auth.users`); incluye `user_type` (guardian/psychologist), `professional_card_number` (COLPSIC), `password_changed_at` y campos de bloqueo de login (`failed_login_attempts`, `login_locked_until`).
+- `app_user`: usuarios locales (no usa `auth.users`); incluye `user_type` (guardian/psychologist), `professional_card_number` (COLPSIC), **verificación COLPSIC** (`colpsic_verified`, `colpsic_verified_at`, `colpsic_rejected_at`, `colpsic_reject_reason`, `colpsic_*_by`), `password_changed_at`, `sessions_revoked_at` y campos de bloqueo de login (`failed_login_attempts`, `login_locked_until`).
 - `password_reset_token`: tokens de recuperación (hash, expiración, uso, metadata).
 - `email_delivery_log`: log de envio de emails transaccionales (template, status, error, timestamps).
 - `email_unsubscribe`: lista de bajas (email, reason, source, metadata).
@@ -28,7 +28,7 @@ entorno de tesis y auditoria tecnica.
 - `refresh_token`, `user_mfa`, `recovery_code`, `mfa_login_challenge`: MFA/JWT.
 
 ### Cuestionarios
-- `questionnaire_template`: plantilla (nombre, version, is_active).
+- `questionnaire_template`: plantilla (nombre, version, is_active, is_archived).
 - `question`: preguntas; incluye constraints opcionales:
   - `response_min`, `response_max`, `response_step`, `response_options`.
 - `question_disorder`: **relacion N:M** para preguntas multi-trastorno.

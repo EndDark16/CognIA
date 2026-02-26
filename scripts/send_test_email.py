@@ -83,6 +83,11 @@ def main() -> int:
         dest="reset_link",
         default="https://example.com/reset-password?token=test",
     )
+    parser.add_argument(
+        "--reject-reason",
+        dest="reject_reason",
+        default="Información insuficiente para validar la tarjeta profesional.",
+    )
     args = parser.parse_args()
 
     host = os.getenv("SMTP_HOST")
@@ -112,6 +117,7 @@ def main() -> int:
     subject_map = {
         "welcome": "Bienvenido a CognIA",
         "password_reset": "Restablecer contraseña",
+        "psychologist_rejected": "Verificación pendiente - CognIA",
     }
     subject = args.subject or subject_map.get(args.template, f"Test template: {args.template}")
 
@@ -121,6 +127,7 @@ def main() -> int:
         "year": year_override or str(datetime.now(timezone.utc).year),
         "EMAIL_REPLY_TO": os.getenv("EMAIL_REPLY_TO") or "",
         "reset_link": args.reset_link,
+        "reject_reason": args.reject_reason,
         "frontend_url": (os.getenv("FRONTEND_URL") or "").rstrip("/"),
         "asset_base_url": (os.getenv("EMAIL_ASSET_BASE_URL") or "").rstrip("/"),
         "logo_light_path": "logo/cognia-logo-light.png",

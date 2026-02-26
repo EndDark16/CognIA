@@ -193,6 +193,29 @@ def test_register_psychologist_requires_card(client):
     assert resp_ok.status_code == 201
 
 
+def test_psychologist_login_requires_colpsic_verification(client, app):
+    username = f"psychlogin_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={
+            "username": username,
+            "email": email,
+            "password": password,
+            "full_name": "Psych User",
+            "user_type": "psychologist",
+            "professional_card_number": "COLPSIC-98765",
+        },
+    )
+    assert resp_reg.status_code == 201
+
+    resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
+    assert resp_login.status_code == 403
+    assert resp_login.json.get("error") == "colpsic_pending"
+
+
 def test_mfa_setup_and_login_flow(client, app):
     username = f"mfauser_{uuid.uuid4().hex[:8]}"
     email = f"{username}@example.com"
