@@ -399,6 +399,8 @@ def login():
                 current_app.logger.error("Failed to update login attempts for %s: %s", username, e, exc_info=True)
         return _error_response("Invalid credentials", "invalid_credentials", 401)
 
+    if user.user_type == "psychologist" and not getattr(user, "colpsic_verified", False):
+        return _error_response("Account pending verification", "colpsic_pending", 403)
     if not user.is_active:
         return _error_response("Account inactive", "inactive_account", 403)
 
@@ -523,7 +525,11 @@ def login_mfa():
         return _error_response("Invalid challenge", "invalid_challenge", 401)
 
     user = db.session.get(AppUser, challenge.user_id)
-    if not user or not user.is_active:
+    if not user:
+        return _error_response("Invalid credentials", "invalid_credentials", 401)
+    if user.user_type == "psychologist" and not getattr(user, "colpsic_verified", False):
+        return _error_response("Account pending verification", "colpsic_pending", 403)
+    if not user.is_active:
         return _error_response("Invalid credentials", "invalid_credentials", 401)
     if requires_mfa_enrollment(user) and not user.mfa_enabled:
         resp = jsonify(
@@ -611,7 +617,11 @@ def refresh():
         return _error_response("Token revoked", "token_revoked", 401)
 
     user = db.session.get(AppUser, identity)
-    if not user or not user.is_active:
+    if not user:
+        return _error_response("User not found or inactive", "user_inactive", 401)
+    if user.user_type == "psychologist" and not getattr(user, "colpsic_verified", False):
+        return _error_response("Account pending verification", "colpsic_pending", 403)
+    if not user.is_active:
         return _error_response("User not found or inactive", "user_inactive", 401)
 
     if requires_mfa_enrollment(user) and not user.mfa_enabled:
@@ -729,6 +739,7 @@ def me():
                 "full_name": user.full_name,
                 "user_type": user.user_type,
                 "professional_card_number": user.professional_card_number,
+                "colpsic_verified": user.colpsic_verified,
                 "is_active": user.is_active,
                 "roles": _get_roles(user),
                 "mfa_enabled": user.mfa_enabled,

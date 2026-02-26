@@ -61,6 +61,13 @@ class Config:
     PASSWORD_RESET_RATE_LIMIT = os.getenv("PASSWORD_RESET_RATE_LIMIT", "5 per 10 minutes")
     PASSWORD_VERIFY_RATE_LIMIT = os.getenv("PASSWORD_VERIFY_RATE_LIMIT", "20 per 10 minutes")
 
+    # Admin rate limits
+    ADMIN_LIST_RATE_LIMIT = os.getenv("ADMIN_LIST_RATE_LIMIT", "60 per minute")
+    ADMIN_MUTATION_RATE_LIMIT = os.getenv("ADMIN_MUTATION_RATE_LIMIT", "20 per minute")
+    ADMIN_SECURITY_RATE_LIMIT = os.getenv("ADMIN_SECURITY_RATE_LIMIT", "10 per minute")
+    ADMIN_AUDIT_RATE_LIMIT = os.getenv("ADMIN_AUDIT_RATE_LIMIT", "30 per minute")
+    ADMIN_IMPERSONATION_TTL_SECONDS = int(os.getenv("ADMIN_IMPERSONATION_TTL_SECONDS", "900"))
+
     # Evaluations
     EVALUATION_MIN_AGE = int(os.getenv("EVALUATION_MIN_AGE", "6"))
     EVALUATION_MAX_AGE = int(os.getenv("EVALUATION_MAX_AGE", "11"))
