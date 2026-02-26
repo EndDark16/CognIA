@@ -120,6 +120,7 @@ class Config:
     SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
     SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() == "true"
     SMTP_USE_SSL = os.getenv("SMTP_USE_SSL", "false").lower() == "true"
+    SMTP_DEBUG = os.getenv("SMTP_DEBUG", "false").lower() == "true"
     SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", "10"))
 
     SWAGGER_ENABLED = os.getenv("SWAGGER_ENABLED", "true").lower() == "true"

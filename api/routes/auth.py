@@ -823,9 +823,15 @@ def forgot_password():
 
     email = _normalize_email(data.get("email"))
     if not email or not _is_valid_email(email):
+        current_app.logger.info("password_forgot ignored: invalid email input")
         return jsonify({"message": "If the email exists, a reset link has been sent"}), 200
 
     user = AppUser.query.filter_by(email=email).first()
+    if not user:
+        current_app.logger.info("password_forgot accepted: no user for email=%s", email)
+    elif not user.is_active:
+        current_app.logger.info("password_forgot accepted: inactive user_id=%s", user.id)
+
     if user and user.is_active:
         try:
             token = create_reset_token(
@@ -833,12 +839,18 @@ def forgot_password():
                 request_ip=request.remote_addr,
                 user_agent=request.user_agent.string,
             )
+            current_app.logger.info("password_forgot token created user_id=%s", user.id)
             base_url = current_app.config.get("FRONTEND_URL", "").rstrip("/")
             if not base_url:
                 current_app.logger.warning("FRONTEND_URL not configured; skipping password reset email")
             else:
                 path = current_app.config.get("PASSWORD_RESET_PATH", "/reset-password")
                 reset_link = f"{base_url}{path}?token={token}"
+                current_app.logger.info(
+                    "password_forgot sending reset email user_id=%s async=%s",
+                    user.id,
+                    bool(current_app.config.get("EMAIL_SEND_ASYNC", True)),
+                )
                 send_password_reset(to_email=user.email, reset_link=reset_link, full_name=user.full_name)
         except Exception as e:
             current_app.logger.error("Password reset flow failed for %s: %s", email, e, exc_info=True)
