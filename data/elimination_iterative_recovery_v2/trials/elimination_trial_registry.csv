@@ -1,0 +1,13 @@
+trial_id,dataset_key,n_features,n_removed,threshold,calibration_method,preliminary_decision
+T01_baseline_replay_controlado,strict,300,42,0.6,none,perfect_score_blocked
+T02_drop_high_risk_semantic_proxies,strict,280,174,0.44999999999999996,none,candidate_honest
+T03_drop_high_plus_critical_proxies,strict,260,174,0.39999999999999997,none,candidate_honest
+T04_strict_semantic_minimal,strict,200,174,0.44999999999999996,none,candidate_honest
+T05_compact_low_complexity_rf,compact,6,174,0.05,none,perfect_score_blocked
+T06_stability_first_rf,strict,220,174,0.49999999999999994,none,candidate_honest
+T07_missingness_augmented_honest_run,strict,314,174,0.39999999999999997,none,candidate_honest
+T08_threshold_conservative_run,strict,240,174,0.85,none,perfect_score_blocked
+T09_calibrated_run,strict,240,174,0.49999999999999994,sigmoid,candidate_honest
+T10_thesis_defensible_candidate,compact,6,174,0.05,sigmoid,perfect_score_blocked
+T11_ultra_strict_candidate,strict,174,174,0.95,sigmoid,perfect_score_blocked
+T12_best_combined_honest_candidate,strict,254,174,0.65,sigmoid,candidate_honest

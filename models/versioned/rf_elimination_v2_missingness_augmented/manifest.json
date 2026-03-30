@@ -1,0 +1,107 @@
+{
+  "model_version": "rf_elimination_v2_missingness_augmented",
+  "parent_version": "rf_elimination_v1_baseline",
+  "task_type": "binary",
+  "status": "completed",
+  "dataset_name": "dataset_elimination_core",
+  "dataset_variant": "core",
+  "data_scope": "strict_no_leakage",
+  "split_version": "splits_strict_no_leakage_frozen_v1",
+  "preprocessing_version": "rf_preproc_v1",
+  "seed": 42,
+  "target": "target_elimination",
+  "n_features_raw": 17,
+  "n_features_final": 22,
+  "train_rows": 1333,
+  "val_rows": 286,
+  "test_rows": 286,
+  "best_params": {
+    "model__n_estimators": 150,
+    "model__min_samples_split": 10,
+    "model__min_samples_leaf": 4,
+    "model__max_features": "log2",
+    "model__max_depth": 10,
+    "model__class_weight": "balanced_subsample"
+  },
+  "search_meta": {
+    "best_cv_balanced_accuracy": 0.5367170845633223,
+    "cv_splits": 3,
+    "n_iter": 10
+  },
+  "threshold_strategy": "youden_j",
+  "threshold_value": 0.11081514150403322,
+  "calibration_strategy": "sigmoid",
+  "validation_metrics": {
+    "threshold": 0.11081514150403322,
+    "accuracy": 0.5909090909090909,
+    "balanced_accuracy": 0.6406395891690009,
+    "precision": 0.183206106870229,
+    "recall": 0.7058823529411765,
+    "sensitivity": 0.7058823529411765,
+    "specificity": 0.5753968253968254,
+    "f1": 0.2909090909090909,
+    "support_negative": 252,
+    "support_positive": 34,
+    "confusion_matrix": [
+      [
+        145,
+        107
+      ],
+      [
+        10,
+        24
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.5753968253968254,
+        0.4246031746031746
+      ],
+      [
+        0.29411764705882354,
+        0.7058823529411765
+      ]
+    ],
+    "roc_auc": 0.6338702147525677,
+    "pr_auc": 0.21938240070211756,
+    "brier_score": 0.10198058638794386
+  },
+  "test_metrics": {
+    "threshold": 0.11081514150403322,
+    "accuracy": 0.5874125874125874,
+    "balanced_accuracy": 0.6768207282913166,
+    "precision": 0.1956521739130435,
+    "recall": 0.7941176470588235,
+    "sensitivity": 0.7941176470588235,
+    "specificity": 0.5595238095238095,
+    "f1": 0.313953488372093,
+    "support_negative": 252,
+    "support_positive": 34,
+    "confusion_matrix": [
+      [
+        141,
+        111
+      ],
+      [
+        7,
+        27
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.5595238095238095,
+        0.44047619047619047
+      ],
+      [
+        0.20588235294117646,
+        0.7941176470588235
+      ]
+    ],
+    "roc_auc": 0.7105508870214753,
+    "pr_auc": 0.24416137088073053,
+    "brier_score": 0.10071456746977792
+  },
+  "notes": "Elimination core model with explicit missingness indicators (exploratory).",
+  "experimental": false,
+  "created_at": "2026-03-24T03:20:33.862178+00:00"
+}

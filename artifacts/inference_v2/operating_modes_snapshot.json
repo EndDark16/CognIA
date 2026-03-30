@@ -1,0 +1,94 @@
+{
+  "modes_snapshot": [
+    {
+      "trial_id": "domain_adhd_strict_full",
+      "mode": "sensitive",
+      "threshold": 0.6,
+      "precision_test": 0.98125,
+      "recall_test": 0.9751552795031057,
+      "specificity_test": 0.976,
+      "balanced_accuracy_test": 0.9755776397515528
+    },
+    {
+      "trial_id": "domain_adhd_strict_full",
+      "mode": "precise",
+      "threshold": 0.85,
+      "precision_test": 0.9808917197452228,
+      "recall_test": 0.9565217391304348,
+      "specificity_test": 0.976,
+      "balanced_accuracy_test": 0.9662608695652174
+    },
+    {
+      "trial_id": "domain_adhd_strict_full",
+      "mode": "abstention_assisted",
+      "threshold": 0.75,
+      "precision_test": 0.98125,
+      "recall_test": 0.9751552795031057,
+      "specificity_test": 0.976,
+      "balanced_accuracy_test": 0.9755776397515528
+    },
+    {
+      "trial_id": "domain_adhd_research_full",
+      "mode": "sensitive",
+      "threshold": 0.2,
+      "precision_test": 1.0,
+      "recall_test": 1.0,
+      "specificity_test": 1.0,
+      "balanced_accuracy_test": 1.0
+    },
+    {
+      "trial_id": "domain_adhd_research_full",
+      "mode": "precise",
+      "threshold": 0.15,
+      "precision_test": 1.0,
+      "recall_test": 1.0,
+      "specificity_test": 1.0,
+      "balanced_accuracy_test": 1.0
+    },
+    {
+      "trial_id": "domain_adhd_research_full",
+      "mode": "abstention_assisted",
+      "threshold": 0.05,
+      "precision_test": 1.0,
+      "recall_test": 1.0,
+      "specificity_test": 1.0,
+      "balanced_accuracy_test": 1.0
+    },
+    {
+      "trial_id": "domain_conduct_strict_full",
+      "mode": "sensitive",
+      "threshold": 0.5,
+      "precision_test": 0.9605263157894736,
+      "recall_test": 0.9125,
+      "specificity_test": 0.9854368932038836,
+      "balanced_accuracy_test": 0.9489684466019416
+    },
+    {
+      "trial_id": "domain_conduct_strict_full",
+      "mode": "precise",
+      "threshold": 0.75,
+      "precision_test": 0.96,
+      "recall_test": 0.9,
+      "specificity_test": 0.9854368932038836,
+      "balanced_accuracy_test": 0.9427184466019418
+    },
+    {
+      "trial_id": "domain_conduct_strict_full",
+      "mode": "abstention_assisted",
+      "threshold": 0.65,
+      "precision_test": 0.96,
+      "recall_test": 0.9,
+      "specificity_test": 0.9854368932038836,
+      "balanced_accuracy_test": 0.9427184466019418
+    },
+    {
+      "trial_id": "domain_conduct_strict_compact",
+      "mode": "sensitive",
+      "threshold": 0.7,
+      "precision_test": 0.9571428571428572,
+      "recall_test": 0.8375,
+      "specificity_test": 0.9854368932038836,
+      "balanced_accuracy_test": 0.9114684466019418
+    }
+  ]
+}

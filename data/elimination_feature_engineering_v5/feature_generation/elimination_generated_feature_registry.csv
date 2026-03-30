@@ -1,0 +1,20 @@
+generated_feature_name,feature_family,source_columns,transformation_type,derivation_rule,clinical_rationale,methodological_risk,leakage_risk,promotable_yes_no
+v5_comp_elim_core_sum,composite_clinical,"cbcl_108,cbcl_112,sdq_impact",derived_composite,cbcl_108 + cbcl_112 + sdq_impact,Core compatible elimination signal sum,low,low,yes
+v5_comp_elim_core_mean,composite_clinical,"cbcl_108,cbcl_112,sdq_impact",derived_composite,(cbcl_108 + cbcl_112 + sdq_impact) / 3,Core compatible elimination signal mean,low,low,yes
+v5_comp_elim_source_convergence,composite_clinical,"has_cbcl,has_sdq",derived_composite,1 if has_cbcl + has_sdq >= 2 else 0,Convergence flag between available parent-report sources,low,low,yes
+v5_comp_elim_consistency,composite_clinical,"cbcl_108,cbcl_112",derived_composite,1 / (1 + abs(cbcl_108 - cbcl_112)),Consistency between core subtype proxies,low,low,yes
+v5_anti_transdiag_burden,anti_transdiagnostic,"cbcl_internalizing_proxy,cbcl_externalizing_proxy,asr_internalizing_proxy,asr_externalizing_proxy,ysr_internalizing_proxy,ysr_externalizing_proxy,sdq_total_difficulties,sdq_difficulties_total_proxy",derived_composite,"sum(internalizing, externalizing, sdq_difficulties proxies)",Global transdiagnostic burden proxy,moderate,low,yes
+v5_anti_specificity_ratio,anti_transdiagnostic,"v5_comp_elim_core_sum,v5_anti_transdiag_burden",derived_composite,elim_core_sum / (1 + transdiag_burden),Relative elimination specificity vs diffuse burden,moderate,low,yes
+v5_anti_focality_index,anti_transdiagnostic,"v5_comp_elim_core_mean,cbcl_internalizing_proxy,cbcl_externalizing_proxy",derived_composite,elim_core_mean - 0.35*(internalizing + externalizing),Focal elimination signal against broad internalizing/externalizing,moderate,low,yes
+v5_anti_internalizing_minus_elim,anti_transdiagnostic,"cbcl_internalizing_proxy,asr_internalizing_proxy,ysr_internalizing_proxy,v5_comp_elim_core_sum",derived_composite,internalizing_proxy_sum - elim_core_sum,High values suggest non-specific internalizing profile,moderate,low,yes
+v5_eq_source_count,evidence_quality,"has_cbcl,has_sdq,has_ari_p,has_ari_sr",derived_composite,has_cbcl + has_sdq + has_ari_p + has_ari_sr,Number of useful sources available per case,low,low,yes
+v5_eq_core_observed_ratio,evidence_quality,"cbcl_108,cbcl_112,sdq_impact",derived_composite,"non_missing_ratio([cbcl_108, cbcl_112, sdq_impact])",Observed core signal ratio,low,low,yes
+v5_eq_missing_ratio_core,evidence_quality,v5_eq_core_observed_ratio,derived_composite,1 - core_observed_ratio,Core missingness ratio,low,low,yes
+v5_eq_evidence_quality_score,evidence_quality,"v5_eq_source_count,v5_eq_core_observed_ratio,v5_eq_missing_ratio_core",derived_composite,source_count + core_observed_ratio - 0.5*missing_ratio_core,Simple evidence quality score,low,low,yes
+v5_sub_aux_enuresis_proxy_flag,subtype_auxiliary,cbcl_108,derived_composite,1 if cbcl_108 >= q70(1.0000) else 0,Auxiliary enuresis-like proxy flag,moderate,moderate,yes
+v5_sub_aux_encopresis_proxy_flag,subtype_auxiliary,cbcl_112,derived_composite,1 if cbcl_112 >= q70(1.0000) else 0,Auxiliary encopresis-like proxy flag,moderate,moderate,yes
+v5_sub_aux_overlap_flag,subtype_auxiliary,"v5_sub_aux_enuresis_proxy_flag,v5_sub_aux_encopresis_proxy_flag",derived_composite,1 if both subtype auxiliary flags are active else 0,Auxiliary mixed subtype pattern,moderate,moderate,yes
+v5_sub_aux_dominance_index,subtype_auxiliary,"cbcl_108,cbcl_112",derived_composite,cbcl_108 - cbcl_112,Subtype dominance proxy (auxiliary only),moderate,moderate,yes
+v5_hn_negative_guard,hard_negative,"v5_anti_transdiag_burden,v5_comp_elim_core_sum",derived_composite,transdiag_burden - elim_core_sum,Hard-negative guard against diffuse distress false positives,moderate,low,yes
+v5_hn_transdiag_pressure,hard_negative,v5_anti_transdiag_burden,derived_composite,copy(v5_anti_transdiag_burden),Raw transdiagnostic pressure for guard analysis,moderate,low,yes
+v5_hn_hard_negative_flag,hard_negative,v5_hn_negative_guard,derived_composite,1 if negative_guard >= q75(66.0000) else 0,Flag likely hard negatives with diffuse burden,moderate,low,yes

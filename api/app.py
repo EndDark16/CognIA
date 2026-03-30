@@ -33,6 +33,7 @@ from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import SQLAlchemyError, OperationalError, DBAPIError
 from flask_limiter.errors import RateLimitExceeded
 from marshmallow import ValidationError
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 def create_app(config_class=DevelopmentConfig):
@@ -42,6 +43,15 @@ def create_app(config_class=DevelopmentConfig):
         static_folder=os.path.join(PROJECT_ROOT, "static"),
     )
     app.config.from_object(config_class)
+    if app.config.get("TRUST_PROXY_HEADERS", False):
+        app.wsgi_app = ProxyFix(
+            app.wsgi_app,
+            x_for=int(app.config.get("PROXY_FIX_X_FOR", 1)),
+            x_proto=int(app.config.get("PROXY_FIX_X_PROTO", 1)),
+            x_host=int(app.config.get("PROXY_FIX_X_HOST", 1)),
+            x_port=int(app.config.get("PROXY_FIX_X_PORT", 1)),
+            x_prefix=int(app.config.get("PROXY_FIX_X_PREFIX", 1)),
+        )
 
     def _to_timedelta(value, default_seconds: int) -> timedelta:
         if isinstance(value, timedelta):
@@ -58,14 +68,36 @@ def create_app(config_class=DevelopmentConfig):
 
     # JWT cookie settings
     is_prod = not app.debug and not app.testing
+    cross_site_cookies = bool(app.config.get("AUTH_CROSS_SITE_COOKIES", False))
+    cookie_secure_cfg = app.config.get("JWT_COOKIE_SECURE")
+    cookie_samesite_cfg = app.config.get("JWT_COOKIE_SAMESITE")
+    cookie_secure = is_prod if cookie_secure_cfg is None else bool(cookie_secure_cfg)
+
+    if cookie_samesite_cfg:
+        samesite = str(cookie_samesite_cfg).strip().capitalize()
+        if samesite not in {"Lax", "Strict", "None"}:
+            samesite = "Strict" if is_prod else "Lax"
+    else:
+        if cross_site_cookies and is_prod:
+            samesite = "None"
+        else:
+            samesite = "Strict" if is_prod else "Lax"
+
+    if samesite == "None":
+        # Browsers reject SameSite=None cookies unless Secure=true.
+        cookie_secure = True
+
     app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
     app.config["JWT_REFRESH_COOKIE_NAME"] = "refresh_token"
     app.config["JWT_REFRESH_COOKIE_PATH"] = "/api/auth/refresh"
-    app.config["JWT_COOKIE_SAMESITE"] = "Strict" if is_prod else "Lax"
-    app.config["JWT_COOKIE_SECURE"] = True if is_prod else False
+    app.config["JWT_COOKIE_SAMESITE"] = samesite
+    app.config["JWT_COOKIE_SECURE"] = cookie_secure
     app.config["JWT_COOKIE_CSRF_PROTECT"] = True
     app.config["JWT_ACCESS_CSRF_HEADER_NAME"] = "X-CSRF-Token"
     app.config["JWT_REFRESH_CSRF_HEADER_NAME"] = "X-CSRF-Token"
+    cookie_domain = app.config.get("JWT_COOKIE_DOMAIN")
+    if cookie_domain:
+        app.config["JWT_COOKIE_DOMAIN"] = cookie_domain
 
     # Initialize extensions
     db.init_app(app)
@@ -77,10 +109,28 @@ def create_app(config_class=DevelopmentConfig):
         reason_lower = reason.lower()
         if "csrf" in reason_lower:
             return {"msg": "Missing or invalid CSRF token", "error": "csrf_failed"}, 403
-        return {"msg": reason, "error": "unauthorized"}, 401
+        return {"msg": "Unauthorized", "error": "unauthorized"}, 401
+
+    @jwt.invalid_token_loader
+    def handle_invalid_token(reason):
+        return {"msg": "Unauthorized", "error": "unauthorized"}, 401
+
+    @jwt.expired_token_loader
+    def handle_expired_token(jwt_header, jwt_payload):
+        return {"msg": "Token expired", "error": "token_expired"}, 401
+
+    @jwt.revoked_token_loader
+    def handle_revoked_token(jwt_header, jwt_payload):
+        return {"msg": "Token revoked", "error": "token_revoked"}, 401
 
     # Enable CORS with credentials
-    CORS(app, origins=app.config.get("CORS_ORIGINS"), supports_credentials=True)
+    CORS(
+        app,
+        origins=app.config.get("CORS_ORIGINS"),
+        supports_credentials=True,
+        always_send=False,
+        vary_header=True,
+    )
 
     def _json_error(message: str, error_code: str, status_code: int, details=None):
         payload = {"msg": message, "error": error_code}
@@ -220,6 +270,37 @@ def create_app(config_class=DevelopmentConfig):
                         duration_ms,
                         request.remote_addr,
                     )
+
+        if app.config.get("SECURITY_HEADERS_ENABLED", True):
+            response.headers.setdefault(
+                "X-Content-Type-Options",
+                app.config.get("SECURITY_CONTENT_TYPE_OPTIONS", "nosniff"),
+            )
+            response.headers.setdefault(
+                "X-Frame-Options",
+                app.config.get("SECURITY_FRAME_OPTIONS", "DENY"),
+            )
+            response.headers.setdefault(
+                "Referrer-Policy",
+                app.config.get("SECURITY_REFERRER_POLICY", "strict-origin-when-cross-origin"),
+            )
+            csp = app.config.get("SECURITY_CSP")
+            if csp:
+                response.headers.setdefault("Content-Security-Policy", csp)
+            permissions_policy = app.config.get("SECURITY_PERMISSIONS_POLICY")
+            if permissions_policy:
+                response.headers.setdefault("Permissions-Policy", permissions_policy)
+
+            forwarded_proto = request.headers.get("X-Forwarded-Proto", "")
+            is_secure_request = request.is_secure or forwarded_proto.split(",")[0].strip().lower() == "https"
+            hsts_seconds = int(app.config.get("SECURITY_HSTS_SECONDS", 0))
+            if is_secure_request and hsts_seconds > 0:
+                hsts_value = f"max-age={hsts_seconds}"
+                if app.config.get("SECURITY_HSTS_INCLUDE_SUBDOMAINS", True):
+                    hsts_value += "; includeSubDomains"
+                if app.config.get("SECURITY_HSTS_PRELOAD", False):
+                    hsts_value += "; preload"
+                response.headers.setdefault("Strict-Transport-Security", hsts_value)
         return response
 
     # Ensure sessions are cleaned up per request/appcontext

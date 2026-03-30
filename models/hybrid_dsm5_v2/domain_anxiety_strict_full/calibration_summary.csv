@@ -1,0 +1,4 @@
+trial_id,method,brier_score_val,status,selected
+domain_anxiety_strict_full,none,0.0022296933835395374,ok,True
+domain_anxiety_strict_full,sigmoid,0.005094269716468532,ok,False
+domain_anxiety_strict_full,isotonic,0.0050075384100110535,ok,False

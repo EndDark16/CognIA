@@ -1,0 +1,6 @@
+domain,residual_critical_features,suspicious_perfect_score,leakage_risk,overfit_risk,final_flag
+adhd,0,False,low,low,ok
+anxiety,0,False,low,low,ok
+conduct,0,False,low,low,ok
+depression,0,False,low,low,ok
+elimination,0,False,low,low,ok

@@ -1,0 +1,12 @@
+path,purpose,required_for_deploy,category,sensitivity,recommendation,notes,exists
+Dockerfile,Docker build definition,yes,deploy_config,low,safe_to_commit,Required for container build,True
+docker\entrypoint.sh,Runtime entrypoint and migrations,yes,deploy_config,low,safe_to_commit,Required to start gunicorn and migrations,True
+docker-compose.yml,Local/dev orchestration,optional,deploy_config,low,safe_to_commit,Not needed on Render but useful for local dev,True
+requirements.txt,Python dependencies,yes,deploy_config,low,safe_to_commit,Required to build image,True
+run.py,WSGI app entrypoint,yes,runtime,low,safe_to_commit,Gunicorn uses run:app,True
+config\settings.py,Runtime config via env,yes,runtime,medium,safe_to_commit,Contains defaults; all secrets via env,True
+.env,Local secrets,no,secrets,critical,must_be_secret_managed,Contains real creds; must not be committed,True
+.env.example,Env template,yes,template,low,must_be_template_only,Template for Render/Docker setup,True
+artifacts\inference_v4\promotion_scope.json,Inference scope,yes,runtime,low,safe_to_commit,Defines active/hold domains,True
+models,Model binaries,conditional,runtime,high,keep_internal_not_public,Heavy; for production prefer external storage or build-time fetch,True
+artifacts\models,Model binaries (duplicate),no,artifact,high,keep_internal_not_public,Duplicates; move to external storage,True

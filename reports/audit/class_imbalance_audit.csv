@@ -1,0 +1,6 @@
+disorder,model_version,train_positive,train_negative,train_pos_neg_ratio,prevalence_train
+adhd,rf_adhd_v1_baseline,748,585,1.2786324786324785,0.5611402850712678
+anxiety,rf_anxiety_v1_baseline,585,748,0.7820855614973262,0.43885971492873216
+depression,rf_depression_v4_precision_thresholded,140,1193,0.1173512154233026,0.10502625656414104
+conduct,rf_conduct_v1_baseline,194,1139,0.17032484635645304,0.145536384096024
+elimination,rf_elimination_v1_baseline,156,1177,0.13254035683942225,0.11702925731432859

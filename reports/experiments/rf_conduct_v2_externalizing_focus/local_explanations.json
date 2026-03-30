@@ -1,0 +1,260 @@
+{
+  "HBN_SYN_001794": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 2.2425063323209953
+      },
+      {
+        "feature": "num__icut_total",
+        "score": 2.0829312417639487
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 1.7358830208127547
+      },
+      {
+        "feature": "num__icut_uncaring",
+        "score": 1.3825862256175643
+      },
+      {
+        "feature": "num__icut_callousness",
+        "score": 0.6005197497102946
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 0.5898827701760189
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.5036149389017816
+      },
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 0.47511239777685643
+      },
+      {
+        "feature": "num__ari_sr_symptom_total",
+        "score": 0.3919834713102568
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.37227486258860476
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "cat__site_Staten Island",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_ysr",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_aggressive_behavior_proxy",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_externalizing_proxy",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_cbcl",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_rule_breaking_proxy",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Female",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_ari_sr",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ari_p_symptom_total",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ari_p_impairment_item",
+        "score": 0.0
+      }
+    ]
+  },
+  "HBN_SYN_003231": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 0.12669663940716172
+      },
+      {
+        "feature": "num__ari_p_symptom_total",
+        "score": 0.11587724035370515
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": 0.029597483508152375
+      },
+      {
+        "feature": "num__ari_sr_impairment_item",
+        "score": 0.018428391089384794
+      },
+      {
+        "feature": "num__age_years",
+        "score": 0.006546376198078456
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Female",
+        "score": 0.0030441485617607998
+      },
+      {
+        "feature": "cat__site_CBIC",
+        "score": 0.002740200997474688
+      },
+      {
+        "feature": "num__has_icut",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_ari_p",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_ari_sr",
+        "score": 0.0
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": -0.5606265830802488
+      },
+      {
+        "feature": "num__icut_total",
+        "score": -0.5400192108276904
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": -0.3357432926011877
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": -0.26705892627888533
+      },
+      {
+        "feature": "num__icut_uncaring",
+        "score": -0.21270557317193298
+      },
+      {
+        "feature": "num__icut_unemotional",
+        "score": -0.2072971345495359
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": -0.13537267730494718
+      },
+      {
+        "feature": "num__icut_callousness",
+        "score": -0.13344883326895438
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": -0.06554253001955765
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": -0.02200615286161163
+      }
+    ]
+  },
+  "HBN_SYN_002451": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 1.7940050658567963
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 1.3352946313944267
+      },
+      {
+        "feature": "num__icut_total",
+        "score": 1.3114752262958196
+      },
+      {
+        "feature": "num__ari_p_symptom_total",
+        "score": 0.8111406824759361
+      },
+      {
+        "feature": "num__icut_uncaring",
+        "score": 0.638116719515799
+      },
+      {
+        "feature": "num__icut_callousness",
+        "score": 0.4670709164413403
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.4196791157514846
+      },
+      {
+        "feature": "num__ari_sr_symptom_total",
+        "score": 0.3135867770482054
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 0.17478008005215373
+      },
+      {
+        "feature": "num__icut_unemotional",
+        "score": 0.15547285091215193
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": -0.04751123977768565
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": -0.04439622526222856
+      },
+      {
+        "feature": "num__has_ari_sr",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_RUBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_ysr",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_aggressive_behavior_proxy",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_cbcl",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_externalizing_proxy",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_rule_breaking_proxy",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_sdq",
+        "score": 0.0
+      }
+    ]
+  }
+}

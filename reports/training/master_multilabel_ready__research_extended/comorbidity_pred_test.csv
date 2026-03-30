@@ -1,0 +1,6 @@
+target,target_conduct,target_adhd,target_elimination,target_anxiety,target_depression
+target_conduct,40,40,0,27,6
+target_adhd,40,151,0,91,15
+target_elimination,0,0,0,0,0
+target_anxiety,27,91,0,122,15
+target_depression,6,15,0,15,15
