@@ -1,0 +1,6 @@
+domain,x_y_separation_check,targets_excluded_from_X,participant_id_excluded,diagnostic_raw_exclusion,leakage_residual_risk,proxy_leakage_risk,suspicious_perfect_score,seed_std_balacc,split_std_balacc,noise_moderate_drop_balacc,realism_worst_drop_balacc,threshold_final,calibration_strategy,status_coherent_with_evidence,integrity_verdict
+adhd,pass,pass,pass,pass,low,low,False,0.002570518237358,0.0239902447356971,0.031055900621118,0.0913788819875777,0.75,not_explicit_in_final_artifacts,True,pass
+anxiety,pass,pass,pass,pass,low,low,False,0.0,0.0064431064758449,-0.0022727272727273,0.0204545454545453,0.05,not_explicit_in_final_metrics_csv,True,pass
+conduct,pass,pass,pass,pass,low,low,False,0.0071260964068696,0.0076456310679611,0.0350728155339806,0.0388956310679612,0.7,not_explicit_in_final_metrics_csv,True,pass
+depression,pass,pass,pass,pass,low,low,False,0.0023814024239354,0.0163532976469301,0.0,0.0043478260869566,0.75,not_explicit_in_final_metrics_csv,True,pass
+elimination,pass,pass,pass,pass,low,low,False,0.0018856180831641,0.0069260497948011,0.0066335403726708,0.0071055900621117,0.4999999999999999,none,True,pass

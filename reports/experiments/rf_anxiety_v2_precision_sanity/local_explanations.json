@@ -1,0 +1,260 @@
+{
+  "HBN_SYN_000059": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 0.9012871157994682
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": 0.6181592266066933
+      },
+      {
+        "feature": "num__cbcl_024",
+        "score": 0.18218597017692362
+      },
+      {
+        "feature": "num__cbcl_005",
+        "score": 0.04507326114889039
+      },
+      {
+        "feature": "num__cbcl_022",
+        "score": 0.04406558027113955
+      },
+      {
+        "feature": "num__cbcl_012",
+        "score": 0.04317146877750594
+      },
+      {
+        "feature": "num__scared_sr_social_anxiety",
+        "score": 0.025076975803704948
+      },
+      {
+        "feature": "num__cbcl_020",
+        "score": 0.02287985485964535
+      },
+      {
+        "feature": "num__cbcl_027",
+        "score": 0.021115966791727798
+      },
+      {
+        "feature": "num__scared_sr_panic_somatic",
+        "score": 0.0
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__scared_p_total",
+        "score": -0.11027671738730915
+      },
+      {
+        "feature": "num__scared_sr_separation_anxiety",
+        "score": -0.024736652591240096
+      },
+      {
+        "feature": "num__scared_sr_total",
+        "score": -0.024494318058303897
+      },
+      {
+        "feature": "num__cbcl_011",
+        "score": 0.0
+      },
+      {
+        "feature": "num__scared_sr_generalized_anxiety",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_014",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_002",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_010",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_009",
+        "score": 0.0
+      },
+      {
+        "feature": "num__scared_p_separation_anxiety",
+        "score": 0.0
+      }
+    ]
+  },
+  "HBN_SYN_003645": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 1.8025742315989364
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": 1.3246269141571998
+      },
+      {
+        "feature": "num__cbcl_010",
+        "score": 0.10069239309304973
+      },
+      {
+        "feature": "num__cbcl_024",
+        "score": 0.09109298508846181
+      },
+      {
+        "feature": "num__cbcl_005",
+        "score": 0.09014652229778078
+      },
+      {
+        "feature": "num__cbcl_009",
+        "score": 0.04672273481785992
+      },
+      {
+        "feature": "num__cbcl_022",
+        "score": 0.04406558027113955
+      },
+      {
+        "feature": "num__cbcl_002",
+        "score": 0.04361234010973927
+      },
+      {
+        "feature": "num__cbcl_027",
+        "score": 0.042231933583455596
+      },
+      {
+        "feature": "num__cbcl_011",
+        "score": 0.04132066386397654
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__scared_sr_separation_anxiety",
+        "score": 0.0
+      },
+      {
+        "feature": "num__scared_sr_generalized_anxiety",
+        "score": 0.0
+      },
+      {
+        "feature": "num__scared_p_total",
+        "score": 0.0
+      },
+      {
+        "feature": "num__scared_sr_social_anxiety",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_014",
+        "score": 0.0
+      },
+      {
+        "feature": "num__scared_sr_total",
+        "score": 0.0
+      },
+      {
+        "feature": "num__scared_sr_panic_somatic",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_012",
+        "score": 0.0
+      },
+      {
+        "feature": "num__scared_p_separation_anxiety",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_020",
+        "score": 0.02287985485964535
+      }
+    ]
+  },
+  "HBN_SYN_003947": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 3.9656633095176597
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": 2.38432844548296
+      },
+      {
+        "feature": "num__scared_sr_total",
+        "score": 1.1267386306819793
+      },
+      {
+        "feature": "num__scared_p_total",
+        "score": 1.0660082680773217
+      },
+      {
+        "feature": "num__scared_sr_panic_somatic",
+        "score": 0.2392460910969692
+      },
+      {
+        "feature": "num__scared_sr_social_anxiety",
+        "score": 0.22569278223334452
+      },
+      {
+        "feature": "num__scared_sr_separation_anxiety",
+        "score": 0.22262987332116085
+      },
+      {
+        "feature": "num__scared_sr_generalized_anxiety",
+        "score": 0.1954827454588618
+      },
+      {
+        "feature": "num__cbcl_024",
+        "score": 0.18218597017692362
+      },
+      {
+        "feature": "num__scared_p_separation_anxiety",
+        "score": 0.1351204640600152
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_011",
+        "score": 0.02066033193198827
+      },
+      {
+        "feature": "num__cbcl_014",
+        "score": 0.04078609746485058
+      },
+      {
+        "feature": "num__cbcl_027",
+        "score": 0.042231933583455596
+      },
+      {
+        "feature": "num__cbcl_012",
+        "score": 0.04317146877750594
+      },
+      {
+        "feature": "num__cbcl_020",
+        "score": 0.0457597097192907
+      },
+      {
+        "feature": "num__cbcl_009",
+        "score": 0.04672273481785992
+      },
+      {
+        "feature": "num__cbcl_002",
+        "score": 0.08722468021947855
+      },
+      {
+        "feature": "num__cbcl_022",
+        "score": 0.0881311605422791
+      },
+      {
+        "feature": "num__cbcl_005",
+        "score": 0.09014652229778078
+      },
+      {
+        "feature": "num__cbcl_010",
+        "score": 0.10069239309304973
+      }
+    ]
+  }
+}

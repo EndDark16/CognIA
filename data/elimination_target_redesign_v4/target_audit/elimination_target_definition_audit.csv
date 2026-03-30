@@ -1,0 +1,7 @@
+item,rule
+target_definition_replay,target_domain_elimination
+logical_decomposition_check,target_domain_elimination == (target_enuresis_exact OR target_encopresis_exact)
+strong_positive_rule,"elimination_any=1 and direct_criteria>=1 with low absent, or both subtypes with proxy support"
+strong_negative_rule,elimination_any=0 and no direct/proxy support
+ambiguous_rule,not strong_positive and not strong_negative
+subtype_standalone_risk,high overlap and pseudo_target_risk in prior modelability audit

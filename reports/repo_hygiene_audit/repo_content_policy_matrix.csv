@@ -1,0 +1,16 @@
+content_class,example_paths,category,rationale,protection_class,notes
+core_source_code,"api/, app/, core/, config/, scripts/, tests/",A_subir_si_o_si,Necesario para reproducibilidad y mantenimiento,safe_to_commit,Excluir caches y entornos locales
+deploy_configs,"Dockerfile, docker/entrypoint.sh, docker-compose.yml, requirements.txt, run.py",A_subir_si_o_si,Necesario para build/runtime,safe_to_commit,Mantener sin secretos embebidos
+final_documentation,"README.md, reports/final_closure/, REPO_CONTENT_POLICY.md",A_subir_si_o_si,Define estado final y decisiones de cierre,safe_to_commit,Base para jurado/equipo
+final_compact_tables,data/final_closure_audit_v1/*,A_subir_si_o_si,Trazabilidad auditada de cierre,safe_to_commit,Mantener tablas compactas
+normative_specs,"data/normative_matrix/, docs/",A_subir_si_o_si,Fuente normativa del proyecto,safe_to_commit,Autoridad metodologica
+inference_scope,artifacts/inference_v4/,A_subir_si_o_si,Scope de inferencia vigente,deploy_required_but_protected,Mantener versionado
+training_reports_light,"reports/versioning/, reports/promotions/, reports/metrics/, reports/training/summary",B_subir_opcional,Util para auditoria extendida,safe_to_commit,Evitar imagenes/outputs masivos
+processed_large_datasets,"data/processed*, participant_normative_evidence_long.csv",C_storage_externo,Muy pesados y parcialmente regenerables,keep_internal_not_public,Conservar checksums/manifests en repo
+serialized_models_bulk,"models/*/*.joblib, artifacts/models/, artifacts/versioned_models/",C_storage_externo,Binarios pesados y duplicados,keep_internal_not_public,Mantener solo metadatos en repo
+intermediate_artifacts,"artifacts/preprocessing/, stress test dumps grandes",C_storage_externo,Regenerables y no necesarios para onboarding,keep_internal_not_public,Guardar ruta de backup y manifiesto
+local_runtime_env,"venv/, scripts/venv/, .env",D_no_subir,Entorno local y secretos,must_be_secret_managed,Usar env vars/Render secrets
+cache_and_temp,"__pycache__/, .pytest_cache/, *.log, tmp/",D_no_subir,Basura regenerable,ignore_from_repo,Limpieza rutinaria
+templates, .env.example,G_template_only,Plantillas seguras,must_be_template_only,Sin valores reales
+env_vars,secrets en env,H_env_only,Credenciales y claves,must_be_env_var,Configurar en Render
+legacy_or_unclear_outputs,"notebooks/, reports/figures grandes, inference_v5",E_revision_manual,Requiere criterio de publicacion,unclear_review_needed,No bloquear; decidir por release

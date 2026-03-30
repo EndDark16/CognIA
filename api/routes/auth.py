@@ -812,8 +812,20 @@ def change_password():
 
 
 @auth_bp.post("/password/forgot")
-@limiter.limit(lambda: current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes"), key_func=get_remote_address)
-@limiter.limit(lambda: current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes"), key_func=_password_forgot_email_key)
+@limiter.limit(
+    lambda: current_app.config.get(
+        "PASSWORD_FORGOT_RATE_LIMIT_IP",
+        current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "20 per 10 minutes"),
+    ),
+    key_func=get_remote_address,
+)
+@limiter.limit(
+    lambda: current_app.config.get(
+        "PASSWORD_FORGOT_RATE_LIMIT_EMAIL",
+        current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes"),
+    ),
+    key_func=_password_forgot_email_key,
+)
 def forgot_password():
     schema = PasswordForgotSchema()
     try:

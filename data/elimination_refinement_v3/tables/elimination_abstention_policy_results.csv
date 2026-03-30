@@ -1,0 +1,3 @@
+mode,trial_id,coverage,precision,effective_recall,uncertain_pct,thesis_utility,product_utility
+binary_default,V3_T07_abstention_assisted_operating_mode,1.0,0.891566265060241,0.9192546583850931,0.0,baseline,not_product_ready
+abstention_assisted,V3_T07_abstention_assisted_operating_mode,0.9335664335664337,0.9225352112676056,0.8136645962732919,0.0664335664335664,high_if_disclaimer_present,experimental_only

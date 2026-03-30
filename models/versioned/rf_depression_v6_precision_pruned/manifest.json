@@ -1,0 +1,132 @@
+{
+  "model_version": "rf_depression_v6_precision_pruned",
+  "parent_version": "rf_depression_v1_baseline",
+  "task_type": "binary",
+  "status": "completed",
+  "dataset_name": "dataset_depression_combined",
+  "dataset_variant": "combined",
+  "data_scope": "strict_no_leakage",
+  "split_version": "splits_strict_no_leakage_frozen_v1",
+  "preprocessing_version": "rf_preproc_v1",
+  "seed": 42,
+  "target": "target_depression",
+  "n_features_raw": 25,
+  "n_features_final": 16,
+  "train_rows": 1333,
+  "val_rows": 286,
+  "test_rows": 286,
+  "threshold_strategy": "precision_constrained",
+  "threshold_value": 0.130322,
+  "recall_floor": 0.78,
+  "balanced_accuracy_tolerance": 0.03,
+  "calibration_strategy": "sigmoid",
+  "validation_metrics": {
+    "threshold": 0.130322,
+    "accuracy": 0.8916083916083916,
+    "balanced_accuracy": 0.8658854166666667,
+    "precision": 0.49019607843137253,
+    "recall": 0.8333333333333334,
+    "sensitivity": 0.8333333333333334,
+    "specificity": 0.8984375,
+    "f1": 0.6172839506172839,
+    "support_negative": 256,
+    "support_positive": 30,
+    "confusion_matrix": [
+      [
+        230,
+        26
+      ],
+      [
+        5,
+        25
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.8984375,
+        0.1015625
+      ],
+      [
+        0.16666666666666666,
+        0.8333333333333334
+      ]
+    ],
+    "roc_auc": 0.9416666666666667,
+    "pr_auc": 0.6536649619330086,
+    "brier_score": 0.058365924231596006,
+    "fpr": 0.1015625,
+    "fnr": 0.16666666666666663,
+    "prevalence": 0.1048951048951049,
+    "precision_lift_vs_baseline": 0.03256895978730473,
+    "recall_delta_vs_baseline": -0.06666666666666665,
+    "balanced_accuracy_delta_vs_baseline": -0.021614583333333215
+  },
+  "test_metrics": {
+    "threshold": 0.130322,
+    "accuracy": 0.8881118881118881,
+    "balanced_accuracy": 0.8786458333333333,
+    "precision": 0.48148148148148145,
+    "recall": 0.8666666666666667,
+    "sensitivity": 0.8666666666666667,
+    "specificity": 0.890625,
+    "f1": 0.6190476190476191,
+    "support_negative": 256,
+    "support_positive": 30,
+    "confusion_matrix": [
+      [
+        228,
+        28
+      ],
+      [
+        4,
+        26
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.890625,
+        0.109375
+      ],
+      [
+        0.13333333333333333,
+        0.8666666666666667
+      ]
+    ],
+    "roc_auc": 0.9248697916666667,
+    "pr_auc": 0.5530227431591507,
+    "brier_score": 0.06312267559928941,
+    "fpr": 0.109375,
+    "fnr": 0.1333333333333333,
+    "prevalence": 0.1048951048951049,
+    "precision_lift_vs_baseline": NaN,
+    "recall_delta_vs_baseline": -0.033333333333333326,
+    "balanced_accuracy_delta_vs_baseline": -0.0010416666666666075
+  },
+  "abstention_validation": {
+    "low_threshold": 0.130322,
+    "high_threshold": 0.7368421052631579,
+    "coverage": 0.8286713286713286,
+    "uncertain_rate": 0.17132867132867133,
+    "precision_high": 1.0,
+    "npv_low": 0.9787234042553191,
+    "recall_effective": 0.06666666666666667,
+    "specificity_effective": 0.8984375,
+    "selection_reason": "target_precision_with_coverage",
+    "target_high_precision": 0.7,
+    "min_confident_coverage": 0.1
+  },
+  "abstention_test": {
+    "coverage": 0.8251748251748252,
+    "uncertain_rate": 0.17482517482517482,
+    "precision_high": 0.75,
+    "npv_low": 0.9827586206896551,
+    "recall_effective": 0.1,
+    "specificity_effective": 0.890625,
+    "confident_positive_n": 4,
+    "confident_negative_n": 232,
+    "uncertain_n": 50
+  },
+  "notes": "Aggressive pruning on combined depression features for PPV uplift.",
+  "experimental": false,
+  "created_at": "2026-03-25T20:27:09.676611+00:00"
+}

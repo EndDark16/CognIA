@@ -1,0 +1,4078 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CognIA Questionnaire Input Schema",
+  "type": "object",
+  "properties": {
+    "age_years": {
+      "type": "number",
+      "description": "participants::age_years",
+      "x-modality": "dato_demografico",
+      "x-disorder-domain": "general",
+      "x-age-applicability": "6-11"
+    },
+    "sex_assigned_at_birth": {
+      "type": "string",
+      "description": "participants::sex_assigned_at_birth",
+      "x-modality": "dato_demografico",
+      "x-disorder-domain": "general",
+      "x-age-applicability": "6-11"
+    },
+    "site": {
+      "type": "string",
+      "description": "participants::site",
+      "x-modality": "dato_demografico",
+      "x-disorder-domain": "general",
+      "x-age-applicability": "6-11"
+    },
+    "release": {
+      "type": "number",
+      "description": "participants::release",
+      "x-modality": "dato_demografico",
+      "x-disorder-domain": "general",
+      "x-age-applicability": "6-11"
+    },
+    "has_ari_p": {
+      "type": "number",
+      "description": "ari_p::has_ari_p",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_p_01": {
+      "type": "number",
+      "description": "ari_p::ari_p_01",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_p_02": {
+      "type": "number",
+      "description": "ari_p::ari_p_02",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_p_03": {
+      "type": "number",
+      "description": "ari_p::ari_p_03",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_p_04": {
+      "type": "number",
+      "description": "ari_p::ari_p_04",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_p_05": {
+      "type": "number",
+      "description": "ari_p::ari_p_05",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_p_06": {
+      "type": "number",
+      "description": "ari_p::ari_p_06",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_p_07": {
+      "type": "number",
+      "description": "ari_p::ari_p_07",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_p_symptom_total": {
+      "type": "number",
+      "description": "ari_p::ari_p_symptom_total",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_p_impairment_item": {
+      "type": "number",
+      "description": "ari_p::ari_p_impairment_item",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "has_ari_sr": {
+      "type": "number",
+      "description": "ari_sr::has_ari_sr",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_sr_01": {
+      "type": "number",
+      "description": "ari_sr::ari_sr_01",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_sr_02": {
+      "type": "number",
+      "description": "ari_sr::ari_sr_02",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_sr_03": {
+      "type": "number",
+      "description": "ari_sr::ari_sr_03",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_sr_04": {
+      "type": "number",
+      "description": "ari_sr::ari_sr_04",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_sr_05": {
+      "type": "number",
+      "description": "ari_sr::ari_sr_05",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_sr_06": {
+      "type": "number",
+      "description": "ari_sr::ari_sr_06",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_sr_07": {
+      "type": "number",
+      "description": "ari_sr::ari_sr_07",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_sr_symptom_total": {
+      "type": "number",
+      "description": "ari_sr::ari_sr_symptom_total",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ari_sr_impairment_item": {
+      "type": "number",
+      "description": "ari_sr::ari_sr_impairment_item",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "has_cbcl": {
+      "type": "number",
+      "description": "cbcl::has_cbcl",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_001": {
+      "type": "number",
+      "description": "cbcl::cbcl_001",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_002": {
+      "type": "number",
+      "description": "cbcl::cbcl_002",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_003": {
+      "type": "number",
+      "description": "cbcl::cbcl_003",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_004": {
+      "type": "number",
+      "description": "cbcl::cbcl_004",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_005": {
+      "type": "number",
+      "description": "cbcl::cbcl_005",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_006": {
+      "type": "number",
+      "description": "cbcl::cbcl_006",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_007": {
+      "type": "number",
+      "description": "cbcl::cbcl_007",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_008": {
+      "type": "number",
+      "description": "cbcl::cbcl_008",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_009": {
+      "type": "number",
+      "description": "cbcl::cbcl_009",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_010": {
+      "type": "number",
+      "description": "cbcl::cbcl_010",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_011": {
+      "type": "number",
+      "description": "cbcl::cbcl_011",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_012": {
+      "type": "number",
+      "description": "cbcl::cbcl_012",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_013": {
+      "type": "number",
+      "description": "cbcl::cbcl_013",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_014": {
+      "type": "number",
+      "description": "cbcl::cbcl_014",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_015": {
+      "type": "number",
+      "description": "cbcl::cbcl_015",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_016": {
+      "type": "number",
+      "description": "cbcl::cbcl_016",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_017": {
+      "type": "number",
+      "description": "cbcl::cbcl_017",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_018": {
+      "type": "number",
+      "description": "cbcl::cbcl_018",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_019": {
+      "type": "number",
+      "description": "cbcl::cbcl_019",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_020": {
+      "type": "number",
+      "description": "cbcl::cbcl_020",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_021": {
+      "type": "number",
+      "description": "cbcl::cbcl_021",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_022": {
+      "type": "number",
+      "description": "cbcl::cbcl_022",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_023": {
+      "type": "number",
+      "description": "cbcl::cbcl_023",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_024": {
+      "type": "number",
+      "description": "cbcl::cbcl_024",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_025": {
+      "type": "number",
+      "description": "cbcl::cbcl_025",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_026": {
+      "type": "number",
+      "description": "cbcl::cbcl_026",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_027": {
+      "type": "number",
+      "description": "cbcl::cbcl_027",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_028": {
+      "type": "number",
+      "description": "cbcl::cbcl_028",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_029": {
+      "type": "number",
+      "description": "cbcl::cbcl_029",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_030": {
+      "type": "number",
+      "description": "cbcl::cbcl_030",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_031": {
+      "type": "number",
+      "description": "cbcl::cbcl_031",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_032": {
+      "type": "number",
+      "description": "cbcl::cbcl_032",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_033": {
+      "type": "number",
+      "description": "cbcl::cbcl_033",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_034": {
+      "type": "number",
+      "description": "cbcl::cbcl_034",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_035": {
+      "type": "number",
+      "description": "cbcl::cbcl_035",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_036": {
+      "type": "number",
+      "description": "cbcl::cbcl_036",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_037": {
+      "type": "number",
+      "description": "cbcl::cbcl_037",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_038": {
+      "type": "number",
+      "description": "cbcl::cbcl_038",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_039": {
+      "type": "number",
+      "description": "cbcl::cbcl_039",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_040": {
+      "type": "number",
+      "description": "cbcl::cbcl_040",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_041": {
+      "type": "number",
+      "description": "cbcl::cbcl_041",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_042": {
+      "type": "number",
+      "description": "cbcl::cbcl_042",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_043": {
+      "type": "number",
+      "description": "cbcl::cbcl_043",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_044": {
+      "type": "number",
+      "description": "cbcl::cbcl_044",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_045": {
+      "type": "number",
+      "description": "cbcl::cbcl_045",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_046": {
+      "type": "number",
+      "description": "cbcl::cbcl_046",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_047": {
+      "type": "number",
+      "description": "cbcl::cbcl_047",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_048": {
+      "type": "number",
+      "description": "cbcl::cbcl_048",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_049": {
+      "type": "number",
+      "description": "cbcl::cbcl_049",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_050": {
+      "type": "number",
+      "description": "cbcl::cbcl_050",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_051": {
+      "type": "number",
+      "description": "cbcl::cbcl_051",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_052": {
+      "type": "number",
+      "description": "cbcl::cbcl_052",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_053": {
+      "type": "number",
+      "description": "cbcl::cbcl_053",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_054": {
+      "type": "number",
+      "description": "cbcl::cbcl_054",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_055": {
+      "type": "number",
+      "description": "cbcl::cbcl_055",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_056": {
+      "type": "number",
+      "description": "cbcl::cbcl_056",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_057": {
+      "type": "number",
+      "description": "cbcl::cbcl_057",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_058": {
+      "type": "number",
+      "description": "cbcl::cbcl_058",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_059": {
+      "type": "number",
+      "description": "cbcl::cbcl_059",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_060": {
+      "type": "number",
+      "description": "cbcl::cbcl_060",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_061": {
+      "type": "number",
+      "description": "cbcl::cbcl_061",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_062": {
+      "type": "number",
+      "description": "cbcl::cbcl_062",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_063": {
+      "type": "number",
+      "description": "cbcl::cbcl_063",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_064": {
+      "type": "number",
+      "description": "cbcl::cbcl_064",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_065": {
+      "type": "number",
+      "description": "cbcl::cbcl_065",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_066": {
+      "type": "number",
+      "description": "cbcl::cbcl_066",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_067": {
+      "type": "number",
+      "description": "cbcl::cbcl_067",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_068": {
+      "type": "number",
+      "description": "cbcl::cbcl_068",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_069": {
+      "type": "number",
+      "description": "cbcl::cbcl_069",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_070": {
+      "type": "number",
+      "description": "cbcl::cbcl_070",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_071": {
+      "type": "number",
+      "description": "cbcl::cbcl_071",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_072": {
+      "type": "number",
+      "description": "cbcl::cbcl_072",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_073": {
+      "type": "number",
+      "description": "cbcl::cbcl_073",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_074": {
+      "type": "number",
+      "description": "cbcl::cbcl_074",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_075": {
+      "type": "number",
+      "description": "cbcl::cbcl_075",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_076": {
+      "type": "number",
+      "description": "cbcl::cbcl_076",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_077": {
+      "type": "number",
+      "description": "cbcl::cbcl_077",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_078": {
+      "type": "number",
+      "description": "cbcl::cbcl_078",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_079": {
+      "type": "number",
+      "description": "cbcl::cbcl_079",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_080": {
+      "type": "number",
+      "description": "cbcl::cbcl_080",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_081": {
+      "type": "number",
+      "description": "cbcl::cbcl_081",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_082": {
+      "type": "number",
+      "description": "cbcl::cbcl_082",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_083": {
+      "type": "number",
+      "description": "cbcl::cbcl_083",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_084": {
+      "type": "number",
+      "description": "cbcl::cbcl_084",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_085": {
+      "type": "number",
+      "description": "cbcl::cbcl_085",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_086": {
+      "type": "number",
+      "description": "cbcl::cbcl_086",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_087": {
+      "type": "number",
+      "description": "cbcl::cbcl_087",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_088": {
+      "type": "number",
+      "description": "cbcl::cbcl_088",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_089": {
+      "type": "number",
+      "description": "cbcl::cbcl_089",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_090": {
+      "type": "number",
+      "description": "cbcl::cbcl_090",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_091": {
+      "type": "number",
+      "description": "cbcl::cbcl_091",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_092": {
+      "type": "number",
+      "description": "cbcl::cbcl_092",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_093": {
+      "type": "number",
+      "description": "cbcl::cbcl_093",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_094": {
+      "type": "number",
+      "description": "cbcl::cbcl_094",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_095": {
+      "type": "number",
+      "description": "cbcl::cbcl_095",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_096": {
+      "type": "number",
+      "description": "cbcl::cbcl_096",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_097": {
+      "type": "number",
+      "description": "cbcl::cbcl_097",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_098": {
+      "type": "number",
+      "description": "cbcl::cbcl_098",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_099": {
+      "type": "number",
+      "description": "cbcl::cbcl_099",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_100": {
+      "type": "number",
+      "description": "cbcl::cbcl_100",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_101": {
+      "type": "number",
+      "description": "cbcl::cbcl_101",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_102": {
+      "type": "number",
+      "description": "cbcl::cbcl_102",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_103": {
+      "type": "number",
+      "description": "cbcl::cbcl_103",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_104": {
+      "type": "number",
+      "description": "cbcl::cbcl_104",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_105": {
+      "type": "number",
+      "description": "cbcl::cbcl_105",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_106": {
+      "type": "number",
+      "description": "cbcl::cbcl_106",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_107": {
+      "type": "number",
+      "description": "cbcl::cbcl_107",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_108": {
+      "type": "number",
+      "description": "cbcl::cbcl_108",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_109": {
+      "type": "number",
+      "description": "cbcl::cbcl_109",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_110": {
+      "type": "number",
+      "description": "cbcl::cbcl_110",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_111": {
+      "type": "number",
+      "description": "cbcl::cbcl_111",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_112": {
+      "type": "number",
+      "description": "cbcl::cbcl_112",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_113": {
+      "type": "number",
+      "description": "cbcl::cbcl_113",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_114": {
+      "type": "number",
+      "description": "cbcl::cbcl_114",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_115": {
+      "type": "number",
+      "description": "cbcl::cbcl_115",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_116": {
+      "type": "number",
+      "description": "cbcl::cbcl_116",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_117": {
+      "type": "number",
+      "description": "cbcl::cbcl_117",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_118": {
+      "type": "number",
+      "description": "cbcl::cbcl_118",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_anxious_depressed_proxy": {
+      "type": "number",
+      "description": "cbcl::cbcl_anxious_depressed_proxy",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_attention_problems_proxy": {
+      "type": "number",
+      "description": "cbcl::cbcl_attention_problems_proxy",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_rule_breaking_proxy": {
+      "type": "number",
+      "description": "cbcl::cbcl_rule_breaking_proxy",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_aggressive_behavior_proxy": {
+      "type": "number",
+      "description": "cbcl::cbcl_aggressive_behavior_proxy",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_internalizing_proxy": {
+      "type": "number",
+      "description": "cbcl::cbcl_internalizing_proxy",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "cbcl_externalizing_proxy": {
+      "type": "number",
+      "description": "cbcl::cbcl_externalizing_proxy",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "has_cdi": {
+      "type": "number",
+      "description": "cdi::has_cdi",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_01": {
+      "type": "number",
+      "description": "cdi::cdi_01",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_02": {
+      "type": "number",
+      "description": "cdi::cdi_02",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_03": {
+      "type": "number",
+      "description": "cdi::cdi_03",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_04": {
+      "type": "number",
+      "description": "cdi::cdi_04",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_05": {
+      "type": "number",
+      "description": "cdi::cdi_05",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_06": {
+      "type": "number",
+      "description": "cdi::cdi_06",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_07": {
+      "type": "number",
+      "description": "cdi::cdi_07",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_08": {
+      "type": "number",
+      "description": "cdi::cdi_08",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_09": {
+      "type": "number",
+      "description": "cdi::cdi_09",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_10": {
+      "type": "number",
+      "description": "cdi::cdi_10",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_11": {
+      "type": "number",
+      "description": "cdi::cdi_11",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_12": {
+      "type": "number",
+      "description": "cdi::cdi_12",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_13": {
+      "type": "number",
+      "description": "cdi::cdi_13",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_14": {
+      "type": "number",
+      "description": "cdi::cdi_14",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_15": {
+      "type": "number",
+      "description": "cdi::cdi_15",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_16": {
+      "type": "number",
+      "description": "cdi::cdi_16",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_17": {
+      "type": "number",
+      "description": "cdi::cdi_17",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_18": {
+      "type": "number",
+      "description": "cdi::cdi_18",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_19": {
+      "type": "number",
+      "description": "cdi::cdi_19",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_20": {
+      "type": "number",
+      "description": "cdi::cdi_20",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_21": {
+      "type": "number",
+      "description": "cdi::cdi_21",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_22": {
+      "type": "number",
+      "description": "cdi::cdi_22",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_23": {
+      "type": "number",
+      "description": "cdi::cdi_23",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_24": {
+      "type": "number",
+      "description": "cdi::cdi_24",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_25": {
+      "type": "number",
+      "description": "cdi::cdi_25",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_26": {
+      "type": "number",
+      "description": "cdi::cdi_26",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_27": {
+      "type": "number",
+      "description": "cdi::cdi_27",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "cdi_total": {
+      "type": "number",
+      "description": "cdi::cdi_total",
+      "x-modality": "score_derivado",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "has_conners": {
+      "type": "number",
+      "description": "conners::has_conners",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_01": {
+      "type": "number",
+      "description": "conners::conners_01",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_02": {
+      "type": "number",
+      "description": "conners::conners_02",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_03": {
+      "type": "number",
+      "description": "conners::conners_03",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_04": {
+      "type": "number",
+      "description": "conners::conners_04",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_05": {
+      "type": "number",
+      "description": "conners::conners_05",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_06": {
+      "type": "number",
+      "description": "conners::conners_06",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_07": {
+      "type": "number",
+      "description": "conners::conners_07",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_08": {
+      "type": "number",
+      "description": "conners::conners_08",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_09": {
+      "type": "number",
+      "description": "conners::conners_09",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_10": {
+      "type": "number",
+      "description": "conners::conners_10",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_11": {
+      "type": "number",
+      "description": "conners::conners_11",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_12": {
+      "type": "number",
+      "description": "conners::conners_12",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_13": {
+      "type": "number",
+      "description": "conners::conners_13",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_14": {
+      "type": "number",
+      "description": "conners::conners_14",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_15": {
+      "type": "number",
+      "description": "conners::conners_15",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_16": {
+      "type": "number",
+      "description": "conners::conners_16",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_17": {
+      "type": "number",
+      "description": "conners::conners_17",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_18": {
+      "type": "number",
+      "description": "conners::conners_18",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_19": {
+      "type": "number",
+      "description": "conners::conners_19",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_20": {
+      "type": "number",
+      "description": "conners::conners_20",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_21": {
+      "type": "number",
+      "description": "conners::conners_21",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_22": {
+      "type": "number",
+      "description": "conners::conners_22",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_23": {
+      "type": "number",
+      "description": "conners::conners_23",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_24": {
+      "type": "number",
+      "description": "conners::conners_24",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_25": {
+      "type": "number",
+      "description": "conners::conners_25",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_26": {
+      "type": "number",
+      "description": "conners::conners_26",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_27": {
+      "type": "number",
+      "description": "conners::conners_27",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_cognitive_problems": {
+      "type": "number",
+      "description": "conners::conners_cognitive_problems",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_hyperactivity": {
+      "type": "number",
+      "description": "conners::conners_hyperactivity",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_conduct_problems": {
+      "type": "number",
+      "description": "conners::conners_conduct_problems",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "conners_total": {
+      "type": "number",
+      "description": "conners::conners_total",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "has_icut": {
+      "type": "number",
+      "description": "icut::has_icut",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_01": {
+      "type": "number",
+      "description": "icut::icut_01",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_02": {
+      "type": "number",
+      "description": "icut::icut_02",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_03": {
+      "type": "number",
+      "description": "icut::icut_03",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_04": {
+      "type": "number",
+      "description": "icut::icut_04",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_05": {
+      "type": "number",
+      "description": "icut::icut_05",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_06": {
+      "type": "number",
+      "description": "icut::icut_06",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_07": {
+      "type": "number",
+      "description": "icut::icut_07",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_08": {
+      "type": "number",
+      "description": "icut::icut_08",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_09": {
+      "type": "number",
+      "description": "icut::icut_09",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_10": {
+      "type": "number",
+      "description": "icut::icut_10",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_11": {
+      "type": "number",
+      "description": "icut::icut_11",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_12": {
+      "type": "number",
+      "description": "icut::icut_12",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_13": {
+      "type": "number",
+      "description": "icut::icut_13",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_14": {
+      "type": "number",
+      "description": "icut::icut_14",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_15": {
+      "type": "number",
+      "description": "icut::icut_15",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_16": {
+      "type": "number",
+      "description": "icut::icut_16",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_17": {
+      "type": "number",
+      "description": "icut::icut_17",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_18": {
+      "type": "number",
+      "description": "icut::icut_18",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_19": {
+      "type": "number",
+      "description": "icut::icut_19",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_20": {
+      "type": "number",
+      "description": "icut::icut_20",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_21": {
+      "type": "number",
+      "description": "icut::icut_21",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_22": {
+      "type": "number",
+      "description": "icut::icut_22",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_23": {
+      "type": "number",
+      "description": "icut::icut_23",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_24": {
+      "type": "number",
+      "description": "icut::icut_24",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_callousness": {
+      "type": "number",
+      "description": "icut::icut_callousness",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_uncaring": {
+      "type": "number",
+      "description": "icut::icut_uncaring",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_unemotional": {
+      "type": "number",
+      "description": "icut::icut_unemotional",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "icut_total": {
+      "type": "number",
+      "description": "icut::icut_total",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "has_mfq_p": {
+      "type": "number",
+      "description": "mfq_p::has_mfq_p",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_01": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_01",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_02": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_02",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_03": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_03",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_04": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_04",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_05": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_05",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_06": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_06",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_07": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_07",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_08": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_08",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_09": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_09",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_10": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_10",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_11": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_11",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_12": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_12",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_13": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_13",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_14": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_14",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_15": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_15",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_16": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_16",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_17": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_17",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_18": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_18",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_19": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_19",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_20": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_20",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_21": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_21",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_22": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_22",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_23": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_23",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_24": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_24",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_25": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_25",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_26": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_26",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_27": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_27",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_28": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_28",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_29": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_29",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_30": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_30",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_31": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_31",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_32": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_32",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_33": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_33",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_p_total": {
+      "type": "number",
+      "description": "mfq_p::mfq_p_total",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "has_mfq_sr": {
+      "type": "number",
+      "description": "mfq_sr::has_mfq_sr",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_01": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_01",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_02": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_02",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_03": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_03",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_04": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_04",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_05": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_05",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_06": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_06",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_07": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_07",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_08": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_08",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_09": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_09",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_10": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_10",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_11": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_11",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_12": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_12",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_13": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_13",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_14": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_14",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_15": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_15",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_16": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_16",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_17": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_17",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_18": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_18",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_19": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_19",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_20": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_20",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_21": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_21",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_22": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_22",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_23": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_23",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_24": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_24",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_25": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_25",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_26": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_26",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_27": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_27",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_28": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_28",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_29": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_29",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_30": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_30",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_31": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_31",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_32": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_32",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_33": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_33",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "mfq_sr_total": {
+      "type": "number",
+      "description": "mfq_sr::mfq_sr_total",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "has_scared_p": {
+      "type": "number",
+      "description": "scared_p::has_scared_p",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_01": {
+      "type": "number",
+      "description": "scared_p::scared_p_01",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_02": {
+      "type": "number",
+      "description": "scared_p::scared_p_02",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_03": {
+      "type": "number",
+      "description": "scared_p::scared_p_03",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_04": {
+      "type": "number",
+      "description": "scared_p::scared_p_04",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_05": {
+      "type": "number",
+      "description": "scared_p::scared_p_05",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_06": {
+      "type": "number",
+      "description": "scared_p::scared_p_06",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_07": {
+      "type": "number",
+      "description": "scared_p::scared_p_07",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_08": {
+      "type": "number",
+      "description": "scared_p::scared_p_08",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_09": {
+      "type": "number",
+      "description": "scared_p::scared_p_09",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_10": {
+      "type": "number",
+      "description": "scared_p::scared_p_10",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_11": {
+      "type": "number",
+      "description": "scared_p::scared_p_11",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_12": {
+      "type": "number",
+      "description": "scared_p::scared_p_12",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_13": {
+      "type": "number",
+      "description": "scared_p::scared_p_13",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_14": {
+      "type": "number",
+      "description": "scared_p::scared_p_14",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_15": {
+      "type": "number",
+      "description": "scared_p::scared_p_15",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_16": {
+      "type": "number",
+      "description": "scared_p::scared_p_16",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_17": {
+      "type": "number",
+      "description": "scared_p::scared_p_17",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_18": {
+      "type": "number",
+      "description": "scared_p::scared_p_18",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_19": {
+      "type": "number",
+      "description": "scared_p::scared_p_19",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_20": {
+      "type": "number",
+      "description": "scared_p::scared_p_20",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_21": {
+      "type": "number",
+      "description": "scared_p::scared_p_21",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_22": {
+      "type": "number",
+      "description": "scared_p::scared_p_22",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_23": {
+      "type": "number",
+      "description": "scared_p::scared_p_23",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_24": {
+      "type": "number",
+      "description": "scared_p::scared_p_24",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_25": {
+      "type": "number",
+      "description": "scared_p::scared_p_25",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_26": {
+      "type": "number",
+      "description": "scared_p::scared_p_26",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_27": {
+      "type": "number",
+      "description": "scared_p::scared_p_27",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_28": {
+      "type": "number",
+      "description": "scared_p::scared_p_28",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_29": {
+      "type": "number",
+      "description": "scared_p::scared_p_29",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_30": {
+      "type": "number",
+      "description": "scared_p::scared_p_30",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_31": {
+      "type": "number",
+      "description": "scared_p::scared_p_31",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_32": {
+      "type": "number",
+      "description": "scared_p::scared_p_32",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_33": {
+      "type": "number",
+      "description": "scared_p::scared_p_33",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_34": {
+      "type": "number",
+      "description": "scared_p::scared_p_34",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_35": {
+      "type": "number",
+      "description": "scared_p::scared_p_35",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_36": {
+      "type": "number",
+      "description": "scared_p::scared_p_36",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_37": {
+      "type": "number",
+      "description": "scared_p::scared_p_37",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_38": {
+      "type": "number",
+      "description": "scared_p::scared_p_38",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_39": {
+      "type": "number",
+      "description": "scared_p::scared_p_39",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_40": {
+      "type": "number",
+      "description": "scared_p::scared_p_40",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_41": {
+      "type": "number",
+      "description": "scared_p::scared_p_41",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_panic_somatic": {
+      "type": "number",
+      "description": "scared_p::scared_p_panic_somatic",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_generalized_anxiety": {
+      "type": "number",
+      "description": "scared_p::scared_p_generalized_anxiety",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_separation_anxiety": {
+      "type": "number",
+      "description": "scared_p::scared_p_separation_anxiety",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_social_anxiety": {
+      "type": "number",
+      "description": "scared_p::scared_p_social_anxiety",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_school_avoidance": {
+      "type": "number",
+      "description": "scared_p::scared_p_school_avoidance",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_total": {
+      "type": "number",
+      "description": "scared_p::scared_p_total",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_p_possible_anxiety_disorder_cut25": {
+      "type": "number",
+      "description": "scared_p::scared_p_possible_anxiety_disorder_cut25",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "has_scared_sr": {
+      "type": "number",
+      "description": "scared_sr::has_scared_sr",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_01": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_01",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_02": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_02",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_03": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_03",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_04": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_04",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_05": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_05",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_06": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_06",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_07": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_07",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_08": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_08",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_09": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_09",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_10": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_10",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_11": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_11",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_12": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_12",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_13": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_13",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_14": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_14",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_15": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_15",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_16": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_16",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_17": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_17",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_18": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_18",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_19": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_19",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_20": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_20",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_21": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_21",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_22": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_22",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_23": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_23",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_24": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_24",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_25": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_25",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_26": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_26",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_27": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_27",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_28": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_28",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_29": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_29",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_30": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_30",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_31": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_31",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_32": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_32",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_33": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_33",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_34": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_34",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_35": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_35",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_36": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_36",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_37": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_37",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_38": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_38",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_39": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_39",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_40": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_40",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_41": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_41",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_panic_somatic": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_panic_somatic",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_generalized_anxiety": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_generalized_anxiety",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_separation_anxiety": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_separation_anxiety",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_social_anxiety": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_social_anxiety",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_school_avoidance": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_school_avoidance",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_total": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_total",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "scared_sr_possible_anxiety_disorder_cut25": {
+      "type": "number",
+      "description": "scared_sr::scared_sr_possible_anxiety_disorder_cut25",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "anxiety",
+      "x-age-applicability": "6-11"
+    },
+    "has_sdq": {
+      "type": "number",
+      "description": "sdq::has_sdq",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_01": {
+      "type": "number",
+      "description": "sdq::sdq_01",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_02": {
+      "type": "number",
+      "description": "sdq::sdq_02",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_03": {
+      "type": "number",
+      "description": "sdq::sdq_03",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_04": {
+      "type": "number",
+      "description": "sdq::sdq_04",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_05": {
+      "type": "number",
+      "description": "sdq::sdq_05",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_06": {
+      "type": "number",
+      "description": "sdq::sdq_06",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_07": {
+      "type": "number",
+      "description": "sdq::sdq_07",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_08": {
+      "type": "number",
+      "description": "sdq::sdq_08",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_09": {
+      "type": "number",
+      "description": "sdq::sdq_09",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_10": {
+      "type": "number",
+      "description": "sdq::sdq_10",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_11": {
+      "type": "number",
+      "description": "sdq::sdq_11",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_12": {
+      "type": "number",
+      "description": "sdq::sdq_12",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_13": {
+      "type": "number",
+      "description": "sdq::sdq_13",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_14": {
+      "type": "number",
+      "description": "sdq::sdq_14",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_15": {
+      "type": "number",
+      "description": "sdq::sdq_15",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_16": {
+      "type": "number",
+      "description": "sdq::sdq_16",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_17": {
+      "type": "number",
+      "description": "sdq::sdq_17",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_18": {
+      "type": "number",
+      "description": "sdq::sdq_18",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_19": {
+      "type": "number",
+      "description": "sdq::sdq_19",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_20": {
+      "type": "number",
+      "description": "sdq::sdq_20",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_21": {
+      "type": "number",
+      "description": "sdq::sdq_21",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_22": {
+      "type": "number",
+      "description": "sdq::sdq_22",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_23": {
+      "type": "number",
+      "description": "sdq::sdq_23",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_24": {
+      "type": "number",
+      "description": "sdq::sdq_24",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_25": {
+      "type": "number",
+      "description": "sdq::sdq_25",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_emotional_symptoms": {
+      "type": "number",
+      "description": "sdq::sdq_emotional_symptoms",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_conduct_problems": {
+      "type": "number",
+      "description": "sdq::sdq_conduct_problems",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_hyperactivity_inattention": {
+      "type": "number",
+      "description": "sdq::sdq_hyperactivity_inattention",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_peer_problems": {
+      "type": "number",
+      "description": "sdq::sdq_peer_problems",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_prosocial_behavior": {
+      "type": "number",
+      "description": "sdq::sdq_prosocial_behavior",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_total_difficulties": {
+      "type": "number",
+      "description": "sdq::sdq_total_difficulties",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "sdq_impact": {
+      "type": "number",
+      "description": "sdq::sdq_impact",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "has_swan": {
+      "type": "number",
+      "description": "swan::has_swan",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_01": {
+      "type": "number",
+      "description": "swan::swan_01",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_02": {
+      "type": "number",
+      "description": "swan::swan_02",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_03": {
+      "type": "number",
+      "description": "swan::swan_03",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_04": {
+      "type": "number",
+      "description": "swan::swan_04",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_05": {
+      "type": "number",
+      "description": "swan::swan_05",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_06": {
+      "type": "number",
+      "description": "swan::swan_06",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_07": {
+      "type": "number",
+      "description": "swan::swan_07",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_08": {
+      "type": "number",
+      "description": "swan::swan_08",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_09": {
+      "type": "number",
+      "description": "swan::swan_09",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_10": {
+      "type": "number",
+      "description": "swan::swan_10",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_11": {
+      "type": "number",
+      "description": "swan::swan_11",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_12": {
+      "type": "number",
+      "description": "swan::swan_12",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_13": {
+      "type": "number",
+      "description": "swan::swan_13",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_14": {
+      "type": "number",
+      "description": "swan::swan_14",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_15": {
+      "type": "number",
+      "description": "swan::swan_15",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_16": {
+      "type": "number",
+      "description": "swan::swan_16",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_17": {
+      "type": "number",
+      "description": "swan::swan_17",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_18": {
+      "type": "number",
+      "description": "swan::swan_18",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_inattention_total": {
+      "type": "number",
+      "description": "swan::swan_inattention_total",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_hyperactive_impulsive_total": {
+      "type": "number",
+      "description": "swan::swan_hyperactive_impulsive_total",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "swan_total": {
+      "type": "number",
+      "description": "swan::swan_total",
+      "x-modality": "reporte_cuidador",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "has_ysr": {
+      "type": "number",
+      "description": "ysr::has_ysr",
+      "x-modality": "disponibilidad_instrumental",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_001": {
+      "type": "number",
+      "description": "ysr::ysr_001",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_002": {
+      "type": "number",
+      "description": "ysr::ysr_002",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_003": {
+      "type": "number",
+      "description": "ysr::ysr_003",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_004": {
+      "type": "number",
+      "description": "ysr::ysr_004",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_005": {
+      "type": "number",
+      "description": "ysr::ysr_005",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_006": {
+      "type": "number",
+      "description": "ysr::ysr_006",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_007": {
+      "type": "number",
+      "description": "ysr::ysr_007",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_008": {
+      "type": "number",
+      "description": "ysr::ysr_008",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_009": {
+      "type": "number",
+      "description": "ysr::ysr_009",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_010": {
+      "type": "number",
+      "description": "ysr::ysr_010",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_011": {
+      "type": "number",
+      "description": "ysr::ysr_011",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_012": {
+      "type": "number",
+      "description": "ysr::ysr_012",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_013": {
+      "type": "number",
+      "description": "ysr::ysr_013",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_014": {
+      "type": "number",
+      "description": "ysr::ysr_014",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_015": {
+      "type": "number",
+      "description": "ysr::ysr_015",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_016": {
+      "type": "number",
+      "description": "ysr::ysr_016",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_017": {
+      "type": "number",
+      "description": "ysr::ysr_017",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_018": {
+      "type": "number",
+      "description": "ysr::ysr_018",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_019": {
+      "type": "number",
+      "description": "ysr::ysr_019",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_020": {
+      "type": "number",
+      "description": "ysr::ysr_020",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_021": {
+      "type": "number",
+      "description": "ysr::ysr_021",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_022": {
+      "type": "number",
+      "description": "ysr::ysr_022",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_023": {
+      "type": "number",
+      "description": "ysr::ysr_023",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_024": {
+      "type": "number",
+      "description": "ysr::ysr_024",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_025": {
+      "type": "number",
+      "description": "ysr::ysr_025",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_026": {
+      "type": "number",
+      "description": "ysr::ysr_026",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_027": {
+      "type": "number",
+      "description": "ysr::ysr_027",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_028": {
+      "type": "number",
+      "description": "ysr::ysr_028",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_029": {
+      "type": "number",
+      "description": "ysr::ysr_029",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_030": {
+      "type": "number",
+      "description": "ysr::ysr_030",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_031": {
+      "type": "number",
+      "description": "ysr::ysr_031",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_032": {
+      "type": "number",
+      "description": "ysr::ysr_032",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_033": {
+      "type": "number",
+      "description": "ysr::ysr_033",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_034": {
+      "type": "number",
+      "description": "ysr::ysr_034",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_035": {
+      "type": "number",
+      "description": "ysr::ysr_035",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_036": {
+      "type": "number",
+      "description": "ysr::ysr_036",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_037": {
+      "type": "number",
+      "description": "ysr::ysr_037",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_038": {
+      "type": "number",
+      "description": "ysr::ysr_038",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_039": {
+      "type": "number",
+      "description": "ysr::ysr_039",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_040": {
+      "type": "number",
+      "description": "ysr::ysr_040",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_041": {
+      "type": "number",
+      "description": "ysr::ysr_041",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_042": {
+      "type": "number",
+      "description": "ysr::ysr_042",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_043": {
+      "type": "number",
+      "description": "ysr::ysr_043",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_044": {
+      "type": "number",
+      "description": "ysr::ysr_044",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_045": {
+      "type": "number",
+      "description": "ysr::ysr_045",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_046": {
+      "type": "number",
+      "description": "ysr::ysr_046",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_047": {
+      "type": "number",
+      "description": "ysr::ysr_047",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_048": {
+      "type": "number",
+      "description": "ysr::ysr_048",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_049": {
+      "type": "number",
+      "description": "ysr::ysr_049",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_050": {
+      "type": "number",
+      "description": "ysr::ysr_050",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_051": {
+      "type": "number",
+      "description": "ysr::ysr_051",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_052": {
+      "type": "number",
+      "description": "ysr::ysr_052",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_053": {
+      "type": "number",
+      "description": "ysr::ysr_053",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_054": {
+      "type": "number",
+      "description": "ysr::ysr_054",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_055": {
+      "type": "number",
+      "description": "ysr::ysr_055",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_056": {
+      "type": "number",
+      "description": "ysr::ysr_056",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_057": {
+      "type": "number",
+      "description": "ysr::ysr_057",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_058": {
+      "type": "number",
+      "description": "ysr::ysr_058",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_059": {
+      "type": "number",
+      "description": "ysr::ysr_059",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_060": {
+      "type": "number",
+      "description": "ysr::ysr_060",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_061": {
+      "type": "number",
+      "description": "ysr::ysr_061",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_062": {
+      "type": "number",
+      "description": "ysr::ysr_062",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_063": {
+      "type": "number",
+      "description": "ysr::ysr_063",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_064": {
+      "type": "number",
+      "description": "ysr::ysr_064",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_065": {
+      "type": "number",
+      "description": "ysr::ysr_065",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_066": {
+      "type": "number",
+      "description": "ysr::ysr_066",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_067": {
+      "type": "number",
+      "description": "ysr::ysr_067",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_068": {
+      "type": "number",
+      "description": "ysr::ysr_068",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_069": {
+      "type": "number",
+      "description": "ysr::ysr_069",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_070": {
+      "type": "number",
+      "description": "ysr::ysr_070",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_071": {
+      "type": "number",
+      "description": "ysr::ysr_071",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_072": {
+      "type": "number",
+      "description": "ysr::ysr_072",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_073": {
+      "type": "number",
+      "description": "ysr::ysr_073",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_074": {
+      "type": "number",
+      "description": "ysr::ysr_074",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_075": {
+      "type": "number",
+      "description": "ysr::ysr_075",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_076": {
+      "type": "number",
+      "description": "ysr::ysr_076",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_077": {
+      "type": "number",
+      "description": "ysr::ysr_077",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_078": {
+      "type": "number",
+      "description": "ysr::ysr_078",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_079": {
+      "type": "number",
+      "description": "ysr::ysr_079",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_080": {
+      "type": "number",
+      "description": "ysr::ysr_080",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_081": {
+      "type": "number",
+      "description": "ysr::ysr_081",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_082": {
+      "type": "number",
+      "description": "ysr::ysr_082",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_083": {
+      "type": "number",
+      "description": "ysr::ysr_083",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_084": {
+      "type": "number",
+      "description": "ysr::ysr_084",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_085": {
+      "type": "number",
+      "description": "ysr::ysr_085",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_086": {
+      "type": "number",
+      "description": "ysr::ysr_086",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_087": {
+      "type": "number",
+      "description": "ysr::ysr_087",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_088": {
+      "type": "number",
+      "description": "ysr::ysr_088",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_089": {
+      "type": "number",
+      "description": "ysr::ysr_089",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_090": {
+      "type": "number",
+      "description": "ysr::ysr_090",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_091": {
+      "type": "number",
+      "description": "ysr::ysr_091",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_092": {
+      "type": "number",
+      "description": "ysr::ysr_092",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_093": {
+      "type": "number",
+      "description": "ysr::ysr_093",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_094": {
+      "type": "number",
+      "description": "ysr::ysr_094",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_095": {
+      "type": "number",
+      "description": "ysr::ysr_095",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_096": {
+      "type": "number",
+      "description": "ysr::ysr_096",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_097": {
+      "type": "number",
+      "description": "ysr::ysr_097",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_098": {
+      "type": "number",
+      "description": "ysr::ysr_098",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_099": {
+      "type": "number",
+      "description": "ysr::ysr_099",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_100": {
+      "type": "number",
+      "description": "ysr::ysr_100",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_101": {
+      "type": "number",
+      "description": "ysr::ysr_101",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_102": {
+      "type": "number",
+      "description": "ysr::ysr_102",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_103": {
+      "type": "number",
+      "description": "ysr::ysr_103",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_104": {
+      "type": "number",
+      "description": "ysr::ysr_104",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_105": {
+      "type": "number",
+      "description": "ysr::ysr_105",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_106": {
+      "type": "number",
+      "description": "ysr::ysr_106",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_107": {
+      "type": "number",
+      "description": "ysr::ysr_107",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_108": {
+      "type": "number",
+      "description": "ysr::ysr_108",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_109": {
+      "type": "number",
+      "description": "ysr::ysr_109",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_110": {
+      "type": "number",
+      "description": "ysr::ysr_110",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_111": {
+      "type": "number",
+      "description": "ysr::ysr_111",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_112": {
+      "type": "number",
+      "description": "ysr::ysr_112",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_anxious_depressed_proxy": {
+      "type": "number",
+      "description": "ysr::ysr_anxious_depressed_proxy",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "depression",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_attention_problems_proxy": {
+      "type": "number",
+      "description": "ysr::ysr_attention_problems_proxy",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "adhd",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_rule_breaking_proxy": {
+      "type": "number",
+      "description": "ysr::ysr_rule_breaking_proxy",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_aggressive_behavior_proxy": {
+      "type": "number",
+      "description": "ysr::ysr_aggressive_behavior_proxy",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "conduct",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_internalizing_proxy": {
+      "type": "number",
+      "description": "ysr::ysr_internalizing_proxy",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    },
+    "ysr_externalizing_proxy": {
+      "type": "number",
+      "description": "ysr::ysr_externalizing_proxy",
+      "x-modality": "autoreporte",
+      "x-disorder-domain": "transdiagnostic",
+      "x-age-applicability": "6-11"
+    }
+  },
+  "required": [
+    "age_years"
+  ],
+  "additionalProperties": false
+}
