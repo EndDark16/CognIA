@@ -1,0 +1,107 @@
+{
+  "model_version": "rf_depression_v3_calibrated",
+  "parent_version": "rf_depression_v1_baseline",
+  "task_type": "binary",
+  "status": "completed",
+  "dataset_name": "dataset_depression_combined",
+  "dataset_variant": "combined",
+  "data_scope": "strict_no_leakage",
+  "split_version": "splits_strict_no_leakage_frozen_v1",
+  "preprocessing_version": "rf_preproc_v1",
+  "seed": 42,
+  "target": "target_depression",
+  "n_features_raw": 25,
+  "n_features_final": 24,
+  "train_rows": 1333,
+  "val_rows": 286,
+  "test_rows": 286,
+  "best_params": {
+    "model__n_estimators": 150,
+    "model__min_samples_split": 10,
+    "model__min_samples_leaf": 4,
+    "model__max_features": "log2",
+    "model__max_depth": 10,
+    "model__class_weight": "balanced_subsample"
+  },
+  "search_meta": {
+    "best_cv_balanced_accuracy": 0.7979507966006624,
+    "cv_splits": 3,
+    "n_iter": 10
+  },
+  "threshold_strategy": "sensitivity_priority",
+  "threshold_value": 0.220238,
+  "calibration_strategy": "isotonic",
+  "validation_metrics": {
+    "threshold": 0.220238,
+    "accuracy": 0.8706293706293706,
+    "balanced_accuracy": 0.8688802083333333,
+    "precision": 0.4406779661016949,
+    "recall": 0.8666666666666667,
+    "sensitivity": 0.8666666666666667,
+    "specificity": 0.87109375,
+    "f1": 0.5842696629213483,
+    "support_negative": 256,
+    "support_positive": 30,
+    "confusion_matrix": [
+      [
+        223,
+        33
+      ],
+      [
+        4,
+        26
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.87109375,
+        0.12890625
+      ],
+      [
+        0.13333333333333333,
+        0.8666666666666667
+      ]
+    ],
+    "roc_auc": 0.9426432291666667,
+    "pr_auc": 0.6476364797755426,
+    "brier_score": 0.057990110729130205
+  },
+  "test_metrics": {
+    "threshold": 0.220238,
+    "accuracy": 0.8741258741258742,
+    "balanced_accuracy": 0.885546875,
+    "precision": 0.45,
+    "recall": 0.9,
+    "sensitivity": 0.9,
+    "specificity": 0.87109375,
+    "f1": 0.6,
+    "support_negative": 256,
+    "support_positive": 30,
+    "confusion_matrix": [
+      [
+        223,
+        33
+      ],
+      [
+        3,
+        27
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.87109375,
+        0.12890625
+      ],
+      [
+        0.1,
+        0.9
+      ]
+    ],
+    "roc_auc": 0.9245442708333333,
+    "pr_auc": 0.562511166236528,
+    "brier_score": 0.06339864597228478
+  },
+  "notes": "Combined depression features with stronger recall objective and isotonic calibration.",
+  "experimental": false,
+  "created_at": "2026-03-24T03:18:44.569610+00:00"
+}

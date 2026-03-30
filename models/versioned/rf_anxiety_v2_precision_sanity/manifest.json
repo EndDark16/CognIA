@@ -1,0 +1,132 @@
+{
+  "model_version": "rf_anxiety_v2_precision_sanity",
+  "parent_version": "rf_anxiety_v1_baseline",
+  "task_type": "binary",
+  "status": "completed",
+  "dataset_name": "dataset_anxiety_items",
+  "dataset_variant": "items",
+  "data_scope": "strict_no_leakage",
+  "split_version": "splits_strict_no_leakage_frozen_v1",
+  "preprocessing_version": "rf_preproc_v1",
+  "seed": 42,
+  "target": "target_anxiety",
+  "n_features_raw": 260,
+  "n_features_final": 20,
+  "train_rows": 1333,
+  "val_rows": 286,
+  "test_rows": 286,
+  "threshold_strategy": "precision_constrained",
+  "threshold_value": 0.595479,
+  "recall_floor": 0.7,
+  "balanced_accuracy_tolerance": 0.03,
+  "calibration_strategy": "none",
+  "validation_metrics": {
+    "threshold": 0.595479,
+    "accuracy": 0.8601398601398601,
+    "balanced_accuracy": 0.8480496894409938,
+    "precision": 0.912621359223301,
+    "recall": 0.752,
+    "sensitivity": 0.752,
+    "specificity": 0.9440993788819876,
+    "f1": 0.8245614035087719,
+    "support_negative": 161,
+    "support_positive": 125,
+    "confusion_matrix": [
+      [
+        152,
+        9
+      ],
+      [
+        31,
+        94
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.9440993788819876,
+        0.055900621118012424
+      ],
+      [
+        0.248,
+        0.752
+      ]
+    ],
+    "roc_auc": 0.935751552795031,
+    "pr_auc": 0.9305498825158305,
+    "brier_score": 0.09943721297551998,
+    "fpr": 0.05590062111801242,
+    "fnr": 0.248,
+    "prevalence": 0.4370629370629371,
+    "precision_lift_vs_baseline": -0.01330456670262492,
+    "recall_delta_vs_baseline": -0.04800000000000004,
+    "balanced_accuracy_delta_vs_baseline": -0.027105590062111884
+  },
+  "test_metrics": {
+    "threshold": 0.595479,
+    "accuracy": 0.8531468531468531,
+    "balanced_accuracy": 0.8426091269841269,
+    "precision": 0.8962264150943396,
+    "recall": 0.753968253968254,
+    "sensitivity": 0.753968253968254,
+    "specificity": 0.93125,
+    "f1": 0.8189655172413793,
+    "support_negative": 160,
+    "support_positive": 126,
+    "confusion_matrix": [
+      [
+        149,
+        11
+      ],
+      [
+        31,
+        95
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.93125,
+        0.06875
+      ],
+      [
+        0.24603174603174602,
+        0.753968253968254
+      ]
+    ],
+    "roc_auc": 0.9429811507936509,
+    "pr_auc": 0.9311871607052521,
+    "brier_score": 0.09633454278513691,
+    "fpr": 0.06874999999999998,
+    "fnr": 0.24603174603174605,
+    "prevalence": 0.4405594405594406,
+    "precision_lift_vs_baseline": NaN,
+    "recall_delta_vs_baseline": -0.007936507936507908,
+    "balanced_accuracy_delta_vs_baseline": -0.0070932539682539986
+  },
+  "abstention_validation": {
+    "low_threshold": 0.5,
+    "high_threshold": 0.912682,
+    "coverage": 0.8041958041958042,
+    "uncertain_rate": 0.1958041958041958,
+    "precision_high": 0.9848484848484849,
+    "npv_low": 0.8780487804878049,
+    "recall_effective": 0.52,
+    "specificity_effective": 0.8944099378881988,
+    "selection_reason": "target_precision_with_coverage",
+    "target_high_precision": 0.95,
+    "min_confident_coverage": 0.1
+  },
+  "abstention_test": {
+    "coverage": 0.7692307692307693,
+    "uncertain_rate": 0.23076923076923078,
+    "precision_high": 0.9682539682539683,
+    "npv_low": 0.8980891719745223,
+    "recall_effective": 0.48412698412698413,
+    "specificity_effective": 0.88125,
+    "confident_positive_n": 63,
+    "confident_negative_n": 157,
+    "uncertain_n": 66
+  },
+  "notes": "Light sanity challenger for Anxiety precision.",
+  "experimental": false,
+  "created_at": "2026-03-25T20:29:29.959073+00:00"
+}

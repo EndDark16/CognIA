@@ -1,0 +1,8 @@
+feature_family,candidate_feature_name,source_columns,source_tables,transformation_type,clinical_rationale,expected_effect,methodological_risk,leakage_risk,implementation_priority,promotable_yes_no
+composite_clinical,v5_comp_elim_core_sum,"cbcl_108,cbcl_112,sdq_impact",HBN_hybrid_existing,sum,Concentrates compatible elimination core evidence,improve_signal_quality,low,low,1,yes
+composite_clinical,v5_comp_elim_source_convergence,"has_cbcl,has_sdq",HBN_hybrid_existing,binary_flag,Captures convergence across available parent sources,stability_gain,low,low,1,yes
+anti_transdiagnostic,v5_anti_specificity_ratio,"elim_core,internalizing_proxy,externalizing_proxy,sdq_difficulties",HBN_hybrid_existing,ratio,Relative specificity signal vs diffuse burden,false_positive_reduction,moderate,low,1,yes
+evidence_quality,v5_eq_evidence_quality_score,has_* flags plus observed core ratio,HBN_hybrid_existing,composite_score,Quantifies evidence completeness and quality,robustness_gain,low,low,2,yes
+subtype_auxiliary,v5_sub_aux_overlap_flag,"cbcl_108,cbcl_112",HBN_hybrid_existing,auxiliary_flag,Subtype-aware structure for internal support only,analytic_support,moderate,moderate,2,yes
+hard_negative,v5_hn_negative_guard,"transdiagnostic_burden,elimination_core",HBN_hybrid_existing,difference,Hard-negative guard against diffuse distress FPs,specificity_gain,moderate,low,1,yes
+danger_zone,target_* criteria counts as features,target_*,derived_targets,unsafe_direct_proxy,Near-direct diagnostic reconstruction risk,artificial_metric_inflation,critical,critical,0,no

@@ -1,0 +1,18 @@
+{
+  "model_id": "multilabel_domain_strict",
+  "task_kind": "multilabel_domain",
+  "scope": "strict_no_leakage_hybrid",
+  "dataset_variant": "multilabel",
+  "split_source": "created",
+  "n_rows": 1905,
+  "n_features": 600,
+  "subset_accuracy": 0.8776223776223776,
+  "hamming_loss": 0.025174825174825177,
+  "micro_precision": 0.9759450171821306,
+  "micro_recall": 0.9627118644067797,
+  "micro_f1": 0.9692832764505119,
+  "macro_precision": 0.9775722684958353,
+  "macro_recall": 0.9587588812255226,
+  "macro_f1": 0.9678869486673731,
+  "weighted_f1": 0.9692220709973633
+}

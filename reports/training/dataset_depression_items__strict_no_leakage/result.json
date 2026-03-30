@@ -1,0 +1,401 @@
+{
+  "summary": {
+    "model_id": "dataset_depression_items__strict_no_leakage",
+    "dataset_name": "dataset_depression_items",
+    "version": "strict_no_leakage",
+    "disorder": "depression",
+    "variant": "items",
+    "target": "target_depression",
+    "n_rows": 1905,
+    "n_features": 261,
+    "search_param_source": "search",
+    "best_params": {
+      "model__n_estimators": 350,
+      "model__min_samples_split": 5,
+      "model__min_samples_leaf": 4,
+      "model__max_features": "log2",
+      "model__max_depth": 20,
+      "model__class_weight": "balanced_subsample"
+    },
+    "search_meta": {
+      "best_cv_balanced_accuracy": 0.7980310501524728,
+      "cv_splits": 3,
+      "n_iter": 6
+    },
+    "threshold_method": "youden_j",
+    "threshold_value": 0.12379394628185941,
+    "balanced_accuracy_val": 0.9022135416666667,
+    "balanced_accuracy_test": 0.8541666666666667,
+    "recall_test": 0.8333333333333334,
+    "specificity_test": 0.875,
+    "f1_test": 0.5747126436781609,
+    "roc_auc_test": 0.9334635416666667,
+    "pr_auc_test": 0.6174270111706665,
+    "brier_score_test": 0.059474163196645224,
+    "accuracy_test": 0.8706293706293706,
+    "precision_test": 0.43859649122807015,
+    "support_positive_test": 30,
+    "support_negative_test": 256,
+    "missing_ratio_test": 0.17336494922701817,
+    "risk_band_example": "low",
+    "evidence_quality": "strong",
+    "artifact_pipeline_path": "artifacts\\models\\binary\\dataset_depression_items__strict_no_leakage\\pipeline.joblib",
+    "artifact_calibrated_path": "artifacts\\models\\calibrated\\dataset_depression_items__strict_no_leakage\\calibrated.joblib",
+    "artifact_metadata_path": "artifacts\\models\\binary\\dataset_depression_items__strict_no_leakage\\metadata.json",
+    "figure_roc": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\dataset_depression_items__strict_no_leakage\\dataset_depression_items__strict_no_leakage_roc.png",
+    "figure_pr": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\dataset_depression_items__strict_no_leakage\\dataset_depression_items__strict_no_leakage_pr.png",
+    "figure_confusion": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\dataset_depression_items__strict_no_leakage\\dataset_depression_items__strict_no_leakage_confusion.png",
+    "figure_calibration": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\dataset_depression_items__strict_no_leakage\\dataset_depression_items__strict_no_leakage_calibration.png",
+    "dropped_columns_count": 9,
+    "manifest_exists": true
+  },
+  "validation_metrics": {
+    "threshold": 0.12379394628185941,
+    "accuracy": 0.8776223776223776,
+    "balanced_accuracy": 0.9022135416666667,
+    "precision": 0.45901639344262296,
+    "recall": 0.9333333333333333,
+    "sensitivity": 0.9333333333333333,
+    "specificity": 0.87109375,
+    "f1": 0.6153846153846154,
+    "support_negative": 256,
+    "support_positive": 30,
+    "confusion_matrix": [
+      [
+        223,
+        33
+      ],
+      [
+        2,
+        28
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.87109375,
+        0.12890625
+      ],
+      [
+        0.06666666666666667,
+        0.9333333333333333
+      ]
+    ],
+    "roc_auc": 0.94375,
+    "pr_auc": 0.6377741400852726,
+    "brier_score": 0.057242300588981984
+  },
+  "test_metrics": {
+    "threshold": 0.12379394628185941,
+    "accuracy": 0.8706293706293706,
+    "balanced_accuracy": 0.8541666666666667,
+    "precision": 0.43859649122807015,
+    "recall": 0.8333333333333334,
+    "sensitivity": 0.8333333333333334,
+    "specificity": 0.875,
+    "f1": 0.5747126436781609,
+    "support_negative": 256,
+    "support_positive": 30,
+    "confusion_matrix": [
+      [
+        224,
+        32
+      ],
+      [
+        5,
+        25
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.875,
+        0.125
+      ],
+      [
+        0.16666666666666666,
+        0.8333333333333334
+      ]
+    ],
+    "roc_auc": 0.9334635416666667,
+    "pr_auc": 0.6174270111706665,
+    "brier_score": 0.059474163196645224
+  },
+  "threshold_recommendation": {
+    "method": "youden_j",
+    "threshold": 0.12379394628185941,
+    "val_balanced_accuracy": 0.9022135416666667,
+    "val_recall": 0.9333333333333333,
+    "val_specificity": 0.87109375,
+    "val_f1": 0.6153846153846154
+  },
+  "removed_columns": {
+    "participant_id": "meta",
+    "target_conduct": "target_column",
+    "target_adhd": "target_column",
+    "target_elimination": "target_column",
+    "target_anxiety": "target_column",
+    "target_depression": "target_column",
+    "primary_target": "meta",
+    "dataset_name": "meta",
+    "is_exploratory": "meta"
+  },
+  "local_explanations": {
+    "HBN_SYN_003314": {
+      "top_positive_contributors": [
+        {
+          "feature": "num__cbcl_externalizing_proxy",
+          "score": 0.09231059514214816
+        },
+        {
+          "feature": "num__cbcl_rule_breaking_proxy",
+          "score": 0.035276519190807966
+        },
+        {
+          "feature": "num__cbcl_aggressive_behavior_proxy",
+          "score": 0.022741075491129262
+        },
+        {
+          "feature": "num__cbcl_attention_problems_proxy",
+          "score": 0.01742326526824947
+        },
+        {
+          "feature": "num__cbcl_098",
+          "score": 0.01309954552389239
+        },
+        {
+          "feature": "num__cbcl_007",
+          "score": 0.01150595385716062
+        },
+        {
+          "feature": "num__cbcl_109",
+          "score": 0.010856805300058982
+        },
+        {
+          "feature": "num__cbcl_095",
+          "score": 0.007885984911762683
+        },
+        {
+          "feature": "num__cbcl_118",
+          "score": 0.007001445896310883
+        },
+        {
+          "feature": "num__cbcl_103",
+          "score": 0.00630304938138398
+        }
+      ],
+      "top_negative_contributors": [
+        {
+          "feature": "num__cbcl_internalizing_proxy",
+          "score": -0.17034769377303272
+        },
+        {
+          "feature": "num__cbcl_anxious_depressed_proxy",
+          "score": -0.10897289815707278
+        },
+        {
+          "feature": "num__cbcl_006",
+          "score": -0.020389815671747562
+        },
+        {
+          "feature": "num__cbcl_027",
+          "score": -0.017103411961285626
+        },
+        {
+          "feature": "num__cdi_total",
+          "score": -0.01501721418741239
+        },
+        {
+          "feature": "num__age_years",
+          "score": -0.004805613829223305
+        },
+        {
+          "feature": "num__cdi_15",
+          "score": -0.002808189426933139
+        },
+        {
+          "feature": "num__cbcl_093",
+          "score": -0.0025439632820688477
+        },
+        {
+          "feature": "num__cbcl_107",
+          "score": -0.0018205033718108586
+        },
+        {
+          "feature": "num__cdi_16",
+          "score": -0.0011692051901332392
+        }
+      ]
+    },
+    "HBN_SYN_003134": {
+      "top_positive_contributors": [
+        {
+          "feature": "num__cbcl_attention_problems_proxy",
+          "score": 0.029038775447082457
+        },
+        {
+          "feature": "num__cbcl_118",
+          "score": 0.007001445896310883
+        },
+        {
+          "feature": "num__cbcl_externalizing_proxy",
+          "score": 0.006837821862381345
+        },
+        {
+          "feature": "num__cbcl_aggressive_behavior_proxy",
+          "score": 0.0068223226473387785
+        },
+        {
+          "feature": "num__cbcl_017",
+          "score": 0.006267821428301579
+        },
+        {
+          "feature": "num__cbcl_106",
+          "score": 0.004924805472415197
+        },
+        {
+          "feature": "num__age_years",
+          "score": 0.004240247496373506
+        },
+        {
+          "feature": "num__sdq_03",
+          "score": 0.0033498068490088865
+        },
+        {
+          "feature": "num__cbcl_036",
+          "score": 0.0024196255556365774
+        },
+        {
+          "feature": "num__cbcl_038",
+          "score": 0.0021923681007642334
+        }
+      ],
+      "top_negative_contributors": [
+        {
+          "feature": "num__cbcl_internalizing_proxy",
+          "score": -0.1987389760685382
+        },
+        {
+          "feature": "num__cbcl_anxious_depressed_proxy",
+          "score": -0.18162149692845464
+        },
+        {
+          "feature": "num__mfq_sr_total",
+          "score": -0.15316544971782958
+        },
+        {
+          "feature": "num__sdq_total_difficulties",
+          "score": -0.12069051879935418
+        },
+        {
+          "feature": "num__sdq_hyperactivity_inattention",
+          "score": -0.022129532039350263
+        },
+        {
+          "feature": "num__cbcl_006",
+          "score": -0.020389815671747562
+        },
+        {
+          "feature": "num__sdq_peer_problems",
+          "score": -0.01979370929369658
+        },
+        {
+          "feature": "num__cbcl_027",
+          "score": -0.017103411961285626
+        },
+        {
+          "feature": "num__cbcl_010",
+          "score": -0.014513919229334064
+        },
+        {
+          "feature": "num__sdq_conduct_problems",
+          "score": -0.014005763575728008
+        }
+      ]
+    },
+    "HBN_SYN_000323": {
+      "top_positive_contributors": [
+        {
+          "feature": "num__cbcl_internalizing_proxy",
+          "score": 0.7381733396831418
+        },
+        {
+          "feature": "num__cbcl_anxious_depressed_proxy",
+          "score": 0.47221589201398206
+        },
+        {
+          "feature": "num__sdq_total_difficulties",
+          "score": 0.36207155639806254
+        },
+        {
+          "feature": "num__cbcl_externalizing_proxy",
+          "score": 0.07521604048619479
+        },
+        {
+          "feature": "num__sdq_emotional_symptoms",
+          "score": 0.06331110919015559
+        },
+        {
+          "feature": "num__sdq_peer_problems",
+          "score": 0.05938112788108974
+        },
+        {
+          "feature": "num__sdq_conduct_problems",
+          "score": 0.049020172515048026
+        },
+        {
+          "feature": "num__sdq_hyperactivity_inattention",
+          "score": 0.044259064078700526
+        },
+        {
+          "feature": "num__cbcl_016",
+          "score": 0.03975196431669427
+        },
+        {
+          "feature": "num__cbcl_015",
+          "score": 0.03936646946939923
+        }
+      ],
+      "top_negative_contributors": [
+        {
+          "feature": "num__age_years",
+          "score": -0.007632445493472309
+        },
+        {
+          "feature": "num__cbcl_068",
+          "score": -0.0008155719317251612
+        },
+        {
+          "feature": "cat__sex_assigned_at_birth_Male",
+          "score": -0.000800659183754322
+        },
+        {
+          "feature": "num__cdi_14",
+          "score": 0.0
+        },
+        {
+          "feature": "num__cdi_15",
+          "score": 0.0
+        },
+        {
+          "feature": "num__cdi_16",
+          "score": 0.0
+        },
+        {
+          "feature": "num__cdi_17",
+          "score": 0.0
+        },
+        {
+          "feature": "num__cdi_18",
+          "score": 0.0
+        },
+        {
+          "feature": "num__cdi_19",
+          "score": 0.0
+        },
+        {
+          "feature": "num__cdi_20",
+          "score": 0.0
+        }
+      ]
+    }
+  }
+}

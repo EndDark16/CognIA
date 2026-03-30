@@ -1,0 +1,13 @@
+trial_id,suspicious_perfect_score,trigger_detail,blocked_from_promotion
+V5_T01_control_replay_v2_best,False,none,False
+V5_T02_composite_clinical,False,none,False
+V5_T03_anti_transdiagnostic,False,none,False
+V5_T04_evidence_quality_meta,False,none,False
+V5_T05_subtype_auxiliary,False,none,False
+V5_T06_hard_negative_engineering,False,none,False
+V5_T07_compact_best_combined,False,none,False
+V5_T08_two_stage_filter,True,metric>=0.999 in train/val/test set,True
+V5_T09_abstention_ready_refit,False,none,False
+V5_T10_research_context_optional,False,none,False
+V5_T11_stop_condition_control,True,metric>=0.999 in train/val/test set,True
+V5_T12_best_honest_candidate_final,False,none,False

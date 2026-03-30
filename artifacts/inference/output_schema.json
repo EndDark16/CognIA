@@ -1,0 +1,25 @@
+{
+  "binary_output": {
+    "type": "object",
+    "required": [
+      "disorder",
+      "probability_score",
+      "predicted_label",
+      "threshold_used",
+      "risk_band",
+      "evidence_quality",
+      "missing_critical_features",
+      "top_contributors"
+    ]
+  },
+  "multilabel_output": {
+    "type": "object",
+    "required": [
+      "per_disorder",
+      "suspected_comorbidity",
+      "predicted_positive_count",
+      "evidence_quality",
+      "missing_critical_features"
+    ]
+  }
+}

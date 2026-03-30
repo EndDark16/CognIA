@@ -1,0 +1,8 @@
+path,classification,reason,action
+models/,unsafe_to_exclude,runtime uses models/adhd_model.pkl,keep_in_repo_for_deploy_or_externalize_and_fetch
+artifacts/models/,safe_to_exclude,duplicate binaries; not referenced at runtime,move_to_external_storage
+artifacts/versioned_models/,safe_to_exclude,not referenced by runtime,move_to_external_storage
+data/processed*,safe_to_exclude,not used by runtime,move_to_external_storage
+artifacts/preprocessing/,safe_to_exclude,not used by runtime,move_to_external_storage
+.env,move_to_env_or_secret,contains real secrets,use_render_secrets
+.env.example,keep_template_only,needed for deploy setup,keep_in_repo

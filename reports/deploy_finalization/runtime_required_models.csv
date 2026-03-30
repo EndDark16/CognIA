@@ -1,0 +1,6 @@
+"domain,expected_loader_name,required_model_file,current_path,exists,used_by_runtime,evidence,commit_policy,coherent_with_inference_v4"
+"adhd,adhd,adhd_model.pkl,models/adhd_model.pkl,yes,yes,api/services/model_service.py:21;core/models/predictor.py:6-8,keep_in_repo,yes"
+"anxiety,anxiety,anxiety_model.pkl,models/anxiety_model.pkl,no,no,api/services/model_service.py:25 (comentado),exclude_from_runtime,partial"
+"conduct,conduct,conduct_model.pkl,models/conduct_model.pkl,no,no,no runtime call,exclude_from_runtime,partial"
+"depression,depression,depression_model.pkl,models/depression_model.pkl,no,no,no runtime call,exclude_from_runtime,partial"
+"elimination,elimination,elimination_model.pkl,models/elimination_model.pkl,no,no,hold in artifacts/inference_v4/promotion_scope.json,exclude_from_runtime,yes"

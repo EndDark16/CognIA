@@ -1,0 +1,6 @@
+domain,model_id,recommended_mode,threshold,precision_test,recall_test,specificity_test,balanced_accuracy_test
+adhd,domain_adhd_research_full,sensitive,0.2,1.0,1.0,1.0,1.0
+anxiety,domain_anxiety_strict_full,sensitive,0.2,0.9701492537313432,0.9848484848484848,0.990909090909091,0.987878787878788
+conduct,domain_conduct_research_full,sensitive,0.5499999999999999,0.975609756097561,1.0,0.9902912621359224,0.9951456310679612
+depression,domain_depression_strict_full,precise,0.85,0.9739130434782608,0.9739130434782608,0.9824561403508772,0.9781845919145692
+elimination,domain_elimination_strict_full,sensitive,0.2,1.0,1.0,1.0,1.0

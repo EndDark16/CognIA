@@ -1,0 +1,6 @@
+{
+  "generated_at_utc": "2026-03-29T16:15:28.736454+00:00",
+  "selected_trial": "T02_drop_high_risk_semantic_proxies",
+  "decision": "recovered_but_experimental_high_caution",
+  "ranking_path": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\data\\elimination_iterative_recovery_v2\\tables\\elimination_honest_model_ranking.csv"
+}

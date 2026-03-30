@@ -1,0 +1,38 @@
+path,content_type,purpose_apparent,size_mb_approx,file_count,reproducibility_critical,audit_critical,understanding_critical,deploy_critical,sensitivity_potential,duplication_apparent,recommendation_prelim,exists
+.env,secret,Local secrets file,0.002,1,none,none,none,low,critical,no,env_only,True
+venv,env,Local python environment,472.694,16357,none,none,none,no,low,no,ignore_from_repo,True
+scripts/venv,env,Nested local env accidentally inside scripts,11.339,865,none,none,none,no,low,no,ignore_from_repo,True
+notebooks,notebook,Ad-hoc exploration area,0.0,1,low,low,low,low,low,low,ignore_from_repo,True
+.pytest_cache,cache,Pytest local cache,0.0,0,none,none,none,no,low,no,ignore_from_repo,False
+data/questionnaire_dsm5_v1,data,Questionnaire schema + simulated responses,22.056,10,medium,medium,medium,low,low,low,keep_but_slim_down,True
+reports,reports,Full report history (audits/experiments/training),20.762,805,high,high,medium,low,low,medium,keep_but_slim_down,True
+data/HBN_synthetic_release11_focused_subset_csv,data,Empirical source CSV snapshot,6.365,27,high,high,medium,low,medium,low,keep_but_slim_down,True
+data/elimination_feature_engineering_v5,data,Elimination v5 FE traces,0.665,32,medium,high,medium,low,low,low,keep_but_slim_down,True
+data/elimination_target_redesign_v4,data,Elimination v4 target redesign traces,0.655,30,medium,high,medium,low,low,low,keep_but_slim_down,True
+data/elimination_iterative_recovery_v2,data,Elimination v2 audit/trials,0.248,27,medium,high,medium,low,low,low,keep_but_slim_down,True
+data/elimination_refinement_v3,data,Elimination v3 refinement traces,0.047,24,medium,high,medium,low,low,low,keep_but_slim_down,True
+data/finalization_and_recovery_v1,data,Finalization and recovery logs/tables,0.03,31,medium,high,medium,low,low,low,keep_but_slim_down,True
+scripts,code,Training/audit/rebuild executable scripts,12.32,936,high,high,high,low,low,low,keep_in_repo,True
+api,code,API routes/services/auth/domain logic,0.173,33,high,medium,high,high,low,no,keep_in_repo,True
+docs,doc,Technical specifications,0.112,3,medium,medium,high,low,low,low,keep_in_repo,True
+tests,code,Automated tests,0.082,15,medium,low,high,low,low,no,keep_in_repo,True
+data/normative_matrix,data,Normative DSM-5 matrix (authoritative),0.051,1,high,high,high,low,low,no,keep_in_repo,True
+app,code,ORM models and persistence layer,0.022,2,high,medium,high,high,low,no,keep_in_repo,True
+data/final_closure_audit_v1,data,Final closure audited tables/reports,0.019,21,high,high,high,low,low,no,keep_in_repo,True
+reports/final_closure,doc,Final closure package and compact final tables,0.012,10,high,high,high,low,low,no,keep_in_repo,True
+config,code,Runtime configuration defaults,0.009,2,high,medium,high,high,medium,no,keep_in_repo,True
+README.md,doc,Onboarding and project summary,0.003,1,high,high,high,medium,low,no,keep_in_repo,True
+REPO_CONTENT_POLICY.md,doc,Repository content governance policy,0.002,1,high,high,high,low,low,no,keep_in_repo,True
+docker/entrypoint.sh,deploy,Container entrypoint,0.002,1,high,medium,medium,high,low,no,keep_in_repo,True
+run.py,deploy,WSGI entrypoint,0.002,1,high,medium,medium,high,low,no,keep_in_repo,True
+core,code,Model loading/inference helpers,0.001,2,high,medium,high,high,low,no,keep_in_repo,True
+Dockerfile,deploy,Docker build definition,0.001,1,high,medium,medium,high,low,no,keep_in_repo,True
+docker-compose.yml,deploy,Local dev orchestration,0.001,1,medium,low,low,medium,low,no,keep_in_repo,True
+requirements.txt,deploy,Python dependencies,0.001,1,high,medium,medium,high,low,no,keep_in_repo,True
+artifacts/inference_v4,artifact,Current promoted inference scope,0.0,2,high,high,high,high,low,no,keep_in_repo,True
+artifacts,artifact,Generated artifacts (models/preprocessing/history),633.757,672,medium,high,low,medium,high,high,move_to_external_storage,True
+models,binary_model,Serialized model families (many duplicates),593.12,253,medium,high,low,medium,high,high,move_to_external_storage,True
+data/processed_hybrid_dsm5_v2,data,Hybrid rebuilt datasets (large intermediates),376.292,168,high,high,medium,low,low,high,move_to_external_storage,True
+data/processed_dsm5_exact_v1,data,DSM5 exact rebuilt datasets (large intermediates),172.262,139,high,high,medium,low,low,high,move_to_external_storage,True
+data/processed,data,Legacy processed datasets,98.544,397,medium,medium,low,low,low,medium,move_to_external_storage,True
+.env.example,template,Env template,0.002,1,high,medium,medium,high,low,no,template_only,True

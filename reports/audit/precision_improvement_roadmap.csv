@@ -1,0 +1,5 @@
+phase,action,hypothesis_causal,cost_estimate,methodological_risk,expected_precision_impact,expected_recall_impact,priority,requires_new_data_or_questionnaire,thesis_ready,web_app_ready
+quick_win,Enable precision operating mode with constrained threshold + abstention band for depression and conduct.,Decision threshold is suboptimal for PPV in part of the disorders.,low,low,medium_positive,negative_if_no_abstention_management,P1,no,yes,yes
+medium_effort_high_impact,Introduce high-confidence target variants and uncertain-case audit loop for depression/conduct/elimination.,Label ambiguity and mixed-confidence positives cap PPV.,medium,medium,high_positive,moderate_negative,P1,partial,yes,partial
+long_term_structural,Redesign questionnaire items to strengthen DSM-5 specificity for conduct and elimination.,"Current features are too transdiagnostic, causing FP inflation.",high,medium,high_positive,neutral_to_positive,P2,yes,yes,future_release
+long_term_structural,Increase effective minority-class support with targeted instrument completion.,PPV is prevalence-limited with sparse clinically specific data.,high,low,medium_positive,positive,P2,yes,yes,future_release
