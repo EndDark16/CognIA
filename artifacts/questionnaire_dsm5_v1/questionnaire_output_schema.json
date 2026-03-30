@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "required": [
+    "participant_id",
+    "questionnaire_completion",
+    "normative_evidence_updates"
+  ],
+  "properties": {
+    "participant_id": {
+      "type": "string"
+    },
+    "questionnaire_completion": {
+      "type": "number"
+    },
+    "normative_evidence_updates": {
+      "type": "array"
+    },
+    "coverage_summary": {
+      "type": "object"
+    },
+    "warnings": {
+      "type": "array"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "generated_at_utc": "2026-03-28T02:14:12.450043Z",
+  "gate_root": "c:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\data\\generalization_gate_v1",
+  "history_tables": [
+    "trial_registry_generalization.csv",
+    "fold_metrics_generalization.csv",
+    "hyperparameter_history_generalization.csv",
+    "seed_stability_history.csv",
+    "split_stability_history.csv",
+    "learning_curve_history.csv",
+    "threshold_sweep_history_generalization.csv",
+    "calibration_history_generalization.csv",
+    "stress_test_history.csv",
+    "model_acceptance_history.csv"
+  ],
+  "reports": [
+    "generalization_gate_summary.md",
+    "final_model_classification.md",
+    "domain_generalization_decisions.md"
+  ]
+}

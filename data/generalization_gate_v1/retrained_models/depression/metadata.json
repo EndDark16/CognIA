@@ -1,0 +1,45 @@
+{
+  "domain": "depression",
+  "base_model_id": "domain_depression_strict_full",
+  "candidate_id": "depression_anti_overfit_v1_c3",
+  "params": {
+    "n_estimators": 180,
+    "max_depth": 6,
+    "min_samples_split": 20,
+    "min_samples_leaf": 8,
+    "max_features": 0.5,
+    "class_weight": "balanced_subsample"
+  },
+  "threshold_recommended": 0.7999999999999999,
+  "metrics_val": {
+    "accuracy": 0.9790209790209791,
+    "balanced_accuracy": 0.9736842105263157,
+    "precision": 1.0,
+    "recall": 0.9473684210526315,
+    "specificity": 1.0,
+    "f1": 0.972972972972973,
+    "roc_auc": 0.9985720114239086,
+    "pr_auc": 0.9979531145698326,
+    "brier_score": 0.018140602785087678,
+    "tn": 172,
+    "fp": 0,
+    "fn": 6,
+    "tp": 108
+  },
+  "metrics_test": {
+    "accuracy": 0.958041958041958,
+    "balanced_accuracy": 0.9492499364352911,
+    "precision": 0.9904761904761905,
+    "recall": 0.9043478260869565,
+    "specificity": 0.9941520467836257,
+    "f1": 0.9454545454545454,
+    "roc_auc": 0.9974574116450547,
+    "pr_auc": 0.9963783671994461,
+    "brier_score": 0.020458961341237692,
+    "tn": 170,
+    "fp": 1,
+    "fn": 11,
+    "tp": 104
+  },
+  "created_at_utc": "2026-03-28T02:13:21.257043+00:00"
+}

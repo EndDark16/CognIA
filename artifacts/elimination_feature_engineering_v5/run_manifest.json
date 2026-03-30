@@ -1,0 +1,13 @@
+{
+  "generated_at_utc": "2026-03-30T02:34:41.954529+00:00",
+  "selected_trial_v5": "V5_T02_composite_clinical",
+  "selected_trial_metrics": {
+    "test_precision": 0.94375,
+    "test_balanced_accuracy": 0.932944099378882,
+    "test_recall": 0.937888198757764,
+    "test_specificity": 0.928,
+    "test_pr_auc": 0.980570549015714
+  },
+  "status": "completed",
+  "notes": "No previous line was overwritten; all outputs are in elimination_feature_engineering_v5."
+}

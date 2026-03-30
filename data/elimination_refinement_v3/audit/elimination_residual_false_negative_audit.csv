@@ -1,0 +1,5 @@
+participant_id,age_years,sex_assigned_at_birth,site,y_true,y_pred,probability,error_type,missing_ratio_row,high_confidence_error
+HBN_SYN_001496,9.6,Male,CBIC,1,0,0.5809433753520092,false_negative,0.0,0
+HBN_SYN_001574,10.4,Female,CBIC,1,0,0.5585754837809064,false_negative,0.0,0
+HBN_SYN_001965,10.9,Female,RUBIC,1,0,0.598535959082131,false_negative,0.0,0
+HBN_SYN_003584,9.4,Female,CBIC,1,0,0.5991523856393064,false_negative,0.0,0

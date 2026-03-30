@@ -1,0 +1,260 @@
+{
+  "HBN_SYN_003314": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.6711736882739183
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 0.2828582647870789
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.2017746886555369
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.12915232437342591
+      },
+      {
+        "feature": "cat__site_CUNY",
+        "score": 0.002130925256816525
+      },
+      {
+        "feature": "num__has_sdq",
+        "score": 0.0
+      },
+      {
+        "feature": "num__release",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_mfq_p",
+        "score": 0.0
+      },
+      {
+        "feature": "num__mfq_p_total",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_mfq_sr",
+        "score": 0.0
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": -0.9565128098181586
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": -0.44005375149839626
+      },
+      {
+        "feature": "num__cdi_total",
+        "score": -0.11713704688429216
+      },
+      {
+        "feature": "num__age_years",
+        "score": -0.03430334270795315
+      },
+      {
+        "feature": "cat__site_CBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Unknown",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Male",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Female",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_prosocial_behavior",
+        "score": 0.0
+      }
+    ]
+  },
+  "HBN_SYN_003134": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.21525387395570986
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.06053240659666108
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.04971656950177173
+      },
+      {
+        "feature": "num__age_years",
+        "score": 0.030267655330546907
+      },
+      {
+        "feature": "cat__site_Staten Island",
+        "score": 0.0027549007707299814
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Male",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Female",
+        "score": 0.0
+      },
+      {
+        "feature": "num__release",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_mfq_p",
+        "score": 0.0
+      },
+      {
+        "feature": "num__mfq_p_total",
+        "score": 0.0
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__mfq_sr_total",
+        "score": -1.4187812630729164
+      },
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": -1.1159316114545184
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": -0.7334229191639938
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": -0.6676886545802717
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": -0.23320813841274926
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": -0.11056218205897166
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": -0.07730955165637135
+      },
+      {
+        "feature": "num__sdq_emotional_symptoms",
+        "score": -0.05766772170868239
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": -0.05657165295741578
+      },
+      {
+        "feature": "num__sdq_prosocial_behavior",
+        "score": -0.03302555681383735
+      }
+    ]
+  },
+  "HBN_SYN_000323": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 4.144888842545354
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 2.003065963740815
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": 1.9068995898263839
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.5468822645194891
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": 0.4664162768254985
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": 0.3869676372064008
+      },
+      {
+        "feature": "num__sdq_emotional_symptoms",
+        "score": 0.2883386085434119
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 0.24514382948213503
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": 0.23192865496911405
+      },
+      {
+        "feature": "num__sdq_prosocial_behavior",
+        "score": 0.1981533408830241
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__age_years",
+        "score": -0.054481779594984424
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Male",
+        "score": -0.003513433420128598
+      },
+      {
+        "feature": "cat__site_CUNY",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_CBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Unknown",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_sdq",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_cbcl",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_Staten Island",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_cdi",
+        "score": 0.0
+      },
+      {
+        "feature": "num__release",
+        "score": 0.0
+      }
+    ]
+  }
+}

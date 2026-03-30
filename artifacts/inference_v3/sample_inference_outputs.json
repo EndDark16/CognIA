@@ -1,0 +1,41 @@
+{
+  "probability_by_domain": {
+    "adhd": 0.61,
+    "conduct": 0.21,
+    "elimination": 0.08,
+    "anxiety": 0.42,
+    "depression": 0.19
+  },
+  "probability_by_internal_unit_when_applicable": {
+    "target_adhd_exact": 0.57
+  },
+  "confidence_level": "medium",
+  "coverage_summary": {
+    "available_features_ratio": 0.87
+  },
+  "direct_proxy_absent_summary": {
+    "direct": 18,
+    "proxy": 9,
+    "absent": 4
+  },
+  "missing_critical_inputs": [
+    "q_qi_0007"
+  ],
+  "top_positive_contributors": [
+    "cbcl_attention_problems_proxy",
+    "sdq_hyperactivity_total"
+  ],
+  "top_negative_contributors": [
+    "has_scared_p",
+    "q_qi_0015"
+  ],
+  "abstention_flag": false,
+  "threshold_used": 0.55,
+  "model_version": "retrained_adhd_anti_overfit_v1",
+  "generalization_status": "accepted_generalizing_model",
+  "recommendation_text": "Riesgo moderado, priorizar tamizaje clinico complementario.",
+  "disclaimers": [
+    "Entorno simulado",
+    "No constituye diagnostico clinico definitivo"
+  ]
+}

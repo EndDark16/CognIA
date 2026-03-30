@@ -1,0 +1,11 @@
+{
+  "generated_at_utc": "2026-03-29T20:51:10.616420+00:00",
+  "selected_trial": "V3_T07_abstention_assisted_operating_mode",
+  "final_status": "recovered_but_experimental_high_caution",
+  "v2_reference": {
+    "precision": 0.9056603773584906,
+    "balanced_accuracy": 0.8872049689440994,
+    "recall": 0.8944099378881988,
+    "specificity": 0.88
+  }
+}
