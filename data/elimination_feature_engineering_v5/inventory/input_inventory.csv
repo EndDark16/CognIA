@@ -1,0 +1,14 @@
+path,exists,size_bytes,modified_utc,rows,cols
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\elimination_iterative_recovery_v2\reports\elimination_final_decision_v2.md,True,443.0,2026-03-29T16:15:28.732433+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\elimination_refinement_v3\reports\elimination_final_decision_v3.md,True,347.0,2026-03-29T20:51:10.607417+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\elimination_target_redesign_v4\reports\elimination_final_decision_v4.md,True,347.0,2026-03-30T00:55:54.012243+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\elimination_iterative_recovery_v2\tables\elimination_honest_model_ranking.csv,True,2627.0,2026-03-29T16:15:28.730433+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\elimination_refinement_v3\tables\elimination_abstention_policy_results.csv,True,410.0,2026-03-29T20:51:10.615419+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\elimination_target_redesign_v4\tables\elimination_generation_comparison.csv,True,677.0,2026-03-30T00:55:54.003650+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\elimination_target_redesign_v4\tables\elimination_fp_comparison_across_generations.csv,True,382.0,2026-03-30T00:55:42.049135+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\elimination_target_redesign_v4\tables\elimination_subtype_results.csv,True,372.0,2026-03-30T00:55:42.017752+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\elimination_target_redesign_v4\tables\elimination_clear_vs_ambiguous_evaluation.csv,True,416.0,2026-03-30T00:55:42.002678+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\final\model_ready\strict_no_leakage_hybrid\dataset_hybrid_model_ready_strict_no_leakage_hybrid.csv,True,5759782.0,2026-03-27T04:02:33.819259+00:00,,
+in_memory::strict,True,,2026-03-30T02:28:18.591176+00:00,1905.0,990.0
+in_memory::research,True,,2026-03-30T02:28:18.591176+00:00,1905.0,1057.0
+in_memory::semantic,True,,2026-03-30T02:28:18.591176+00:00,988.0,8.0

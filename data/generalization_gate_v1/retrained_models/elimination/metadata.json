@@ -1,0 +1,45 @@
+{
+  "domain": "elimination",
+  "base_model_id": "domain_elimination_strict_full",
+  "candidate_id": "elimination_anti_overfit_v1_c3",
+  "params": {
+    "n_estimators": 180,
+    "max_depth": 6,
+    "min_samples_split": 20,
+    "min_samples_leaf": 8,
+    "max_features": 0.5,
+    "class_weight": "balanced_subsample"
+  },
+  "threshold_recommended": 0.05,
+  "metrics_val": {
+    "accuracy": 1.0,
+    "balanced_accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "specificity": 1.0,
+    "f1": 1.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "brier_score": 1.5653531603019459e-06,
+    "tn": 125,
+    "fp": 0,
+    "fn": 0,
+    "tp": 161
+  },
+  "metrics_test": {
+    "accuracy": 1.0,
+    "balanced_accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "specificity": 1.0,
+    "f1": 1.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "brier_score": 3.4371444862199722e-06,
+    "tn": 125,
+    "fp": 0,
+    "fn": 0,
+    "tp": 161
+  },
+  "created_at_utc": "2026-03-28T02:13:26.872048+00:00"
+}

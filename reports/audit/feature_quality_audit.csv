@@ -1,0 +1,6 @@
+disorder,current_champion,n_features,high_missing_feature_ratio_gt_40pct,high_correlation_pairs_gt_0_90,jaccard_with_top_precision_challenger,test_precision,test_false_positives,test_false_negatives
+adhd,rf_adhd_v1_baseline,35,0.34285714285714286,58,,0.8943661971830986,15,33
+anxiety,rf_anxiety_v1_baseline,260,0.0,80,,0.9056603773584906,10,30
+conduct,rf_conduct_v1_baseline,23,0.0,12,0.782608695652174,0.5428571428571428,32,4
+depression,rf_depression_v4_precision_thresholded,18,0.0,12,1.0,0.45,33,3
+elimination,rf_elimination_v1_baseline,17,0.0,7,0.6666666666666666,0.22033898305084745,92,8

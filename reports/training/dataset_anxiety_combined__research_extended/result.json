@@ -1,0 +1,404 @@
+{
+  "summary": {
+    "model_id": "dataset_anxiety_combined__research_extended",
+    "dataset_name": "dataset_anxiety_combined",
+    "version": "research_extended",
+    "disorder": "anxiety",
+    "variant": "combined",
+    "target": "target_anxiety",
+    "n_rows": 1905,
+    "n_features": 36,
+    "search_param_source": "strict_reuse",
+    "best_params": {
+      "model__n_estimators": 250,
+      "model__min_samples_split": 10,
+      "model__min_samples_leaf": 4,
+      "model__max_features": "log2",
+      "model__max_depth": null,
+      "model__class_weight": "balanced_subsample"
+    },
+    "search_meta": {
+      "best_cv_balanced_accuracy": NaN,
+      "cv_splits": 0,
+      "n_iter": 0
+    },
+    "threshold_method": "youden_j",
+    "threshold_value": 0.31576909163199035,
+    "balanced_accuracy_val": 0.9120993788819876,
+    "balanced_accuracy_test": 0.8986607142857144,
+    "recall_test": 0.9285714285714286,
+    "specificity_test": 0.86875,
+    "f1_test": 0.8863636363636364,
+    "roc_auc_test": 0.9630952380952381,
+    "pr_auc_test": 0.9526284287671681,
+    "brier_score_test": 0.08065129330363302,
+    "accuracy_test": 0.8951048951048951,
+    "precision_test": 0.8478260869565217,
+    "support_positive_test": 126,
+    "support_negative_test": 160,
+    "missing_ratio_test": 0.15870240870240865,
+    "risk_band_example": "low",
+    "evidence_quality": "strong",
+    "artifact_pipeline_path": "artifacts\\models\\binary\\dataset_anxiety_combined__research_extended\\pipeline.joblib",
+    "artifact_calibrated_path": "artifacts\\models\\calibrated\\dataset_anxiety_combined__research_extended\\calibrated.joblib",
+    "artifact_metadata_path": "artifacts\\models\\binary\\dataset_anxiety_combined__research_extended\\metadata.json",
+    "figure_roc": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\dataset_anxiety_combined__research_extended\\dataset_anxiety_combined__research_extended_roc.png",
+    "figure_pr": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\dataset_anxiety_combined__research_extended\\dataset_anxiety_combined__research_extended_pr.png",
+    "figure_confusion": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\dataset_anxiety_combined__research_extended\\dataset_anxiety_combined__research_extended_confusion.png",
+    "figure_calibration": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\dataset_anxiety_combined__research_extended\\dataset_anxiety_combined__research_extended_calibration.png",
+    "dropped_columns_count": 12,
+    "manifest_exists": true
+  },
+  "validation_metrics": {
+    "threshold": 0.31576909163199035,
+    "accuracy": 0.9090909090909091,
+    "balanced_accuracy": 0.9120993788819876,
+    "precision": 0.8666666666666667,
+    "recall": 0.936,
+    "sensitivity": 0.936,
+    "specificity": 0.8881987577639752,
+    "f1": 0.9,
+    "support_negative": 161,
+    "support_positive": 125,
+    "confusion_matrix": [
+      [
+        143,
+        18
+      ],
+      [
+        8,
+        117
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.8881987577639752,
+        0.11180124223602485
+      ],
+      [
+        0.064,
+        0.936
+      ]
+    ],
+    "roc_auc": 0.9603478260869565,
+    "pr_auc": 0.952824267176577,
+    "brier_score": 0.08008665555228696
+  },
+  "test_metrics": {
+    "threshold": 0.31576909163199035,
+    "accuracy": 0.8951048951048951,
+    "balanced_accuracy": 0.8986607142857144,
+    "precision": 0.8478260869565217,
+    "recall": 0.9285714285714286,
+    "sensitivity": 0.9285714285714286,
+    "specificity": 0.86875,
+    "f1": 0.8863636363636364,
+    "support_negative": 160,
+    "support_positive": 126,
+    "confusion_matrix": [
+      [
+        139,
+        21
+      ],
+      [
+        9,
+        117
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.86875,
+        0.13125
+      ],
+      [
+        0.07142857142857142,
+        0.9285714285714286
+      ]
+    ],
+    "roc_auc": 0.9630952380952381,
+    "pr_auc": 0.9526284287671681,
+    "brier_score": 0.08065129330363302
+  },
+  "threshold_recommendation": {
+    "method": "youden_j",
+    "threshold": 0.31576909163199035,
+    "val_balanced_accuracy": 0.9120993788819876,
+    "val_recall": 0.936,
+    "val_specificity": 0.8881987577639752,
+    "val_f1": 0.9
+  },
+  "removed_columns": {
+    "participant_id": "meta",
+    "target_conduct": "target_column",
+    "target_adhd": "target_column",
+    "target_elimination": "target_column",
+    "target_anxiety": "target_column",
+    "target_depression": "target_column",
+    "n_diagnoses": "post_diagnostic_pattern",
+    "has_any_target_disorder": "post_diagnostic_pattern",
+    "label_pattern": "post_diagnostic_pattern",
+    "primary_target": "meta",
+    "dataset_name": "meta",
+    "is_exploratory": "meta"
+  },
+  "local_explanations": {
+    "HBN_SYN_000059": {
+      "top_positive_contributors": [
+        {
+          "feature": "num__cbcl_internalizing_proxy",
+          "score": 0.7766068290056393
+        },
+        {
+          "feature": "num__sdq_total_difficulties",
+          "score": 0.6436314264355224
+        },
+        {
+          "feature": "num__cbcl_anxious_depressed_proxy",
+          "score": 0.39979465158926525
+        },
+        {
+          "feature": "num__cbcl_externalizing_proxy",
+          "score": 0.25097065619972436
+        },
+        {
+          "feature": "num__sdq_conduct_problems",
+          "score": 0.23175690324306036
+        },
+        {
+          "feature": "num__comorbidity_count_5targets",
+          "score": 0.17335506144585047
+        },
+        {
+          "feature": "num__cbcl_rule_breaking_proxy",
+          "score": 0.14948547915881016
+        },
+        {
+          "feature": "num__sdq_hyperactivity_inattention",
+          "score": 0.14913684622218604
+        },
+        {
+          "feature": "num__sdq_peer_problems",
+          "score": 0.11963362306951777
+        },
+        {
+          "feature": "num__cbcl_attention_problems_proxy",
+          "score": 0.10800948117876955
+        }
+      ],
+      "top_negative_contributors": [
+        {
+          "feature": "num__scared_p_total",
+          "score": -0.13922871121607996
+        },
+        {
+          "feature": "num__scared_sr_total",
+          "score": -0.04129745548402704
+        },
+        {
+          "feature": "num__scared_p_panic_somatic",
+          "score": -0.033725831786412454
+        },
+        {
+          "feature": "num__scared_sr_separation_anxiety",
+          "score": -0.03210083841627288
+        },
+        {
+          "feature": "num__sdq_emotional_symptoms",
+          "score": -0.029066440107812706
+        },
+        {
+          "feature": "num__scared_p_social_anxiety",
+          "score": -0.01733073438475505
+        },
+        {
+          "feature": "num__scared_p_school_avoidance",
+          "score": -0.013099970012184917
+        },
+        {
+          "feature": "num__scared_sr_school_avoidance",
+          "score": -0.011018442787908434
+        },
+        {
+          "feature": "num__age_years",
+          "score": -0.006745765498098183
+        },
+        {
+          "feature": "cat__site_CUNY",
+          "score": 0.0
+        }
+      ]
+    },
+    "HBN_SYN_003645": {
+      "top_positive_contributors": [
+        {
+          "feature": "num__cbcl_internalizing_proxy",
+          "score": 1.5532136580112785
+        },
+        {
+          "feature": "num__cbcl_anxious_depressed_proxy",
+          "score": 0.8567028248341398
+        },
+        {
+          "feature": "num__sdq_total_difficulties",
+          "score": 0.5057104064850533
+        },
+        {
+          "feature": "num__comorbidity_count_5targets",
+          "score": 0.17335506144585047
+        },
+        {
+          "feature": "num__cbcl_attention_problems_proxy",
+          "score": 0.16801474850030818
+        },
+        {
+          "feature": "num__sdq_peer_problems",
+          "score": 0.11963362306951777
+        },
+        {
+          "feature": "num__sdq_hyperactivity_inattention",
+          "score": 0.11930947697774882
+        },
+        {
+          "feature": "num__cbcl_externalizing_proxy",
+          "score": 0.1056718552419892
+        },
+        {
+          "feature": "num__sdq_conduct_problems",
+          "score": 0.05793922581076509
+        },
+        {
+          "feature": "num__cbcl_rule_breaking_proxy",
+          "score": 0.049828493052936726
+        }
+      ],
+      "top_negative_contributors": [
+        {
+          "feature": "num__age_years",
+          "score": -0.022164658065179758
+        },
+        {
+          "feature": "cat__sex_assigned_at_birth_Male",
+          "score": -0.0016135415375308554
+        },
+        {
+          "feature": "cat__sex_assigned_at_birth_Unknown",
+          "score": 0.0
+        },
+        {
+          "feature": "cat__site_CBIC",
+          "score": 0.0
+        },
+        {
+          "feature": "cat__site_RUBIC",
+          "score": 0.0
+        },
+        {
+          "feature": "cat__site_CUNY",
+          "score": 0.0
+        },
+        {
+          "feature": "num__has_cbcl",
+          "score": 0.0
+        },
+        {
+          "feature": "num__scared_sr_total",
+          "score": 0.0
+        },
+        {
+          "feature": "num__scared_sr_social_anxiety",
+          "score": 0.0
+        },
+        {
+          "feature": "num__scared_sr_separation_anxiety",
+          "score": 0.0
+        }
+      ]
+    },
+    "HBN_SYN_003947": {
+      "top_positive_contributors": [
+        {
+          "feature": "num__cbcl_internalizing_proxy",
+          "score": 3.417070047624813
+        },
+        {
+          "feature": "num__scared_sr_total",
+          "score": 1.8996829522652436
+        },
+        {
+          "feature": "num__cbcl_anxious_depressed_proxy",
+          "score": 1.5420650847014516
+        },
+        {
+          "feature": "num__scared_p_total",
+          "score": 1.3458775417554396
+        },
+        {
+          "feature": "num__sdq_total_difficulties",
+          "score": 1.2412891795542218
+        },
+        {
+          "feature": "num__scared_sr_social_anxiety",
+          "score": 0.3447851335548414
+        },
+        {
+          "feature": "num__cbcl_externalizing_proxy",
+          "score": 0.3302245476312163
+        },
+        {
+          "feature": "num__scared_sr_panic_somatic",
+          "score": 0.30817773414402627
+        },
+        {
+          "feature": "num__scared_sr_generalized_anxiety",
+          "score": 0.2941597595360473
+        },
+        {
+          "feature": "num__scared_sr_separation_anxiety",
+          "score": 0.2889075457464559
+        }
+      ],
+      "top_negative_contributors": [
+        {
+          "feature": "num__release",
+          "score": 0.0
+        },
+        {
+          "feature": "num__has_scared_p",
+          "score": 0.0
+        },
+        {
+          "feature": "cat__site_CUNY",
+          "score": 0.0
+        },
+        {
+          "feature": "cat__site_CBIC",
+          "score": 0.0
+        },
+        {
+          "feature": "cat__sex_assigned_at_birth_Unknown",
+          "score": 0.0
+        },
+        {
+          "feature": "cat__sex_assigned_at_birth_Male",
+          "score": 0.0
+        },
+        {
+          "feature": "cat__sex_assigned_at_birth_Female",
+          "score": 0.0
+        },
+        {
+          "feature": "num__has_sdq",
+          "score": 0.0
+        },
+        {
+          "feature": "num__has_scared_sr",
+          "score": 0.0
+        },
+        {
+          "feature": "cat__site_RUBIC",
+          "score": 0.0
+        }
+      ]
+    }
+  }
+}

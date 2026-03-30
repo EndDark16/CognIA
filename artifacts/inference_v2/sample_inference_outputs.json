@@ -1,0 +1,41 @@
+{
+  "probabilities_by_domain": {
+    "adhd": 0.71,
+    "conduct": 0.38,
+    "elimination": 0.52,
+    "anxiety": 0.44,
+    "depression": 0.29
+  },
+  "probabilities_by_internal_unit": {
+    "adhd": 0.69
+  },
+  "confidence_level": "medium",
+  "coverage_summary": {
+    "observed_features_ratio": 0.82
+  },
+  "direct_proxy_absent_summary": {
+    "direct": 41,
+    "proxy": 18,
+    "absent": 9
+  },
+  "key_positive_contributors": [
+    "q_qi_0012",
+    "q_qi_0048"
+  ],
+  "key_negative_contributors": [
+    "q_qi_0113"
+  ],
+  "missing_critical_inputs": [
+    "q_qi_0009"
+  ],
+  "abstention_flag": false,
+  "threshold_used": {
+    "adhd": 0.58
+  },
+  "model_version": "hybrid_dsm5_v2",
+  "recommendation_text": "Use as early-warning support and clinical triage aid.",
+  "disclaimers": [
+    "Experimental simulated environment",
+    "Not a clinical diagnosis"
+  ]
+}

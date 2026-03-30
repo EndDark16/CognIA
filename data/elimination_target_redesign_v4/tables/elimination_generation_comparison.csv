@@ -1,0 +1,4 @@
+generation,trial_id,precision,balanced_accuracy,recall,specificity,f1,pr_auc,suspicious_perfect_score,leakage_risk,stability,realism_robustness,operational_utility,thesis_utility,product_utility
+v2,T02_drop_high_risk_semantic_proxies,0.9056603773584906,0.8872049689440994,0.8944099378881988,0.88,,,False,low,good,good,moderate,high,no
+v3,V3_T07_abstention_assisted_operating_mode,0.891566265060241,0.8876273291925465,0.9192546583850932,0.856,,,False,low,good,good,high_abstention,high,no
+v4,V4_T03_target_high_confidence,0.9741379310344828,0.8389316770186335,0.7018633540372671,0.976,0.8158844765342961,0.9656147308620275,False,low,good,moderate,high_if_abstention,high,no

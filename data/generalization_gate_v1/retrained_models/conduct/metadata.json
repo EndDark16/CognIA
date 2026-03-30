@@ -1,0 +1,45 @@
+{
+  "domain": "conduct",
+  "base_model_id": "domain_conduct_research_full",
+  "candidate_id": "conduct_anti_overfit_v1_c3",
+  "params": {
+    "n_estimators": 180,
+    "max_depth": 6,
+    "min_samples_split": 20,
+    "min_samples_leaf": 8,
+    "max_features": 0.5,
+    "class_weight": "balanced_subsample"
+  },
+  "threshold_recommended": 0.85,
+  "metrics_val": {
+    "accuracy": 0.972027972027972,
+    "balanced_accuracy": 0.9538228155339805,
+    "precision": 0.9864864864864865,
+    "recall": 0.9125,
+    "specificity": 0.9951456310679612,
+    "f1": 0.948051948051948,
+    "roc_auc": 0.998118932038835,
+    "pr_auc": 0.9951663091944365,
+    "brier_score": 0.02197053099547761,
+    "tn": 205,
+    "fp": 1,
+    "fn": 7,
+    "tp": 73
+  },
+  "metrics_test": {
+    "accuracy": 0.9545454545454546,
+    "balanced_accuracy": 0.9225728155339805,
+    "precision": 0.9855072463768116,
+    "recall": 0.85,
+    "specificity": 0.9951456310679612,
+    "f1": 0.912751677852349,
+    "roc_auc": 0.9985436893203883,
+    "pr_auc": 0.9960627987704198,
+    "brier_score": 0.010505233800792853,
+    "tn": 205,
+    "fp": 1,
+    "fn": 12,
+    "tp": 68
+  },
+  "created_at_utc": "2026-03-28T02:13:11.435043+00:00"
+}

@@ -1,0 +1,4 @@
+trial_id,method,brier_score_val,status,selected
+domain_depression_strict_full,none,0.011373002022645155,ok,True
+domain_depression_strict_full,sigmoid,0.018067456297588748,ok,False
+domain_depression_strict_full,isotonic,0.016229204068437746,ok,False

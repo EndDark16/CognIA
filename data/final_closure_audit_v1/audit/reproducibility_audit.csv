@@ -1,0 +1,6 @@
+domain,metrics_source_exists,status_source_exists,reproducible_from_artifacts,rerun_needed,issue_class
+adhd,True,True,True,False,none
+anxiety,True,True,True,False,none
+conduct,True,True,True,False,none
+depression,True,True,True,False,none
+elimination,True,True,True,False,none
