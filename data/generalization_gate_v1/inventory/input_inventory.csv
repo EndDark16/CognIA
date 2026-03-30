@@ -1,0 +1,24 @@
+path,exists,type,size_bytes,modified_utc,domain,model_id
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\artifacts\hybrid_dsm5_v2\models\domain_adhd_research_full\model.joblib,True,file,849665.0,2026-03-27T03:06:38.092268+00:00,adhd,domain_adhd_research_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\artifacts\hybrid_dsm5_v2\models\domain_anxiety_strict_full\model.joblib,True,file,545478.0,2026-03-27T03:43:30.792009+00:00,anxiety,domain_anxiety_strict_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\artifacts\hybrid_dsm5_v2\models\domain_conduct_research_full\model.joblib,True,file,2582420.0,2026-03-27T03:25:31.009390+00:00,conduct,domain_conduct_research_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\artifacts\hybrid_dsm5_v2\models\domain_depression_strict_full\model.joblib,True,file,919913.0,2026-03-27T03:51:19.215533+00:00,depression,domain_depression_strict_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\artifacts\hybrid_dsm5_v2\models\domain_elimination_strict_full\model.joblib,True,file,245338.0,2026-03-27T03:30:25.130024+00:00,elimination,domain_elimination_strict_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\artifacts\inference_v2,True,dir,,2026-03-27T03:56:57.963578+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2,True,dir,,2026-03-27T02:44:35.403443+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\feature_lineage_dsm5_exact.csv,True,file,903028.0,2026-03-27T04:02:59.550579+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\final\model_ready\research_extended_hybrid,True,dir,,2026-03-27T02:22:15.097904+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\final\model_ready\research_extended_hybrid\dataset_hybrid_model_ready_research_extended_hybrid.csv,True,file,6444300.0,2026-03-27T04:02:36.095805+00:00,adhd,domain_adhd_research_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\final\model_ready\strict_no_leakage_hybrid,True,dir,,2026-03-27T02:23:53.401216+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\final\model_ready\strict_no_leakage_hybrid\dataset_hybrid_model_ready_strict_no_leakage_hybrid.csv,True,file,5759782.0,2026-03-27T04:02:33.819259+00:00,anxiety,domain_anxiety_strict_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\leakage_audit_dsm5_exact.csv,True,file,136.0,2026-03-27T04:02:59.560579+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\modelability_audit,True,dir,,2026-03-27T02:27:13.739910+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\parameter_lineage_dsm5_exact.csv,True,file,24879.0,2026-03-27T04:02:59.557577+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\questionnaire_dsm5_v1,True,dir,,2026-03-27T02:21:58.445126+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\models\hybrid_dsm5_v2\domain_adhd_research_full\model_metadata.json,True,file,12847.0,2026-03-27T03:06:37.428325+00:00,adhd,domain_adhd_research_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\models\hybrid_dsm5_v2\domain_anxiety_strict_full\model_metadata.json,True,file,10256.0,2026-03-27T03:43:30.446967+00:00,anxiety,domain_anxiety_strict_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\models\hybrid_dsm5_v2\domain_conduct_research_full\model_metadata.json,True,file,12976.0,2026-03-27T03:25:28.289763+00:00,conduct,domain_conduct_research_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\models\hybrid_dsm5_v2\domain_depression_strict_full\model_metadata.json,True,file,10403.0,2026-03-27T03:51:19.124532+00:00,depression,domain_depression_strict_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\models\hybrid_dsm5_v2\domain_elimination_strict_full\model_metadata.json,True,file,10098.0,2026-03-27T03:30:24.822685+00:00,elimination,domain_elimination_strict_full
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\reports\operating_modes,True,dir,,2026-03-27T04:00:00.915403+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\reports\training_history,True,dir,,2026-03-27T03:56:55.628381+00:00,,

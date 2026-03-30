@@ -1,0 +1,218 @@
+{
+  "model_version": "rf_elimination_v7_precision_experimental_research",
+  "parent_version": "rf_elimination_v1_baseline",
+  "disorder": "elimination",
+  "target": "target_elimination",
+  "dataset_name": "dataset_elimination_core",
+  "data_scope": "research_extended",
+  "feature_strategy": "missingness_augmented",
+  "class_balance_strategy": "balanced_subsample",
+  "calibration_strategy_requested": "sigmoid",
+  "calibration_strategy_used": "sigmoid",
+  "threshold_strategy": "precision_constrained",
+  "threshold_value": 0.213723,
+  "recall_floor": 0.5,
+  "balanced_accuracy_tolerance": 0.05,
+  "balanced_accuracy_floor": 0.5909897292250232,
+  "best_params": {
+    "model__n_estimators": 150,
+    "model__min_samples_split": 2,
+    "model__min_samples_leaf": 4,
+    "model__max_features": "sqrt",
+    "model__max_depth": 20,
+    "model__class_weight": "balanced_subsample"
+  },
+  "search_meta": {
+    "best_cv_balanced_accuracy": 0.6330682449139374,
+    "cv_splits": 3,
+    "n_iter": 8
+  },
+  "feature_columns": [
+    "age_years",
+    "sex_assigned_at_birth",
+    "site",
+    "has_cbcl",
+    "cbcl_aggressive_behavior_proxy",
+    "cbcl_anxious_depressed_proxy",
+    "cbcl_attention_problems_proxy",
+    "cbcl_externalizing_proxy",
+    "cbcl_internalizing_proxy",
+    "cbcl_rule_breaking_proxy",
+    "has_sdq",
+    "sdq_conduct_problems",
+    "sdq_emotional_symptoms",
+    "sdq_hyperactivity_inattention",
+    "sdq_impact",
+    "sdq_total_difficulties",
+    "comorbidity_count_5targets",
+    "has_sdq__missing",
+    "sdq_conduct_problems__missing",
+    "sdq_emotional_symptoms__missing",
+    "sdq_hyperactivity_inattention__missing",
+    "sdq_impact__missing",
+    "sdq_total_difficulties__missing"
+  ],
+  "removed_columns": {
+    "participant_id": "meta",
+    "target_conduct": "target_column",
+    "target_adhd": "target_column",
+    "target_elimination": "target_column",
+    "target_anxiety": "target_column",
+    "target_depression": "target_column",
+    "n_diagnoses": "post_diagnostic_pattern",
+    "has_any_target_disorder": "post_diagnostic_pattern",
+    "label_pattern": "post_diagnostic_pattern",
+    "primary_target": "meta",
+    "dataset_name": "meta",
+    "is_exploratory": "meta"
+  },
+  "strategy_meta": {
+    "feature_strategy": "missingness_augmented",
+    "removed_by_strategy": {
+      "release": "constant_or_sparse"
+    },
+    "created_features": [
+      "has_sdq__missing",
+      "sdq_conduct_problems__missing",
+      "sdq_emotional_symptoms__missing",
+      "sdq_hyperactivity_inattention__missing",
+      "sdq_impact__missing",
+      "sdq_total_difficulties__missing"
+    ]
+  },
+  "validation_metrics": {
+    "threshold": 0.213723,
+    "accuracy": 0.8566433566433567,
+    "balanced_accuracy": 0.7659897292250233,
+    "precision": 0.43137254901960786,
+    "recall": 0.6470588235294118,
+    "sensitivity": 0.6470588235294118,
+    "specificity": 0.8849206349206349,
+    "f1": 0.5176470588235295,
+    "support_negative": 252,
+    "support_positive": 34,
+    "confusion_matrix": [
+      [
+        223,
+        29
+      ],
+      [
+        12,
+        22
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.8849206349206349,
+        0.11507936507936507
+      ],
+      [
+        0.35294117647058826,
+        0.6470588235294118
+      ]
+    ],
+    "roc_auc": 0.865079365079365,
+    "pr_auc": 0.4389005003496181,
+    "brier_score": 0.0830326717418833,
+    "fpr": 0.11507936507936511,
+    "fnr": 0.3529411764705882,
+    "prevalence": 0.11888111888111888,
+    "precision_lift_vs_baseline": 0.238390092879257,
+    "recall_delta_vs_baseline": 0.0,
+    "balanced_accuracy_delta_vs_baseline": 0.125
+  },
+  "test_metrics": {
+    "threshold": 0.213723,
+    "accuracy": 0.8951048951048951,
+    "balanced_accuracy": 0.775093370681606,
+    "precision": 0.5526315789473685,
+    "recall": 0.6176470588235294,
+    "sensitivity": 0.6176470588235294,
+    "specificity": 0.9325396825396826,
+    "f1": 0.5833333333333334,
+    "support_negative": 252,
+    "support_positive": 34,
+    "confusion_matrix": [
+      [
+        235,
+        17
+      ],
+      [
+        13,
+        21
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.9325396825396826,
+        0.06746031746031746
+      ],
+      [
+        0.38235294117647056,
+        0.6176470588235294
+      ]
+    ],
+    "roc_auc": 0.8808356676003735,
+    "pr_auc": 0.4930618135880706,
+    "brier_score": 0.08109831994774817,
+    "fpr": 0.06746031746031744,
+    "fnr": 0.38235294117647056,
+    "prevalence": 0.11888111888111888,
+    "precision_lift_vs_baseline": NaN,
+    "recall_delta_vs_baseline": -0.1470588235294117,
+    "balanced_accuracy_delta_vs_baseline": 0.07528011204481799
+  },
+  "abstention_validation": {
+    "low_threshold": 0.213723,
+    "high_threshold": 0.7131578947368421,
+    "coverage": 0.8251748251748252,
+    "uncertain_rate": 0.17482517482517482,
+    "precision_high": 1.0,
+    "npv_low": 0.948936170212766,
+    "recall_effective": 0.029411764705882353,
+    "specificity_effective": 0.8849206349206349,
+    "selection_reason": "target_precision_with_coverage",
+    "target_high_precision": 0.7,
+    "min_confident_coverage": 0.1
+  },
+  "abstention_test": {
+    "coverage": 0.8706293706293706,
+    "uncertain_rate": 0.12937062937062938,
+    "precision_high": 1.0,
+    "npv_low": 0.9475806451612904,
+    "recall_effective": 0.029411764705882353,
+    "specificity_effective": 0.9325396825396826,
+    "confident_positive_n": 1,
+    "confident_negative_n": 248,
+    "uncertain_n": 37
+  },
+  "figures": {
+    "roc_curve": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\precision\\rf_elimination_v7_precision_experimental_research\\rf_elimination_v7_precision_experimental_research_roc.png",
+    "pr_curve": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\precision\\rf_elimination_v7_precision_experimental_research\\rf_elimination_v7_precision_experimental_research_pr.png",
+    "confusion": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\precision\\rf_elimination_v7_precision_experimental_research\\rf_elimination_v7_precision_experimental_research_confusion.png",
+    "confusion_normalized": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\precision\\rf_elimination_v7_precision_experimental_research\\rf_elimination_v7_precision_experimental_research_confusion_normalized.png",
+    "calibration_curve": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\precision\\rf_elimination_v7_precision_experimental_research\\rf_elimination_v7_precision_experimental_research_calibration.png"
+  },
+  "top_permutation_features": [
+    "num__sdq_conduct_problems__missing",
+    "num__cbcl_attention_problems_proxy",
+    "num__has_sdq",
+    "num__cbcl_externalizing_proxy",
+    "num__sdq_hyperactivity_inattention",
+    "num__cbcl_internalizing_proxy",
+    "num__sdq_impact",
+    "num__sdq_conduct_problems",
+    "num__has_cbcl",
+    "num__sdq_total_difficulties",
+    "num__age_years",
+    "num__has_sdq__missing",
+    "num__cbcl_aggressive_behavior_proxy",
+    "num__cbcl_rule_breaking_proxy",
+    "num__cbcl_anxious_depressed_proxy",
+    "num__sdq_impact__missing",
+    "num__sdq_emotional_symptoms",
+    "num__sdq_emotional_symptoms__missing",
+    "num__sdq_hyperactivity_inattention__missing",
+    "cat__sex_assigned_at_birth_Female"
+  ]
+}

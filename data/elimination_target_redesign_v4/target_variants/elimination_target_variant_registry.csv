@@ -1,0 +1,9 @@
+target_variant,prevalence,n_positive,n_negative,n_rows,ambiguous_cases,viability_for_standalone_model,methodological_strength,pseudo_target_risk,overlap_with_other_subtype,recommendation,standalone_recommendation
+target_elimination_current_replay,0.5637795275590551,1074,831,1905,1173,yes,moderate,no,,candidate_for_training,candidate_for_training
+target_elimination_any_if_subtypes_exist,0.5637795275590551,1074,831,1905,1173,yes,moderate,no,0.384251968503937,candidate_for_training,candidate_for_training
+target_elimination_strict,0.0,0,1905,1905,1173,no,moderate,no,,candidate_for_training,candidate_for_training
+target_elimination_high_confidence,0.5637795275590551,1074,831,1905,1173,yes,moderate,no,,candidate_for_training,candidate_for_training
+target_elimination_relaxed,1.0,1905,0,1905,1173,no,moderate,no,,audit_only,candidate_for_training
+target_elimination_clear_cases_only,0.384251968503937,732,1173,1905,1173,yes,moderate,no,,candidate_for_training,candidate_for_training
+target_enuresis,0.46194225721784776,880,1025,1905,732,yes,weak,yes,0.384251968503937,auxiliary_only,standalone_not_recommended
+target_encopresis,0.4860892388451444,926,979,1905,732,yes,weak,yes,0.384251968503937,auxiliary_only,standalone_not_recommended

@@ -1,0 +1,11 @@
+metric,value
+n_rows,1905.0
+prev_elimination_any,0.5637795275590551
+prev_enuresis,0.46194225721784776
+prev_encopresis,0.4860892388451444
+subtype_overlap_rate,0.384251968503937
+subtype_jaccard,0.6815642458100558
+clear_positive_rate,0.384251968503937
+clear_negative_rate,0.0
+ambiguous_rate,0.6157480314960629
+target_ambiguity_is_primary_issue,1.0

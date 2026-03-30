@@ -1,0 +1,260 @@
+{
+  "HBN_SYN_003314": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.6802210919140779
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 0.32025638302563564
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.21904774456150544
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.14163460374596798
+      },
+      {
+        "feature": "cat__site_CUNY",
+        "score": 0.0024249108131523846
+      },
+      {
+        "feature": "cat__site_Staten Island",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_RUBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "num__release",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_mfq_p",
+        "score": 0.0
+      },
+      {
+        "feature": "num__mfq_p_total",
+        "score": 0.0
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": -1.0989331262548714
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": -0.6284744169554082
+      },
+      {
+        "feature": "num__age_years",
+        "score": -0.03685182270485096
+      },
+      {
+        "feature": "cat__site_CBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Unknown",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Male",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Female",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_prosocial_behavior",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": 0.0
+      }
+    ]
+  },
+  "HBN_SYN_003134": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.23605767290994667
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.06571432336845162
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.05038674754919095
+      },
+      {
+        "feature": "num__age_years",
+        "score": 0.0325163141513391
+      },
+      {
+        "feature": "cat__site_Staten Island",
+        "score": 0.0027861331977984674
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Male",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_CBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "num__release",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_mfq_p",
+        "score": 0.0
+      },
+      {
+        "feature": "num__mfq_p_total",
+        "score": 0.0
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": -1.2820886472973498
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": -1.047457361592347
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": -0.510353516110228
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": -0.22539624357843863
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": -0.12382688577953363
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": -0.10180698726361512
+      },
+      {
+        "feature": "num__sdq_emotional_symptoms",
+        "score": -0.0669202208232375
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": -0.06405127660512712
+      },
+      {
+        "feature": "num__sdq_prosocial_behavior",
+        "score": -0.042222021553641825
+      },
+      {
+        "feature": "num__sdq_impact",
+        "score": -0.022190698527172602
+      }
+    ]
+  },
+  "HBN_SYN_000323": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 4.762043547104443
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": 2.7233891401401022
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 1.5310605483306838
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.5542542230411005
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": 0.45079248715687725
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": 0.3714806573386009
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": 0.3563244554226529
+      },
+      {
+        "feature": "num__sdq_emotional_symptoms",
+        "score": 0.3346011041161875
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 0.2775555319555509
+      },
+      {
+        "feature": "num__sdq_prosocial_behavior",
+        "score": 0.25333212932185095
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__age_years",
+        "score": -0.05852936547241036
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Male",
+        "score": -0.00392795130644581
+      },
+      {
+        "feature": "cat__site_CUNY",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_CBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Unknown",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_sdq",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_Staten Island",
+        "score": 0.0
+      },
+      {
+        "feature": "num__release",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_mfq_p",
+        "score": 0.0
+      },
+      {
+        "feature": "num__mfq_p_total",
+        "score": 0.0
+      }
+    ]
+  }
+}

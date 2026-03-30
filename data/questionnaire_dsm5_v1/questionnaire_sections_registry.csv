@@ -1,0 +1,148 @@
+diagnostic_unit,external_domain,dsm_block,section_item_count,questionnaire_section_id
+Encopresis,Eliminación,A,1,QS_001
+Encopresis,Eliminación,B,1,QS_002
+Encopresis,Eliminación,C,1,QS_003
+Encopresis,Eliminación,D,1,QS_004
+Encopresis,Eliminación,Especificador,1,QS_005
+Encopresis,Eliminación,,1,QS_006
+Enuresis,Eliminación,A,1,QS_007
+Enuresis,Eliminación,B,1,QS_008
+Enuresis,Eliminación,C,1,QS_009
+Enuresis,Eliminación,D,1,QS_010
+Enuresis,Eliminación,Especificador,1,QS_011
+Enuresis,Eliminación,,1,QS_012
+TRANSVERSAL,TRANSVERSAL,Comorbilidad,1,QS_013
+TRANSVERSAL,TRANSVERSAL,Contexto,2,QS_014
+TRANSVERSAL,TRANSVERSAL,Cronología,2,QS_015
+TRANSVERSAL,TRANSVERSAL,Evidencia,2,QS_016
+TRANSVERSAL,TRANSVERSAL,Exclusiones,2,QS_017
+TRANSVERSAL,TRANSVERSAL,Funcionamiento,1,QS_018
+TRANSVERSAL,TRANSVERSAL,Identificación,2,QS_019
+TRANSVERSAL,TRANSVERSAL,Salida,3,QS_020
+TRANSVERSAL,TRANSVERSAL,Temporalidad,3,QS_021
+Trastorno de ansiedad generalizada,Ansiedad,A,1,QS_022
+Trastorno de ansiedad generalizada,Ansiedad,B,1,QS_023
+Trastorno de ansiedad generalizada,Ansiedad,C,1,QS_024
+Trastorno de ansiedad generalizada,Ansiedad,C.1,1,QS_025
+Trastorno de ansiedad generalizada,Ansiedad,C.2,1,QS_026
+Trastorno de ansiedad generalizada,Ansiedad,C.3,1,QS_027
+Trastorno de ansiedad generalizada,Ansiedad,C.4,1,QS_028
+Trastorno de ansiedad generalizada,Ansiedad,C.5,1,QS_029
+Trastorno de ansiedad generalizada,Ansiedad,C.6,1,QS_030
+Trastorno de ansiedad generalizada,Ansiedad,D,1,QS_031
+Trastorno de ansiedad generalizada,Ansiedad,E,1,QS_032
+Trastorno de ansiedad generalizada,Ansiedad,F,1,QS_033
+Trastorno de ansiedad generalizada,Ansiedad,,1,QS_034
+Trastorno de ansiedad por separación,Ansiedad,A,1,QS_035
+Trastorno de ansiedad por separación,Ansiedad,A.1,1,QS_036
+Trastorno de ansiedad por separación,Ansiedad,A.2,1,QS_037
+Trastorno de ansiedad por separación,Ansiedad,A.3,1,QS_038
+Trastorno de ansiedad por separación,Ansiedad,A.4,1,QS_039
+Trastorno de ansiedad por separación,Ansiedad,A.5,1,QS_040
+Trastorno de ansiedad por separación,Ansiedad,A.6,1,QS_041
+Trastorno de ansiedad por separación,Ansiedad,A.7,1,QS_042
+Trastorno de ansiedad por separación,Ansiedad,A.8,1,QS_043
+Trastorno de ansiedad por separación,Ansiedad,B,1,QS_044
+Trastorno de ansiedad por separación,Ansiedad,C,1,QS_045
+Trastorno de ansiedad por separación,Ansiedad,D,1,QS_046
+Trastorno de ansiedad por separación,Ansiedad,,1,QS_047
+Trastorno de conducta,Conducta,A,1,QS_048
+Trastorno de conducta,Conducta,Agresión 1,1,QS_049
+Trastorno de conducta,Conducta,Agresión 2,1,QS_050
+Trastorno de conducta,Conducta,Agresión 3,1,QS_051
+Trastorno de conducta,Conducta,Agresión 4,1,QS_052
+Trastorno de conducta,Conducta,Agresión 5,1,QS_053
+Trastorno de conducta,Conducta,Agresión 6,1,QS_054
+Trastorno de conducta,Conducta,Agresión 7,1,QS_055
+Trastorno de conducta,Conducta,B,1,QS_056
+Trastorno de conducta,Conducta,C,1,QS_057
+Trastorno de conducta,Conducta,Criterio A,1,QS_058
+Trastorno de conducta,Conducta,Emociones prosociales limitadas,4,QS_059
+Trastorno de conducta,Conducta,Engaño/Robo 1,1,QS_060
+Trastorno de conducta,Conducta,Engaño/Robo 2,1,QS_061
+Trastorno de conducta,Conducta,Engaño/Robo 3,1,QS_062
+Trastorno de conducta,Conducta,Especificador,2,QS_063
+Trastorno de conducta,Conducta,Gravedad actual,1,QS_064
+Trastorno de conducta,Conducta,Normas 1,1,QS_065
+Trastorno de conducta,Conducta,Normas 2,1,QS_066
+Trastorno de conducta,Conducta,Normas 3,1,QS_067
+Trastorno de conducta,Conducta,Propiedad 1,1,QS_068
+Trastorno de conducta,Conducta,Propiedad 2,1,QS_069
+Trastorno de conducta,Conducta,,1,QS_070
+Trastorno de depresión mayor,Depresión,A,2,QS_071
+Trastorno de depresión mayor,Depresión,A.1,1,QS_072
+Trastorno de depresión mayor,Depresión,A.2,1,QS_073
+Trastorno de depresión mayor,Depresión,A.3,1,QS_074
+Trastorno de depresión mayor,Depresión,A.4,1,QS_075
+Trastorno de depresión mayor,Depresión,A.5,1,QS_076
+Trastorno de depresión mayor,Depresión,A.6,1,QS_077
+Trastorno de depresión mayor,Depresión,A.7,1,QS_078
+Trastorno de depresión mayor,Depresión,A.8,1,QS_079
+Trastorno de depresión mayor,Depresión,A.9,1,QS_080
+Trastorno de depresión mayor,Depresión,B,1,QS_081
+Trastorno de depresión mayor,Depresión,C,1,QS_082
+Trastorno de depresión mayor,Depresión,D,1,QS_083
+Trastorno de depresión mayor,Depresión,E,1,QS_084
+Trastorno de depresión mayor,Depresión,Especificador depresivo,9,QS_085
+Trastorno de depresión mayor,Depresión,Especificadores,1,QS_086
+Trastorno de depresión mayor,Depresión,,1,QS_087
+Trastorno de depresión mayor,depression,Procedimientos de codificación y registro,6,QS_088
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,A,1,QS_089
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,B,1,QS_090
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,C,1,QS_091
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,D,1,QS_092
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,E,1,QS_093
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,F,1,QS_094
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,G,1,QS_095
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,H,1,QS_096
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,I,1,QS_097
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,J,1,QS_098
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,K,1,QS_099
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,Nota de coexistencia,1,QS_100
+Trastorno de desregulación disruptiva del estado de ánimo,Depresión,,1,QS_101
+Trastorno depresivo persistente,Depresión,A,1,QS_102
+Trastorno depresivo persistente,Depresión,B,1,QS_103
+Trastorno depresivo persistente,Depresión,B.1,1,QS_104
+Trastorno depresivo persistente,Depresión,B.2,1,QS_105
+Trastorno depresivo persistente,Depresión,B.3,1,QS_106
+Trastorno depresivo persistente,Depresión,B.4,1,QS_107
+Trastorno depresivo persistente,Depresión,B.5,1,QS_108
+Trastorno depresivo persistente,Depresión,B.6,1,QS_109
+Trastorno depresivo persistente,Depresión,C,1,QS_110
+Trastorno depresivo persistente,Depresión,D,1,QS_111
+Trastorno depresivo persistente,Depresión,E,1,QS_112
+Trastorno depresivo persistente,Depresión,Especificador,3,QS_113
+Trastorno depresivo persistente,Depresión,Especificador depresivo,7,QS_114
+Trastorno depresivo persistente,Depresión,F,1,QS_115
+Trastorno depresivo persistente,Depresión,G,1,QS_116
+Trastorno depresivo persistente,Depresión,Gravedad actual,1,QS_117
+Trastorno depresivo persistente,Depresión,H,1,QS_118
+Trastorno depresivo persistente,Depresión,,1,QS_119
+Trastorno por déficit de atención/hiperactividad,TDAH,A1,1,QS_120
+Trastorno por déficit de atención/hiperactividad,TDAH,A1.a,1,QS_121
+Trastorno por déficit de atención/hiperactividad,TDAH,A1.b,1,QS_122
+Trastorno por déficit de atención/hiperactividad,TDAH,A1.c,1,QS_123
+Trastorno por déficit de atención/hiperactividad,TDAH,A1.d,1,QS_124
+Trastorno por déficit de atención/hiperactividad,TDAH,A1.e,1,QS_125
+Trastorno por déficit de atención/hiperactividad,TDAH,A1.f,1,QS_126
+Trastorno por déficit de atención/hiperactividad,TDAH,A1.g,1,QS_127
+Trastorno por déficit de atención/hiperactividad,TDAH,A1.h,1,QS_128
+Trastorno por déficit de atención/hiperactividad,TDAH,A1.i,1,QS_129
+Trastorno por déficit de atención/hiperactividad,TDAH,A2,1,QS_130
+Trastorno por déficit de atención/hiperactividad,TDAH,A2.a,1,QS_131
+Trastorno por déficit de atención/hiperactividad,TDAH,A2.b,1,QS_132
+Trastorno por déficit de atención/hiperactividad,TDAH,A2.c,1,QS_133
+Trastorno por déficit de atención/hiperactividad,TDAH,A2.d,1,QS_134
+Trastorno por déficit de atención/hiperactividad,TDAH,A2.e,1,QS_135
+Trastorno por déficit de atención/hiperactividad,TDAH,A2.f,1,QS_136
+Trastorno por déficit de atención/hiperactividad,TDAH,A2.g,1,QS_137
+Trastorno por déficit de atención/hiperactividad,TDAH,A2.h,1,QS_138
+Trastorno por déficit de atención/hiperactividad,TDAH,A2.i,1,QS_139
+Trastorno por déficit de atención/hiperactividad,TDAH,B,1,QS_140
+Trastorno por déficit de atención/hiperactividad,TDAH,C,1,QS_141
+Trastorno por déficit de atención/hiperactividad,TDAH,Criterio A,1,QS_142
+Trastorno por déficit de atención/hiperactividad,TDAH,D,1,QS_143
+Trastorno por déficit de atención/hiperactividad,TDAH,E,1,QS_144
+Trastorno por déficit de atención/hiperactividad,TDAH,Especificador,2,QS_145
+Trastorno por déficit de atención/hiperactividad,TDAH,Gravedad actual,1,QS_146
+Trastorno por déficit de atención/hiperactividad,TDAH,,1,QS_147

@@ -1,0 +1,107 @@
+{
+  "model_version": "rf_elimination_v3_proxy_pruned",
+  "parent_version": "rf_elimination_v1_baseline",
+  "task_type": "binary",
+  "status": "completed",
+  "dataset_name": "dataset_elimination_items",
+  "dataset_variant": "items",
+  "data_scope": "strict_no_leakage",
+  "split_version": "splits_strict_no_leakage_frozen_v1",
+  "preprocessing_version": "rf_preproc_v1",
+  "seed": 42,
+  "target": "target_elimination",
+  "n_features_raw": 162,
+  "n_features_final": 42,
+  "train_rows": 1333,
+  "val_rows": 286,
+  "test_rows": 286,
+  "best_params": {
+    "model__n_estimators": 150,
+    "model__min_samples_split": 2,
+    "model__min_samples_leaf": 4,
+    "model__max_features": "sqrt",
+    "model__max_depth": 20,
+    "model__class_weight": "balanced"
+  },
+  "search_meta": {
+    "best_cv_balanced_accuracy": 0.5427446130145149,
+    "cv_splits": 3,
+    "n_iter": 10
+  },
+  "threshold_strategy": "best_f1",
+  "threshold_value": 0.144653,
+  "calibration_strategy": "sigmoid",
+  "validation_metrics": {
+    "threshold": 0.144653,
+    "accuracy": 0.8006993006993007,
+    "balanced_accuracy": 0.6197478991596639,
+    "precision": 0.2653061224489796,
+    "recall": 0.38235294117647056,
+    "sensitivity": 0.38235294117647056,
+    "specificity": 0.8571428571428571,
+    "f1": 0.3132530120481928,
+    "support_negative": 252,
+    "support_positive": 34,
+    "confusion_matrix": [
+      [
+        216,
+        36
+      ],
+      [
+        21,
+        13
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.8571428571428571,
+        0.14285714285714285
+      ],
+      [
+        0.6176470588235294,
+        0.38235294117647056
+      ]
+    ],
+    "roc_auc": 0.6189309056956116,
+    "pr_auc": 0.23712548640119843,
+    "brier_score": 0.1015670418939692
+  },
+  "test_metrics": {
+    "threshold": 0.144653,
+    "accuracy": 0.7657342657342657,
+    "balanced_accuracy": 0.5108543417366946,
+    "precision": 0.13333333333333333,
+    "recall": 0.17647058823529413,
+    "sensitivity": 0.17647058823529413,
+    "specificity": 0.8452380952380952,
+    "f1": 0.1518987341772152,
+    "support_negative": 252,
+    "support_positive": 34,
+    "confusion_matrix": [
+      [
+        213,
+        39
+      ],
+      [
+        28,
+        6
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.8452380952380952,
+        0.15476190476190477
+      ],
+      [
+        0.8235294117647058,
+        0.17647058823529413
+      ]
+    ],
+    "roc_auc": 0.6532446311858077,
+    "pr_auc": 0.20819744518886008,
+    "brier_score": 0.10302572767899015
+  },
+  "notes": "Elimination items reduced to interpretable proxy subset (exploratory).",
+  "experimental": false,
+  "created_at": "2026-03-24T03:21:13.531406+00:00"
+}

@@ -6,6 +6,20 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+
+def _bool_env(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _optional_bool_env(name: str):
+    value = os.getenv(name)
+    if value is None:
+        return None
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
 class Config:
     DEBUG = False
     TESTING = False
@@ -36,6 +50,7 @@ class Config:
         "CORS_ORIGINS",
         "http://localhost:3000,http://localhost:5000"
     ).split(",")
+    CORS_ORIGINS = [origin.strip() for origin in CORS_ORIGINS if origin.strip()]
 
     # MFA
     MFA_CHALLENGE_TTL = int(os.getenv("MFA_CHALLENGE_TTL", "300"))
@@ -50,16 +65,27 @@ class Config:
     # Auth hardening
     MAX_LOGIN_ATTEMPTS = int(os.getenv("MAX_LOGIN_ATTEMPTS", "5"))
     LOGIN_LOCKOUT_MINUTES = int(os.getenv("LOGIN_LOCKOUT_MINUTES", "15"))
-    REGISTER_RATE_LIMIT = os.getenv("REGISTER_RATE_LIMIT", "5 per 10 minutes")
-    LOGIN_RATE_LIMIT = os.getenv("LOGIN_RATE_LIMIT", "5 per 15 minutes")
+    REGISTER_RATE_LIMIT = os.getenv("REGISTER_RATE_LIMIT", "10 per 10 minutes")
+    LOGIN_RATE_LIMIT = os.getenv("LOGIN_RATE_LIMIT", "10 per 15 minutes")
     LOGIN_MFA_RATE_LIMIT = os.getenv("LOGIN_MFA_RATE_LIMIT", "5 per 10 minutes")
     MFA_SETUP_RATE_LIMIT = os.getenv("MFA_SETUP_RATE_LIMIT", "3 per 10 minutes")
     MFA_CONFIRM_RATE_LIMIT = os.getenv("MFA_CONFIRM_RATE_LIMIT", "5 per 10 minutes")
     MFA_DISABLE_RATE_LIMIT = os.getenv("MFA_DISABLE_RATE_LIMIT", "3 per 10 minutes")
     PASSWORD_CHANGE_RATE_LIMIT = os.getenv("PASSWORD_CHANGE_RATE_LIMIT", "5 per 10 minutes")
     PASSWORD_FORGOT_RATE_LIMIT = os.getenv("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes")
+    PASSWORD_FORGOT_RATE_LIMIT_IP = os.getenv("PASSWORD_FORGOT_RATE_LIMIT_IP", "20 per 10 minutes")
+    PASSWORD_FORGOT_RATE_LIMIT_EMAIL = os.getenv(
+        "PASSWORD_FORGOT_RATE_LIMIT_EMAIL",
+        PASSWORD_FORGOT_RATE_LIMIT,
+    )
     PASSWORD_RESET_RATE_LIMIT = os.getenv("PASSWORD_RESET_RATE_LIMIT", "5 per 10 minutes")
     PASSWORD_VERIFY_RATE_LIMIT = os.getenv("PASSWORD_VERIFY_RATE_LIMIT", "20 per 10 minutes")
+
+    # Cookies/session for cross-domain frontend-backend deployments
+    AUTH_CROSS_SITE_COOKIES = _bool_env("AUTH_CROSS_SITE_COOKIES", False)
+    JWT_COOKIE_SAMESITE = os.getenv("JWT_COOKIE_SAMESITE")
+    JWT_COOKIE_SECURE = _optional_bool_env("JWT_COOKIE_SECURE")
+    JWT_COOKIE_DOMAIN = os.getenv("JWT_COOKIE_DOMAIN")
 
     # Admin rate limits
     ADMIN_LIST_RATE_LIMIT = os.getenv("ADMIN_LIST_RATE_LIMIT", "60 per minute")
@@ -89,6 +115,23 @@ class Config:
     METRICS_TOKEN = os.getenv("METRICS_TOKEN")
     METRICS_TOKEN_REQUIRED = os.getenv("METRICS_TOKEN_REQUIRED", "false").lower() == "true"
     RATELIMIT_ENABLED = os.getenv("RATELIMIT_ENABLED", "true").lower() == "true"
+
+    # Proxy and response hardening
+    TRUST_PROXY_HEADERS = _bool_env("TRUST_PROXY_HEADERS", False)
+    PROXY_FIX_X_FOR = int(os.getenv("PROXY_FIX_X_FOR", "1"))
+    PROXY_FIX_X_PROTO = int(os.getenv("PROXY_FIX_X_PROTO", "1"))
+    PROXY_FIX_X_HOST = int(os.getenv("PROXY_FIX_X_HOST", "1"))
+    PROXY_FIX_X_PORT = int(os.getenv("PROXY_FIX_X_PORT", "1"))
+    PROXY_FIX_X_PREFIX = int(os.getenv("PROXY_FIX_X_PREFIX", "1"))
+    SECURITY_HEADERS_ENABLED = _bool_env("SECURITY_HEADERS_ENABLED", True)
+    SECURITY_HSTS_SECONDS = int(os.getenv("SECURITY_HSTS_SECONDS", "31536000"))
+    SECURITY_HSTS_INCLUDE_SUBDOMAINS = _bool_env("SECURITY_HSTS_INCLUDE_SUBDOMAINS", True)
+    SECURITY_HSTS_PRELOAD = _bool_env("SECURITY_HSTS_PRELOAD", False)
+    SECURITY_FRAME_OPTIONS = os.getenv("SECURITY_FRAME_OPTIONS", "DENY")
+    SECURITY_CONTENT_TYPE_OPTIONS = os.getenv("SECURITY_CONTENT_TYPE_OPTIONS", "nosniff")
+    SECURITY_REFERRER_POLICY = os.getenv("SECURITY_REFERRER_POLICY", "strict-origin-when-cross-origin")
+    SECURITY_CSP = os.getenv("SECURITY_CSP")
+    SECURITY_PERMISSIONS_POLICY = os.getenv("SECURITY_PERMISSIONS_POLICY")
 
     # Email (SMTP)
     EMAIL_ENABLED = os.getenv("EMAIL_ENABLED", "false").lower() == "true"
@@ -136,6 +179,9 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
+    AUTH_CROSS_SITE_COOKIES = _bool_env("AUTH_CROSS_SITE_COOKIES", True)
+    TRUST_PROXY_HEADERS = _bool_env("TRUST_PROXY_HEADERS", True)
+    JWT_COOKIE_SECURE = True if Config.JWT_COOKIE_SECURE is None else Config.JWT_COOKIE_SECURE
     # Ajustes de pool para concurrencia
     SQLALCHEMY_ENGINE_OPTIONS = {
         # Ajustado para no competir con poolers externos (ej. pgbouncer en free tier)
@@ -154,3 +200,4 @@ class TestingConfig(Config):
     LOG_REQUESTS = False
     RATELIMIT_ENABLED = False
     EMAIL_ENABLED = False
+    SECURITY_HEADERS_ENABLED = False

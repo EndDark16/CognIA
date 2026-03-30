@@ -1,0 +1,184 @@
+questionnaire_item_id,diagnostic_unit,unit_key
+QI_0001,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0002,Trastorno de conducta,conduct_disorder
+QI_0003,Enuresis,enuresis
+QI_0004,Encopresis,encopresis
+QI_0005,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0006,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0007,Trastorno de depresión mayor,major_depressive_disorder
+QI_0008,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0009,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0010,TRANSVERSAL,transversal
+QI_0011,TRANSVERSAL,transversal
+QI_0012,TRANSVERSAL,transversal
+QI_0013,TRANSVERSAL,transversal
+QI_0014,TRANSVERSAL,transversal
+QI_0015,TRANSVERSAL,transversal
+QI_0016,TRANSVERSAL,transversal
+QI_0017,TRANSVERSAL,transversal
+QI_0018,TRANSVERSAL,transversal
+QI_0019,TRANSVERSAL,transversal
+QI_0020,TRANSVERSAL,transversal
+QI_0021,TRANSVERSAL,transversal
+QI_0022,TRANSVERSAL,transversal
+QI_0023,TRANSVERSAL,transversal
+QI_0024,TRANSVERSAL,transversal
+QI_0025,TRANSVERSAL,transversal
+QI_0026,TRANSVERSAL,transversal
+QI_0027,TRANSVERSAL,transversal
+QI_0028,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0029,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0030,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0031,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0032,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0033,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0034,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0035,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0036,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0037,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0038,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0039,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0040,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0041,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0042,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0043,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0044,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0045,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0046,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0047,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0048,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0049,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0050,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0051,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0052,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0053,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0054,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0055,Trastorno por déficit de atención/hiperactividad,adhd
+QI_0056,Trastorno de conducta,conduct_disorder
+QI_0057,Trastorno de conducta,conduct_disorder
+QI_0058,Trastorno de conducta,conduct_disorder
+QI_0059,Trastorno de conducta,conduct_disorder
+QI_0060,Trastorno de conducta,conduct_disorder
+QI_0061,Trastorno de conducta,conduct_disorder
+QI_0062,Trastorno de conducta,conduct_disorder
+QI_0063,Trastorno de conducta,conduct_disorder
+QI_0064,Trastorno de conducta,conduct_disorder
+QI_0065,Trastorno de conducta,conduct_disorder
+QI_0066,Trastorno de conducta,conduct_disorder
+QI_0067,Trastorno de conducta,conduct_disorder
+QI_0068,Trastorno de conducta,conduct_disorder
+QI_0069,Trastorno de conducta,conduct_disorder
+QI_0070,Trastorno de conducta,conduct_disorder
+QI_0071,Trastorno de conducta,conduct_disorder
+QI_0072,Trastorno de conducta,conduct_disorder
+QI_0073,Trastorno de conducta,conduct_disorder
+QI_0074,Trastorno de conducta,conduct_disorder
+QI_0075,Trastorno de conducta,conduct_disorder
+QI_0076,Trastorno de conducta,conduct_disorder
+QI_0077,Trastorno de conducta,conduct_disorder
+QI_0078,Trastorno de conducta,conduct_disorder
+QI_0079,Trastorno de conducta,conduct_disorder
+QI_0080,Trastorno de conducta,conduct_disorder
+QI_0081,Trastorno de conducta,conduct_disorder
+QI_0082,Enuresis,enuresis
+QI_0083,Enuresis,enuresis
+QI_0084,Enuresis,enuresis
+QI_0085,Enuresis,enuresis
+QI_0086,Enuresis,enuresis
+QI_0087,Encopresis,encopresis
+QI_0088,Encopresis,encopresis
+QI_0089,Encopresis,encopresis
+QI_0090,Encopresis,encopresis
+QI_0091,Encopresis,encopresis
+QI_0092,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0093,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0094,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0095,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0096,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0097,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0098,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0099,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0100,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0101,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0102,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0103,Trastorno de ansiedad por separación,separation_anxiety_disorder
+QI_0104,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0105,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0106,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0107,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0108,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0109,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0110,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0111,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0112,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0113,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0114,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0115,Trastorno de ansiedad generalizada,generalized_anxiety_disorder
+QI_0116,Trastorno de depresión mayor,major_depressive_disorder
+QI_0117,Trastorno de depresión mayor,major_depressive_disorder
+QI_0118,Trastorno de depresión mayor,major_depressive_disorder
+QI_0119,Trastorno de depresión mayor,major_depressive_disorder
+QI_0120,Trastorno de depresión mayor,major_depressive_disorder
+QI_0121,Trastorno de depresión mayor,major_depressive_disorder
+QI_0122,Trastorno de depresión mayor,major_depressive_disorder
+QI_0123,Trastorno de depresión mayor,major_depressive_disorder
+QI_0124,Trastorno de depresión mayor,major_depressive_disorder
+QI_0125,Trastorno de depresión mayor,major_depressive_disorder
+QI_0126,Trastorno de depresión mayor,major_depressive_disorder
+QI_0127,Trastorno de depresión mayor,major_depressive_disorder
+QI_0128,Trastorno de depresión mayor,major_depressive_disorder
+QI_0129,Trastorno de depresión mayor,major_depressive_disorder
+QI_0130,Trastorno de depresión mayor,major_depressive_disorder
+QI_0131,Trastorno de depresión mayor,major_depressive_disorder
+QI_0132,Trastorno de depresión mayor,major_depressive_disorder
+QI_0133,Trastorno de depresión mayor,major_depressive_disorder
+QI_0134,Trastorno de depresión mayor,major_depressive_disorder
+QI_0135,Trastorno de depresión mayor,major_depressive_disorder
+QI_0136,Trastorno de depresión mayor,major_depressive_disorder
+QI_0137,Trastorno de depresión mayor,major_depressive_disorder
+QI_0138,Trastorno de depresión mayor,major_depressive_disorder
+QI_0139,Trastorno de depresión mayor,major_depressive_disorder
+QI_0140,Trastorno de depresión mayor,major_depressive_disorder
+QI_0141,Trastorno de depresión mayor,major_depressive_disorder
+QI_0142,Trastorno de depresión mayor,major_depressive_disorder
+QI_0143,Trastorno de depresión mayor,major_depressive_disorder
+QI_0144,Trastorno de depresión mayor,major_depressive_disorder
+QI_0145,Trastorno de depresión mayor,major_depressive_disorder
+QI_0146,Trastorno de depresión mayor,major_depressive_disorder
+QI_0147,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0148,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0149,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0150,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0151,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0152,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0153,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0154,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0155,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0156,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0157,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0158,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0159,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0160,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0161,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0162,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0163,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0164,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0165,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0166,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0167,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0168,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0169,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0170,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0171,Trastorno depresivo persistente,persistent_depressive_disorder
+QI_0172,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0173,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0174,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0175,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0176,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0177,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0178,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0179,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0180,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0181,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0182,Trastorno de desregulación disruptiva del estado de ánimo,dmdd
+QI_0183,Trastorno de desregulación disruptiva del estado de ánimo,dmdd

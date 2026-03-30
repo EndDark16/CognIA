@@ -1,0 +1,13 @@
+metric,value
+rows_total,1905.0
+rows_train,1333.0
+rows_val,286.0
+rows_test,286.0
+prevalence_total,0.5637795275590551
+prevalence_train,0.5641410352588146
+prevalence_val,0.5629370629370629
+prevalence_test,0.5629370629370629
+feature_duplicate_ratio,0.0
+n_positive,1074.0
+n_negative,831.0
+class_balance_ratio_pos_neg,1.2924187725631768

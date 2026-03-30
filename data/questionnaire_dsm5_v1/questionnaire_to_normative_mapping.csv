@@ -1,0 +1,184 @@
+questionnaire_item_id,row_id_from_normative_csv,diagnostic_unit,external_domain,parameter_name,dsm_block,direct_or_proxy_for_normative_parameter
+QI_0001,1,Trastorno por déficit de atención/hiperactividad,TDAH,NORM_PARAM_0001,,proxy
+QI_0002,2,Trastorno de conducta,Conducta,NORM_PARAM_0002,,proxy
+QI_0003,3,Enuresis,Eliminación,NORM_PARAM_0003,,proxy
+QI_0004,4,Encopresis,Eliminación,NORM_PARAM_0004,,proxy
+QI_0005,5,Trastorno de ansiedad por separación,Ansiedad,NORM_PARAM_0005,,proxy
+QI_0006,6,Trastorno de ansiedad generalizada,Ansiedad,NORM_PARAM_0006,,proxy
+QI_0007,7,Trastorno de depresión mayor,Depresión,NORM_PARAM_0007,,proxy
+QI_0008,8,Trastorno depresivo persistente,Depresión,NORM_PARAM_0008,,proxy
+QI_0009,9,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,NORM_PARAM_0009,,proxy
+QI_0010,10,TRANSVERSAL,TRANSVERSAL,diagnostic_unit,Identificación,proxy
+QI_0011,11,TRANSVERSAL,TRANSVERSAL,diagnostic_domain,Identificación,proxy
+QI_0012,12,TRANSVERSAL,TRANSVERSAL,age_at_assessment,Cronología,direct
+QI_0013,13,TRANSVERSAL,TRANSVERSAL,age_at_onset,Cronología,direct
+QI_0014,14,TRANSVERSAL,TRANSVERSAL,duration_minimum,Temporalidad,direct
+QI_0015,15,TRANSVERSAL,TRANSVERSAL,symptom_frequency,Temporalidad,direct
+QI_0016,16,TRANSVERSAL,TRANSVERSAL,persistence_rule,Temporalidad,direct
+QI_0017,17,TRANSVERSAL,TRANSVERSAL,contexts_present,Contexto,direct
+QI_0018,18,TRANSVERSAL,TRANSVERSAL,cross_setting_severity,Contexto,direct
+QI_0019,19,TRANSVERSAL,TRANSVERSAL,functional_impairment,Funcionamiento,proxy
+QI_0020,20,TRANSVERSAL,TRANSVERSAL,substance_medical_exclusion,Exclusiones,direct
+QI_0021,21,TRANSVERSAL,TRANSVERSAL,other_mental_disorder_exclusion,Exclusiones,direct
+QI_0022,22,TRANSVERSAL,TRANSVERSAL,diagnostic_coexistence_rule,Comorbilidad,proxy
+QI_0023,23,TRANSVERSAL,TRANSVERSAL,subjective_report,Evidencia,proxy
+QI_0024,24,TRANSVERSAL,TRANSVERSAL,observer_report,Evidencia,proxy
+QI_0025,25,TRANSVERSAL,TRANSVERSAL,specifier_set,Salida,direct
+QI_0026,26,TRANSVERSAL,TRANSVERSAL,severity_current,Salida,proxy
+QI_0027,27,TRANSVERSAL,TRANSVERSAL,remission_status,Salida,direct
+QI_0028,28,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_GATE_A,Criterio A,proxy
+QI_0029,29,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A1_THRESHOLD,A1,proxy
+QI_0030,30,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A2_THRESHOLD,A2,proxy
+QI_0031,31,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_ONSET_BEFORE_12,B,direct
+QI_0032,32,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_MULTICONTEXT,C,proxy
+QI_0033,33,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_IMPAIRMENT,D,proxy
+QI_0034,34,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_EXCLUSION,E,direct
+QI_0035,35,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_PRESENTATION,Especificador,proxy
+QI_0036,36,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_PARTIAL_REMISSION,Especificador,direct
+QI_0037,37,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_SEVERITY,Gravedad actual,proxy
+QI_0038,38,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A1_a,A1.a,proxy
+QI_0039,39,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A1_b,A1.b,proxy
+QI_0040,40,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A1_c,A1.c,proxy
+QI_0041,41,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A1_d,A1.d,proxy
+QI_0042,42,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A1_e,A1.e,proxy
+QI_0043,43,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A1_f,A1.f,proxy
+QI_0044,44,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A1_g,A1.g,proxy
+QI_0045,45,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A1_h,A1.h,proxy
+QI_0046,46,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A1_i,A1.i,proxy
+QI_0047,47,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A2_a,A2.a,proxy
+QI_0048,48,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A2_b,A2.b,proxy
+QI_0049,49,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A2_c,A2.c,proxy
+QI_0050,50,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A2_d,A2.d,proxy
+QI_0051,51,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A2_e,A2.e,proxy
+QI_0052,52,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A2_f,A2.f,proxy
+QI_0053,53,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A2_g,A2.g,proxy
+QI_0054,54,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A2_h,A2.h,proxy
+QI_0055,55,Trastorno por déficit de atención/hiperactividad,TDAH,ADHD_A2_i,A2.i,proxy
+QI_0056,56,Trastorno de conducta,Conducta,CD_GATE_A,Criterio A,proxy
+QI_0057,57,Trastorno de conducta,Conducta,CD_THRESHOLD,A,proxy
+QI_0058,58,Trastorno de conducta,Conducta,CD_IMPAIRMENT,B,proxy
+QI_0059,59,Trastorno de conducta,Conducta,CD_ASPD_EXCLUSION,C,direct
+QI_0060,60,Trastorno de conducta,Conducta,CD_ONSET_TYPE,Especificador,direct
+QI_0061,61,Trastorno de conducta,Conducta,CD_LIMITED_PROSOCIAL,Especificador,proxy
+QI_0062,62,Trastorno de conducta,Conducta,CD_SEVERITY,Gravedad actual,proxy
+QI_0063,63,Trastorno de conducta,Conducta,CD_1,Agresión 1,proxy
+QI_0064,64,Trastorno de conducta,Conducta,CD_2,Agresión 2,proxy
+QI_0065,65,Trastorno de conducta,Conducta,CD_3,Agresión 3,proxy
+QI_0066,66,Trastorno de conducta,Conducta,CD_4,Agresión 4,proxy
+QI_0067,67,Trastorno de conducta,Conducta,CD_5,Agresión 5,proxy
+QI_0068,68,Trastorno de conducta,Conducta,CD_6,Agresión 6,proxy
+QI_0069,69,Trastorno de conducta,Conducta,CD_7,Agresión 7,proxy
+QI_0070,70,Trastorno de conducta,Conducta,CD_8,Propiedad 1,proxy
+QI_0071,71,Trastorno de conducta,Conducta,CD_9,Propiedad 2,proxy
+QI_0072,72,Trastorno de conducta,Conducta,CD_10,Engaño/Robo 1,proxy
+QI_0073,73,Trastorno de conducta,Conducta,CD_11,Engaño/Robo 2,proxy
+QI_0074,74,Trastorno de conducta,Conducta,CD_12,Engaño/Robo 3,proxy
+QI_0075,75,Trastorno de conducta,Conducta,CD_13,Normas 1,proxy
+QI_0076,76,Trastorno de conducta,Conducta,CD_14,Normas 2,proxy
+QI_0077,77,Trastorno de conducta,Conducta,CD_15,Normas 3,proxy
+QI_0078,78,Trastorno de conducta,Conducta,CD_LPE_1,Emociones prosociales limitadas,proxy
+QI_0079,79,Trastorno de conducta,Conducta,CD_LPE_2,Emociones prosociales limitadas,proxy
+QI_0080,80,Trastorno de conducta,Conducta,CD_LPE_3,Emociones prosociales limitadas,proxy
+QI_0081,81,Trastorno de conducta,Conducta,CD_LPE_4,Emociones prosociales limitadas,proxy
+QI_0082,82,Enuresis,Eliminación,ENUR_A,A,proxy
+QI_0083,83,Enuresis,Eliminación,ENUR_B,B,proxy
+QI_0084,84,Enuresis,Eliminación,ENUR_C,C,direct
+QI_0085,85,Enuresis,Eliminación,ENUR_D,D,direct
+QI_0086,86,Enuresis,Eliminación,ENUR_SUBTYPE,Especificador,direct
+QI_0087,87,Encopresis,Eliminación,ENC_A,A,proxy
+QI_0088,88,Encopresis,Eliminación,ENC_B,B,proxy
+QI_0089,89,Encopresis,Eliminación,ENC_C,C,direct
+QI_0090,90,Encopresis,Eliminación,ENC_D,D,direct
+QI_0091,91,Encopresis,Eliminación,ENC_SUBTYPE,Especificador,direct
+QI_0092,92,Trastorno de ansiedad por separación,Ansiedad,SAD_A_THRESHOLD,A,proxy
+QI_0093,93,Trastorno de ansiedad por separación,Ansiedad,SAD_B,B,direct
+QI_0094,94,Trastorno de ansiedad por separación,Ansiedad,SAD_C,C,proxy
+QI_0095,95,Trastorno de ansiedad por separación,Ansiedad,SAD_D,D,direct
+QI_0096,96,Trastorno de ansiedad por separación,Ansiedad,SAD_1,A.1,proxy
+QI_0097,97,Trastorno de ansiedad por separación,Ansiedad,SAD_2,A.2,proxy
+QI_0098,98,Trastorno de ansiedad por separación,Ansiedad,SAD_3,A.3,proxy
+QI_0099,99,Trastorno de ansiedad por separación,Ansiedad,SAD_4,A.4,proxy
+QI_0100,100,Trastorno de ansiedad por separación,Ansiedad,SAD_5,A.5,proxy
+QI_0101,101,Trastorno de ansiedad por separación,Ansiedad,SAD_6,A.6,proxy
+QI_0102,102,Trastorno de ansiedad por separación,Ansiedad,SAD_7,A.7,proxy
+QI_0103,103,Trastorno de ansiedad por separación,Ansiedad,SAD_8,A.8,proxy
+QI_0104,104,Trastorno de ansiedad generalizada,Ansiedad,GAD_A,A,proxy
+QI_0105,105,Trastorno de ansiedad generalizada,Ansiedad,GAD_B,B,proxy
+QI_0106,106,Trastorno de ansiedad generalizada,Ansiedad,GAD_C_THRESHOLD,C,proxy
+QI_0107,107,Trastorno de ansiedad generalizada,Ansiedad,GAD_D,D,proxy
+QI_0108,108,Trastorno de ansiedad generalizada,Ansiedad,GAD_E,E,direct
+QI_0109,109,Trastorno de ansiedad generalizada,Ansiedad,GAD_F,F,direct
+QI_0110,110,Trastorno de ansiedad generalizada,Ansiedad,GAD_1,C.1,proxy
+QI_0111,111,Trastorno de ansiedad generalizada,Ansiedad,GAD_2,C.2,proxy
+QI_0112,112,Trastorno de ansiedad generalizada,Ansiedad,GAD_3,C.3,proxy
+QI_0113,113,Trastorno de ansiedad generalizada,Ansiedad,GAD_4,C.4,proxy
+QI_0114,114,Trastorno de ansiedad generalizada,Ansiedad,GAD_5,C.5,proxy
+QI_0115,115,Trastorno de ansiedad generalizada,Ansiedad,GAD_6,C.6,proxy
+QI_0116,116,Trastorno de depresión mayor,Depresión,MDD_A_THRESHOLD,A,proxy
+QI_0117,117,Trastorno de depresión mayor,Depresión,MDD_A_NUCLEAR,A,proxy
+QI_0118,118,Trastorno de depresión mayor,Depresión,MDD_B,B,direct
+QI_0119,119,Trastorno de depresión mayor,Depresión,MDD_C,C,proxy
+QI_0120,120,Trastorno de depresión mayor,Depresión,MDD_D,D,direct
+QI_0121,121,Trastorno de depresión mayor,Depresión,MDD_E,E,direct
+QI_0122,122,Trastorno de depresión mayor,Depresión,MDD_SPECIFIERS,Especificadores,direct
+QI_0123,123,Trastorno de depresión mayor,depression,MDD_EPISODE_COURSE,Procedimientos de codificación y registro,direct
+QI_0124,124,Trastorno de depresión mayor,depression,MDD_RECURRENT_INTERVAL,Procedimientos de codificación y registro,direct
+QI_0125,125,Trastorno de depresión mayor,depression,MDD_CURRENT_SEVERITY,Procedimientos de codificación y registro,proxy
+QI_0126,126,Trastorno de depresión mayor,depression,MDD_PSYCHOTIC_STATUS,Procedimientos de codificación y registro,direct
+QI_0127,127,Trastorno de depresión mayor,depression,MDD_REMISSION_STATUS,Procedimientos de codificación y registro,direct
+QI_0128,128,Trastorno de depresión mayor,depression,MDD_DIAGNOSTIC_RECORD_ORDER,Procedimientos de codificación y registro,proxy
+QI_0129,129,Trastorno de depresión mayor,Depresión,MDD_1,A.1,proxy
+QI_0130,130,Trastorno de depresión mayor,Depresión,MDD_2,A.2,proxy
+QI_0131,131,Trastorno de depresión mayor,Depresión,MDD_3,A.3,proxy
+QI_0132,132,Trastorno de depresión mayor,Depresión,MDD_4,A.4,proxy
+QI_0133,133,Trastorno de depresión mayor,Depresión,MDD_5,A.5,proxy
+QI_0134,134,Trastorno de depresión mayor,Depresión,MDD_6,A.6,proxy
+QI_0135,135,Trastorno de depresión mayor,Depresión,MDD_7,A.7,proxy
+QI_0136,136,Trastorno de depresión mayor,Depresión,MDD_8,A.8,proxy
+QI_0137,137,Trastorno de depresión mayor,Depresión,MDD_9,A.9,proxy
+QI_0138,138,Trastorno de depresión mayor,Depresión,MDD_SPEC_1,Especificador depresivo,direct
+QI_0139,139,Trastorno de depresión mayor,Depresión,MDD_SPEC_2,Especificador depresivo,direct
+QI_0140,140,Trastorno de depresión mayor,Depresión,MDD_SPEC_3,Especificador depresivo,direct
+QI_0141,141,Trastorno de depresión mayor,Depresión,MDD_SPEC_4,Especificador depresivo,direct
+QI_0142,142,Trastorno de depresión mayor,Depresión,MDD_SPEC_5,Especificador depresivo,direct
+QI_0143,143,Trastorno de depresión mayor,Depresión,MDD_SPEC_6,Especificador depresivo,direct
+QI_0144,144,Trastorno de depresión mayor,Depresión,MDD_SPEC_7,Especificador depresivo,direct
+QI_0145,145,Trastorno de depresión mayor,Depresión,MDD_SPEC_8,Especificador depresivo,direct
+QI_0146,146,Trastorno de depresión mayor,Depresión,MDD_SPEC_9,Especificador depresivo,direct
+QI_0147,147,Trastorno depresivo persistente,Depresión,PDD_A,A,proxy
+QI_0148,148,Trastorno depresivo persistente,Depresión,PDD_B_THRESHOLD,B,proxy
+QI_0149,149,Trastorno depresivo persistente,Depresión,PDD_C,C,direct
+QI_0150,150,Trastorno depresivo persistente,Depresión,PDD_D,D,direct
+QI_0151,151,Trastorno depresivo persistente,Depresión,PDD_E,E,direct
+QI_0152,152,Trastorno depresivo persistente,Depresión,PDD_F,F,direct
+QI_0153,153,Trastorno depresivo persistente,Depresión,PDD_G,G,direct
+QI_0154,154,Trastorno depresivo persistente,Depresión,PDD_H,H,direct
+QI_0155,155,Trastorno depresivo persistente,Depresión,PDD_REMISSION,Especificador,direct
+QI_0156,156,Trastorno depresivo persistente,Depresión,PDD_ONSET,Especificador,direct
+QI_0157,157,Trastorno depresivo persistente,Depresión,PDD_COURSE,Especificador,direct
+QI_0158,158,Trastorno depresivo persistente,Depresión,PDD_SEVERITY,Gravedad actual,proxy
+QI_0159,159,Trastorno depresivo persistente,Depresión,PDD_1,B.1,proxy
+QI_0160,160,Trastorno depresivo persistente,Depresión,PDD_2,B.2,proxy
+QI_0161,161,Trastorno depresivo persistente,Depresión,PDD_3,B.3,proxy
+QI_0162,162,Trastorno depresivo persistente,Depresión,PDD_4,B.4,proxy
+QI_0163,163,Trastorno depresivo persistente,Depresión,PDD_5,B.5,proxy
+QI_0164,164,Trastorno depresivo persistente,Depresión,PDD_6,B.6,proxy
+QI_0165,165,Trastorno depresivo persistente,Depresión,PDD_SPEC_1,Especificador depresivo,direct
+QI_0166,166,Trastorno depresivo persistente,Depresión,PDD_SPEC_2,Especificador depresivo,direct
+QI_0167,167,Trastorno depresivo persistente,Depresión,PDD_SPEC_3,Especificador depresivo,direct
+QI_0168,168,Trastorno depresivo persistente,Depresión,PDD_SPEC_4,Especificador depresivo,direct
+QI_0169,169,Trastorno depresivo persistente,Depresión,PDD_SPEC_5,Especificador depresivo,direct
+QI_0170,170,Trastorno depresivo persistente,Depresión,PDD_SPEC_6,Especificador depresivo,direct
+QI_0171,171,Trastorno depresivo persistente,Depresión,PDD_SPEC_7,Especificador depresivo,direct
+QI_0172,172,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_A,A,proxy
+QI_0173,173,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_B,B,proxy
+QI_0174,174,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_C,C,proxy
+QI_0175,175,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_D,D,proxy
+QI_0176,176,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_E,E,proxy
+QI_0177,177,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_F,F,proxy
+QI_0178,178,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_G,G,proxy
+QI_0179,179,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_H,H,direct
+QI_0180,180,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_I,I,proxy
+QI_0181,181,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_J,J,direct
+QI_0182,182,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_J_COEXISTENCE,Nota de coexistencia,proxy
+QI_0183,183,Trastorno de desregulación disruptiva del estado de ánimo,Depresión,DMDD_K,K,proxy
