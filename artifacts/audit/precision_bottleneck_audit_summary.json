@@ -1,0 +1,14 @@
+{
+  "champions_audited": 5,
+  "disorders": [
+    "adhd",
+    "anxiety",
+    "conduct",
+    "depression",
+    "elimination"
+  ],
+  "avg_current_precision": 0.6026445400899159,
+  "max_short_term_ceiling": 0.99,
+  "report_dir": "reports\\audit",
+  "generated_at_utc": "2026-03-25T23:07:09.051779+00:00"
+}

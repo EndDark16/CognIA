@@ -1,0 +1,4 @@
+trial_id,method,brier_score_val,status,selected
+domain_conduct_strict_compact,none,0.03238561489163026,ok,False
+domain_conduct_strict_compact,sigmoid,0.031185598744239314,ok,False
+domain_conduct_strict_compact,isotonic,0.03104676512291117,ok,True

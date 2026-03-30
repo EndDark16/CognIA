@@ -1,0 +1,28 @@
+source_name,url,used_for
+HBN Phenotypic Data,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network/Phenotypic.html,Public access page; CSV export description; Diagnosis_ClinicianConsensus slots/certainty levels; Release 11 dictionaries link
+HBN Release 11 Notes,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network/release/release_notes11_0.html,Release 11 phenotypic total n=4867; KSADS split into T/P/D
+HBN Factsheet PDF,https://neuromechanist.github.io/data/hbn/HBN-factsheet.pdf,Public summary of age range and sex totals; secondary source
+HBN SWAN page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/swan.html,Ages 6-17 parent report
+SWAN public item/range summary,https://novopsych.com/adhd/strengths-and-weaknesses-of-adhd-symptoms-and-normal-behavior-scale-swan/,18 items; -3 to +3
+HBN Conners page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/conners.html,Ages 11-17 self-report
+Conners short self-report public summary,https://link.springer.com/content/pdf/10.1023/A%3A1012775303034.pdf?pdf=preview,27-item short form
+HBN CAARS page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/caars.html,Adults 18+
+NKI CAARS short form page,https://fcon_1000.projects.nitrc.org/indi/enhanced/assessments/caars.html,26 items; 0..3
+HBN SCARED page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/scared.html,Ages 8-17 parent and self
+SCARED public form PDF,https://www.ohsu.edu/sites/default/files/2019-06/SCARED-form-Parent-and-Child-version.pdf,41 items; 0..2; public subscale cutoffs
+HBN STAI page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/stai.html,40 questions; 4 responses
+HBN MFQ-SR page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/mfq-sr.html,MFQ self-report used by HBN
+HBN MFQ-P page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/mfq-p.html,MFQ parent-report used by HBN
+MFQ public description,https://psychiatry.duke.edu/research/research-programs-areas/assessment-intervention/developmental-epidemiology-instruments-0,MFQ long/short versions; no prescribed cut-points
+HBN CBCL page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/cbcl.html,118 behavior-problem items; 3-point scale
+HBN YSR page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/ysr.html,Ages 11-18 self-report
+NKI YSR page,https://fcon_1000.projects.nitrc.org/indi/enhanced/assessments/ysr.html,112 items; 0..2
+HBN ASR page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/asr.html,Adult self-report used by HBN
+NKI ASR page,https://fcon_1000.projects.nitrc.org/indi/enhanced/assessments/asr.html,126 items; 0..2
+HBN SDQ page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/sdq.html,25 items
+HBN ICUT page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/icut.html,24 items; callousness/uncaring/unemotional
+HBN ARI-P page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/ari-p.html,All participants
+HBN ARI-S page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/ari-s.html,All participants
+ARI public scoring summary,https://ebchelp.blueprint.ai/en/articles/5604885-affective-reactivity-index-ari,7 items; first 6 sum to 0..12
+HBN CDI page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/cdi.html,27 items; legacy
+HBN BDI page,https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network_working/assessments/bdi.html,21 items; legacy

@@ -1,0 +1,4 @@
+generation,trial_id,precision,recall,specificity,approx_fp_rate
+v2_best_honest,T02_drop_high_risk_semantic_proxies,0.9056603773584906,0.8944099378881988,0.88,0.12
+v3_best,V3_T07_abstention_assisted_operating_mode,0.891566265060241,0.9192546583850932,0.856,0.14400000000000002
+v4_best,V4_T03_target_high_confidence,0.9741379310344828,0.7018633540372671,0.976,0.02400000000000002

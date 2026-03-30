@@ -1,4 +1,6 @@
 from datetime import datetime, timezone, timedelta
+import re
+import unicodedata
 import uuid
 
 from flask import Blueprint, current_app, jsonify, request
@@ -10,6 +12,8 @@ from flask_jwt_extended import (
     get_jwt_identity,
     jwt_required,
 )
+from flask_limiter.util import get_remote_address
+from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 from api.extensions import limiter
 from api.security import (
@@ -22,6 +26,18 @@ from api.security import (
     requires_mfa_enrollment,
     decrypt_mfa_secret,
     validate_totp,
+    password_policy_errors,
+)
+from api.services.email_service import send_welcome_email, send_password_reset
+from api.services.password_reset_service import (
+    create_reset_token,
+    lookup_valid_token,
+    mark_token_used,
+)
+from api.schemas.password_schema import (
+    PasswordChangeSchema,
+    PasswordForgotSchema,
+    PasswordResetSchema,
 )
 from app.models import (
     AppUser,
@@ -30,6 +46,8 @@ from app.models import (
     UserMFA,
     RecoveryCode,
     MFALoginChallenge,
+    Role,
+    UserRole,
     db,
 )
 
@@ -72,8 +90,17 @@ def _build_auth_response(access_token: str):
     )
 
 
-def _error_response(message: str, error_code: str, status_code: int):
-    return jsonify({"msg": message, "error": error_code}), status_code
+def _revoke_refresh_tokens(user_id: uuid.UUID) -> None:
+    RefreshToken.query.filter_by(user_id=user_id, revoked=False).update(
+        {"revoked": True}, synchronize_session=False
+    )
+
+
+def _error_response(message: str, error_code: str, status_code: int, details=None):
+    payload = {"msg": message, "error": error_code}
+    if details is not None:
+        payload["details"] = details
+    return jsonify(payload), status_code
 
 
 def _challenge_ttl_seconds() -> int:
@@ -83,57 +110,273 @@ def _challenge_ttl_seconds() -> int:
         return 300
 
 
-@auth_bp.route("/register", methods=["POST"])
-def register():
+def _enroll_ttl_seconds() -> int:
+    try:
+        return int(current_app.config.get("MFA_ENROLL_TOKEN_TTL", 600))
+    except Exception:
+        return 600
+
+
+_USER_TYPE_ALIASES = {
+    "guardian": "guardian",
+    "padre": "guardian",
+    "tutor": "guardian",
+    "padre_tutor": "guardian",
+    "parent_tutor": "guardian",
+    "psychologist": "psychologist",
+    "psicologo": "psychologist",
+}
+
+_USER_TYPE_ROLE = {
+    "guardian": "GUARDIAN",
+    "psychologist": "PSYCHOLOGIST",
+}
+
+_USERNAME_RE = re.compile(r"^[A-Za-z0-9._-]{3,32}$")
+_EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+_FULL_NAME_MAX = 120
+_EMAIL_MAX = 254
+_PASSWORD_MIN = 8
+
+
+def _normalize_user_type(raw: str | None) -> str | None:
+    if not raw:
+        return None
+    cleaned = unicodedata.normalize("NFKD", str(raw)).encode("ascii", "ignore").decode()
+    cleaned = cleaned.strip().lower()
+    cleaned = re.sub(r"[\s/\-]+", "_", cleaned)
+    cleaned = cleaned.strip("_")
+    return _USER_TYPE_ALIASES.get(cleaned)
+
+
+def _normalize_professional_card(raw: str | None) -> str | None:
+    if raw is None:
+        return None
+    card = str(raw).strip()
+    if not card:
+        return None
+    card = re.sub(r"\s+", "", card)
+    return card
+
+
+def _normalize_username(raw: str | None) -> str | None:
+    if not raw:
+        return None
+    return str(raw).strip()
+
+
+def _normalize_email(raw: str | None) -> str | None:
+    if not raw:
+        return None
+    return str(raw).strip().lower()
+
+
+def _is_valid_username(username: str) -> bool:
+    return bool(_USERNAME_RE.fullmatch(username or ""))
+
+
+def _is_valid_email(email: str) -> bool:
+    if not email or len(email) > _EMAIL_MAX:
+        return False
+    return bool(_EMAIL_RE.fullmatch(email))
+
+
+def _login_rate_key() -> str:
     data = request.get_json(silent=True) or {}
     username = data.get("username")
-    email = data.get("email")
-    password = data.get("password")
-    full_name = data.get("full_name")
+    if username:
+        return f"login:{str(username).strip()}"
+    return f"login_ip:{get_remote_address()}"
+
+
+def _mfa_rate_key() -> str:
+    data = request.get_json(silent=True) or {}
+    challenge_id = data.get("challenge_id")
+    if challenge_id:
+        return f"mfa:{str(challenge_id).strip()}"
+    return f"mfa_ip:{get_remote_address()}"
+
+
+def _password_change_rate_key() -> str:
+    identity = _parse_identity(get_jwt_identity())
+    if identity:
+        return f"pwd_change:{identity}:{get_remote_address()}"
+    return f"pwd_change_ip:{get_remote_address()}"
+
+
+def _password_forgot_rate_key() -> str:
+    data = request.get_json(silent=True) or {}
+    email = _normalize_email(data.get("email"))
+    if email:
+        return f"pwd_forgot:{email}:{get_remote_address()}"
+    return f"pwd_forgot_ip:{get_remote_address()}"
+
+
+def _password_forgot_email_key() -> str:
+    data = request.get_json(silent=True) or {}
+    email = _normalize_email(data.get("email"))
+    return f"pwd_forgot_email:{email}" if email else f"pwd_forgot_email:{get_remote_address()}"
+
+
+def _password_reset_rate_key() -> str:
+    data = request.get_json(silent=True) or {}
+    token = data.get("token")
+    if token:
+        return f"pwd_reset:{str(token)[:12]}:{get_remote_address()}"
+    return f"pwd_reset_ip:{get_remote_address()}"
+
+
+@auth_bp.route("/register", methods=["POST"])
+@limiter.limit(lambda: current_app.config.get("REGISTER_RATE_LIMIT", "5 per 10 minutes"))
+def register():
+    data = request.get_json(silent=True) or {}
+    username = _normalize_username(data.get("username"))
+    email = _normalize_email(data.get("email"))
+    password = data.get("password") or ""
+    full_name = (data.get("full_name") or "").strip() or None
+    user_type = _normalize_user_type(data.get("user_type"))
+    professional_card_number = _normalize_professional_card(
+        data.get("professional_card_number") or data.get("colpsic_card_number")
+    )
 
     if not username or not email or not password:
         return _error_response("Missing username, email or password", "missing_fields", 400)
 
-    if len(password) < 8:
-        return _error_response("Password must be at least 8 characters", "weak_password", 400)
+    if not _is_valid_username(username):
+        return _error_response(
+            "Invalid username format",
+            "invalid_username",
+            400,
+        )
+
+    if not _is_valid_email(email):
+        return _error_response("Invalid email format", "invalid_email", 400)
+
+    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", _PASSWORD_MIN))
+    pwd_errors = password_policy_errors(password, min_len)
+    if pwd_errors:
+        return _error_response(
+            "Weak password",
+            "weak_password",
+            400,
+            {"requirements": pwd_errors},
+        )
+
+    if full_name and len(full_name) > _FULL_NAME_MAX:
+        return _error_response("Full name too long", "invalid_full_name", 400)
+
+    if not user_type:
+        return _error_response("Missing or invalid user_type", "invalid_user_type", 400)
+
+    if user_type == "psychologist" and not professional_card_number:
+        return _error_response(
+            "Missing professional card number",
+            "missing_professional_card",
+            400,
+        )
+
+    if professional_card_number and not re.fullmatch(r"[A-Za-z0-9-]{4,32}", professional_card_number):
+        return _error_response(
+            "Invalid professional card number format",
+            "invalid_professional_card",
+            400,
+        )
 
     if AppUser.query.filter(
         (AppUser.username == username) | (AppUser.email == email)
     ).first():
         return _error_response("Username or email already exists", "user_exists", 400)
 
+    if professional_card_number and AppUser.query.filter_by(
+        professional_card_number=professional_card_number
+    ).first():
+        return _error_response(
+            "Professional card number already exists",
+            "professional_card_exists",
+            409,
+        )
+
+    role_name = _USER_TYPE_ROLE.get(user_type)
+    if not role_name:
+        return _error_response("Invalid user_type", "invalid_user_type", 400)
+
     hashed = hash_password(password)
     new_user = AppUser(
-        username=username, email=email, password=hashed, full_name=full_name
+        username=username,
+        email=email,
+        password=hashed,
+        full_name=full_name,
+        user_type=user_type,
+        professional_card_number=professional_card_number,
     )
 
     try:
+        role = Role.query.filter_by(name=role_name).first()
+        if not role:
+            role = Role(name=role_name, description=f"Auto-created role for {user_type} registration")
+            db.session.add(role)
+            db.session.flush()
         db.session.add(new_user)
+        db.session.flush()
+        db.session.add(UserRole(user_id=new_user.id, role_id=role.id))
         db.session.commit()
     except IntegrityError as e:
         db.session.rollback()
         current_app.logger.warning("Integrity error on register for %s/%s: %s", username, email, e)
-        return jsonify({"msg": "Username or email already exists"}), 400
+        return _error_response(
+            "Username, email or professional card already exists",
+            "user_exists",
+            400,
+        )
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Unexpected error on register: %s", e, exc_info=True)
         return jsonify({"msg": "Could not create user"}), 500
 
     log_audit(new_user.id, "register", "auth", f"User registered: {username}")
+    try:
+        send_welcome_email(to_email=new_user.email, full_name=new_user.full_name)
+    except Exception:
+        current_app.logger.error("Failed to schedule welcome email for %s", new_user.email, exc_info=True)
     return jsonify({"msg": "user created", "user_id": new_user.id}), 201
 
 
 @auth_bp.route("/login", methods=["POST"])
-@limiter.limit("5 per 15 minutes")
+@limiter.limit(lambda: current_app.config.get("LOGIN_RATE_LIMIT", "5 per 15 minutes"), key_func=_login_rate_key)
 def login():
     data = request.get_json(silent=True) or {}
-    username = data.get("username")
-    password = data.get("password")
+    username = _normalize_username(data.get("username"))
+    password = data.get("password") or ""
 
     if not username or not password:
         return _error_response("Missing credentials", "missing_credentials", 400)
 
+    if not _is_valid_username(username):
+        return _error_response("Invalid username format", "invalid_username", 400)
+
     user = AppUser.query.filter_by(username=username).first()
+    if user:
+        try:
+            db.session.refresh(user)
+        except Exception:
+            db.session.rollback()
+    if user:
+        now = datetime.now(timezone.utc)
+        if user.login_locked_until:
+            locked_until = user.login_locked_until
+            if locked_until.tzinfo is None:
+                locked_until = locked_until.replace(tzinfo=timezone.utc)
+            if locked_until > now:
+                retry_after = int((locked_until - now).total_seconds())
+                return _error_response(
+                    "Account locked due to failed attempts",
+                    "account_locked",
+                    423,
+                    {"retry_after_seconds": retry_after},
+                )
+            user.login_locked_until = None
+            user.failed_login_attempts = 0
+
     if not user or not check_password(password, user.password):
         log_audit(
             user.id if user else None,
@@ -141,22 +384,46 @@ def login():
             "auth",
             f"Failed login for: {username}",
         )
+        if user:
+            try:
+                user.failed_login_attempts = (user.failed_login_attempts or 0) + 1
+                user.last_failed_login_at = datetime.now(timezone.utc)
+                max_attempts = int(current_app.config.get("MAX_LOGIN_ATTEMPTS", 5))
+                if user.failed_login_attempts >= max_attempts:
+                    lock_minutes = int(current_app.config.get("LOGIN_LOCKOUT_MINUTES", 15))
+                    user.login_locked_until = datetime.now(timezone.utc) + timedelta(minutes=lock_minutes)
+                db.session.add(user)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                current_app.logger.error("Failed to update login attempts for %s: %s", username, e, exc_info=True)
         return _error_response("Invalid credentials", "invalid_credentials", 401)
 
+    if user.user_type == "psychologist" and not getattr(user, "colpsic_verified", False):
+        return _error_response("Account pending verification", "colpsic_pending", 403)
     if not user.is_active:
         return _error_response("Account inactive", "inactive_account", 403)
 
     if requires_mfa_enrollment(user) and not user.mfa_enabled:
+        expires_in = _enroll_ttl_seconds()
+        enrollment_token = create_access_token(
+            identity=str(user.id),
+            additional_claims={"roles": [], "mfa_enrollment": True},
+            expires_delta=timedelta(seconds=expires_in),
+        )
         log_audit(user.id, "MFA_ENROLLMENT_REQUIRED", "auth", "MFA enrollment required")
         return (
             jsonify(
                 {
                     "mfa_enrollment_required": True,
+                    "enrollment_token": enrollment_token,
+                    "token_type": "bearer",
+                    "expires_in": expires_in,
                     "msg": "MFA enrollment required",
                     "error": "mfa_enrollment_required",
                 }
             ),
-            403,
+            200,
         )
 
     if user.mfa_enabled:
@@ -209,7 +476,11 @@ def login():
     )
 
     try:
+        user.failed_login_attempts = 0
+        user.last_failed_login_at = None
+        user.login_locked_until = None
         db.session.add_all([db_refresh_token, user_session])
+        db.session.add(user)
         db.session.commit()
     except Exception as e:
         db.session.rollback()
@@ -223,7 +494,7 @@ def login():
 
 
 @auth_bp.route("/login/mfa", methods=["POST"])
-@limiter.limit("3 per 10 minutes")
+@limiter.limit(lambda: current_app.config.get("LOGIN_MFA_RATE_LIMIT", "5 per 10 minutes"), key_func=_mfa_rate_key)
 def login_mfa():
     data = request.get_json(silent=True) or {}
     challenge_raw = data.get("challenge_id")
@@ -254,7 +525,11 @@ def login_mfa():
         return _error_response("Invalid challenge", "invalid_challenge", 401)
 
     user = db.session.get(AppUser, challenge.user_id)
-    if not user or not user.is_active:
+    if not user:
+        return _error_response("Invalid credentials", "invalid_credentials", 401)
+    if user.user_type == "psychologist" and not getattr(user, "colpsic_verified", False):
+        return _error_response("Account pending verification", "colpsic_pending", 403)
+    if not user.is_active:
         return _error_response("Invalid credentials", "invalid_credentials", 401)
     if requires_mfa_enrollment(user) and not user.mfa_enabled:
         resp = jsonify(
@@ -277,7 +552,13 @@ def login_mfa():
         valid = True
         user_mfa.last_used_at = datetime.now(timezone.utc)
     elif recovery_code:
-        recovery_entries = RecoveryCode.query.filter_by(user_id=user.id, used_at=None).all()
+        max_days = int(current_app.config.get("RECOVERY_CODE_MAX_AGE_DAYS", 90))
+        cutoff = datetime.now(timezone.utc) - timedelta(days=max_days)
+        recovery_entries = (
+            RecoveryCode.query.filter_by(user_id=user.id, used_at=None)
+            .filter(RecoveryCode.created_at >= cutoff)
+            .all()
+        )
         for entry in recovery_entries:
             if check_password(recovery_code, entry.code_hash):
                 entry.used_at = datetime.now(timezone.utc)
@@ -336,7 +617,11 @@ def refresh():
         return _error_response("Token revoked", "token_revoked", 401)
 
     user = db.session.get(AppUser, identity)
-    if not user or not user.is_active:
+    if not user:
+        return _error_response("User not found or inactive", "user_inactive", 401)
+    if user.user_type == "psychologist" and not getattr(user, "colpsic_verified", False):
+        return _error_response("Account pending verification", "colpsic_pending", 403)
+    if not user.is_active:
         return _error_response("User not found or inactive", "user_inactive", 401)
 
     if requires_mfa_enrollment(user) and not user.mfa_enabled:
@@ -379,6 +664,7 @@ def refresh():
         db.session.commit()
     except Exception:
         db.session.rollback()
+        current_app.logger.error("Database error on refresh for user %s", identity, exc_info=True)
         return jsonify({"msg": "Database error"}), 500
 
     response = _build_auth_response(new_access_token)
@@ -397,7 +683,12 @@ def logout():
         return _error_response("Missing or invalid CSRF token", "csrf_failed", 403)
 
     # Revoke all refresh tokens for this user (logout all sessions)
-    RefreshToken.query.filter_by(user_id=identity, revoked=False).update({"revoked": True})
+    try:
+        RefreshToken.query.filter_by(user_id=identity, revoked=False).update({"revoked": True})
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Database error revoking refresh tokens for %s: %s", identity, e, exc_info=True)
+        return jsonify({"msg": "Database error"}), 500
 
     last_session = (
         UserSession.query.filter_by(user_id=identity, ended_at=None)
@@ -419,3 +710,222 @@ def logout():
     response = jsonify({"message": "logged out"})
     clear_auth_cookies(response)
     return response, 200
+
+
+@auth_bp.route("/me", methods=["GET"])
+@jwt_required()
+def me():
+    claims = get_jwt()
+    if claims.get("mfa_enrollment"):
+        return _error_response("Enrollment token not allowed", "mfa_enrollment_only", 403)
+
+    identity = _parse_identity(get_jwt_identity())
+    if not identity:
+        return _error_response("Invalid user", "invalid_user", 401)
+
+    user = db.session.get(AppUser, identity)
+    if not user:
+        return _error_response("User not found", "user_not_found", 404)
+
+    def _fmt(dt):
+        return dt.isoformat() if dt else None
+
+    return (
+        jsonify(
+            {
+                "id": str(user.id),
+                "username": user.username,
+                "email": user.email,
+                "full_name": user.full_name,
+                "user_type": user.user_type,
+                "professional_card_number": user.professional_card_number,
+                "colpsic_verified": user.colpsic_verified,
+                "is_active": user.is_active,
+                "roles": _get_roles(user),
+                "mfa_enabled": user.mfa_enabled,
+                "mfa_confirmed_at": _fmt(user.mfa_confirmed_at),
+                "mfa_method": user.mfa_method,
+                "created_at": _fmt(user.created_at),
+                "updated_at": _fmt(user.updated_at),
+            }
+        ),
+        200,
+    )
+
+
+@auth_bp.post("/password/change")
+@jwt_required()
+@limiter.limit(lambda: current_app.config.get("PASSWORD_CHANGE_RATE_LIMIT", "5 per 10 minutes"), key_func=_password_change_rate_key)
+def change_password():
+    claims = get_jwt()
+    if claims.get("mfa_enrollment"):
+        return _error_response("Enrollment token not allowed", "mfa_enrollment_only", 403)
+
+    identity = _parse_identity(get_jwt_identity())
+    if not identity:
+        return _error_response("Invalid user", "invalid_user", 401)
+    user = db.session.get(AppUser, identity)
+    if not user or not user.is_active:
+        return _error_response("User not found or inactive", "user_not_found", 404)
+
+    schema = PasswordChangeSchema()
+    try:
+        data = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
+
+    current_password = data.get("current_password") or ""
+    new_password = data.get("new_password") or ""
+    confirm_password = data.get("confirm_new_password") or ""
+    max_len = int(current_app.config.get("PASSWORD_INPUT_MAX", 200))
+
+    if not current_password or not new_password or not confirm_password:
+        return _error_response("Missing fields", "missing_fields", 400)
+    if len(current_password) > max_len or len(new_password) > max_len or len(confirm_password) > max_len:
+        return _error_response("Input too long", "invalid_input", 400)
+    if new_password == current_password:
+        return _error_response("New password must be different", "invalid_password", 400)
+    if new_password != confirm_password:
+        return _error_response("Passwords do not match", "password_mismatch", 400)
+    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", _PASSWORD_MIN))
+    pwd_errors = password_policy_errors(new_password, min_len)
+    if pwd_errors:
+        return _error_response("Weak password", "weak_password", 400, {"requirements": pwd_errors})
+
+    if not check_password(current_password, user.password):
+        return _error_response("Invalid credentials", "invalid_credentials", 400)
+
+    user.password = hash_password(new_password)
+    user.password_changed_at = datetime.now(timezone.utc)
+
+    try:
+        _revoke_refresh_tokens(user.id)
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Database error on password change for %s: %s", user.id, e, exc_info=True)
+        return jsonify({"msg": "Database error"}), 500
+
+    log_audit(user.id, "PASSWORD_CHANGED", "auth", "Password changed")
+    return jsonify({"message": "Password updated"}), 200
+
+
+@auth_bp.post("/password/forgot")
+@limiter.limit(
+    lambda: current_app.config.get(
+        "PASSWORD_FORGOT_RATE_LIMIT_IP",
+        current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "20 per 10 minutes"),
+    ),
+    key_func=get_remote_address,
+)
+@limiter.limit(
+    lambda: current_app.config.get(
+        "PASSWORD_FORGOT_RATE_LIMIT_EMAIL",
+        current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes"),
+    ),
+    key_func=_password_forgot_email_key,
+)
+def forgot_password():
+    schema = PasswordForgotSchema()
+    try:
+        data = schema.load(request.get_json(silent=True) or {})
+    except ValidationError:
+        return jsonify({"message": "If the email exists, a reset link has been sent"}), 200
+
+    email = _normalize_email(data.get("email"))
+    if not email or not _is_valid_email(email):
+        current_app.logger.info("password_forgot ignored: invalid email input")
+        return jsonify({"message": "If the email exists, a reset link has been sent"}), 200
+
+    user = AppUser.query.filter_by(email=email).first()
+    if not user:
+        current_app.logger.info("password_forgot accepted: no user for email=%s", email)
+    elif not user.is_active:
+        current_app.logger.info("password_forgot accepted: inactive user_id=%s", user.id)
+
+    if user and user.is_active:
+        try:
+            token = create_reset_token(
+                user_id=user.id,
+                request_ip=request.remote_addr,
+                user_agent=request.user_agent.string,
+            )
+            current_app.logger.info("password_forgot token created user_id=%s", user.id)
+            base_url = current_app.config.get("FRONTEND_URL", "").rstrip("/")
+            if not base_url:
+                current_app.logger.warning("FRONTEND_URL not configured; skipping password reset email")
+            else:
+                path = current_app.config.get("PASSWORD_RESET_PATH", "/reset-password")
+                reset_link = f"{base_url}{path}?token={token}"
+                current_app.logger.info(
+                    "password_forgot sending reset email user_id=%s async=%s",
+                    user.id,
+                    bool(current_app.config.get("EMAIL_SEND_ASYNC", True)),
+                )
+                send_password_reset(to_email=user.email, reset_link=reset_link, full_name=user.full_name)
+        except Exception as e:
+            current_app.logger.error("Password reset flow failed for %s: %s", email, e, exc_info=True)
+
+    return jsonify({"message": "If the email exists, a reset link has been sent"}), 200
+
+
+@auth_bp.post("/password/reset")
+@limiter.limit(lambda: current_app.config.get("PASSWORD_RESET_RATE_LIMIT", "5 per 10 minutes"), key_func=get_remote_address)
+@limiter.limit(lambda: current_app.config.get("PASSWORD_RESET_RATE_LIMIT", "5 per 10 minutes"), key_func=_password_reset_rate_key)
+def reset_password():
+    schema = PasswordResetSchema()
+    try:
+        data = schema.load(request.get_json(silent=True) or {})
+    except ValidationError:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+
+    token = data.get("token")
+    new_password = data.get("new_password") or ""
+    confirm_password = data.get("confirm_new_password") or ""
+    max_len = int(current_app.config.get("PASSWORD_INPUT_MAX", 200))
+
+    if not token or not new_password or not confirm_password:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+    if len(new_password) > max_len or len(confirm_password) > max_len:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+    if new_password != confirm_password:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+    min_len = int(current_app.config.get("PASSWORD_MIN_LENGTH", _PASSWORD_MIN))
+    if password_policy_errors(new_password, min_len):
+        return _error_response("Invalid token or password", "invalid_token", 400)
+
+    entry = lookup_valid_token(token)
+    if not entry:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+
+    user = db.session.get(AppUser, entry.user_id)
+    if not user or not user.is_active:
+        return _error_response("Invalid token or password", "invalid_token", 400)
+
+    try:
+        user.password = hash_password(new_password)
+        user.password_changed_at = datetime.now(timezone.utc)
+        mark_token_used(entry)
+        _revoke_refresh_tokens(user.id)
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Password reset failed for %s: %s", user.id, e, exc_info=True)
+        return jsonify({"msg": "Database error"}), 500
+
+    log_audit(user.id, "PASSWORD_RESET_COMPLETED", "auth", "Password reset completed")
+    return jsonify({"message": "Password updated"}), 200
+
+
+@auth_bp.get("/password/reset/verify")
+@limiter.limit(lambda: current_app.config.get("PASSWORD_VERIFY_RATE_LIMIT", "20 per 10 minutes"), key_func=get_remote_address)
+def verify_reset_token():
+    token = request.args.get("token")
+    if not token:
+        return jsonify({"valid": False}), 400
+    entry = lookup_valid_token(token)
+    if not entry:
+        return jsonify({"valid": False}), 400
+    return jsonify({"valid": True}), 200

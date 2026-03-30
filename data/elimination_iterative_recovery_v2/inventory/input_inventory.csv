@@ -1,0 +1,15 @@
+path,exists,type,size_bytes,modified_utc,rows,cols
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\elimination_recovery\elimination_overfit_root_cause_audit.csv,True,file,5298.0,2026-03-28T15:42:20.276927+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\elimination_recovery\elimination_suspicious_signal_audit.csv,True,file,2887.0,2026-03-28T15:42:20.279935+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\elimination_recovery\elimination_retraining_trials.csv,True,file,855.0,2026-03-28T15:42:20.271931+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\elimination_recovery\elimination_recovery_comparison.csv,True,file,505.0,2026-03-28T15:42:20.282927+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\elimination_recovery\elimination_final_decision.md,True,file,120.0,2026-03-28T15:42:20.284929+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\tables\overfit_audit.csv,True,file,1711.0,2026-03-28T01:48:13.350687+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\tables\leakage_feature_audit.csv,True,file,283088.0,2026-03-28T01:48:14.991925+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\tables\retraining_comparison.csv,True,file,2057.0,2026-03-28T02:13:26.876373+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\final\model_ready\strict_no_leakage_hybrid\dataset_hybrid_model_ready_strict_no_leakage_hybrid.csv,True,file,5759782.0,2026-03-27T04:02:33.819259+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\final\external_domains\dataset_domain_elimination.csv,True,file,1920915.0,2026-03-27T04:02:40.235011+00:00,,
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\reports\training_history\trial_registry_generalization.csv,True,file,4871.0,2026-03-28T02:13:26.921629+00:00,,
+in_memory::strict,True,dataset,,2026-03-29T16:14:18.412984+00:00,1905.0,990.0
+in_memory::research,True,dataset,,2026-03-29T16:14:18.412984+00:00,1905.0,1057.0
+in_memory::compact,True,dataset,,2026-03-29T16:14:18.412984+00:00,1905.0,135.0

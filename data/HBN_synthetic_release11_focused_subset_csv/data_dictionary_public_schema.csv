@@ -1,0 +1,23 @@
+table_name,description,public_schema,row_count,source_basis,notes
+participants,Synthetic participant master list,"release, age_years, sex_assigned_at_birth, site",4867 rows,Public HBN release notes; fact sheet demographics,Exact HBN participant-level hidden fields are not public; this is a synthetic anchor table.
+Diagnosis_ClinicianConsensus,Consensus diagnosis table,10 diagnosis slots + certainty levels,4867,Public HBN phenotypic documentation,Exact table name preserved. Item/slot formatting is public; diagnoses are synthetic.
+Diagnosis_KSADS_T,K-SADS proxy summary (clinician integrated),binary disorder-family summary fields,4867,Release 11 notes split KSADS into T/P/D,Exact hidden K-SADS item columns were not publicly accessible; proxy summary columns used.
+Diagnosis_KSADS_P,K-SADS proxy summary (parent/caregiver),binary disorder-family summary fields,4867,Release 11 notes split KSADS into T/P/D,Exact hidden K-SADS item columns were not publicly accessible; proxy summary columns used.
+Diagnosis_KSADS_D,K-SADS proxy summary (participant),binary disorder-family summary fields,4867,Release 11 notes split KSADS into T/P/D,Exact hidden K-SADS item columns were not publicly accessible; proxy summary columns used.
+SWAN,ADHD dimensional ratings,18 items; values -3..3; parent ages 6-17,3976,HBN SWAN page + public SWAN instrument docs,Exact HBN item variable names not public here; synthetic item names SWAN_01..SWAN_18 used.
+Conners,Adolescent self-report ADHD/problem behavior,27 items; values 0..3; ages 11-17,2103,HBN Conners page + CASS short-form literature,Item count and range based on public descriptions of the short self-report form.
+CAARS,Adult ADHD self-report short version,26 items; values 0..3; ages 18+,440,HBN CAARS page + NKI CAARS-S:S docs,Exact HBN item variable names not public here; CAARS_01..CAARS_26 used.
+SCARED_P,Parent anxiety screener,41 items; values 0..2; ages 8-17,3427,HBN SCARED page + public SCARED form,Includes public subscale totals and cutoff flag.
+SCARED_SR,Self-report anxiety screener,41 items; values 0..2; ages 8-17,3461,HBN SCARED page + public SCARED form,Includes public subscale totals and cutoff flag.
+STAI,Adult anxiety inventory,40 items; values 1..4; ages 18+,438,HBN STAI page,State/Trait halves are standard synthetic split.
+MFQ_P,Parent depression questionnaire (long version),33 items; values 0..2; ages 8-17,3424,HBN MFQ-P page + public MFQ documentation,Long-version item count simulated as 33 items.
+MFQ_SR,Self-report depression questionnaire (long version),33 items; values 0..2; ages 8+,4045,HBN MFQ-SR page + public MFQ documentation,Long-version item count simulated as 33 items.
+CDI,Childrens Depression Inventory (legacy HBN measure),27 items; values 0..2; ages 7-17,2516,HBN CDI page,"Legacy/deprecated in newer protocol, kept for realism."
+BDI,Beck Depression Inventory II (legacy HBN measure),21 items; values 0..3; ages 18+,284,HBN BDI page,"Legacy/deprecated in newer protocol, kept for realism."
+CBCL,Parent behavioral problems questionnaire,118 problem items; values 0..2; ages 5-17,4101,HBN CBCL page,Proxy syndrome columns added for requested disorders; exact ASEBA item texts omitted.
+YSR,Youth self-report questionnaire,112 items; values 0..2; ages 11-18,2327,HBN YSR page + NKI YSR docs,Proxy syndrome columns added for requested disorders.
+ASR,Adult self-report questionnaire,126 items; values 0..2; ages 18+,446,HBN ASR page + NKI ASR docs,Proxy syndrome columns added for requested disorders.
+SDQ,Strengths and Difficulties Questionnaire,25 items; values 0..2; ages 3-16,3783,HBN SDQ page,Standard 5x5 block summary scores included.
+ICUT,Inventory of Callous-Unemotional Traits,24 items; synthetic values 0..3; all participants via parent report,4606,HBN ICUT page,"HBN page documents 24 items/subscales, but public coding was not explicit; 0..3 synthetic coding used."
+ARI_P,Affective Reactivity Index parent,7 items; values 0..2; all participants,4683,HBN ARI-P page + public ARI scoring docs,6 symptom items + 1 impairment item.
+ARI_SR,Affective Reactivity Index self-report,7 items; values 0..2; all participants,4683,HBN ARI-S/ARI_SR page + public ARI scoring docs,6 symptom items + 1 impairment item.

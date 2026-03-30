@@ -14,6 +14,8 @@ from app.models import db
 
 def _client():
     app = create_app(TestingConfig)
+    # Ensure metrics endpoint isn't blocked by env-level token in tests
+    app.config["METRICS_TOKEN"] = None
     with app.app_context():
         db.create_all()
     return app.test_client(), app

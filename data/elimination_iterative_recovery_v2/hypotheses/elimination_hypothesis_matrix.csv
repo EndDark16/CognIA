@@ -1,0 +1,5 @@
+hypothesis_id,description,evidence_for,evidence_against,estimated_severity,expected_fix,priority_order
+H1,proxy leakage residual via target-aggregate features,critical_features=47,none strong,high,drop critical aggregate/proxy features,1
+H2,feature space too deterministic / short-rule separability,near_perfect_short_rules=10,"if dropped, performance should normalize",high,"semantic + separability pruning, complexity constraints",2
+H3,clinical coverage for elimination is indirect and fragile,high_specific_instrument_coverage=0.953,CBCL/SDQ still provide partial signal,moderate,prefer defendible compact feature sets and caveated interpretation,3
+H4,threshold calibration can mask ranking issues,"best_test_precision=1.0000, best_test_bal_acc=0.9898",ranking remains high in multiple thresholds,moderate,conservative threshold + calibration audit,4

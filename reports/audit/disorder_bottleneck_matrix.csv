@@ -1,0 +1,6 @@
+disorder,current_champion,current_precision,estimated_precision_ceiling_short_term,estimated_precision_ceiling_medium_term,main_bottleneck,recommended_next_action,confidence_in_diagnosis_of_bottleneck
+adhd,rf_adhd_v1_baseline,0.8943661971830986,0.981981981981982,0.99,operating_threshold_and_calibration,deploy precision operating mode with constrained threshold/abstention,high
+anxiety,rf_anxiety_v1_baseline,0.9056603773584906,0.99,0.99,operating_threshold_and_calibration,deploy precision operating mode with constrained threshold/abstention,high
+conduct,rf_conduct_v1_baseline,0.5428571428571428,0.99,0.99,effective_sample_size,increase high-quality sample coverage for key instruments,medium
+depression,rf_depression_v4_precision_thresholded,0.45,0.99,0.99,effective_sample_size,increase high-quality sample coverage for key instruments,medium
+elimination,rf_elimination_v1_baseline,0.22033898305084745,0.99,0.99,operating_threshold_and_calibration,deploy precision operating mode with constrained threshold/abstention,high

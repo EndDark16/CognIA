@@ -1,0 +1,26 @@
+domain,artifact_type,path,exists
+adhd,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\models\champions\rf_adhd_current,True
+adhd,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\retrained_models\adhd\model.joblib,True
+adhd,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\retrained_models\adhd\metadata.json,True
+adhd,metrics_source,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\adhd_recovery\adhd_recovery_comparison.csv,True
+adhd,status_source,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\adhd_recovery\adhd_final_decision.md,True
+anxiety,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\models\champions\rf_anxiety_current,True
+anxiety,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\retrained_models\anxiety\model.joblib,True
+anxiety,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\retrained_models\anxiety\metadata.json,True
+anxiety,metrics_source,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\final_reports\anxiety_final_metrics.csv,True
+anxiety,status_source,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\final_reports\anxiety_final_metrics.csv,True
+conduct,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\models\champions\rf_conduct_current,True
+conduct,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\retrained_models\conduct\model.joblib,True
+conduct,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\retrained_models\conduct\metadata.json,True
+conduct,metrics_source,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\final_reports\conduct_final_metrics.csv,True
+conduct,status_source,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\final_reports\conduct_final_metrics.csv,True
+depression,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\models\champions\rf_depression_current,True
+depression,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\retrained_models\depression\model.joblib,True
+depression,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\retrained_models\depression\metadata.json,True
+depression,metrics_source,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\final_reports\depression_final_metrics.csv,True
+depression,status_source,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\finalization_and_recovery_v1\final_reports\depression_final_metrics.csv,True
+elimination,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\models\champions\rf_elimination_current,True
+elimination,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\retrained_models\elimination\model.joblib,True
+elimination,model_or_metadata_candidate,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\retrained_models\elimination\metadata.json,True
+elimination,metrics_source,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\elimination_feature_engineering_v5\trials\elimination_v5_trial_metrics_full.csv,True
+elimination,status_source,C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\elimination_feature_engineering_v5\reports\elimination_final_decision_v5.md,True

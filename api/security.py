@@ -1,5 +1,7 @@
 import bcrypt
-from app.models import db, AuditLog, AppUser
+import re
+from app.models import db, AuditLog, AppUser, RefreshToken
+from datetime import datetime, timezone
 from flask import request
 from flask_jwt_extended import set_refresh_cookies
 from cryptography.fernet import Fernet, InvalidToken
@@ -17,6 +19,28 @@ def check_password(plain_password: str, hashed_password: str) -> bool:
     """Check a password against a hash."""
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
+
+_PWD_UPPER_RE = re.compile(r"[A-Z]")
+_PWD_LOWER_RE = re.compile(r"[a-z]")
+_PWD_DIGIT_RE = re.compile(r"\d")
+_PWD_SPECIAL_RE = re.compile(r"[^A-Za-z0-9]")
+
+
+def password_policy_errors(password: str, min_length: int = 8) -> list[str]:
+    """Return list of missing password requirements."""
+    errors = []
+    if len(password) < min_length:
+        errors.append(f"min_length:{min_length}")
+    if not _PWD_UPPER_RE.search(password or ""):
+        errors.append("uppercase")
+    if not _PWD_LOWER_RE.search(password or ""):
+        errors.append("lowercase")
+    if not _PWD_DIGIT_RE.search(password or ""):
+        errors.append("number")
+    if not _PWD_SPECIAL_RE.search(password or ""):
+        errors.append("special")
+    return errors
+
 def log_audit(user_id, action, section=None, details=None):
     """Helper to log audit events."""
     try:
@@ -31,6 +55,21 @@ def log_audit(user_id, action, section=None, details=None):
     except Exception as e:
         print(f"Failed to write audit log: {e}")
         db.session.rollback()
+
+
+def revoke_user_sessions(user: AppUser) -> None:
+    """Revoke refresh tokens and mark access tokens as revoked for a user."""
+    now = datetime.now(timezone.utc)
+    try:
+        RefreshToken.query.filter_by(user_id=user.id, revoked=False).update(
+            {"revoked": True}, synchronize_session=False
+        )
+        user.sessions_revoked_at = now
+        db.session.add(user)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def set_refresh_cookie(response, refresh_token: str) -> None:

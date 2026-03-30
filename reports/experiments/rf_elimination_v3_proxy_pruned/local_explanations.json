@@ -1,0 +1,260 @@
+{
+  "HBN_SYN_000582": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 1.3091505667819319
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.6690051394269797
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": 0.31080964557540885
+      },
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 0.07621587719989302
+      },
+      {
+        "feature": "num__cbcl_046",
+        "score": 0.06204245539010741
+      },
+      {
+        "feature": "num__cbcl_084",
+        "score": 0.04746144706121081
+      },
+      {
+        "feature": "num__cbcl_082",
+        "score": 0.041689576658137266
+      },
+      {
+        "feature": "num__cbcl_039",
+        "score": 0.04009845742009284
+      },
+      {
+        "feature": "num__sdq_08",
+        "score": 0.038795434470533234
+      },
+      {
+        "feature": "num__cbcl_011",
+        "score": 0.036798675918252005
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_006",
+        "score": -0.02256102181940577
+      },
+      {
+        "feature": "num__cbcl_010",
+        "score": -0.02140718628955448
+      },
+      {
+        "feature": "num__cbcl_116",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_048",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_02",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_023",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_086",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_027",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_118",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_092",
+        "score": 0.0
+      }
+    ]
+  },
+  "HBN_SYN_004384": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_114",
+        "score": 0.09147453469965722
+      },
+      {
+        "feature": "num__cbcl_118",
+        "score": 0.04236274806466845
+      },
+      {
+        "feature": "num__cbcl_092",
+        "score": 0.036008400787350424
+      },
+      {
+        "feature": "num__cbcl_048",
+        "score": 0.033714512779752216
+      },
+      {
+        "feature": "num__cbcl_116",
+        "score": 0.023744843108368614
+      },
+      {
+        "feature": "num__sdq_18",
+        "score": 0.018756847778731066
+      },
+      {
+        "feature": "num__cbcl_109",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_070",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_066",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_08",
+        "score": 0.0
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": -0.5335111403992512
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": -0.4363835222606439
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": -0.2007015418280939
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": -0.08880275587868824
+      },
+      {
+        "feature": "num__cbcl_035",
+        "score": -0.030221509753413922
+      },
+      {
+        "feature": "num__cbcl_006",
+        "score": -0.02256102181940577
+      },
+      {
+        "feature": "num__sdq_02",
+        "score": -0.022026411809545128
+      },
+      {
+        "feature": "num__cbcl_010",
+        "score": -0.02140718628955448
+      },
+      {
+        "feature": "num__cbcl_102",
+        "score": -0.02097801034110883
+      },
+      {
+        "feature": "num__cbcl_043",
+        "score": -0.017389780678831675
+      }
+    ]
+  },
+  "HBN_SYN_002611": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 1.9637258501728976
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.6690051394269797
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": 0.31080964557540885
+      },
+      {
+        "feature": "num__cbcl_046",
+        "score": 0.06204245539010741
+      },
+      {
+        "feature": "num__cbcl_084",
+        "score": 0.04746144706121081
+      },
+      {
+        "feature": "num__cbcl_094",
+        "score": 0.04301731580713983
+      },
+      {
+        "feature": "num__cbcl_082",
+        "score": 0.041689576658137266
+      },
+      {
+        "feature": "num__cbcl_039",
+        "score": 0.04009845742009284
+      },
+      {
+        "feature": "num__sdq_08",
+        "score": 0.038795434470533234
+      },
+      {
+        "feature": "num__sdq_18",
+        "score": 0.03751369555746213
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": -0.15243175439978604
+      },
+      {
+        "feature": "num__cbcl_114",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_102",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_116",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_048",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_023",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_086",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_027",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_118",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_092",
+        "score": 0.0
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+trial_id,suspicious_perfect_score,residual_critical_features
+T01_baseline_replay_controlado,True,7
+T02_drop_high_risk_semantic_proxies,False,0
+T03_drop_high_plus_critical_proxies,False,0
+T04_strict_semantic_minimal,False,0
+T05_compact_low_complexity_rf,True,0
+T06_stability_first_rf,False,0
+T07_missingness_augmented_honest_run,False,0
+T08_threshold_conservative_run,True,0
+T09_calibrated_run,False,0
+T10_thesis_defensible_candidate,True,0
+T11_ultra_strict_candidate,True,0
+T12_best_combined_honest_candidate,False,0
