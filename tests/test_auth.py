@@ -69,6 +69,7 @@ def test_register_and_login(client):
             "email": email,
             "password": password,
             "full_name": "Test User",
+            "user_type": "guardian",
         },
     )
 
@@ -131,6 +132,90 @@ def test_register_and_login(client):
     assert resp_no_cookie.status_code == 401
 
 
+def test_register_sends_welcome_email(client, monkeypatch):
+    called = {}
+
+    def _fake_send(to_email, full_name):
+        called["to_email"] = to_email
+        called["full_name"] = full_name
+
+    monkeypatch.setattr("api.routes.auth.send_welcome_email", _fake_send)
+
+    username = f"testuser_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={
+            "username": username,
+            "email": email,
+            "password": password,
+            "full_name": "Test User",
+            "user_type": "guardian",
+        },
+    )
+
+    assert resp_reg.status_code == 201
+    assert called["to_email"] == email
+    assert called["full_name"] == "Test User"
+
+
+def test_register_psychologist_requires_card(client):
+    username = f"psych_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+
+    resp_missing = client.post(
+        "/api/auth/register",
+        json={
+            "username": username,
+            "email": email,
+            "password": password,
+            "full_name": "Psych User",
+            "user_type": "psychologist",
+        },
+    )
+    assert resp_missing.status_code == 400
+    assert resp_missing.json.get("error") == "missing_professional_card"
+
+    resp_ok = client.post(
+        "/api/auth/register",
+        json={
+            "username": f"{username}2",
+            "email": f"{username}2@example.com",
+            "password": password,
+            "full_name": "Psych User 2",
+            "user_type": "psychologist",
+            "professional_card_number": "COLPSIC-12345",
+        },
+    )
+    assert resp_ok.status_code == 201
+
+
+def test_psychologist_login_requires_colpsic_verification(client, app):
+    username = f"psychlogin_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={
+            "username": username,
+            "email": email,
+            "password": password,
+            "full_name": "Psych User",
+            "user_type": "psychologist",
+            "professional_card_number": "COLPSIC-98765",
+        },
+    )
+    assert resp_reg.status_code == 201
+
+    resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
+    assert resp_login.status_code == 403
+    assert resp_login.json.get("error") == "colpsic_pending"
+
+
 def test_mfa_setup_and_login_flow(client, app):
     username = f"mfauser_{uuid.uuid4().hex[:8]}"
     email = f"{username}@example.com"
@@ -138,7 +223,7 @@ def test_mfa_setup_and_login_flow(client, app):
 
     client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "MFA User"},
+        json={"username": username, "email": email, "password": password, "full_name": "MFA User", "user_type": "guardian"},
     )
 
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
@@ -198,7 +283,7 @@ def test_refresh_requires_csrf_header(client):
 
     client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "CSRF User"},
+        json={"username": username, "email": email, "password": password, "full_name": "CSRF User", "user_type": "guardian"},
     )
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
     assert resp_login.status_code == 200
@@ -221,7 +306,7 @@ def test_login_requires_mfa_enrollment_for_admin(client, app):
 
     resp_reg = client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "Admin User"},
+        json={"username": username, "email": email, "password": password, "full_name": "Admin User", "user_type": "guardian"},
     )
     assert resp_reg.status_code == 201
     user_id = uuid.UUID(resp_reg.json["user_id"])
@@ -232,9 +317,27 @@ def test_login_requires_mfa_enrollment_for_admin(client, app):
         db.session.commit()
 
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
-    assert resp_login.status_code == 403
+    assert resp_login.status_code == 200
     assert resp_login.json.get("mfa_enrollment_required") is True
+    assert "enrollment_token" in resp_login.json
     assert not any("refresh_token=" in c for c in resp_login.headers.getlist("Set-Cookie"))
+
+    enrollment_token = resp_login.json["enrollment_token"]
+    resp_setup = client.post(
+        "/api/mfa/setup",
+        headers={"Authorization": f"Bearer {enrollment_token}"},
+    )
+    assert resp_setup.status_code == 200
+    secret = resp_setup.json["secret"]
+
+    totp = pyotp.TOTP(secret)
+    code = totp.now()
+    resp_confirm = client.post(
+        "/api/mfa/confirm",
+        headers={"Authorization": f"Bearer {enrollment_token}"},
+        json={"code": code},
+    )
+    assert resp_confirm.status_code == 200
 
 
 def test_refresh_rotation_revokes_old_token(client):
@@ -244,7 +347,7 @@ def test_refresh_rotation_revokes_old_token(client):
 
     client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "Rot User"},
+        json={"username": username, "email": email, "password": password, "full_name": "Rot User", "user_type": "guardian"},
     )
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
     assert resp_login.status_code == 200
@@ -269,7 +372,7 @@ def test_logout_revokes_refresh(client):
 
     client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "Logout User"},
+        json={"username": username, "email": email, "password": password, "full_name": "Logout User", "user_type": "guardian"},
     )
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
     assert resp_login.status_code == 200
@@ -296,7 +399,7 @@ def test_refresh_rejects_invalid_csrf(client):
 
     client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "CSRF Bad"},
+        json={"username": username, "email": email, "password": password, "full_name": "CSRF Bad", "user_type": "guardian"},
     )
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
     assert resp_login.status_code == 200
@@ -314,7 +417,7 @@ def test_inactive_user_blocked_login(client, app):
 
     resp_reg = client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "Inactive User"},
+        json={"username": username, "email": email, "password": password, "full_name": "Inactive User", "user_type": "guardian"},
     )
     assert resp_reg.status_code == 201
     user_id = uuid.UUID(resp_reg.json["user_id"])
@@ -328,6 +431,34 @@ def test_inactive_user_blocked_login(client, app):
     assert resp_login.status_code == 403
 
 
+def test_login_lockout_after_failed_attempts(client, app):
+    app.config["MAX_LOGIN_ATTEMPTS"] = 2
+    app.config["LOGIN_LOCKOUT_MINUTES"] = 1
+
+    username = f"lock_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={
+            "username": username,
+            "email": email,
+            "password": password,
+            "full_name": "Lock User",
+            "user_type": "guardian",
+        },
+    )
+    assert resp_reg.status_code == 201
+
+    for _ in range(2):
+        resp_fail = client.post("/api/auth/login", json={"username": username, "password": "badpass"})
+        assert resp_fail.status_code == 401
+
+    resp_locked = client.post("/api/auth/login", json={"username": username, "password": password})
+    assert resp_locked.status_code == 423
+
+
 def test_refresh_denied_for_inactive_user(client, app):
     username = f"inact_ref_{uuid.uuid4().hex[:8]}"
     email = f"{username}@example.com"
@@ -335,7 +466,7 @@ def test_refresh_denied_for_inactive_user(client, app):
 
     resp_reg = client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "Inactive Refresh"},
+        json={"username": username, "email": email, "password": password, "full_name": "Inactive Refresh", "user_type": "guardian"},
     )
     assert resp_reg.status_code == 201
     user_id = uuid.UUID(resp_reg.json["user_id"])
@@ -362,7 +493,7 @@ def test_mfa_challenge_reuse_rejected(client):
 
     client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "MFA Reuse"},
+        json={"username": username, "email": email, "password": password, "full_name": "MFA Reuse", "user_type": "guardian"},
     )
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
     access_token = resp_login.json["access_token"]
@@ -396,7 +527,7 @@ def test_mfa_challenge_expired_rejected(client, app):
 
     client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "MFA Exp"},
+        json={"username": username, "email": email, "password": password, "full_name": "MFA Exp", "user_type": "guardian"},
     )
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
     access_token = resp_login.json["access_token"]
@@ -436,7 +567,7 @@ def test_recovery_code_cannot_be_reused(client):
 
     client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "MFA Rec"},
+        json={"username": username, "email": email, "password": password, "full_name": "MFA Rec", "user_type": "guardian"},
     )
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
     access_token = resp_login.json["access_token"]
@@ -488,7 +619,7 @@ def test_roles_required_enforces_claims(client, app):
     password = "StrongPassword123!"
     resp_reg = client.post(
         "/api/auth/register",
-        json={"username": username, "email": email, "password": password, "full_name": "Role User"},
+        json={"username": username, "email": email, "password": password, "full_name": "Role User", "user_type": "guardian"},
     )
     user_id = uuid.UUID(resp_reg.json["user_id"])
 
@@ -508,7 +639,7 @@ def test_roles_required_enforces_claims(client, app):
     email2 = f"{username2}@example.com"
     client.post(
         "/api/auth/register",
-        json={"username": username2, "email": email2, "password": password, "full_name": "No Role"},
+        json={"username": username2, "email": email2, "password": password, "full_name": "No Role", "user_type": "guardian"},
     )
     resp_login2 = client.post("/api/auth/login", json={"username": username2, "password": password})
     access_token2 = resp_login2.json["access_token"]
@@ -516,3 +647,25 @@ def test_roles_required_enforces_claims(client, app):
         "/api/admin-only", headers={"Authorization": f"Bearer {access_token2}"}
     )
     assert resp_forbidden.status_code == 403
+
+
+def test_auth_me_returns_profile(client):
+    username = f"profile_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={"username": username, "email": email, "password": password, "full_name": "Profile User", "user_type": "guardian"},
+    )
+    assert resp_reg.status_code == 201
+
+    resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
+    access_token = resp_login.json["access_token"]
+
+    resp_me = client.get(
+        "/api/auth/me",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert resp_me.status_code == 200
+    assert resp_me.json["username"] == username
+    assert resp_me.json["email"] == email

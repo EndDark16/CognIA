@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "required": [
+    "participant_id",
+    "responses"
+  ],
+  "properties": {
+    "participant_id": {
+      "type": "string"
+    },
+    "responses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "questionnaire_item_id",
+          "response_value"
+        ],
+        "properties": {
+          "questionnaire_item_id": {
+            "type": "string"
+          },
+          "response_value": {},
+          "response_timestamp_utc": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

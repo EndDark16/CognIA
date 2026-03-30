@@ -1,0 +1,4 @@
+trial_id,method,brier_score_val,status,selected
+internal_adhd_strict_compact,none,0.026221094537199067,ok,False
+internal_adhd_strict_compact,sigmoid,0.025686322081103347,ok,False
+internal_adhd_strict_compact,isotonic,0.02561403263162596,ok,True

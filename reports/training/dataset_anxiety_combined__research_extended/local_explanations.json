@@ -1,0 +1,260 @@
+{
+  "HBN_SYN_000059": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 0.7766068290056393
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 0.6436314264355224
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": 0.39979465158926525
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.25097065619972436
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": 0.23175690324306036
+      },
+      {
+        "feature": "num__comorbidity_count_5targets",
+        "score": 0.17335506144585047
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 0.14948547915881016
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": 0.14913684622218604
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": 0.11963362306951777
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.10800948117876955
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__scared_p_total",
+        "score": -0.13922871121607996
+      },
+      {
+        "feature": "num__scared_sr_total",
+        "score": -0.04129745548402704
+      },
+      {
+        "feature": "num__scared_p_panic_somatic",
+        "score": -0.033725831786412454
+      },
+      {
+        "feature": "num__scared_sr_separation_anxiety",
+        "score": -0.03210083841627288
+      },
+      {
+        "feature": "num__sdq_emotional_symptoms",
+        "score": -0.029066440107812706
+      },
+      {
+        "feature": "num__scared_p_social_anxiety",
+        "score": -0.01733073438475505
+      },
+      {
+        "feature": "num__scared_p_school_avoidance",
+        "score": -0.013099970012184917
+      },
+      {
+        "feature": "num__scared_sr_school_avoidance",
+        "score": -0.011018442787908434
+      },
+      {
+        "feature": "num__age_years",
+        "score": -0.006745765498098183
+      },
+      {
+        "feature": "cat__site_CUNY",
+        "score": 0.0
+      }
+    ]
+  },
+  "HBN_SYN_003645": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 1.5532136580112785
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": 0.8567028248341398
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 0.5057104064850533
+      },
+      {
+        "feature": "num__comorbidity_count_5targets",
+        "score": 0.17335506144585047
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.16801474850030818
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": 0.11963362306951777
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": 0.11930947697774882
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.1056718552419892
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": 0.05793922581076509
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 0.049828493052936726
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__age_years",
+        "score": -0.022164658065179758
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Male",
+        "score": -0.0016135415375308554
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Unknown",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_CBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_RUBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_CUNY",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_cbcl",
+        "score": 0.0
+      },
+      {
+        "feature": "num__scared_sr_total",
+        "score": 0.0
+      },
+      {
+        "feature": "num__scared_sr_social_anxiety",
+        "score": 0.0
+      },
+      {
+        "feature": "num__scared_sr_separation_anxiety",
+        "score": 0.0
+      }
+    ]
+  },
+  "HBN_SYN_003947": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 3.417070047624813
+      },
+      {
+        "feature": "num__scared_sr_total",
+        "score": 1.8996829522652436
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": 1.5420650847014516
+      },
+      {
+        "feature": "num__scared_p_total",
+        "score": 1.3458775417554396
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 1.2412891795542218
+      },
+      {
+        "feature": "num__scared_sr_social_anxiety",
+        "score": 0.3447851335548414
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.3302245476312163
+      },
+      {
+        "feature": "num__scared_sr_panic_somatic",
+        "score": 0.30817773414402627
+      },
+      {
+        "feature": "num__scared_sr_generalized_anxiety",
+        "score": 0.2941597595360473
+      },
+      {
+        "feature": "num__scared_sr_separation_anxiety",
+        "score": 0.2889075457464559
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__release",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_scared_p",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_CUNY",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_CBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Unknown",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Male",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Female",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_sdq",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_scared_sr",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_RUBIC",
+        "score": 0.0
+      }
+    ]
+  }
+}

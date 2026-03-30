@@ -9,7 +9,7 @@ flask-cors==4.0.1
 fonttools==4.53.0
 python-dotenv==1.0.1
 pytz==2024.1
-scikit-learn==1.5.0
+scikit-learn==1.7.1
 scipy==1.13.1
 seaborn==0.13.2
 six==1.16.0

@@ -1,363 +1,78 @@
-# CognIA - Backend
-Backend de la tesis "Aplicativo web con Random Forest para la alerta temprana de cinco trastornos psicologicos en ninos de 6 a 11 anos". Expone una API REST que procesa datos clinicos/psicologicos estructurados, aplica un modelo de Random Forest y devuelve alertas de riesgo. Solo trabaja con datos simulados o anonimizados y funciona como apoyo temprano, no como diagnostico clinico definitivo.
+# CognIA Backend - Cierre de Iteracion
 
-## Contexto academico y objetivo del proyecto
-Trabajo de grado de Ingenieria de Sistemas y Computacion en la Universidad de Cundinamarca, extension Facatativa, dentro del grupo de investigacion GISTFA. Atiende la necesidad de apoyar la deteccion temprana de trastornos frecuentes en la infancia (conducta, TDAH, eliminacion, ansiedad y depresion) donde la falta de herramientas objetivas y la deteccion tardia impactan el bienestar infantil. El backend recibe datos estructurados, ejecuta el modelo de Random Forest y expone resultados via API para integrarse con clientes web o moviles.
+Sistema backend para alerta temprana experimental en ninos de 6 a 11 anos, basado en Random Forest, con HBN como nucleo empirico y DSM-5 como norma formal.
 
-## Arquitectura general del backend
-- Framework: Flask con Blueprints, CORS y configuraciones por entorno.
-- Capas: rutas/controladores (api/routes), esquemas de validacion (api/schemas), servicios de dominio (api/services), utilidades y carga de modelos (core/models), configuracion (config).
-- Modelo de ML: archivos .pkl en models/ cargados con core/models/predictor.py (ej. models/adhd_model.pkl).
-- Configuracion: clases DevelopmentConfig, ProductionConfig y TestingConfig en config/settings.py; variables .env para MONGO_URI, MODEL_PATH, SECRET_KEY.
+**Estado actual:** iteracion cerrada documental y metodologicamente (sin nuevas campa�as de mejora).
 
-Flujo de peticion:
-```
-HTTP POST /api/predict
- -> Blueprint predict (api/routes/predict.py)
- -> Validacion con Marshmallow (api/schemas/predict_schema.py)
- -> Servicio predict_all_probabilities (api/services/model_service.py)
- -> Carga de modelo Random Forest desde models/ (core/models/predictor.py)
- -> Respuesta JSON con probabilidades
-```
+## Resumen Ejecutivo
+- 5 dominios del producto: `adhd`, `conduct`, `elimination`, `anxiety`, `depression`.
+- Modelo principal: Random Forest.
+- Auditoria final de cierre completada en `data/final_closure_audit_v1/`.
+- Scope final de producto experimental: `adhd`, `anxiety`, `conduct`, `depression`.
+- `elimination` queda como linea experimental util, fuera de producto en esta iteracion.
+- Inferencia vigente: `artifacts/inference_v4/`.
 
-## Tecnologias y dependencias principales
-- Lenguaje: Python 3.12+.
-- Web: Flask 3.x, Flask-CORS, Flask-JWT-Extended, Flask-Limiter.
-- ML y datos: scikit-learn, pandas, numpy, seaborn/matplotlib para analisis.
-- Validacion: marshmallow.
-- Base de datos: PostgreSQL 16 via SQLAlchemy/psycopg + Alembic para migraciones.
-- Configuracion y despliegue: python-dotenv, gunicorn (Linux/macOS).
-- Pruebas: pytest.
+## Objetivo del Sistema
+Proveer una salida probabilistica de riesgo para alerta temprana en entorno simulado.
 
-## Funcionalidades principales del backend
-### Gestion de usuarios y seguridad
-- Autenticacion JWT (Access/Refresh Tokens) y RBAC implementados.
-- Base de usuarios y sesiones en PostgreSQL.
-- Hash de contraseñas con bcrypt.
+> Este sistema **no** es diagnostico clinico definitivo.
 
-### Gestion de evaluaciones
-- El endpoint disponible procesa una evaluacion simulada via POST /api/predict y retorna probabilidades de riesgo (actualmente TDAH). Campos requeridos: age, sex, conners_inattention_score, conners_hyperactivity, cbcl_attention_score, sleep_problems. No se almacenan datos; se espera uso anonimo/simulado.
+## Arquitectura Metodologica
+- HBN = fuente empirica.
+- DSM-5 = capa normativa formal.
+- Capa interna = unidades diagnosticas exactas.
+- Capa externa = 5 dominios de producto.
+- strict_no_leakage = referencia principal.
+- research_extended = referencia secundaria controlada.
 
-### Motor de IA (Random Forest)
-- Inferencia: api/services/model_service.py prepara el DataFrame y llama a predict_proba (en core/models/predictor.py), cargando el modelo desde models/adhd_model.pkl.
-- Modelo: clasificador Random Forest entrenado con datos simulados (pipeline en scripts/train_model.py). La respuesta actual devuelve la probabilidad para TDAH; otras condiciones se planean.
+## Estado Final por Dominio (Iteracion Cerrada)
+| Dominio | Modelo final | Precision | Recall | Specificity | Balanced Accuracy | Estado final |
+| --- | --- | --- | --- | --- | --- | --- |
+| adhd | `adhd_trial_compact_signal` | 0.9797 | 0.9006 | 0.9760 | 0.9383 | `recovered_generalizing_model` |
+| anxiety | `retrained_anxiety_anti_overfit_v1` | 0.9701 | 0.9848 | 0.9909 (derivada) | 0.9879 | `accepted_but_experimental` |
+| conduct | `domain_conduct_research_full` | 0.9753 | 0.9875 | 0.9903 (derivada) | 0.9889 | `accepted_but_experimental` |
+| depression | `domain_depression_strict_full` | 0.9739 | 0.9739 | 0.9825 (derivada) | 0.9782 | `accepted_but_experimental` |
+| elimination | `V5_T02_composite_clinical` | 0.9438 | 0.9379 | 0.9280 | 0.9329 | `experimental_line_more_useful_not_product_ready` |
 
-### Registro, metricas y logging
-- Logging basico activado en modo no debug (configuracion de logging en api/app.py).
-- Logging por request configurable via `LOG_REQUESTS`, `LOG_LEVEL`, `LOG_FORMAT` y `LOG_EXCLUDE_PATHS`.
-- Endpoints de observabilidad: `/healthz`, `/readyz`, `/metrics` (ver seccion de Observabilidad).
-- Scripts de entrenamiento imprimen classification_report de scikit-learn para evaluar precision/recall/specificidad de forma local.
+## Alcance Final: Tesis vs Producto
+### Tesis
+- Incluye los 5 dominios.
+- Elimination entra con caveat metodologico explicito (experimental, no product-ready).
 
-## Estructura del proyecto
-```
-cognia_app/
-|-- api/
-|   |-- app.py              # Fabrica Flask y registro de blueprints/extensiones
-|   |-- routes/             # Endpoints (auth, predict)
-|   |-- schemas/            # Validacion de entrada (Marshmallow)
-|   |-- services/           # Logica de negocio (p.ej. model_service)
-|   |-- decorators.py       # Decoradores de RBAC/JWT
-|   |-- extensions.py       # Instancias compartidas (limiter)
-|   |-- security.py         # Utilidades de hash de password y auditoria
-|-- app/
-|   |-- models.py           # Modelos SQLAlchemy (PostgreSQL)
-|-- config/
-|   |-- settings.py         # Config por entorno (.env)
-|-- migrations/             # Migraciones Alembic
-|-- core/
-|   |-- models/predictor.py # Carga de modelos ML y helpers
-|-- models/                 # Artefactos entrenados (.pkl)
-|-- data/                   # Datasets simulados (CSV)
-|-- scripts/                # Entrenamiento/analisis (train_model.py)
-|-- tests/                  # Pruebas (p.ej. test_auth.py)
-|-- run.py                  # Punto de entrada en desarrollo
-|-- requirements.txt        # Dependencias
-```
+### Producto (iteracion actual)
+- Incluye: `adhd`, `anxiety`, `conduct`, `depression`.
+- Excluye: `elimination`.
 
-## Migraciones (Alembic)
-- Config por defecto toma `config.settings.DevelopmentConfig`. Cambia con `APP_CONFIG_CLASS=config.settings.ProductionConfig` al correr comandos.
-- Crear nueva revision: `alembic revision --autogenerate -m "mensaje"`
-- Aplicar migraciones: `alembic upgrade head`
-- Baseline incluida: crea la tabla `refresh_token` si falta (segura en entornos donde ya existe).
+## Scope de Inferencia Vigente
+Se mantiene `artifacts/inference_v4/promotion_scope.json`:
+- `active_domains`: `adhd`, `anxiety`, `conduct`, `depression`
+- `hold_domains`: `elimination`
 
-## Auth con cookies (refresh) y MFA
-- El refresh token nunca viaja en el body. Se devuelve como cookie HttpOnly `refresh_token` (Path=/api/auth/refresh) protegida con CSRF doble submit (`csrf_refresh_token` cookie y header `X-CSRF-Token`).
-- Access token sigue en JSON (`access_token`). Para usar refresh/logout: enviar cookies y el header CSRF.
-- En cliente (fetch/axios): `credentials: "include"` + header `X-CSRF-Token` con el valor de `csrf_refresh_token`.
-- CORS: al usar credenciales no se permite `origins="*"`. Define `CORS_ORIGINS` (coma-separado) en .env.
-- MFA obligatorio para roles `ADMIN` y `PSYCHOLOGIST/PSICOLOGO`. Si no está habilitado, el login devuelve `mfa_enrollment_required` y no emite tokens. Usuarios con MFA activo deben completar login en 2 pasos (`/auth/login` -> `/auth/login/mfa`).
-- MFA usa TOTP (pyotp) con secreto cifrado (Fernet). Debes definir `MFA_ENCRYPTION_KEY` (base64 urlsafe de 32 bytes) en entorno.
-- CSRF en refresh/logout: si falta o no coincide el header `X-CSRF-Token`, responde 403 con `error: "csrf_failed"`. El valor de `csrf_refresh_token` rota en cada `/api/auth/refresh`, así que el cliente debe leer la nueva cookie después de refrescar.
-- Logout revoca todos los refresh tokens del usuario (logout all) para evitar reuso.
-- Errores estandarizados: todas las respuestas de error incluyen `{"msg": "...", "error": "<codigo>"}`. Ejemplos: `invalid_credentials`, `mfa_required`, `mfa_enrollment_required`, `csrf_failed`, `token_revoked`, `user_exists`.
+No se requiere `inference_v5` para esta iteracion.
 
-## Requisitos previos
-- Python 3.12 o superior.
-- Sistemas: Linux, macOS o Windows.
-- Herramientas: git, pip, entorno virtual (venv o similar).
-- PostgreSQL 16 local (para Auth).
+## Carpetas/Versiones Clave
+- `data/processed_hybrid_dsm5_v2/`
+- `data/finalization_and_recovery_v1/`
+- `data/elimination_iterative_recovery_v2/`
+- `data/elimination_refinement_v3/`
+- `data/elimination_target_redesign_v4/`
+- `data/elimination_feature_engineering_v5/`
+- `data/final_closure_audit_v1/`
+- `reports/final_closure/`
 
-## Configuracion e instalacion
-1) Clonar el repositorio:
-   ```
-   git clone <URL_DEL_REPO>
-   cd cognia_app
-   ```
-2) Crear y activar entorno virtual:
-   - Windows:
-     ```
-     python -m venv venv
-     .\venv\Scripts\activate
-     ```
-   - Linux/macOS:
-     ```
-     python -m venv venv
-     source venv/bin/activate
-     ```
-3) Instalar dependencias:
-   ```
-   pip install -r requirements.txt
-   ```
-4) Crear archivo .env en la raiz:
-   ```
-   SECRET_KEY=dev-secret-key
-   MODEL_PATH=models/adhd_model.pkl
-   DB_USER=postgres
-   DB_PASSWORD=your_db_password
-   DB_HOST=localhost
-   DB_PORT=5432
-   DB_NAME=cognia_db
-   # Si usas Supabase u otro servicio que exige TLS:
-   # DB_SSL_MODE=require
-   MFA_ENCRYPTION_KEY=base64-urlsafe-32bytes-key
-   # Migraciones (rol db_migrator)
-   # MIGRATION_DB_USER=db_migrator
-   # MIGRATION_DB_PASSWORD=your_migrator_password
-   # Logging/Metrics
-   # LOG_LEVEL=INFO
-   # LOG_REQUESTS=true
-   # LOG_EXCLUDE_PATHS=/healthz,/readyz,/metrics
-   # METRICS_ENABLED=true
-   # METRICS_TOKEN=un_token_opcional
-   # RATE_LIMIT_STORAGE_URI=redis://localhost:6379/0   # opcional, para rate limiting profesional
-   ```
+## Cierre de Iteracion
+La auditoria final valido:
+- modelos validados honestamente,
+- sin inconsistencias materiales,
+- `status_match` 5/5,
+- recomendacion final: `close_iteration_now`.
 
-## Ejecucion en desarrollo
-1) Activar el entorno virtual.
-2) Iniciar la API:
-   ```
-   python run.py
-   ```
-   - Host: 0.0.0.0
-   - Puerto por defecto: 5000
-3) Verificar enviando una peticion a POST http://localhost:5000/api/predict (ver ejemplos abajo).
+Documentacion de cierre:
+- `reports/final_closure/final_project_closure_report.md`
+- `reports/final_closure/final_project_executive_summary.md`
+- `reports/final_closure/thesis_scope_final.md`
+- `reports/final_closure/product_scope_final.md`
+- `reports/final_closure/inference_scope_final.md`
 
-## Ejecucion en produccion
-- Ejemplo con gunicorn (Linux/macOS):
-  ```
-  gunicorn -w 4 -b 0.0.0.0:8000 run:app
-  ```
-- Recomendaciones: usar reverse proxy (Nginx), gestionar variables de entorno y certificados TLS, y agregar autenticacion/autorizacion antes de exponer publicamente. En Windows usar un servidor WSGI alternativo o contenedor Docker.
-- En Render (free tier), usa `GUNICORN_WORKERS=2` y `GUNICORN_THREADS=2-4` como punto de partida y ajusta con pruebas de carga.
-
-## Entrenamiento y actualizacion del modelo de IA
-- Script principal: scripts/train_model.py
-  - Dataset esperado: data/adhd_dataset_simulated.csv (simulado/anonimizado).
-  - Ejecucion:
-    ```
-    python scripts/train_model.py
-    ```
-  - Salida: models/adhd_model.pkl (cargado por el backend para inferencia).
-- Para usar un modelo nuevo, coloque el .pkl en models/ y asegure que MODEL_PATH apunte a esa ruta si se modifica el nombre.
-- Entrenamiento solo con datos simulados o anonimizados; nunca use informacion identificable de menores.
-
-## Uso de la API
-### POST /api/predict
-- Descripcion: calcula probabilidades de riesgo (actualmente TDAH) a partir de una evaluacion estructurada.
-- Cuerpo JSON requerido:
-```json
-{
-  "age": 10,
-  "sex": 1,
-  "conners_inattention_score": 12.5,
-  "conners_hyperactivity": 8.1,
-  "cbcl_attention_score": 14.0,
-  "sleep_problems": 0
-}
-```
-- Respuesta exitosa (200):
-```json
-{
-  "predictions": {
-    "adhd": 0.42
-  }
-}
-```
-- Errores de validacion (400):
-```json
-{
-  "errors": {
-    "age": ["Must be greater than or equal to 3."]
-  }
-}
-```
-- Otros codigos: 500 en caso de error interno del servidor.
-
-## Auth Testing
-Instrucciones rapidas para probar la autenticacion (ajusta la URL si es necesario):
-
-### Register
-```bash
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","email":"t@t.com","password":"P4ssw0rd!","full_name":"Test User"}'
-```
-
-### Login
-```bash
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"P4ssw0rd!"}'
-```
--> Respuesta: `access_token` en JSON y cookies `refresh_token` (HttpOnly, Path=/api/auth/refresh) y `csrf_refresh_token` (para header CSRF). Si el usuario tiene MFA activo devuelve `{ "mfa_required": true, "challenge_id": "...", "expires_in": 300 }` (sin cookies). Si el rol requiere MFA y no está habilitado devuelve `{ "mfa_enrollment_required": true }` (sin tokens).
-
-### Login MFA (cuando `mfa_required: true`)
-```bash
-curl -X POST http://localhost:5000/api/auth/login/mfa \
-  -H "Content-Type: application/json" \
-  -d '{"challenge_id":"<challenge_id>","code":"123456"}'
-```
--> Respuesta: `access_token` en JSON y set-cookie de `refresh_token` + `csrf_refresh_token`.
-
-### Refresh
-```bash
-curl -X POST http://localhost:5000/api/auth/refresh \
-  -H "X-CSRF-Token: <csrf_refresh_token_from_cookie>" \
-  --cookie "refresh_token=<refresh_token_cookie>; csrf_refresh_token=<csrf_refresh_token_from_cookie>"
-```
-
-### Logout
-```bash
-curl -X POST http://localhost:5000/api/auth/logout \
-  -H "Authorization: Bearer <access_token>" \
-  -H "X-CSRF-Token: <csrf_refresh_token_from_cookie>" \
-  --cookie "refresh_token=<refresh_token_cookie>; csrf_refresh_token=<csrf_refresh_token_from_cookie>"
-```
-
-### MFA setup / confirm
-```bash
-# 1) Obtener secreto / otpauth_uri (requiere access token)
-curl -X POST http://localhost:5000/api/mfa/setup \
-  -H "Authorization: Bearer <access_token>"
-
-# 2) Confirmar TOTP generado con tu app (Google Authenticator, Authy, etc.)
-curl -X POST http://localhost:5000/api/mfa/confirm \
-  -H "Authorization: Bearer <access_token>" \
-  -H "Content-Type: application/json" \
-  -d '{"code":"123456"}'
-```
--> Devuelve recovery codes (guárdalos en un lugar seguro, se entregan una sola vez).
-
-## Despliegue en Docker
-
-### Build local
-```bash
-docker build -t cognia-app .
-```
-
-### Ejecutar solo la app (DB externa ya creada)
-```bash
-docker run -p 5000:5000 \
-  -e APP_CONFIG_CLASS=config.settings.ProductionConfig \
-  -e DB_HOST=<host_db> -e DB_PORT=5432 -e DB_USER=postgres -e DB_PASSWORD=<pass> -e DB_NAME=cognia_db \
-  -e SECRET_KEY=<secret_key> \
-  -e MFA_ENCRYPTION_KEY=<base64_fernet_key> \
-  -e CORS_ORIGINS="http://tu-frontend.com" \
-  cognia-app
-```
-
-### docker-compose (app + Postgres)
-1) Define variables sensibles (SECRET_KEY, DB_PASSWORD, MFA_ENCRYPTION_KEY) en tu shell o en un `.env` (no se sube a git).
-2) Levanta todo:
-```bash
-docker compose up --build
-```
-- Servicio `db`: Postgres 16 con credenciales de `DB_USER/DB_PASSWORD/DB_NAME`.
-- Servicio `app`: expone puerto 5000, aplica migraciones Alembic al arrancar y lanza Gunicorn. Por defecto usa `DB_HOST=host.docker.internal` para conectar a tu Postgres del host. Si quieres usar el Postgres del compose, exporta `DB_HOST=db` antes de levantar.
-
-### Notas de seguridad en contenedores
-- No incluyas `.env` en la imagen (está en `.dockerignore`).
-- Pasa secretos solo via variables de entorno o secret manager del orquestador.
-- En producción, usa `APP_CONFIG_CLASS=config.settings.ProductionConfig`, `JWT_COOKIE_SECURE=True` ya se aplica automáticamente si no está en debug/testing.
-
-### Baseline completa del esquema (opcional)
-- Se agregó una migración baseline condicional `20251215_01_baseline_full_schema.py` con DDL incrustado del esquema completo. Solo se ejecuta si defines `APPLY_FULL_SCHEMA_SQL=1` en el entorno al correr Alembic.
-- Uso típico en una BD vacía:
-  ```bash
-  $env:APPLY_FULL_SCHEMA_SQL="1"
-  alembic upgrade head
-  ```
-  Luego retira la variable para evitar reejecuciones.
-- En una BD ya poblada, no habilites `APPLY_FULL_SCHEMA_SQL`; si necesitas marcar estado, usa `alembic stamp head`.
-
-### Roles y credenciales (Supabase / producción)
-- Se recomienda usar dos roles:
-  - `api_backend`: runtime con privilegios mínimos (DB_USER/DB_PASSWORD).
-  - `db_migrator`: solo para migraciones (MIGRATION_DB_USER/MIGRATION_DB_PASSWORD) o `MIGRATION_DATABASE_URI`.
-- Ejemplo de URI con SSL para Supabase:
-  `postgresql+psycopg://<user>:<password>@db.eiqmbxydrpzotwrppsss.supabase.co:5432/postgres?sslmode=require`
-- Alembic usará `MIGRATION_DATABASE_URI` si está presente; si no, puede armarse con `MIGRATION_DB_USER/MIGRATION_DB_PASSWORD` y el resto de variables (`DB_HOST/DB_PORT/DB_NAME/DB_SSL_MODE`).
-
-## Observabilidad (health / ready / metrics)
-- `GET /healthz`: liveness básico. Siempre devuelve 200 si la app está viva.
-- `GET /readyz`: readiness con chequeo de DB (`SELECT 1`). Devuelve 503 si falla.
-- `GET /metrics`: métricas básicas en memoria (por worker): `requests_total`, latencia promedio/max y conteo por status.
-  - Puedes protegerlo con `METRICS_TOKEN` (header `Authorization: Bearer <token>`).
-  - En Gunicorn multiproceso, cada worker mantiene sus propias métricas (no agregadas).
-
-## Documentación API (Swagger/OpenAPI)
-- Documentación interactiva: `GET /docs`
-- Especificación OpenAPI: `GET /openapi.yaml`
-- Postman: importa `http://localhost:5000/openapi.yaml` y tendrás todos los endpoints con ejemplos base.
-- Auth:
-  - Access: `Authorization: Bearer <access_token>`
-  - Refresh: cookie `refresh_token` + header `X-CSRF-Token` (valor de la cookie `csrf_refresh_token`)
-
-## Pruebas de carga (k6)
-1) Crea un usuario de prueba y anota credenciales.
-2) Ejecuta:
-```bash
-k6 run -e BASE_URL=http://localhost:5000 -e USERNAME=testuser -e PASSWORD=P4ssw0rd! scripts/k6_smoke.js
-```
-3) Ajusta `GUNICORN_WORKERS/GUNICORN_THREADS` según latencia y CPU disponible.
-
-## CI/CD (GitHub Actions)
-- Pipeline básico:
-  - Lint rápido con Ruff (errores lógicos/sintaxis).
-  - Tests con pytest.
-  - Build Docker (sin push).
-- Archivo: `.github/workflows/ci.yml`.
-
-## Contribucion
-- Lee `CONTRIBUTING.md` para flujo de ramas y checklist de PR.
-- Flujo recomendado: `dev.enddark` -> `development` -> `main`.
-
-## Pruebas
-- Ejecutar:
-  ```
-  pytest
-  ```
-- Los tests actuales son plantillas; se recomienda ampliarlos para cubrir endpoints, validacion y logica de modelo.
-
-## Consideraciones eticas y limitaciones
-- Prototipo academico en entorno simulado; no sustituye evaluacion clinica profesional.
-- Genera alertas de riesgo, no diagnosticos definitivos.
-- No debe usarse con pacientes reales sin aprobacion etica, validacion clinica y cumplimiento legal.
-- Los trastornos abordados (conducta, TDAH, eliminacion, ansiedad, depresion) son sensibles; el proyecto busca alinearse con los ODS 3 (salud) y 4 (educacion) promoviendo uso responsable y proteccion de datos.
-
-## Creditos
-- Andres Felipe Melo Chaguala - Estudiante investigador
-- Johan Thomas Cristancho Silva - Estudiante investigador
-- Oscar Jobany Gomez Ochoa - Director
-- Universidad de Cundinamarca, grupo de investigacion GISTFA
-- Uso academico restringido salvo indicacion contraria (sin licencia explicita en el repositorio).
+## Nota de Uso
+El sistema debe usarse como apoyo de alerta temprana experimental y nunca como sustituto de evaluacion clinica profesional.

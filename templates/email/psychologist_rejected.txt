@@ -1,0 +1,10 @@
+Hola {{ user_name }},
+
+Hemos revisado la información de tu tarjeta profesional y por ahora no fue posible verificarla.
+
+Motivo:
+{{ reject_reason }}
+
+Si consideras que se trata de un error o deseas volver a intentar, por favor contáctanos en {{ EMAIL_REPLY_TO }}.
+
+© {{ year }} CognIA. Todos los derechos reservados.

@@ -1,77 +1,108 @@
-openapi: 3.0.3
+﻿openapi: 3.0.3
 info:
   title: CognIA API
   version: 0.1.0
   description: |
-    API backend para CognIA. Incluye autenticación con JWT (access + refresh),
-    refresh en cookie HttpOnly con CSRF double-submit, MFA TOTP y endpoints de
-    observabilidad (health/ready/metrics).
+    API backend de la tesis "Aplicativo web con Random Forest para la alerta temprana
+    de cinco trastornos psicologicos en ninos de 6 a 11 anos".
+    Proyecto academico del programa de Ingenieria de Sistemas y Computacion en la
+    Universidad de Cundinamarca (grupo GISTFA).
+    Esta API genera alertas de riesgo y no representa un diagnostico clinico.
+    Trabaja solo con datos simulados o anonimizados.
+
+    Enfoque de seguridad y buenas practicas:
+    - Auth: JWT access token en JSON; refresh token en cookie HttpOnly con path
+      /api/auth/refresh.
+    - CSRF: double-submit con header X-CSRF-Token y cookie csrf_refresh_token; la
+      cookie rota en refresh.
+    - MFA: TOTP con secreto cifrado y recovery codes; obligatorio para roles
+      privilegiados.
+    - Observabilidad: /healthz (liveness), /readyz (DB readiness), /metrics (token
+      opcional, por proceso).
+
+    Notas:
+    - Si usas cookies, define CORS_ORIGINS explicitos y envia credenciales.
+    - /api/predict es experimental y puede cambiar.
+
+    Creditos:
+    - Andres Felipe Melo Chaguala (estudiante investigador)
+    - Johan Thomas Cristancho Silva (estudiante investigador)
+    - Oscar Jobany Gomez Ochoa (director)
+    - Universidad de Cundinamarca, grupo GISTFA
 servers:
+  - url: /
+    description: Same-origin (use the host that serves /docs)
+  - url: http://127.0.0.1:5000
+    description: Local development (IPv4)
   - url: http://localhost:5000
+    description: Local development (hostname)
+
 tags:
   - name: Health
-    description: Liveness/readiness y métricas básicas.
+    description: Liveness, readiness, and basic metrics.
   - name: Auth
-    description: Registro, login, refresh y logout.
+    description: Registration, login, refresh, and logout using JWT in cookies.
   - name: MFA
-    description: Setup, confirmación y desactivación de MFA.
+    description: TOTP setup, confirmation, recovery codes, and disable.
+  - name: Email
+    description: Email unsubscribe utilities.
+  - name: Admin
+    description: Admin operations (users, audits, content, evaluations).
+  - name: Users
+    description: Admin user management.
+  - name: Questionnaires
+    description: Questionnaire templates and active template retrieval.
+  - name: Evaluations
+    description: Create evaluations using the active questionnaire.
   - name: Predict
-    description: Inferencia de modelo (Random Forest).
+    description: Experimental model inference (placeholder).
+
 paths:
   /healthz:
     get:
       tags: [Health]
       summary: Liveness check
+      description: Confirms the service process is running.
+      operationId: getLiveness
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: ok
+                $ref: "#/components/schemas/HealthResponse"
+
   /readyz:
     get:
       tags: [Health]
       summary: Readiness check (DB)
+      description: Verifies database connectivity.
+      operationId: getReadiness
       responses:
         "200":
           description: Ready
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: ready
-                  latency_ms:
-                    type: number
-                    example: 2.4
+                $ref: "#/components/schemas/ReadyResponse"
         "503":
           description: Not ready
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: not_ready
+                $ref: "#/components/schemas/NotReadyResponse"
+
   /metrics:
     get:
       tags: [Health]
-      summary: Basic metrics (in-memory)
-      parameters:
-        - in: header
-          name: Authorization
-          required: false
-          schema:
-            type: string
-          description: Bearer token if METRICS_TOKEN is configured
+      summary: Metrics snapshot (in-memory)
+      description: |
+        Returns in-memory counters for the current process.
+        If METRICS_TOKEN is configured, include Authorization: Bearer <token>.
+      operationId: getMetrics
+      security:
+        - metricsToken: []
+        - {}
       responses:
         "200":
           description: Metrics snapshot
@@ -81,10 +112,29 @@ paths:
                 $ref: "#/components/schemas/MetricsResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Metrics disabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponseMsg"
+              examples:
+                disabled:
+                  summary: Disabled
+                  value:
+                    msg: Metrics disabled
+        "500":
+          $ref: "#/components/responses/ServerError"
+
   /api/predict:
     post:
       tags: [Predict]
-      summary: Run prediction
+      summary: Run prediction (experimental)
+      description: |
+        Experimental endpoint. The prediction pipeline is currently a sketch and
+        may change without notice.
+      operationId: createPrediction
+      deprecated: true
       requestBody:
         required: true
         content:
@@ -92,8 +142,8 @@ paths:
             schema:
               $ref: "#/components/schemas/PredictRequest"
             examples:
-              sample:
-                summary: Example input
+              typical:
+                summary: Typical input
                 value:
                   age: 10
                   sex: 1
@@ -101,6 +151,15 @@ paths:
                   conners_hyperactivity: 8.1
                   cbcl_attention_score: 14.0
                   sleep_problems: 0
+              edge:
+                summary: Edge of valid range
+                value:
+                  age: 3
+                  sex: 0
+                  conners_inattention_score: 0.0
+                  conners_hyperactivity: 0.0
+                  cbcl_attention_score: 0.0
+                  sleep_problems: 1
       responses:
         "200":
           description: Prediction result
@@ -108,22 +167,65 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PredictResponse"
+              examples:
+                typical:
+                  summary: Typical prediction
+                  value:
+                    predictions:
+                      adhd: 0.42
+                      anxiety: 0.18
         "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ValidationError"
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalid_payload:
+                  summary: Missing required fields
+                  value:
+                    msg: Validation error
+                    error: validation_error
+                    errors:
+                      age: ["Missing data for required field."]
+        "500":
+          $ref: "#/components/responses/ServerError"
+
   /api/auth/register:
     post:
       tags: [Auth]
       summary: Register user
+      description: |
+        Creates a new user account. Username and email must be unique.
+        Password must be at least 8 characters.
+        user_type must be guardian or psychologist. If psychologist, provide
+        professional_card_number (COLPSIC).
+        Username is case-sensitive and must match ^[A-Za-z0-9._-]{3,32}$.
+      operationId: registerUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/RegisterRequest"
+            examples:
+              guardian:
+                summary: Guardian registration
+                value:
+                  username: guardian_01
+                  email: guardian@example.com
+                  password: "P4ssw0rd!"
+                  full_name: Maria Perez
+                  user_type: guardian
+              psychologist:
+                summary: Psychologist registration
+                value:
+                  username: dr_gomez
+                  email: dr.gomez@example.com
+                  password: "P4ssw0rd!"
+                  full_name: Oscar Gomez
+                  user_type: psychologist
+                  professional_card_number: "COLPSIC-12345"
       responses:
         "201":
           description: User created
@@ -131,26 +233,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RegisterResponse"
+              examples:
+                created:
+                  summary: Registered
+                  value:
+                    msg: user created
+                    user_id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/ServerError"
+
   /api/auth/login:
     post:
       tags: [Auth]
       summary: Login (password)
       description: |
-        Rate limit: 5 per 15 minutes por IP.
-        Respuesta puede ser access token o challenge MFA.
+        Authenticate with username and password.
+        On success returns an access token in JSON and sets refresh_token and
+        csrf_refresh_token cookies. If MFA is enabled, returns a challenge without
+        cookies. If MFA enrollment is required, returns a short-lived enrollment
+        token restricted to MFA setup/confirm. For valid credentials the endpoint
+        always responds 200, with one of:
+        - access_token + cookies (login complete)
+        - mfa_required + challenge_id (no cookies)
+        - mfa_enrollment_required + enrollment_token (no cookies)
+        Rate limit: 5 per 15 minutes per IP.
+      operationId: loginUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/LoginRequest"
+            examples:
+              typical:
+                summary: Username/password
+                value:
+                  username: guardian_01
+                  password: "P4ssw0rd!"
       responses:
         "200":
-          description: Access token o challenge MFA
+          description: Access token or MFA challenge
           headers:
             Set-Cookie:
               schema:
@@ -162,23 +290,70 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/AuthTokenResponse"
                   - $ref: "#/components/schemas/MFAChallengeResponse"
+                  - $ref: "#/components/schemas/MFAEnrollmentResponse"
+              examples:
+                token:
+                  summary: Access token response
+                  value:
+                    access_token: "<jwt>"
+                    token_type: bearer
+                    expires_in: 900
+                mfa_challenge:
+                  summary: MFA challenge response
+                  value:
+                    mfa_required: true
+                    challenge_id: "<uuid>"
+                    expires_in: 300
+                    error: mfa_required
+                mfa_enrollment:
+                  summary: MFA enrollment response
+                  value:
+                    mfa_enrollment_required: true
+                    enrollment_token: "<jwt>"
+                    token_type: bearer
+                    expires_in: 600
+                    msg: MFA enrollment required
+                    error: mfa_enrollment_required
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
+        "423":
+          $ref: "#/components/responses/Locked"
         "429":
           $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
   /api/auth/login/mfa:
     post:
       tags: [Auth]
       summary: Complete MFA login
-      description: "Rate limit: 3 per 10 minutes por IP."
+      description: |
+        Completes the MFA challenge using a TOTP code or a recovery code.
+        If MFA enrollment is still required, returns 403 with
+        error mfa_enrollment_required.
+        Rate limit: 3 per 10 minutes per IP.
+      operationId: completeMfaLogin
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/LoginMFARequest"
+            examples:
+              totp:
+                summary: TOTP code
+                value:
+                  challenge_id: "5f6c5f8f-2f7f-4c57-97f2-9f9e38c8d1d1"
+                  code: "123456"
+              recovery:
+                summary: Recovery code
+                value:
+                  challenge_id: "5f6c5f8f-2f7f-4c57-97f2-9f9e38c8d1d1"
+                  recovery_code: "a1b2c3d4"
       responses:
         "200":
           description: Access token
@@ -191,22 +366,38 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthTokenResponse"
+              examples:
+                token:
+                  summary: Access token
+                  value:
+                    access_token: "<jwt>"
+                    token_type: bearer
+                    expires_in: 900
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
         "429":
           $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
   /api/auth/refresh:
     post:
       tags: [Auth]
       summary: Refresh access token
       description: |
-        Usa cookie HttpOnly refresh_token.
-        CSRF requerido: header X-CSRF-Token debe igualar cookie csrf_refresh_token.
+        Uses the refresh_token cookie to issue a new access token.
+        Requires a CSRF double-submit: X-CSRF-Token header must match the
+        csrf_refresh_token cookie. Refresh token is rotated on every call.
+        If MFA enrollment is required, returns 401 and clears auth cookies.
+      operationId: refreshSession
       security:
         - cookieAuth: []
-        - csrfHeader: []
+          csrfCookie: []
+          csrfHeader: []
       parameters:
         - $ref: "#/components/parameters/CsrfHeader"
       responses:
@@ -216,25 +407,37 @@ paths:
             Set-Cookie:
               schema:
                 type: string
-              description: refresh_token rotado + csrf_refresh_token
+              description: refresh_token rotated + csrf_refresh_token
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthTokenResponse"
+              examples:
+                token:
+                  summary: Refreshed token
+                  value:
+                    access_token: "<jwt>"
+                    token_type: bearer
+                    expires_in: 900
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/CsrfFailed"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
   /api/auth/logout:
     post:
       tags: [Auth]
-      summary: Logout (revoca refresh tokens)
+      summary: Logout (revoke refresh tokens)
       description: |
-        Requiere access token y CSRF header.
-        Revoca todos los refresh tokens del usuario.
+        Requires an access token plus CSRF header and cookie.
+        Revokes all refresh tokens for the user.
+      operationId: logoutUser
       security:
         - bearerAuth: []
-        - csrfHeader: []
+          csrfCookie: []
+          csrfHeader: []
       parameters:
         - $ref: "#/components/parameters/CsrfHeader"
       responses:
@@ -244,36 +447,52 @@ paths:
             Set-Cookie:
               schema:
                 type: string
-              description: cookies de auth eliminadas
+              description: auth cookies cleared
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/LogoutResponse"
+              examples:
+                logged_out:
+                  summary: Logged out
+                  value:
+                    message: logged out
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/CsrfFailed"
-  /api/mfa/setup:
-    post:
-      tags: [MFA]
-      summary: MFA setup
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current user profile
+      description: Returns profile information for the authenticated user.
+      operationId: getCurrentUser
       security:
         - bearerAuth: []
       responses:
         "200":
-          description: MFA otpauth URI
+          description: Profile
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MFASetupResponse"
-        "409":
-          $ref: "#/components/responses/Conflict"
+                $ref: "#/components/schemas/UserProfileResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
-  /api/mfa/confirm:
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/auth/password/change:
     post:
-      tags: [MFA]
-      summary: Confirm MFA
+      tags: [Auth]
+      summary: Change password (authenticated)
+      operationId: changePassword
       security:
         - bearerAuth: []
       requestBody:
@@ -281,7 +500,287 @@ paths:
         content:
           application/json:
             schema:
+              $ref: "#/components/schemas/PasswordChangeRequest"
+            examples:
+              typical:
+                summary: Change password
+                value:
+                  currentPassword: "P4ssw0rd!"
+                  newPassword: "N3wP4ssw0rd!"
+                  confirmNewPassword: "N3wP4ssw0rd!"
+      responses:
+        "200":
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponseMessage"
+              examples:
+                updated:
+                  summary: Updated
+                  value:
+                    message: Password updated
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/auth/password/forgot:
+    post:
+      tags: [Auth]
+      summary: Request password reset (public)
+      operationId: requestPasswordReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordForgotRequest"
+            examples:
+              typical:
+                summary: Password reset request
+                value:
+                  email: guardian@example.com
+      responses:
+        "200":
+          description: Generic response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponseMessage"
+              examples:
+                accepted:
+                  summary: Accepted
+                  value:
+                    message: If the email exists, a reset link has been sent
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/auth/password/reset:
+    post:
+      tags: [Auth]
+      summary: Reset password with token (public)
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordResetRequest"
+            examples:
+              typical:
+                summary: Reset with token
+                value:
+                  token: "reset-token-123"
+                  newPassword: "N3wP4ssw0rd!"
+                  confirmNewPassword: "N3wP4ssw0rd!"
+      responses:
+        "200":
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponseMessage"
+              examples:
+                updated:
+                  summary: Updated
+                  value:
+                    message: Password updated
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/auth/password/reset/verify:
+    get:
+      tags: [Auth]
+      summary: Verify password reset token
+      operationId: verifyResetToken
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Token valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PasswordResetVerifyResponse"
+              examples:
+                valid:
+                  summary: Valid token
+                  value:
+                    valid: true
+        "400":
+          description: Token invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PasswordResetVerifyResponse"
+              examples:
+                invalid:
+                  summary: Invalid token
+                  value:
+                    valid: false
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/email/unsubscribe:
+    get:
+      tags: [Email]
+      summary: Unsubscribe from emails (token)
+      description: |
+        One-click unsubscribe endpoint. The token is signed and does not expose
+        the email address. Returns a generic success message when valid.
+      operationId: unsubscribeEmail
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+            minLength: 10
+            maxLength: 512
+        - in: query
+          name: reason
+          required: false
+          schema:
+            type: string
+            maxLength: 200
+      responses:
+        "200":
+          description: Unsubscribed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponseMessage"
+              examples:
+                success:
+                  summary: Unsubscribed
+                  value:
+                    message: Unsubscribed
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags: [Email]
+      summary: Unsubscribe from emails (token, one-click)
+      description: |
+        Supports List-Unsubscribe one-click POST. Token can be passed in the
+        query string or body. Returns a generic success message when valid.
+      operationId: unsubscribeEmailPost
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailUnsubscribeRequest"
+            examples:
+              typical:
+                summary: Unsubscribe with reason
+                value:
+                  token: "unsubscribe-token-123"
+                  reason: "Too many emails"
+      responses:
+        "200":
+          description: Unsubscribed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponseMessage"
+              examples:
+                success:
+                  summary: Unsubscribed
+                  value:
+                    message: Unsubscribed
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/mfa/setup:
+    post:
+      tags: [MFA]
+      summary: MFA setup
+      description: |
+        Creates or replaces the user's TOTP secret and returns an otpauth URI.
+        The plain secret is returned only in DEBUG or TESTING.
+        Accepts either a full access token or a short-lived enrollment token.
+        Enrollment tokens cannot be used for other endpoints (refresh/logout/disable).
+      operationId: setupMfa
+      security:
+        - bearerAuth: []
+        - mfaEnrollmentToken: []
+      responses:
+        "200":
+          description: MFA otpauth URI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MFASetupResponse"
+              examples:
+                setup:
+                  summary: Setup response
+                  value:
+                    otpauth_uri: otpauth://totp/CogniaApp:demo?secret=BASE32&issuer=CogniaApp
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/mfa/confirm:
+    post:
+      tags: [MFA]
+      summary: Confirm MFA
+      description: |
+        Confirms the TOTP code and returns one-time recovery codes.
+        Accepts either a full access token or a short-lived enrollment token.
+        Enrollment tokens are limited to setup/confirm only.
+      operationId: confirmMfa
+      security:
+        - bearerAuth: []
+        - mfaEnrollmentToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
               $ref: "#/components/schemas/MFAConfirmRequest"
+            examples:
+              totp:
+                summary: Confirm with TOTP
+                value:
+                  code: "123456"
       responses:
         "200":
           description: Recovery codes (one-time)
@@ -289,14 +788,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MFAConfirmResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+              examples:
+                recovery:
+                  summary: Recovery codes
+                  value:
+                    recovery_codes:
+                      - "a1b2c3d4"
+                      - "e5f6g7h8"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
   /api/mfa/disable:
     post:
       tags: [MFA]
       summary: Disable MFA
+      description: |
+        Disables MFA after validating the password and a TOTP or recovery code.
+        Revokes all refresh tokens for the user.
+        Enrollment tokens are not allowed on this endpoint.
+      operationId: disableMfa
       security:
         - bearerAuth: []
       requestBody:
@@ -305,19 +825,1495 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/MFADisableRequest"
+            examples:
+              totp:
+                summary: Disable with TOTP
+                value:
+                  password: "P4ssw0rd!"
+                  code: "123456"
+              recovery:
+                summary: Disable with recovery code
+                value:
+                  password: "P4ssw0rd!"
+                  recovery_code: "a1b2c3d4"
       responses:
         "200":
           description: MFA disabled
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                $ref: "#/components/schemas/MessageResponseMsg"
+              examples:
+                disabled:
+                  summary: Disabled
+                  value:
+                    msg: MFA disabled
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/questionnaires/active:
+    get:
+      tags: [Questionnaires]
+      summary: Get active questionnaire template
+      description: |
+        Returns the single active template and its questions.
+        Questions are ordered by position ASC, then created_at ASC.
+        If position is null, those items appear last.
+      operationId: getActiveQuestionnaire
+      responses:
+        "200":
+          description: Active template with questions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActiveQuestionnaireResponse"
+              examples:
+                active:
+                  summary: Active questionnaire
+                  value:
+                    questionnaire_template:
+                      id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
+                      name: "Conners Short"
+                      version: "v1"
+                      description: "Instrumento base"
+                      is_active: true
+                    questions:
+                      - id: "bd875d7f-6f1a-4c2c-9905-1ce14f74c0d1"
+                        code: "Q1"
+                        text: "Dificultad para concentrarse"
+                        response_type: likert_0_4
+                        disorder_id: null
+                        disorder_ids: []
+                        position: 1
+                        response_min: 0
+                        response_max: 4
+                        response_step: 1
+                        response_options: null
+        "404":
+          description: No active template
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/questionnaires:
+    post:
+      tags: [Questionnaires]
+      summary: Create questionnaire template
+      description: |
+        Creates a new questionnaire template. New templates are created with
+        is_active=false by default to enforce a single active template.
+      operationId: createQuestionnaire
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionnaireCreateRequest"
+            examples:
+              typical:
+                summary: Create template
+                value:
+                  name: "Conners Short"
+                  version: "v1"
+                  description: "Instrumento base"
+      responses:
+        "201":
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionnaireCreateResponse"
+              examples:
+                created:
+                  summary: Created
+                  value:
+                    id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
+                    name: "Conners Short"
+                    version: "v1"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/questionnaires/{template_id}/questions:
+    post:
+      tags: [Questionnaires]
+      summary: Add questions to a template
+      description: |
+        Adds one or more questions to the template. If the template is active,
+        changes are rejected to preserve instrument stability.
+      operationId: createQuestionnaireQuestions
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/QuestionCreateRequest"
+                - $ref: "#/components/schemas/QuestionCreateListRequest"
+            examples:
+              single:
+                summary: Single question
+                value:
+                  code: "Q1"
+                  text: "Dificultad para concentrarse"
+                  response_type: likert_0_4
+                  position: 1
+              batch:
+                summary: Batch questions
+                value:
+                  - code: "Q1"
+                    text: "Dificultad para concentrarse"
+                    response_type: likert_0_4
+                    position: 1
+                  - code: "Q2"
+                    text: "Inquietud o hiperactividad"
+                    response_type: likert_0_4
+                    position: 2
+      responses:
+        "201":
+          description: Questions created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionsCreatedResponse"
+              examples:
+                created:
+                  summary: Created
+                  value:
+                    template_id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
+                    created: 2
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/questionnaires/{template_id}/activate:
+    post:
+      tags: [Questionnaires]
+      summary: Activate a template
+      description: |
+        Activates a template and deactivates all others. Ensures exactly one
+        active template exists globally.
+      operationId: activateQuestionnaire
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: template_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Template activated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponseMsg"
+              examples:
+                activated:
+                  summary: Activated
+                  value:
+                    msg: template activated
+                    template_id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/questionnaires/active/clone:
+    post:
+      tags: [Questionnaires]
+      summary: Clone active template
+      description: |
+        Creates a new draft template by cloning the current active template.
+        Requires a new version string. The cloned template is not activated.
+      operationId: cloneActiveQuestionnaire
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionnaireCloneRequest"
+            examples:
+              typical:
+                summary: Clone active template
+                value:
+                  version: "v2"
+                  name: "Conners Short"
+                  description: "Ajustes de redacción"
+      responses:
+        "201":
+          description: Template cloned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionnaireCloneResponse"
+              examples:
+                cloned:
+                  summary: Cloned
+                  value:
+                    template_id: "8a8dd2c1-4c8c-4c48-baa6-1b1e9bf6fa0d"
+                    name: "Conners Short"
+                    version: "v2"
+                    is_active: false
+                    question_count: 42
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/evaluations:
+    post:
+      tags: [Evaluations]
+      summary: Create evaluation from active questionnaire
+      description: |
+        Creates an evaluation linked to the currently active questionnaire
+        template. Validates that all responses reference questions from the
+        active template.
+      operationId: createEvaluation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluationCreateRequest"
+            examples:
+              typical:
+                summary: Create evaluation
+                value:
+                  age_at_evaluation: 9
+                  evaluation_date: "2026-02-01"
+                  status: submitted
+                  is_anonymous: true
+                  responses:
+                    - question_id: "bd875d7f-6f1a-4c2c-9905-1ce14f74c0d1"
+                      value: 2
+                    - question_id: "bd875d7f-6f1a-4c2c-9905-1ce14f74c0d2"
+                      value: 1
+      responses:
+        "201":
+          description: Evaluation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluationCreateResponse"
+              examples:
+                created:
+                  summary: Created
+                  value:
+                    evaluation_id: "3a086b0c-2e4e-4a2f-9f24-7b61ac4a76f0"
+                    registration_number: "EVAL-2026-0001"
+                    questionnaire_template_id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
+                    access_key: "ABCD12"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/users:
+    get:
+      tags: [Users]
+      summary: List users (admin)
+      description: Paginated list of users. Requires ADMIN role.
+      operationId: listUsers
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserListResponse"
+              examples:
+                typical:
+                  summary: First page
+                  value:
+                    data:
+                      - id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+                        username: guardian_01
+                        email: guardian@example.com
+                        full_name: Maria Perez
+                        user_type: guardian
+                        professional_card_number: null
+                        colpsic_verified: false
+                        is_active: true
+                        roles: ["GUARDIAN"]
+                        created_at: "2026-02-01T10:05:12Z"
+                        updated_at: "2026-02-01T10:05:12Z"
+                    pagination:
+                      page: 1
+                      page_size: 20
+                      total: 1
+                      pages: 1
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags: [Users]
+      summary: Create user (admin)
+      description: Create a new user with optional roles. Requires ADMIN role.
+      operationId: createUser
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+            examples:
+              guardian:
+                summary: Create guardian
+                value:
+                  username: guardian_02
+                  email: guardian2@example.com
+                  password: "P4ssw0rd!"
+                  full_name: Juan Perez
+                  user_type: guardian
+                  is_active: true
+              psychologist:
+                summary: Create psychologist
+                value:
+                  username: dr_sanchez
+                  email: dr.sanchez@example.com
+                  password: "P4ssw0rd!"
+                  full_name: Laura Sanchez
+                  user_type: psychologist
+                  professional_card_number: "COLPSIC-98765"
+                  roles: ["PSYCHOLOGIST"]
+      responses:
+        "201":
+          description: User created
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URL of the created user resource.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserItem"
+              examples:
+                created:
+                  summary: Created
+                  value:
+                    id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+                    username: guardian_02
+                    email: guardian2@example.com
+                    full_name: Juan Perez
+                    user_type: guardian
+                    professional_card_number: null
+                    colpsic_verified: false
+                    is_active: true
+                    roles: ["GUARDIAN"]
+                    created_at: "2026-02-01T10:05:12Z"
+                    updated_at: "2026-02-01T10:05:12Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/users/{user_id}:
+    get:
+      tags: [Users]
+      summary: Get user (admin)
+      operationId: getUserById
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserItem"
+              examples:
+                user:
+                  summary: User detail
+                  value:
+                    id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+                    username: guardian_01
+                    email: guardian@example.com
+                    full_name: Maria Perez
+                    user_type: guardian
+                    professional_card_number: null
+                    colpsic_verified: false
+                    is_active: true
+                    roles: ["GUARDIAN"]
+                    created_at: "2026-02-01T10:05:12Z"
+                    updated_at: "2026-02-01T10:05:12Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    patch:
+      tags: [Users]
+      summary: Update user (admin)
+      description: Partial update (merge-patch semantics).
+      operationId: updateUserById
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateRequest"
+            examples:
+              update_email:
+                summary: Update email
+                value:
+                  email: new-email@example.com
+              update_roles:
+                summary: Update roles
+                value:
+                  roles: ["ADMIN", "ANALYST"]
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserItem"
+              examples:
+                updated:
+                  summary: Updated
+                  value:
+                    id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+                    username: guardian_01
+                    email: new-email@example.com
+                    full_name: Maria Perez
+                    user_type: guardian
+                    professional_card_number: null
+                    colpsic_verified: false
+                    is_active: true
+                    roles: ["GUARDIAN", "ANALYST"]
+                    created_at: "2026-02-01T10:05:12Z"
+                    updated_at: "2026-02-02T11:11:11Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    delete:
+      tags: [Users]
+      summary: Deactivate user (admin)
+      operationId: deactivateUserById
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User deactivated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDeactivateResponse"
+              examples:
+                deactivated:
+                  summary: Deactivated
+                  value:
+                    msg: user deactivated
+                    user_id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/admin/users:
+    get:
+      tags: [Admin]
+      summary: List users (admin)
+      description: Filters support basic search and role/user status flags.
+      operationId: listAdminUsers
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+        - in: query
+          name: q
+          description: Search by username/email (substring).
+          schema: { type: string }
+        - in: query
+          name: email
+          schema: { type: string, format: email }
+        - in: query
+          name: username
+          schema: { type: string }
+        - in: query
+          name: role
+          description: Exact role name (case-insensitive).
+          schema: { type: string }
+        - in: query
+          name: user_type
+          schema: { type: string }
+        - in: query
+          name: is_active
+          schema: { type: boolean }
+        - in: query
+          name: colpsic_verified
+          schema: { type: boolean }
+        - in: query
+          name: sort
+          description: Sort field.
+          schema:
+            type: string
+            enum: [created_at, email, username]
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserListResponse"
+              examples:
+                typical:
+                  summary: First page
+                  value:
+                    data:
+                      - id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+                        username: guardian_01
+                        email: guardian@example.com
+                        full_name: Maria Perez
+                        user_type: guardian
+                        professional_card_number: null
+                        colpsic_verified: false
+                        is_active: true
+                        roles: ["GUARDIAN"]
+                        created_at: "2026-02-01T10:05:12Z"
+                        updated_at: "2026-02-01T10:05:12Z"
+                    pagination:
+                      page: 1
+                      page_size: 20
+                      total: 1
+                      pages: 1
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/users/{id}:
+    patch:
+      tags: [Admin]
+      summary: Update user (admin)
+      description: Partial update (merge-patch semantics).
+      operationId: updateAdminUser
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUserPatchRequest"
+            examples:
+              deactivate:
+                summary: Deactivate user
+                value:
+                  is_active: false
+              roles:
+                summary: Update roles
+                value:
+                  roles: ["ADMIN", "ANALYST"]
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserItem"
+              examples:
+                updated:
+                  summary: Updated
+                  value:
+                    id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+                    username: guardian_01
+                    email: guardian@example.com
+                    full_name: Maria Perez
+                    user_type: guardian
+                    professional_card_number: null
+                    colpsic_verified: false
+                    is_active: false
+                    roles: ["GUARDIAN", "ANALYST"]
+                    updated_at: "2026-02-02T11:11:11Z"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/users/{id}/password-reset:
+    post:
+      tags: [Admin]
+      summary: Force password reset (admin)
+      operationId: resetUserPasswordAdmin
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Reset issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPasswordResetResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/users/{id}/mfa/reset:
+    post:
+      tags: [Admin]
+      summary: Reset MFA (admin)
+      operationId: resetUserMfaAdmin
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: MFA reset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMfaResetResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/audit-logs:
+    get:
+      tags: [Admin]
+      summary: List audit logs
+      operationId: listAuditLogs
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+        - in: query
+          name: user_id
+          schema: { type: string, format: uuid }
+        - in: query
+          name: action
+          schema: { type: string }
+        - in: query
+          name: section
+          schema: { type: string }
+        - in: query
+          name: from_date
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to_date
+          schema: { type: string, format: date-time }
+        - in: query
+          name: sort
+          description: Sort field.
+          schema:
+            type: string
+            enum: [created_at, action, section]
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: Audit logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuditLogListResponse"
+              examples:
+                typical:
+                  summary: First page
+                  value:
+                    data:
+                      - id: "a47b6f8e-4e4a-4b3e-a507-7d1b7d4f07c0"
+                        user_id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+                        action: USER_CREATED
+                        section: users
+                        details:
+                          user_id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+                        created_at: "2026-02-01T10:05:12Z"
+                    pagination:
+                      page: 1
+                      page_size: 20
+                      total: 1
+                      pages: 1
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/questionnaires:
+    get:
+      tags: [Admin]
+      summary: List questionnaires (admin)
+      operationId: listAdminQuestionnaires
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+        - in: query
+          name: name
+          schema: { type: string }
+        - in: query
+          name: version
+          schema: { type: string }
+        - in: query
+          name: is_active
+          schema: { type: boolean }
+        - in: query
+          name: is_archived
+          schema: { type: boolean }
+        - in: query
+          name: sort
+          description: Sort field.
+          schema:
+            type: string
+            enum: [created_at, updated_at, name, version]
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: Questionnaire list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminQuestionnaireListResponse"
+              examples:
+                typical:
+                  summary: First page
+                  value:
+                    data:
+                      - id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
+                        name: "Conners Short"
+                        version: "v1"
+                        description: "Instrumento base"
+                        is_active: true
+                        is_archived: false
+                        created_at: "2026-02-01T10:05:12Z"
+                        updated_at: "2026-02-01T10:05:12Z"
+                    pagination:
+                      page: 1
+                      page_size: 20
+                      total: 1
+                      pages: 1
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/questionnaires/{id}/publish:
+    post:
+      tags: [Admin]
+      summary: Publish questionnaire
+      operationId: publishQuestionnaire
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Published
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTemplateActionResponse"
+              examples:
+                published:
+                  summary: Published
+                  value:
+                    msg: template published
+                    template_id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/questionnaires/{id}/archive:
+    post:
+      tags: [Admin]
+      summary: Archive questionnaire
+      operationId: archiveQuestionnaire
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Archived
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTemplateActionResponse"
+              examples:
+                archived:
+                  summary: Archived
+                  value:
+                    msg: template archived
+                    template_id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/questionnaires/{id}/clone:
+    post:
+      tags: [Admin]
+      summary: Clone questionnaire
+      operationId: cloneQuestionnaireAdmin
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionnaireCloneRequest"
+            examples:
+              typical:
+                summary: Clone template
+                value:
+                  version: "v2"
+                  name: "Conners Short"
+                  description: "Ajustes de redacción"
+      responses:
+        "201":
+          description: Cloned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionnaireCloneResponse"
+              examples:
+                cloned:
+                  summary: Cloned
+                  value:
+                    template_id: "8a8dd2c1-4c8c-4c48-baa6-1b1e9bf6fa0d"
+                    name: "Conners Short"
+                    version: "v2"
+                    is_active: false
+                    question_count: 42
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/psychologists/{id}/approve:
+    post:
+      tags: [Admin]
+      summary: Approve COLPSIC
+      operationId: approvePsychologist
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPsychologistApproveResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/psychologists/{id}/reject:
+    post:
+      tags: [Admin]
+      summary: Reject COLPSIC
+      operationId: rejectPsychologist
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminPsychologistRejectRequest"
+            examples:
+              typical:
+                summary: Rejection reason
+                value:
+                  reason: Documento incompleto o ilegible.
+      responses:
+        "200":
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPsychologistDecisionResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/evaluations:
+    get:
+      tags: [Admin]
+      summary: List evaluations (admin)
+      operationId: listAdminEvaluations
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+        - in: query
+          name: status
+          schema: { type: string }
+        - in: query
+          name: age_min
+          schema: { type: integer }
+        - in: query
+          name: age_max
+          schema: { type: integer }
+        - in: query
+          name: date_from
+          schema: { type: string, format: date }
+        - in: query
+          name: date_to
+          schema: { type: string, format: date }
+        - in: query
+          name: psychologist_id
+          schema: { type: string, format: uuid }
+        - in: query
+          name: subject_id
+          schema: { type: string, format: uuid }
+        - in: query
+          name: sort
+          description: Sort field.
+          schema:
+            type: string
+            enum: [created_at, evaluation_date, status, age_at_evaluation]
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: Evaluations list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminEvaluationListResponse"
+              examples:
+                typical:
+                  summary: First page
+                  value:
+                    data:
+                      - id: "3a086b0c-2e4e-4a2f-9f24-7b61ac4a76f0"
+                        status: submitted
+                        age_at_evaluation: 9
+                        evaluation_date: "2026-02-01"
+                        subject_id: null
+                        psychologist_id: null
+                        created_at: "2026-02-01T10:05:12Z"
+                    pagination:
+                      page: 1
+                      page_size: 20
+                      total: 1
+                      pages: 1
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/evaluations/{id}/status:
+    patch:
+      tags: [Admin]
+      summary: Update evaluation status
+      operationId: updateAdminEvaluationStatus
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminEvaluationStatusRequest"
+            examples:
+              submit:
+                summary: Update status
+                value:
+                  status: submitted
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminEvaluationStatusResponse"
+              examples:
+                updated:
+                  summary: Updated
+                  value:
+                    msg: status updated
+                    evaluation_id: "3a086b0c-2e4e-4a2f-9f24-7b61ac4a76f0"
+                    status: submitted
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/roles:
+    get:
+      tags: [Admin]
+      summary: List roles
+      operationId: listAdminRoles
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Roles list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminRoleListResponse"
+              examples:
+                typical:
+                  summary: Roles
+                  value:
+                    items:
+                      - id: "f7b1f123-2f2a-4f2c-8c4e-9a9f1b9c0b9a"
+                        name: ADMIN
+                        description: Administrator
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    post:
+      tags: [Admin]
+      summary: Create role
+      operationId: createAdminRole
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminRoleCreateRequest"
+            examples:
+              analyst:
+                summary: Create role
+                value:
+                  name: ANALYST
+                  description: Analista de calidad
+      responses:
+        "201":
+          description: Role created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminRoleItem"
+              examples:
+                created:
+                  summary: Created
+                  value:
+                    id: "f7b1f123-2f2a-4f2c-8c4e-9a9f1b9c0b9a"
+                    name: ANALYST
+                    description: Analista de calidad
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/users/{id}/roles:
+    post:
+      tags: [Admin]
+      summary: Assign roles to user
+      operationId: assignAdminUserRoles
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminRoleAssignRequest"
+            examples:
+              assign:
+                summary: Assign roles
+                value:
+                  roles: ["ADMIN", "ANALYST"]
+      responses:
+        "200":
+          description: Roles updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminRoleAssignResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/email/unsubscribes:
+    get:
+      tags: [Admin]
+      summary: List email unsubscribes
+      operationId: listEmailUnsubscribes
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+        - in: query
+          name: email
+          schema: { type: string, format: email }
+        - in: query
+          name: from_date
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to_date
+          schema: { type: string, format: date-time }
+        - in: query
+          name: sort
+          description: Sort field.
+          schema:
+            type: string
+            enum: [unsubscribed_at, email]
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: Unsubscribes list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUnsubscribeListResponse"
+              examples:
+                typical:
+                  summary: First page
+                  value:
+                    data:
+                      - id: "1e5d2d12-31f3-4f6a-8d0c-4b1e9d2a2f9f"
+                        email: "user@example.com"
+                        reason: "Too many emails"
+                        source: "unsubscribe_link"
+                        unsubscribed_at: "2026-02-01T10:05:12Z"
+                    pagination:
+                      page: 1
+                      page_size: 20
+                      total: 1
+                      pages: 1
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/email/unsubscribes/{id}/remove:
+    post:
+      tags: [Admin]
+      summary: Remove unsubscribe entry
+      operationId: removeEmailUnsubscribe
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Unsubscribe removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUnsubscribeRemoveResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/email/health:
+    get:
+      tags: [Admin]
+      summary: Email configuration health
+      operationId: getEmailHealth
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Email health
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminEmailHealthResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/metrics:
+    get:
+      tags: [Admin]
+      summary: Metrics snapshot (admin)
+      operationId: getAdminMetrics
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetricsResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/impersonate/{id}:
+    post:
+      tags: [Admin]
+      summary: Impersonate user (admin)
+      operationId: impersonateUser
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Impersonation token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminImpersonateResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
 components:
   parameters:
     CsrfHeader:
@@ -326,20 +2322,68 @@ components:
       required: true
       schema:
         type: string
-      description: Debe ser igual a cookie csrf_refresh_token
+      description: Must match the csrf_refresh_token cookie value.
+    PageParam:
+      in: query
+      name: page
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number (1-based).
+    PageSizeParam:
+      in: query
+      name: page_size
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Items per page (max 100).
+    OrderParam:
+      in: query
+      name: order
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+      description: Sort order.
+
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: Access token sent in the Authorization header.
+    mfaEnrollmentToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Short-lived token for MFA setup/confirm only (claim mfa_enrollment=true).
     cookieAuth:
       type: apiKey
       in: cookie
       name: refresh_token
+      description: Refresh token cookie (HttpOnly).
+    csrfCookie:
+      type: apiKey
+      in: cookie
+      name: csrf_refresh_token
+      description: CSRF cookie used for double-submit validation.
     csrfHeader:
       type: apiKey
       in: header
       name: X-CSRF-Token
+      description: CSRF header used for double-submit validation.
+    metricsToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: "Bearer token for /metrics (Authorization: Bearer <token>)."
+
   responses:
     BadRequest:
       description: Bad request
@@ -372,7 +2416,7 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     CsrfFailed:
-      description: CSRF failed
+      description: CSRF validation failed
       content:
         application/json:
           schema:
@@ -383,55 +2427,144 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    Locked:
+      description: Resource locked
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
     ServerError:
       description: Server error
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    ServiceUnavailable:
+      description: Service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
   schemas:
     ErrorResponse:
       type: object
+      required: [msg, error]
       properties:
         msg:
           type: string
+          description: Human-readable error message.
         error:
           type: string
+          description: Stable error code.
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: Optional structured details (validation fields, limits, etc.).
+        errors:
+          type: object
+          nullable: true
+          additionalProperties: true
+          deprecated: true
+          description: Legacy validation errors shape (predict endpoint).
+        trace_id:
+          type: string
+          nullable: true
+          description: Correlation/trace id (if enabled by the platform).
       example:
-        msg: Invalid credentials
-        error: invalid_credentials
+        msg: Validation error
+        error: validation_error
+        details:
+          email: ["Invalid email format"]
+        trace_id: "f3c7c6f1c1a34c6a"
     ValidationError:
       type: object
+      deprecated: true
+      description: Legacy validation error payload. Prefer ErrorResponse with details.
       properties:
         errors:
           type: object
       example:
         errors:
           age: ["Must be greater than or equal to 3."]
-    MessageResponse:
+    MessageResponseMsg:
       type: object
+      required: [msg]
       properties:
         msg:
           type: string
       example:
         msg: ok
+    MessageResponseMessage:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+      example:
+        message: ok
+    MessageResponse:
+      oneOf:
+        - $ref: "#/components/schemas/MessageResponseMsg"
+        - $ref: "#/components/schemas/MessageResponseMessage"
+      description: Some endpoints return `msg` (legacy), others return `message`.
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+    ReadyResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ready
+        latency_ms:
+          type: number
+          example: 2.4
+    NotReadyResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: not_ready
     RegisterRequest:
       type: object
-      required: [username, email, password]
+      required: [username, email, password, user_type]
       properties:
         username:
           type: string
+          minLength: 3
+          maxLength: 32
+          pattern: "^[A-Za-z0-9._-]{3,32}$"
           example: testuser
         email:
           type: string
+          maxLength: 254
+          format: email
           example: test@example.com
         password:
           type: string
           format: password
+          minLength: 8
+          maxLength: 128
           example: P4ssw0rd!
         full_name:
           type: string
+          maxLength: 120
           example: Test User
+        user_type:
+          type: string
+          enum: [guardian, psychologist]
+          description: guardian=padre/tutor, psychologist=psicologo
+          example: guardian
+        professional_card_number:
+          type: string
+          description: Required when user_type=psychologist (COLPSIC)
+          pattern: "^[A-Za-z0-9-]{4,32}$"
+          example: "123456"
     RegisterResponse:
       type: object
       properties:
@@ -447,6 +2580,9 @@ components:
       properties:
         username:
           type: string
+          minLength: 3
+          maxLength: 32
+          pattern: "^[A-Za-z0-9._-]{3,32}$"
           example: testuser
         password:
           type: string
@@ -454,6 +2590,7 @@ components:
           example: P4ssw0rd!
     AuthTokenResponse:
       type: object
+      required: [access_token, token_type, expires_in]
       properties:
         access_token:
           type: string
@@ -478,18 +2615,46 @@ components:
         error:
           type: string
           example: mfa_required
+    MFAEnrollmentResponse:
+      type: object
+      properties:
+        mfa_enrollment_required:
+          type: boolean
+          example: true
+        enrollment_token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+          example: 600
+        msg:
+          type: string
+          example: MFA enrollment required
+        error:
+          type: string
+          example: mfa_enrollment_required
     LoginMFARequest:
       type: object
+      description: Provide either code or recovery_code.
       required: [challenge_id]
+      anyOf:
+        - required: [code]
+        - required: [recovery_code]
       properties:
         challenge_id:
           type: string
           format: uuid
         code:
           type: string
+          description: TOTP code
+          minLength: 6
+          maxLength: 10
           example: "123456"
         recovery_code:
           type: string
+          description: One-time recovery code
           example: "a1b2c3d4"
     LogoutResponse:
       type: object
@@ -497,6 +2662,579 @@ components:
         message:
           type: string
           example: logged out
+    UserProfileResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+        full_name:
+          type: string
+          nullable: true
+        user_type:
+          type: string
+          nullable: true
+        professional_card_number:
+          type: string
+          nullable: true
+        colpsic_verified:
+          type: boolean
+        is_active:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+        mfa_enabled:
+          type: boolean
+        mfa_confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        mfa_method:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    UserItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+        full_name:
+          type: string
+          nullable: true
+        user_type:
+          type: string
+        professional_card_number:
+          type: string
+          nullable: true
+        colpsic_verified:
+          type: boolean
+        is_active:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    AdminUserItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+        full_name:
+          type: string
+          nullable: true
+        user_type:
+          type: string
+        professional_card_number:
+          type: string
+          nullable: true
+        colpsic_verified:
+          type: boolean
+        is_active:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    AdminUserListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminUserItem"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+    AdminUserPatchRequest:
+      type: object
+      properties:
+        is_active:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+        user_type:
+          type: string
+          enum: [guardian, psychologist]
+        professional_card_number:
+          type: string
+          nullable: true
+      example:
+        is_active: true
+        roles: ["PSYCHOLOGIST"]
+        user_type: psychologist
+        professional_card_number: "COLPSIC-12345"
+    AdminPasswordResetResponse:
+      type: object
+      properties:
+        msg:
+          type: string
+        email_sent:
+          type: boolean
+      example:
+        msg: Password reset issued
+        email_sent: true
+    AdminAuditLogItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+          nullable: true
+        action:
+          type: string
+        section:
+          type: string
+          nullable: true
+        details:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+    AdminAuditLogListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminAuditLogItem"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+    AdminQuestionnaireItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        is_archived:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    AdminQuestionnaireListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminQuestionnaireItem"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+    AdminEvaluationItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        age_at_evaluation:
+          type: integer
+        evaluation_date:
+          type: string
+          format: date
+          nullable: true
+        subject_id:
+          type: string
+          format: uuid
+          nullable: true
+        psychologist_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+    AdminEvaluationListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminEvaluationItem"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+    AdminEvaluationStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+      example:
+        status: submitted
+    AdminRoleItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+    AdminRoleListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminRoleItem"
+    AdminRoleCreateRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+      example:
+        name: ANALYST
+        description: Analista de calidad
+    AdminRoleAssignRequest:
+      type: object
+      required: [roles]
+      properties:
+        roles:
+          type: array
+          minItems: 1
+          items:
+            type: string
+      example:
+        roles: ["ADMIN", "ANALYST"]
+    AdminUnsubscribeItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        reason:
+          type: string
+          nullable: true
+        source:
+          type: string
+          nullable: true
+        unsubscribed_at:
+          type: string
+          format: date-time
+          nullable: true
+    AdminUnsubscribeListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminUnsubscribeItem"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+    AdminEmailHealthResponse:
+      type: object
+      properties:
+        email_enabled:
+          type: boolean
+        smtp_host_configured:
+          type: boolean
+        smtp_user_configured:
+          type: boolean
+        smtp_use_tls:
+          type: boolean
+        smtp_use_ssl:
+          type: boolean
+      example:
+        email_enabled: true
+        smtp_host_configured: true
+        smtp_user_configured: true
+        smtp_use_tls: true
+        smtp_use_ssl: false
+    AdminPsychologistRejectRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          maxLength: 500
+      example:
+        reason: Documento incompleto o ilegible.
+    AdminPsychologistDecisionResponse:
+      type: object
+      properties:
+        msg:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        email_sent:
+          type: boolean
+      example:
+        msg: psychologist rejected
+        user_id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+        email_sent: true
+    AdminPsychologistApproveResponse:
+      allOf:
+        - $ref: "#/components/schemas/MessageResponseMsg"
+        - type: object
+          properties:
+            user_id:
+              type: string
+              format: uuid
+          required: [user_id]
+      example:
+        msg: psychologist approved
+        user_id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+    AdminTemplateActionResponse:
+      allOf:
+        - $ref: "#/components/schemas/MessageResponseMsg"
+        - type: object
+          properties:
+            template_id:
+              type: string
+              format: uuid
+          required: [template_id]
+      example:
+        msg: template published
+        template_id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
+    AdminMfaResetResponse:
+      allOf:
+        - $ref: "#/components/schemas/MessageResponseMsg"
+        - type: object
+          properties:
+            user_id:
+              type: string
+              format: uuid
+          required: [user_id]
+      example:
+        msg: MFA reset
+        user_id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+    AdminRoleAssignResponse:
+      allOf:
+        - $ref: "#/components/schemas/MessageResponseMsg"
+        - type: object
+          properties:
+            user_id:
+              type: string
+              format: uuid
+          required: [user_id]
+      example:
+        msg: roles updated
+        user_id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+    AdminUnsubscribeRemoveResponse:
+      allOf:
+        - $ref: "#/components/schemas/MessageResponseMsg"
+        - type: object
+          properties:
+            email:
+              type: string
+              format: email
+          required: [email]
+      example:
+        msg: unsubscribe removed
+        email: "user@example.com"
+    AdminEvaluationStatusResponse:
+      allOf:
+        - $ref: "#/components/schemas/MessageResponseMsg"
+        - type: object
+          properties:
+            evaluation_id:
+              type: string
+              format: uuid
+            status:
+              type: string
+          required: [evaluation_id, status]
+      example:
+        msg: status updated
+        evaluation_id: "3a086b0c-2e4e-4a2f-9f24-7b61ac4a76f0"
+        status: submitted
+    UserDeactivateResponse:
+      allOf:
+        - $ref: "#/components/schemas/MessageResponseMsg"
+        - type: object
+          properties:
+            user_id:
+              type: string
+              format: uuid
+          required: [user_id]
+      example:
+        msg: user deactivated
+        user_id: "b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a"
+    AdminImpersonateResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+          example: 900
+      example:
+        access_token: "<jwt>"
+        token_type: bearer
+        expires_in: 900
+    Pagination:
+      type: object
+      required: [page, page_size, total, pages]
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          example: 1
+        page_size:
+          type: integer
+          minimum: 1
+          maximum: 100
+          example: 20
+        total:
+          type: integer
+          example: 42
+        pages:
+          type: integer
+          example: 3
+    PaginationResponse:
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+      deprecated: true
+      description: Legacy name; use Pagination.
+    UserListResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserItem"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+    UserCreateRequest:
+      type: object
+      required: [username, email, password, user_type]
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 32
+          pattern: "^[A-Za-z0-9._-]{3,32}$"
+        email:
+          type: string
+          maxLength: 254
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 128
+        full_name:
+          type: string
+          nullable: true
+          maxLength: 120
+        user_type:
+          type: string
+          enum: [guardian, psychologist]
+        professional_card_number:
+          type: string
+          nullable: true
+        roles:
+          type: array
+          items:
+            type: string
+          nullable: true
+        is_active:
+          type: boolean
+    UserUpdateRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 128
+        full_name:
+          type: string
+          nullable: true
+          maxLength: 120
+        user_type:
+          type: string
+          enum: [guardian, psychologist]
+        professional_card_number:
+          type: string
+          nullable: true
+        roles:
+          type: array
+          items:
+            type: string
+          nullable: true
+        is_active:
+          type: boolean
     MFASetupResponse:
       type: object
       properties:
@@ -505,13 +3243,15 @@ components:
           example: otpauth://totp/CogniaApp:demo?secret=BASE32&issuer=CogniaApp
         secret:
           type: string
-          description: Solo en DEBUG/TESTING
+          description: Returned only in DEBUG/TESTING
     MFAConfirmRequest:
       type: object
       required: [code]
       properties:
         code:
           type: string
+          minLength: 6
+          maxLength: 10
           example: "123456"
     MFAConfirmResponse:
       type: object
@@ -523,7 +3263,11 @@ components:
           example: ["a1b2c3d4", "e5f6g7h8"]
     MFADisableRequest:
       type: object
+      description: Provide password and either code or recovery_code.
       required: [password]
+      anyOf:
+        - required: [code]
+        - required: [recovery_code]
       properties:
         password:
           type: string
@@ -531,6 +3275,337 @@ components:
         code:
           type: string
         recovery_code:
+          type: string
+    PasswordChangeRequest:
+      type: object
+      required: [currentPassword, newPassword, confirmNewPassword]
+      properties:
+        currentPassword:
+          type: string
+          minLength: 1
+          maxLength: 200
+        newPassword:
+          type: string
+          maxLength: 200
+          minLength: 8
+          format: password
+        confirmNewPassword:
+          type: string
+          maxLength: 200
+    PasswordForgotRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          maxLength: 254
+          format: email
+    PasswordResetRequest:
+      type: object
+      required: [token, newPassword, confirmNewPassword]
+      properties:
+        token:
+          type: string
+          minLength: 10
+          maxLength: 512
+        newPassword:
+          type: string
+          maxLength: 200
+          minLength: 8
+          format: password
+        confirmNewPassword:
+          type: string
+          maxLength: 200
+    PasswordResetVerifyResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+    EmailUnsubscribeRequest:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          minLength: 10
+          maxLength: 512
+        reason:
+          type: string
+          maxLength: 200
+    QuestionnaireTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+    QuestionItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 64
+        text:
+          type: string
+          maxLength: 500
+        response_type:
+          type: string
+          enum:
+            - likert_0_4
+            - likert_1_5
+            - boolean
+            - frequency_0_3
+            - intensity_0_10
+            - count
+            - ordinal
+            - text_context
+          description: |
+            Tipos permitidos:
+            - likert_0_4: escala 0-4
+            - likert_1_5: escala 1-5
+            - boolean: 0/1
+            - frequency_0_3: 0=never,1=sometimes,2=often,3=always
+            - intensity_0_10: escala 0-10
+            - count: conteos (n veces)
+            - ordinal: escala ordinal codificada
+            - text_context: texto libre solo para contexto (no modelo)
+        disorder_id:
+          type: string
+          format: uuid
+          nullable: true
+        disorder_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Prefer this field for multi-disorder questions.
+        position:
+          type: integer
+          nullable: true
+          minimum: 0
+        response_min:
+          type: number
+          nullable: true
+        response_max:
+          type: number
+          nullable: true
+        response_step:
+          type: number
+          nullable: true
+        response_options:
+          type: array
+          items:
+            oneOf:
+              - type: number
+              - type: string
+          nullable: true
+    ActiveQuestionnaireResponse:
+      type: object
+      properties:
+        questionnaire_template:
+          $ref: "#/components/schemas/QuestionnaireTemplate"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuestionItem"
+    QuestionnaireCreateRequest:
+      type: object
+      required: [name, version]
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 120
+        version:
+          type: string
+          maxLength: 32
+          pattern: "^[A-Za-z0-9._-]{1,32}$"
+        description:
+          type: string
+          nullable: true
+    QuestionnaireCloneRequest:
+      type: object
+      required: [version]
+      properties:
+        version:
+          type: string
+          maxLength: 32
+          pattern: "^[A-Za-z0-9._-]{1,32}$"
+        name:
+          type: string
+          nullable: true
+          minLength: 3
+          maxLength: 120
+        description:
+          type: string
+          nullable: true
+    QuestionnaireCreateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: string
+    QuestionnaireCloneResponse:
+      type: object
+      properties:
+        template_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: string
+        is_active:
+          type: boolean
+        question_count:
+          type: integer
+    QuestionCreateRequest:
+      type: object
+      required: [code, text, response_type]
+      properties:
+        code:
+          type: string
+          pattern: "^[A-Za-z0-9_-]{2,64}$"
+          maxLength: 64
+        text:
+          type: string
+          minLength: 3
+          maxLength: 500
+        response_type:
+          type: string
+          enum:
+            - likert_0_4
+            - likert_1_5
+            - boolean
+            - frequency_0_3
+            - intensity_0_10
+            - count
+            - ordinal
+            - text_context
+          description: See QuestionItem.response_type for scale details.
+        disorder_id:
+          type: string
+          format: uuid
+          nullable: true
+        disorder_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+        position:
+          type: integer
+          nullable: true
+          minimum: 0
+        response_min:
+          type: number
+          nullable: true
+        response_max:
+          type: number
+          nullable: true
+        response_step:
+          type: number
+          nullable: true
+        response_options:
+          type: array
+          items:
+            oneOf:
+              - type: number
+              - type: string
+          nullable: true
+    QuestionCreateListRequest:
+      type: array
+      items:
+        $ref: "#/components/schemas/QuestionCreateRequest"
+    QuestionsCreatedResponse:
+      type: object
+      properties:
+        template_id:
+          type: string
+          format: uuid
+        created:
+          type: integer
+    EvaluationResponseItem:
+      type: object
+      required: [question_id, value]
+      properties:
+        question_id:
+          type: string
+          format: uuid
+        value:
+          oneOf:
+            - type: number
+            - type: string
+      description: |
+        value debe respetar el tipo de la pregunta.
+        text_context se guarda como texto pero no se usa en el modelo.
+    EvaluationCreateRequest:
+      type: object
+      required: [age_at_evaluation, evaluation_date, status, responses]
+      properties:
+        subject_id:
+          type: string
+          format: uuid
+          nullable: true
+        age_at_evaluation:
+          type: integer
+          minimum: 6
+          maximum: 11
+        evaluation_date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [draft, submitted, completed]
+        is_anonymous:
+          type: boolean
+          default: true
+        context:
+          type: string
+          nullable: true
+        raw_symptoms:
+          type: object
+          nullable: true
+        processed_features:
+          type: object
+          nullable: true
+        access_key:
+          type: string
+          nullable: true
+          minLength: 6
+          maxLength: 64
+        responses:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/EvaluationResponseItem"
+    EvaluationCreateResponse:
+      type: object
+      properties:
+        evaluation_id:
+          type: string
+          format: uuid
+        registration_number:
+          type: string
+        questionnaire_template_id:
+          type: string
+          format: uuid
+        access_key:
           type: string
     PredictRequest:
       type: object
@@ -572,11 +3647,22 @@ components:
       properties:
         uptime_seconds:
           type: integer
+          example: 120
         requests_total:
           type: integer
+          example: 57
         latency_ms_avg:
           type: number
+          example: 12.34
         latency_ms_max:
           type: number
+          example: 120.5
         status_counts:
           type: object
+          additionalProperties:
+            type: integer
+          example:
+            "200": 54
+            "401": 2
+            "500": 1
+

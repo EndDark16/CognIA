@@ -1,0 +1,3 @@
+trial_id,target_variant,test_precision,test_balanced_accuracy,test_recall,test_specificity,preliminary_decision
+V4_T07_subtype_enuresis_aux,target_enuresis,1.0,0.9242424242424243,0.8484848484848485,1.0,perfect_score_blocked
+V4_T08_subtype_encopresis_aux,target_encopresis,0.9922480620155039,0.9570302941320413,0.920863309352518,0.9931972789115646,perfect_score_blocked

@@ -1,0 +1,205 @@
+{
+  "model_version": "rf_conduct_v4_precision_thresholded",
+  "parent_version": "rf_conduct_v1_baseline",
+  "disorder": "conduct",
+  "target": "target_conduct",
+  "dataset_name": "dataset_conduct_minimal",
+  "data_scope": "strict_no_leakage",
+  "feature_strategy": "mi_top_k",
+  "class_balance_strategy": "balanced_subsample",
+  "calibration_strategy_requested": "none",
+  "calibration_strategy_used": "none",
+  "threshold_strategy": "precision_constrained",
+  "threshold_value": 0.692412996873836,
+  "recall_floor": 0.7547619047619047,
+  "balanced_accuracy_tolerance": 0.03,
+  "balanced_accuracy_floor": 0.8711514441842311,
+  "best_params": {
+    "model__n_estimators": 150,
+    "model__min_samples_split": 10,
+    "model__min_samples_leaf": 4,
+    "model__max_features": "log2",
+    "model__max_depth": 10,
+    "model__class_weight": "balanced_subsample"
+  },
+  "search_meta": {
+    "best_cv_balanced_accuracy": 0.848334560682455,
+    "cv_splits": 3,
+    "n_iter": 8
+  },
+  "feature_columns": [
+    "cbcl_externalizing_proxy",
+    "cbcl_rule_breaking_proxy",
+    "icut_total",
+    "cbcl_aggressive_behavior_proxy",
+    "ari_p_symptom_total",
+    "ari_sr_symptom_total",
+    "cbcl_attention_problems_proxy",
+    "sdq_total_difficulties",
+    "sdq_emotional_symptoms",
+    "sdq_conduct_problems",
+    "sdq_hyperactivity_inattention",
+    "sdq_impact",
+    "cbcl_internalizing_proxy",
+    "cbcl_anxious_depressed_proxy",
+    "has_cbcl",
+    "has_ari_p",
+    "age_years",
+    "has_icut"
+  ],
+  "removed_columns": {
+    "participant_id": "meta",
+    "target_conduct": "target_column",
+    "target_adhd": "target_column",
+    "target_elimination": "target_column",
+    "target_anxiety": "target_column",
+    "target_depression": "target_column",
+    "primary_target": "meta",
+    "dataset_name": "meta",
+    "is_exploratory": "meta"
+  },
+  "strategy_meta": {
+    "feature_strategy": "mi_top_k",
+    "removed_by_strategy": {
+      "release": "constant_or_sparse",
+      "sex_assigned_at_birth": "mi_not_in_top_18",
+      "site": "mi_not_in_top_18",
+      "has_ari_sr": "mi_not_in_top_18",
+      "has_sdq": "mi_not_in_top_18"
+    },
+    "created_features": []
+  },
+  "validation_metrics": {
+    "threshold": 0.692412996873836,
+    "accuracy": 0.9440559440559441,
+    "balanced_accuracy": 0.8982240437158471,
+    "precision": 0.7954545454545454,
+    "recall": 0.8333333333333334,
+    "sensitivity": 0.8333333333333334,
+    "specificity": 0.9631147540983607,
+    "f1": 0.813953488372093,
+    "support_negative": 244,
+    "support_positive": 42,
+    "confusion_matrix": [
+      [
+        235,
+        9
+      ],
+      [
+        7,
+        35
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.9631147540983607,
+        0.036885245901639344
+      ],
+      [
+        0.16666666666666666,
+        0.8333333333333334
+      ]
+    ],
+    "roc_auc": 0.9630171740827479,
+    "pr_auc": 0.8426878003352442,
+    "brier_score": 0.0649927872119496,
+    "fpr": 0.03688524590163933,
+    "fnr": 0.16666666666666663,
+    "prevalence": 0.14685314685314685,
+    "precision_lift_vs_baseline": 0.19227994227994227,
+    "recall_delta_vs_baseline": -0.0714285714285714,
+    "balanced_accuracy_delta_vs_baseline": -0.0029274004683840227
+  },
+  "test_metrics": {
+    "threshold": 0.692412996873836,
+    "accuracy": 0.9090909090909091,
+    "balanced_accuracy": 0.7988875878220141,
+    "precision": 0.7105263157894737,
+    "recall": 0.6428571428571429,
+    "sensitivity": 0.6428571428571429,
+    "specificity": 0.9549180327868853,
+    "f1": 0.675,
+    "support_negative": 244,
+    "support_positive": 42,
+    "confusion_matrix": [
+      [
+        233,
+        11
+      ],
+      [
+        15,
+        27
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.9549180327868853,
+        0.045081967213114756
+      ],
+      [
+        0.35714285714285715,
+        0.6428571428571429
+      ]
+    ],
+    "roc_auc": 0.9492583918813426,
+    "pr_auc": 0.7367307099072957,
+    "brier_score": 0.073978809656801,
+    "fpr": 0.04508196721311475,
+    "fnr": 0.3571428571428571,
+    "prevalence": 0.14685314685314685,
+    "precision_lift_vs_baseline": NaN,
+    "recall_delta_vs_baseline": -0.26190476190476186,
+    "balanced_accuracy_delta_vs_baseline": -0.08791959406713501
+  },
+  "abstention_validation": {
+    "low_threshold": 0.5,
+    "high_threshold": 0.9093283679274478,
+    "coverage": 0.8881118881118881,
+    "uncertain_rate": 0.11188811188811189,
+    "precision_high": 0.9523809523809523,
+    "npv_low": 0.9699570815450643,
+    "recall_effective": 0.47619047619047616,
+    "specificity_effective": 0.9262295081967213,
+    "selection_reason": "target_precision_with_coverage",
+    "target_high_precision": 0.7031746031746031,
+    "min_confident_coverage": 0.1
+  },
+  "abstention_test": {
+    "coverage": 0.8706293706293706,
+    "uncertain_rate": 0.12937062937062938,
+    "precision_high": 0.85,
+    "npv_low": 0.9650655021834061,
+    "recall_effective": 0.40476190476190477,
+    "specificity_effective": 0.9057377049180327,
+    "confident_positive_n": 20,
+    "confident_negative_n": 229,
+    "uncertain_n": 37
+  },
+  "figures": {
+    "roc_curve": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\precision\\rf_conduct_v4_precision_thresholded\\rf_conduct_v4_precision_thresholded_roc.png",
+    "pr_curve": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\precision\\rf_conduct_v4_precision_thresholded\\rf_conduct_v4_precision_thresholded_pr.png",
+    "confusion": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\precision\\rf_conduct_v4_precision_thresholded\\rf_conduct_v4_precision_thresholded_confusion.png",
+    "confusion_normalized": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\precision\\rf_conduct_v4_precision_thresholded\\rf_conduct_v4_precision_thresholded_confusion_normalized.png",
+    "calibration_curve": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\precision\\rf_conduct_v4_precision_thresholded\\rf_conduct_v4_precision_thresholded_calibration.png"
+  },
+  "top_permutation_features": [
+    "num__cbcl_attention_problems_proxy",
+    "num__sdq_total_difficulties",
+    "num__sdq_conduct_problems",
+    "num__sdq_hyperactivity_inattention",
+    "num__has_cbcl",
+    "num__has_ari_p",
+    "num__has_icut",
+    "num__cbcl_externalizing_proxy",
+    "num__sdq_impact",
+    "num__ari_p_symptom_total",
+    "num__sdq_emotional_symptoms",
+    "num__cbcl_anxious_depressed_proxy",
+    "num__icut_total",
+    "num__cbcl_rule_breaking_proxy",
+    "num__cbcl_internalizing_proxy",
+    "num__cbcl_aggressive_behavior_proxy",
+    "num__ari_sr_symptom_total",
+    "num__age_years"
+  ]
+}

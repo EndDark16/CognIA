@@ -1,0 +1,209 @@
+# api/routes/evaluations.py
+
+import uuid
+from datetime import date
+
+from flask import Blueprint, jsonify, request, current_app
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from marshmallow import ValidationError
+
+from api.schemas.evaluation_schema import EvaluationCreateSchema
+from api.security import log_audit
+from api.services.evaluation_service import (
+    attach_access_key,
+    build_evaluation_payload,
+    build_evaluation_responses,
+    generate_access_key,
+    get_template_questions_map,
+    validate_response_value,
+)
+from api.services.questionnaire_service import get_active_template
+from app.models import db, Subject, AppUser, SubjectGuardian
+
+
+evaluations_bp = Blueprint("evaluations", __name__, url_prefix="/api/v1/evaluations")
+
+
+def _parse_uuid(value):
+    try:
+        return uuid.UUID(str(value))
+    except (TypeError, ValueError):
+        return None
+
+
+def _error_response(message: str, error_code: str, status_code: int, details=None):
+    payload = {"msg": message, "error": error_code}
+    if details is not None:
+        payload["details"] = details
+    return jsonify(payload), status_code
+
+
+@evaluations_bp.post("")
+@jwt_required()
+def create_evaluation():
+    identity = _parse_uuid(get_jwt_identity())
+    if not identity:
+        return _error_response("Invalid user", "invalid_user", 401)
+    user = db.session.get(AppUser, identity)
+    if not user:
+        return _error_response("User not found", "user_not_found", 404)
+    if not user.is_active:
+        return _error_response("Account inactive", "inactive_account", 403)
+
+    schema = EvaluationCreateSchema()
+    try:
+        data = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
+
+    template = get_active_template()
+    if not template:
+        return _error_response("No active questionnaire template", "no_active_template", 409)
+
+    responses = data.get("responses") or []
+    if not responses:
+        return _error_response("Missing responses", "missing_responses", 400)
+
+    question_ids = [resp.get("question_id") for resp in responses]
+    if any(qid is None for qid in question_ids):
+        return _error_response("Missing question_id", "missing_question_id", 400)
+
+    if len(set(map(str, question_ids))) != len(question_ids):
+        return _error_response("Duplicate question_id in responses", "duplicate_question_id", 400)
+
+    question_map = get_template_questions_map(template.id)
+    if not question_map:
+        return _error_response("Template has no questions", "template_empty", 409)
+
+    invalid = [qid for qid in question_ids if str(qid) not in question_map]
+    if invalid:
+        return _error_response(
+            "Invalid question_id for template",
+            "invalid_question_id",
+            400,
+            {"question_ids": invalid},
+        )
+
+    subject_id = data.get("subject_id")
+    if subject_id:
+        subject_uuid = _parse_uuid(subject_id)
+        if not subject_uuid:
+            return _error_response("Invalid subject_id", "invalid_subject_id", 400)
+        subject = Subject.query.filter_by(id=subject_uuid).first()
+        if not subject:
+            return _error_response("Subject not found", "subject_not_found", 404)
+        if user.user_type == "guardian":
+            guardian_link = SubjectGuardian.query.filter_by(
+                subject_id=subject_uuid, user_id=identity, is_active=True
+            ).first()
+            if not guardian_link:
+                return _error_response("Forbidden subject access", "forbidden_subject", 403)
+    else:
+        subject_uuid = None
+
+    is_anonymous = data.get("is_anonymous")
+    if is_anonymous is None:
+        is_anonymous = subject_uuid is None
+    if subject_uuid and is_anonymous:
+        return _error_response("Anonymous evaluations cannot include subject_id", "invalid_anonymous_subject", 400)
+    if not subject_uuid and is_anonymous is False:
+        return _error_response("subject_id required when is_anonymous=false", "missing_subject_id", 400)
+
+    access_key = data.get("access_key")
+    if access_key:
+        access_key = str(access_key).strip()
+        if len(access_key) < 6 or len(access_key) > 64:
+            return _error_response("Invalid access_key length", "invalid_access_key", 400)
+    else:
+        access_key = generate_access_key()
+
+    min_age = int(current_app.config.get("EVALUATION_MIN_AGE", 6))
+    max_age = int(current_app.config.get("EVALUATION_MAX_AGE", 11))
+    age_value = data.get("age_at_evaluation")
+    if age_value is not None and (age_value < min_age or age_value > max_age):
+        return _error_response(
+            "age_at_evaluation out of allowed range",
+            "invalid_age",
+            400,
+            {"min": min_age, "max": max_age},
+        )
+
+    allowed_statuses = current_app.config.get("EVALUATION_ALLOWED_STATUSES", [])
+    if allowed_statuses and data.get("status") not in allowed_statuses:
+        return _error_response(
+            "Invalid status",
+            "invalid_status",
+            400,
+            {"allowed": allowed_statuses},
+        )
+
+    if data.get("evaluation_date") and data["evaluation_date"] > date.today():
+        return _error_response("evaluation_date cannot be in the future", "invalid_evaluation_date", 400)
+
+    evaluation_id = uuid.uuid4()
+    normalized_responses = []
+    validation_errors = []
+    for resp in responses:
+        question = question_map.get(str(resp["question_id"]))
+        ok, error_code, normalized = validate_response_value(question, resp.get("value"))
+        if not ok:
+            validation_errors.append(
+                {"question_id": str(resp["question_id"]), "error": error_code}
+            )
+        else:
+            normalized_responses.append(
+                {"question_id": resp["question_id"], "value": normalized}
+            )
+
+    if validation_errors:
+        return _error_response(
+            "Invalid response values",
+            "invalid_response_value",
+            400,
+            {"items": validation_errors},
+        )
+
+    evaluation = build_evaluation_payload(
+        evaluation_id=evaluation_id,
+        requested_by_user_id=identity,
+        questionnaire_template_id=template.id,
+        age_at_evaluation=data["age_at_evaluation"],
+        evaluation_date=data["evaluation_date"],
+        status=data["status"],
+        subject_id=subject_uuid,
+        psychologist_id=None,
+        context=data.get("context"),
+        raw_symptoms=data.get("raw_symptoms"),
+        processed_features=data.get("processed_features"),
+        is_anonymous=is_anonymous,
+    )
+
+    attach_access_key(evaluation, access_key)
+    evaluation_responses = build_evaluation_responses(evaluation_id, normalized_responses)
+
+    try:
+        db.session.add(evaluation)
+        db.session.add_all(evaluation_responses)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        return _error_response("Database error", "db_error", 500)
+
+    log_audit(
+        identity,
+        "EVALUATION_CREATED",
+        "evaluations",
+        {"evaluation_id": str(evaluation.id), "template_id": str(template.id)},
+    )
+
+    return (
+        jsonify(
+            {
+                "evaluation_id": str(evaluation.id),
+                "registration_number": evaluation.registration_number,
+                "questionnaire_template_id": str(template.id),
+                "access_key": access_key,
+            }
+        ),
+        201,
+    )

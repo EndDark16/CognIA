@@ -28,10 +28,35 @@ def get_config_class():
 
 def main():
     users_to_create = [
-        {"username": "admin_demo", "email": "admin_demo@example.com", "full_name": "Admin Demo", "role": "ADMIN"},
-        {"username": "psych_demo", "email": "psych_demo@example.com", "full_name": "Psychologist Demo", "role": "PSYCHOLOGIST"},
-        {"username": "teacher_demo", "email": "teacher_demo@example.com", "full_name": "Teacher Demo", "role": "TEACHER"},
-        {"username": "guardian_demo", "email": "guardian_demo@example.com", "full_name": "Guardian Demo", "role": "GUARDIAN"},
+        {
+            "username": "admin_demo",
+            "email": "admin_demo@example.com",
+            "full_name": "Admin Demo",
+            "role": "ADMIN",
+            "user_type": "guardian",
+        },
+        {
+            "username": "psych_demo",
+            "email": "psych_demo@example.com",
+            "full_name": "Psychologist Demo",
+            "role": "PSYCHOLOGIST",
+            "user_type": "psychologist",
+            "professional_card_number": "COLPSIC-DEMO-001",
+        },
+        {
+            "username": "teacher_demo",
+            "email": "teacher_demo@example.com",
+            "full_name": "Teacher Demo",
+            "role": "TEACHER",
+            "user_type": "guardian",
+        },
+        {
+            "username": "guardian_demo",
+            "email": "guardian_demo@example.com",
+            "full_name": "Guardian Demo",
+            "role": "GUARDIAN",
+            "user_type": "guardian",
+        },
     ]
     default_password = os.getenv("SEED_DEFAULT_PASSWORD", "P4ssw0rd!")
 
@@ -54,6 +79,8 @@ def main():
                     full_name=item["full_name"],
                     password=hash_password(default_password),
                     is_active=True,
+                    user_type=item.get("user_type", "guardian"),
+                    professional_card_number=item.get("professional_card_number"),
                 )
                 db.session.add(user)
                 db.session.flush()  # obtiene id
@@ -61,6 +88,9 @@ def main():
             else:
                 print(f"Usuario {item['username']} ya existe, actualizando datos basicos")
                 user.full_name = item["full_name"]
+                user.user_type = item.get("user_type", user.user_type or "guardian")
+                if item.get("professional_card_number"):
+                    user.professional_card_number = item["professional_card_number"]
                 user.is_active = True
 
             # Asignar rol si no lo tiene
