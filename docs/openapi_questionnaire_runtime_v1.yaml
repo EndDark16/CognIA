@@ -1,0 +1,69 @@
+openapi: 3.0.3
+info:
+  title: CognIA Questionnaire Runtime v1 (Addendum)
+  version: 1.0.0
+  description: >
+    Addendum operativo para endpoints de questionnaire runtime v1.
+servers:
+  - url: /
+paths:
+  /api/v1/questionnaire-runtime/questionnaire/active:
+    get:
+      summary: Obtener cuestionario activo versionado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cuestionario activo
+  /api/v1/questionnaire-runtime/evaluations/draft:
+    post:
+      summary: Crear evaluación draft
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Draft creado
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/submit:
+    post:
+      summary: Enviar evaluación para procesamiento
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '202':
+          description: Encolado/ejecución de procesamiento
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results:
+    get:
+      summary: Obtener resultados para usuario
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Resultados disponibles
+  /api/v1/questionnaire-runtime/professional/access:
+    post:
+      summary: Acceso profesional por referencia + PIN
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Acceso concedido
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
