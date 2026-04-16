@@ -401,3 +401,24 @@ Ramas/commits:
 
 Resultado esperado:
 - El backend inicia aunque esos modulos no esten presentes en la imagen desplegada, evitando caida total de Gunicorn.
+
+## Actualizacion (2026-04-16) - cuestionarios runtime/v2 versionados completos
+Problema detectado:
+- Parte critica de cuestionarios/runtime/modelos existia en workspace local pero no en ramas remotas, por eso no aparecia en deploy.
+
+Accion aplicada:
+- Se versiono el bloque completo en `dev.enddark` (commit `96d3ffe`):
+  - rutas `questionnaire_runtime` y `questionnaire_v2`
+  - servicios runtime/v2 + schema v2
+  - migraciones faltantes `20260330_01` y `20260414_01`
+  - script `bootstrap_questionnaire_backend_v2.py`
+  - datos fuente minimos del cuestionario y activacion de 30 modos
+  - docs tecnicas de arquitectura/contratos/migracion/reporting
+  - tests de API/servicios/smoke
+
+Validacion tecnica:
+- Docker Desktop:
+  - `10 passed` en tests API/loader v2+runtime.
+  - `4 passed` en tests model/smoke runtime.
+- Alembic:
+  - `alembic heads` resuelve en `20260415_01 (head)` (cadena consistente incluyendo `20260330_01` y `20260414_01`).
