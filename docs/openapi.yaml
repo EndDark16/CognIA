@@ -1028,103 +1028,6 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
-  /api/v1/questionnaires/{template_id}/activate:
-    post:
-      tags: [Questionnaires]
-      summary: Activate a template
-      description: |
-        Activates a template and deactivates all others. Ensures exactly one
-        active template exists globally.
-      operationId: activateQuestionnaire
-      x-roles: [ADMIN]
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: template_id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        "200":
-          description: Template activated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseMsg"
-              examples:
-                activated:
-                  summary: Activated
-                  value:
-                    msg: template activated
-                    template_id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-        "500":
-          $ref: "#/components/responses/ServerError"
-
-  /api/v1/questionnaires/active/clone:
-    post:
-      tags: [Questionnaires]
-      summary: Clone active template
-      description: |
-        Creates a new draft template by cloning the current active template.
-        Requires a new version string. The cloned template is not activated.
-      operationId: cloneActiveQuestionnaire
-      x-roles: [ADMIN]
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/QuestionnaireCloneRequest"
-            examples:
-              typical:
-                summary: Clone active template
-                value:
-                  version: "v2"
-                  name: "Conners Short"
-                  description: "Ajustes de redacción"
-      responses:
-        "201":
-          description: Template cloned
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/QuestionnaireCloneResponse"
-              examples:
-                cloned:
-                  summary: Cloned
-                  value:
-                    template_id: "8a8dd2c1-4c8c-4c48-baa6-1b1e9bf6fa0d"
-                    name: "Conners Short"
-                    version: "v2"
-                    is_active: false
-                    question_count: 42
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-        "500":
-          $ref: "#/components/responses/ServerError"
-
   /api/v1/evaluations:
     post:
       tags: [Evaluations]
@@ -2087,45 +1990,6 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/ServerError" }
-    post:
-      tags: [Admin]
-      summary: Create role
-      operationId: createAdminRole
-      x-roles: [ADMIN]
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminRoleCreateRequest"
-            examples:
-              analyst:
-                summary: Create role
-                value:
-                  name: ANALYST
-                  description: Analista de calidad
-      responses:
-        "201":
-          description: Role created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AdminRoleItem"
-              examples:
-                created:
-                  summary: Created
-                  value:
-                    id: "f7b1f123-2f2a-4f2c-8c4e-9a9f1b9c0b9a"
-                    name: ANALYST
-                    description: Analista de calidad
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "409": { $ref: "#/components/responses/Conflict" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "403": { $ref: "#/components/responses/Forbidden" }
-        "429": { $ref: "#/components/responses/RateLimited" }
-        "500": { $ref: "#/components/responses/ServerError" }
 
   /api/admin/users/{id}/roles:
     post:
@@ -2287,11 +2151,121 @@ paths:
         "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/ServerError" }
 
-  /api/admin/impersonate/{id}:
+  /api/problem-reports:
     post:
-      tags: [Admin]
-      summary: Impersonate user (admin)
-      operationId: impersonateUser
+      tags: [ProblemReports]
+      summary: Create a problem report
+      operationId: createProblemReport
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProblemReportCreateRequest"
+            examples:
+              basic:
+                summary: Report issue without attachment
+                value:
+                  issue_type: questionnaire
+                  description: No me deja continuar al siguiente bloque del cuestionario.
+                  source_module: questionnaire
+                  source_path: /questionnaire/session/abc/page/2
+      responses:
+        "201":
+          description: Problem report created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemReportCreateResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/problem-reports/mine:
+    get:
+      tags: [ProblemReports]
+      summary: List current user problem reports
+      operationId: listMyProblemReports
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+      responses:
+        "200":
+          description: My problem reports
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemReportListResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/problem-reports:
+    get:
+      tags: [Admin, ProblemReports]
+      summary: List problem reports (admin)
+      operationId: adminListProblemReports
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [open, triaged, in_progress, resolved, rejected]
+        - in: query
+          name: issue_type
+          schema:
+            type: string
+            enum: [bug, ui_issue, data_issue, performance, questionnaire, model_result, other]
+        - in: query
+          name: reporter_role
+          schema:
+            type: string
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: from_date
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: to_date
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [created_at, updated_at, resolved_at, status, issue_type]
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: Problem reports list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemReportListResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/problem-reports/{id}:
+    get:
+      tags: [Admin, ProblemReports]
+      summary: Get problem report detail (admin)
+      operationId: adminGetProblemReport
       x-roles: [ADMIN]
       security:
         - bearerAuth: []
@@ -2299,19 +2273,52 @@ paths:
         - in: path
           name: id
           required: true
-          schema: { type: string, format: uuid }
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
-          description: Impersonation token
+          description: Problem report detail
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AdminImpersonateResponse"
+                $ref: "#/components/schemas/ProblemReportDetailResponse"
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
-        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    patch:
+      tags: [Admin, ProblemReports]
+      summary: Update problem report status or admin notes
+      operationId: adminUpdateProblemReport
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProblemReportUpdateRequest"
+      responses:
+        "200":
+          description: Problem report updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemReportDetailResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
         "500": { $ref: "#/components/responses/ServerError" }
 
 components:
@@ -3665,4 +3672,138 @@ components:
             "200": 54
             "401": 2
             "500": 1
+    ProblemReportAttachment:
+      type: object
+      properties:
+        attachment_id:
+          type: string
+          format: uuid
+        storage_kind:
+          type: string
+          example: local
+        original_filename:
+          type: string
+        mime_type:
+          type: string
+          nullable: true
+        size_bytes:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+    ProblemReportItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        report_code:
+          type: string
+          example: PRB-20260415-A1B2C3
+        reporter_user_id:
+          type: string
+          format: uuid
+        reporter_role:
+          type: string
+          example: GUARDIAN
+        issue_type:
+          type: string
+          enum: [bug, ui_issue, data_issue, performance, questionnaire, model_result, other]
+        description:
+          type: string
+        status:
+          type: string
+          enum: [open, triaged, in_progress, resolved, rejected]
+        source_module:
+          type: string
+          nullable: true
+        source_path:
+          type: string
+          nullable: true
+        related_questionnaire_session_id:
+          type: string
+          format: uuid
+          nullable: true
+        related_questionnaire_history_id:
+          type: string
+          nullable: true
+        admin_notes:
+          type: string
+          nullable: true
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        attachment_count:
+          type: integer
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProblemReportAttachment"
+        metadata:
+          type: object
+          additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    ProblemReportCreateRequest:
+      type: object
+      required: [issue_type, description]
+      properties:
+        issue_type:
+          type: string
+          enum: [bug, ui_issue, data_issue, performance, questionnaire, model_result, other]
+        description:
+          type: string
+          minLength: 10
+          maxLength: 4000
+        source_module:
+          type: string
+          maxLength: 120
+        source_path:
+          type: string
+          maxLength: 255
+        related_questionnaire_session_id:
+          type: string
+          format: uuid
+        related_questionnaire_history_id:
+          type: string
+          maxLength: 64
+        metadata:
+          type: object
+          additionalProperties: true
+    ProblemReportCreateResponse:
+      type: object
+      properties:
+        report:
+          $ref: "#/components/schemas/ProblemReportItem"
+    ProblemReportListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProblemReportItem"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+    ProblemReportDetailResponse:
+      type: object
+      properties:
+        report:
+          $ref: "#/components/schemas/ProblemReportItem"
+    ProblemReportUpdateRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [open, triaged, in_progress, resolved, rejected]
+        admin_notes:
+          type: string
+          maxLength: 5000
 
