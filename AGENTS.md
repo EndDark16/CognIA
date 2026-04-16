@@ -290,3 +290,14 @@ Contexto metodológico:
 - Se formalizo politica de artefactos/versionado:
   - `docs/repository_artifact_policy.md`
   - ajuste de `.gitignore` y `.gitattributes`.
+
+## Actualizacion de estado (2026-04-16) - render_boot_hotfix_optional_questionnaire_routes
+- Se detecto fallo de arranque en deploy por import estricto de rutas no presentes en imagen:
+  - `ModuleNotFoundError: No module named 'api.routes.questionnaire_runtime'`.
+- Se aplico hotfix en `api/app.py`:
+  - imports de `questionnaire_runtime` y `questionnaire_v2` ahora son opcionales (`try/except`).
+  - registro de blueprints condicionado a disponibilidad real del modulo.
+- Objetivo del hotfix: evitar caida total del worker cuando los modulos opcionales no estan versionados en la rama desplegada.
+- Estado de ramas:
+  - `dev.enddark` actualizado con commit `ed5f57e`.
+  - `development` actualizado con commit `0067481`.

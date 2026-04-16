@@ -385,3 +385,19 @@ Documentacion/politica:
 Higiene de repo:
 - Ajuste de `.gitignore` (uploads/runtime/generated noise).
 - Normalizacion de `.gitattributes` para texto/binarios.
+
+## Actualizacion (2026-04-16) - hotfix de arranque en Render
+Incidente:
+- El servicio caia al boot con `ModuleNotFoundError` en `api.routes.questionnaire_runtime` durante carga de `api/app.py`.
+
+Accion aplicada:
+- `api/app.py` actualizado para tratar `questionnaire_runtime` y `questionnaire_v2` como modulos opcionales:
+  - import defensivo (`try/except`)
+  - registro condicional de blueprints solo si el modulo esta disponible
+
+Ramas/commits:
+- `dev.enddark`: `ed5f57e` (`fix(startup): make questionnaire route imports optional`)
+- `development`: `0067481` (promocion del fix para despliegue)
+
+Resultado esperado:
+- El backend inicia aunque esos modulos no esten presentes en la imagen desplegada, evitando caida total de Gunicorn.
