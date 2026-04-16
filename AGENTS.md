@@ -290,3 +290,36 @@ Contexto metodológico:
 - Se formalizo politica de artefactos/versionado:
   - `docs/repository_artifact_policy.md`
   - ajuste de `.gitignore` y `.gitattributes`.
+
+## Actualizacion de estado (2026-04-16) - render_boot_hotfix_optional_questionnaire_routes
+- Se detecto fallo de arranque en deploy por import estricto de rutas no presentes en imagen:
+  - `ModuleNotFoundError: No module named 'api.routes.questionnaire_runtime'`.
+- Se aplico hotfix en `api/app.py`:
+  - imports de `questionnaire_runtime` y `questionnaire_v2` ahora son opcionales (`try/except`).
+  - registro de blueprints condicionado a disponibilidad real del modulo.
+- Objetivo del hotfix: evitar caida total del worker cuando los modulos opcionales no estan versionados en la rama desplegada.
+- Estado de ramas:
+  - `dev.enddark` actualizado con commit `ed5f57e`.
+  - `development` actualizado con commit `0067481`.
+
+## Actualizacion de estado (2026-04-16) - questionnaire_runtime_v1_v2_versioned_complete
+- Se versiono de forma completa el bloque backend de cuestionarios runtime/v2 que estaba solo en workspace local.
+- Commit principal: `96d3ffe` sobre `dev.enddark`.
+- Alcance versionado:
+  - Rutas/API: `api/routes/questionnaire_runtime.py`, `api/routes/questionnaire_v2.py`.
+  - Servicios: `api/services/questionnaire_runtime_service.py`, `api/services/questionnaire_v2_loader_service.py`, `api/services/questionnaire_v2_service.py`.
+  - Schemas: `api/schemas/questionnaire_v2_schema.py`.
+  - Migraciones faltantes en cadena Alembic:
+    - `migrations/versions/20260330_01_add_questionnaire_runtime_v1.py`
+    - `migrations/versions/20260414_01_add_questionnaire_backend_v2.py`
+  - Script operativo: `scripts/bootstrap_questionnaire_backend_v2.py`.
+  - Datos fuente minimos requeridos por loader v2:
+    - `data/cuestionario_v16.4/*` (fuentes del cuestionario)
+    - `data/hybrid_active_modes_freeze_v1/tables/*` (activacion 30 modos)
+    - `data/hybrid_operational_freeze_v1/tables/hybrid_operational_final_champions.csv`
+  - Documentacion tecnica asociada en `docs/` (arquitectura, contrato API, registry/inference, reporting, notas de migracion y openapi runtime).
+  - Tests nuevos de API/servicios/smoke para runtime/v2.
+- Verificacion en Docker Desktop:
+  - `pytest tests/services/test_questionnaire_v2_loader.py tests/api/test_questionnaire_runtime_api.py tests/api/test_questionnaire_v2_api.py -q` => `10 passed`.
+  - `pytest tests/models/test_questionnaire_runtime_service.py tests/smoke/test_questionnaire_runtime_smoke.py -q` => `4 passed`.
+  - `alembic heads` => `20260415_01 (head)` con cadena de revisiones consistente.
