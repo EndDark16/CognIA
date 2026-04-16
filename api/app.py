@@ -25,6 +25,9 @@ from api.routes.admin import admin_bp
 from api.routes.questionnaires import questionnaires_bp
 from api.routes.evaluations import evaluations_bp
 from api.routes.users import users_bp
+from api.routes.questionnaire_runtime import questionnaire_runtime_bp
+from api.routes.questionnaire_v2 import questionnaire_v2_bp
+from api.routes.problem_reports import problem_reports_bp
 from api.extensions import limiter
 from app.models import db, RefreshToken, AppUser
 from api.metrics import metrics_bp, record_request_metrics
@@ -188,6 +191,9 @@ def create_app(config_class=DevelopmentConfig):
     app.register_blueprint(users_bp)
     app.register_blueprint(email_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(questionnaire_runtime_bp)
+    app.register_blueprint(questionnaire_v2_bp)
+    app.register_blueprint(problem_reports_bp)
 
     # Token Blocklist Callback
     @jwt.token_in_blocklist_loader
