@@ -218,6 +218,14 @@ def _password_forgot_email_key() -> str:
     return f"pwd_forgot_email:{email}" if email else f"pwd_forgot_email:{get_remote_address()}"
 
 
+def _password_forgot_email_limit() -> str:
+    base_limit = current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes")
+    email_limit = current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT_EMAIL")
+    if not email_limit or email_limit == "5 per 10 minutes":
+        return base_limit
+    return email_limit
+
+
 def _password_reset_rate_key() -> str:
     data = request.get_json(silent=True) or {}
     token = data.get("token")
@@ -820,10 +828,7 @@ def change_password():
     key_func=get_remote_address,
 )
 @limiter.limit(
-    lambda: current_app.config.get(
-        "PASSWORD_FORGOT_RATE_LIMIT_EMAIL",
-        current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes"),
-    ),
+    lambda: _password_forgot_email_limit(),
     key_func=_password_forgot_email_key,
 )
 def forgot_password():
