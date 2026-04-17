@@ -1,6 +1,6 @@
 import uuid
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 
@@ -29,6 +29,11 @@ def _error(message: str, error: str, status_code: int, details=None):
     if details is not None:
         payload["details"] = details
     return jsonify(payload), status_code
+
+
+def _server_error(message: str, error: str):
+    current_app.logger.error("problem_reports_error error=%s message=%s", error, message, exc_info=True)
+    return _error(message, error, 500)
 
 
 def _current_user() -> tuple[uuid.UUID | None, AppUser | None]:
@@ -74,9 +79,9 @@ def create_problem_report():
         )
     except ValueError as exc:
         return _error("Validation error", str(exc), 400)
-    except Exception as exc:
+    except Exception:
         db.session.rollback()
-        return _error("problem_report_create_failed", "problem_report_create_failed", 500, {"reason": str(exc)})
+        return _server_error("problem_report_create_failed", "problem_report_create_failed")
 
     return jsonify({"report": service.serialize_problem_report(row, include_private=False)}), 201
 
@@ -161,8 +166,8 @@ def update_problem_report_admin(report_id: str):
         return _error("Not found", str(exc), 404)
     except ValueError as exc:
         return _error("Validation error", str(exc), 400)
-    except Exception as exc:
+    except Exception:
         db.session.rollback()
-        return _error("problem_report_update_failed", "problem_report_update_failed", 500, {"reason": str(exc)})
+        return _server_error("problem_report_update_failed", "problem_report_update_failed")
 
     return jsonify({"report": service.serialize_problem_report(row, include_private=True)}), 200
