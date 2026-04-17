@@ -2,6 +2,7 @@ from datetime import datetime, timezone, timedelta
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from marshmallow import ValidationError
 
 from app.models import (
     AppUser,
@@ -26,6 +27,7 @@ from api.security import (
 from api.routes.auth import _parse_identity, _error_response
 from flask import current_app
 from api.extensions import limiter
+from api.schemas.mfa_schema import MFAConfirmSchema, MFADisableSchema
 
 mfa_bp = Blueprint("mfa", __name__, url_prefix="/api/mfa")
 
@@ -85,10 +87,14 @@ def mfa_confirm():
     identity = _parse_identity(get_jwt_identity())
     if not identity:
         return _error_response("Invalid user", "invalid_user", 401)
-    data = request.get_json(silent=True) or {}
-    code = data.get("code")
-    if not code:
-        return _error_response("Missing code", "missing_mfa_code", 400)
+    schema = MFAConfirmSchema()
+    try:
+        data = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        if "code" in exc.messages:
+            return _error_response("Missing code", "missing_mfa_code", 400)
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
+    code = data["code"]
 
     user = db.session.get(AppUser, identity)
     if not user:
@@ -134,7 +140,14 @@ def mfa_disable():
     claims = get_jwt()
     if claims.get("mfa_enrollment"):
         return _error_response("Enrollment token not allowed", "mfa_enrollment_only", 403)
-    data = request.get_json(silent=True) or {}
+    schema = MFADisableSchema()
+    try:
+        data = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        msg = str(exc)
+        if "At least one of code or recovery_code is required" in msg:
+            return _error_response("Missing code or recovery_code", "missing_mfa_code", 400)
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
     password = data.get("password")
     code = data.get("code")
     recovery = data.get("recovery_code")
