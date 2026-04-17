@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate
+from marshmallow import Schema, ValidationError, fields, validate, validates_schema
 
 
 class PaginationSchema(Schema):
@@ -24,10 +24,10 @@ class UserPatchSchema(Schema):
     user_type = fields.String(load_default=None)
     professional_card_number = fields.String(load_default=None)
 
-
-class RoleCreateSchema(Schema):
-    name = fields.String(required=True, validate=validate.Length(min=2, max=64))
-    description = fields.String(load_default=None, validate=validate.Length(max=200))
+    @validates_schema
+    def validate_any_field(self, data, **kwargs):
+        if not data:
+            raise ValidationError("At least one field must be provided")
 
 
 class RoleAssignSchema(Schema):
@@ -51,6 +51,12 @@ class QuestionnaireListQuerySchema(PaginationSchema):
     is_archived = fields.Boolean(load_default=None)
     sort = fields.String(load_default=None)
     order = fields.String(load_default=None, validate=validate.OneOf(["asc", "desc"]))
+
+
+class QuestionnaireCloneRequestSchema(Schema):
+    name = fields.String(required=False, validate=validate.Length(min=1, max=180))
+    version = fields.String(required=True, validate=validate.Length(min=1, max=80))
+    description = fields.String(required=False, validate=validate.Length(max=2000))
 
 
 class EvaluationListQuerySchema(PaginationSchema):

@@ -100,6 +100,23 @@ class Config:
     _allowed_status = os.getenv("EVALUATION_ALLOWED_STATUSES", "draft,submitted,completed")
     EVALUATION_ALLOWED_STATUSES = [s.strip() for s in _allowed_status.split(",") if s.strip()]
 
+    # Questionnaire Runtime v1
+    QR_PROCESS_ASYNC = _bool_env("QR_PROCESS_ASYNC", True)
+    QR_LIVE_HEARTBEAT_GRACE_SECONDS = int(os.getenv("QR_LIVE_HEARTBEAT_GRACE_SECONDS", "45"))
+    QR_RETENTION_DRAFT_DAYS = int(os.getenv("QR_RETENTION_DRAFT_DAYS", "30"))
+    QR_RETENTION_COMPLETED_DAYS = int(os.getenv("QR_RETENTION_COMPLETED_DAYS", "1095"))
+    QR_RETENTION_DELETED_DAYS = int(os.getenv("QR_RETENTION_DELETED_DAYS", "90"))
+    QR_RETENTION_NOTIFICATION_DAYS = int(os.getenv("QR_RETENTION_NOTIFICATION_DAYS", "180"))
+    QR_PIN_MAX_ATTEMPTS = int(os.getenv("QR_PIN_MAX_ATTEMPTS", "5"))
+    QR_PIN_LOCK_MINUTES = int(os.getenv("QR_PIN_LOCK_MINUTES", "10"))
+    QV2_SHARED_ACCESS_RATE_LIMIT = os.getenv("QV2_SHARED_ACCESS_RATE_LIMIT", "30 per minute")
+
+    # Problem reports
+    PROBLEM_REPORT_UPLOAD_DIR = os.getenv("PROBLEM_REPORT_UPLOAD_DIR", "artifacts/problem_reports/uploads")
+    PROBLEM_REPORT_MAX_ATTACHMENT_BYTES = int(os.getenv("PROBLEM_REPORT_MAX_ATTACHMENT_BYTES", str(5 * 1024 * 1024)))
+    _problem_allowed_mime = os.getenv("PROBLEM_REPORT_ALLOWED_MIME_TYPES", "image/png,image/jpeg,image/webp")
+    PROBLEM_REPORT_ALLOWED_MIME_TYPES = [x.strip() for x in _problem_allowed_mime.split(",") if x.strip()]
+
     # Logging / Metrics
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
     LOG_FORMAT = os.getenv(
@@ -123,6 +140,16 @@ class Config:
     PROXY_FIX_X_HOST = int(os.getenv("PROXY_FIX_X_HOST", "1"))
     PROXY_FIX_X_PORT = int(os.getenv("PROXY_FIX_X_PORT", "1"))
     PROXY_FIX_X_PREFIX = int(os.getenv("PROXY_FIX_X_PREFIX", "1"))
+    OPTIONAL_BLUEPRINTS_STRICT = _bool_env("OPTIONAL_BLUEPRINTS_STRICT", True)
+    _optional_blueprints_required = os.getenv(
+        "OPTIONAL_BLUEPRINTS_REQUIRED",
+        "questionnaire_runtime,questionnaire_v2",
+    )
+    OPTIONAL_BLUEPRINTS_REQUIRED = [
+        item.strip()
+        for item in _optional_blueprints_required.split(",")
+        if item.strip()
+    ]
     SECURITY_HEADERS_ENABLED = _bool_env("SECURITY_HEADERS_ENABLED", True)
     SECURITY_HSTS_SECONDS = int(os.getenv("SECURITY_HSTS_SECONDS", "31536000"))
     SECURITY_HSTS_INCLUDE_SUBDOMAINS = _bool_env("SECURITY_HSTS_INCLUDE_SUBDOMAINS", True)
@@ -201,3 +228,4 @@ class TestingConfig(Config):
     RATELIMIT_ENABLED = False
     EMAIL_ENABLED = False
     SECURITY_HEADERS_ENABLED = False
+    QR_PROCESS_ASYNC = False
