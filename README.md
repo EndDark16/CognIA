@@ -73,6 +73,9 @@ cognia_app/
 |  |- versions/
 |- docs/
 |  |- openapi.yaml
+|  |- archive/
+|  |  |- openapi/
+|  |     |- *.yaml
 |  |- OPENAPI_GUIDE.md
 |  |- api_full_reference.md
 |  |- questionnaire_backend_architecture.md
@@ -80,6 +83,7 @@ cognia_app/
 |  |- model_registry_and_inference.md
 |  |- reporting_and_dashboards.md
 |  |- problem_reporting_backend.md
+|  |- security_hardening_20260416.md
 |  |- repository_artifact_policy.md
 |  |- traceability_map.md
 |  |- continuidad.md
@@ -88,6 +92,7 @@ cognia_app/
 |- tests/
 |  |- *.py
 |  |- api/
+|  |- contracts/
 |  |- services/
 |- data/
 |- artifacts/
@@ -119,6 +124,9 @@ Variables criticas:
 - `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_SSL_MODE`
 - `CORS_ORIGINS`
 - `RATELIMIT_ENABLED`
+- `OPTIONAL_BLUEPRINTS_STRICT`
+- `OPTIONAL_BLUEPRINTS_REQUIRED`
+- `QV2_SHARED_ACCESS_RATE_LIMIT`
 - `PROBLEM_REPORT_UPLOAD_DIR`
 - `PROBLEM_REPORT_MAX_ATTACHMENT_BYTES`
 - `PROBLEM_REPORT_ALLOWED_MIME_TYPES`
@@ -133,6 +141,7 @@ Variables criticas:
 ## API y contratos
 - Swagger UI: `GET /docs`
 - OpenAPI: `GET /openapi.yaml`
+- Fuente activa de contrato: `docs/openapi.yaml` (snapshots historicos en `docs/archive/openapi/`)
 - Referencia mantenedor: `docs/api_full_reference.md`
 
 ## Endpoints principales
@@ -166,10 +175,12 @@ Detalles: `docs/problem_reporting_backend.md`.
 - JWT Bearer para rutas protegidas.
 - RBAC por claims `roles` (`ADMIN`, `PSYCHOLOGIST`, etc.).
 - MFA requerido para roles sensibles.
+- Hardening y decisiones de seguridad: `docs/security_hardening_20260416.md`.
 
 ## Testing
 - Ejecutar suite completa: `pytest -q`
 - Pruebas especificas de problem reports: `pytest tests/test_problem_reports.py -q`
+- Guardrail OpenAPI vs runtime: `pytest tests/contracts/test_openapi_runtime_alignment.py -q`
 
 ## Reporting y dashboards
 - Endpoints v2 en `/api/v2/dashboard/*` y `/api/v2/reports/jobs`.

@@ -35,14 +35,16 @@ Operational API reference for backend consumers and maintainers.
 
 ## 2) Admin
 - `/api/admin/users` (list, patch)
-- `/api/admin/users/{id}/password-reset`
-- `/api/admin/users/{id}/mfa/reset`
+- `/api/admin/users/{user_id}` (patch)
+- `/api/admin/users/{user_id}/password-reset`
+- `/api/admin/users/{user_id}/mfa/reset`
 - `/api/admin/audit-logs`
 - `/api/admin/questionnaires` (list, publish/archive/clone)
-- `/api/admin/psychologists/{id}/approve|reject`
+- `/api/admin/questionnaires/{template_id}/publish|archive|clone`
+- `/api/admin/psychologists/{user_id}/approve|reject`
 - `/api/admin/evaluations` (+ status update)
 - `/api/admin/roles`
-- `/api/admin/users/{id}/roles`
+- `/api/admin/users/{user_id}/roles`
 - `/api/admin/email/unsubscribes`
 - `/api/admin/email/health`
 - `/api/admin/metrics`
@@ -131,3 +133,6 @@ When adding or changing endpoints:
 3. Update `docs/openapi.yaml`.
 4. Update this file and domain-specific docs.
 5. Add/adjust tests for request + response + permissions.
+
+Runtime/spec guardrail:
+- `pytest tests/contracts/test_openapi_runtime_alignment.py -q`

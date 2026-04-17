@@ -420,3 +420,57 @@ def test_questionnaire_v2_tables_created_in_metadata(app):
         assert repeat_count == 1
         session_count = QuestionnaireSession.query.count()
         assert session_count >= 0
+
+
+def test_questionnaire_v2_internal_error_hides_exception_details(client, app, monkeypatch):
+    _, token = _user_token(app, "owner_err_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    from api.routes import questionnaire_v2 as route_module
+
+    def _boom(*args, **kwargs):
+        raise RuntimeError("sensitive stack trace detail")
+
+    monkeypatch.setattr(route_module.service, "create_session", _boom)
+
+    resp = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "caregiver", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
+        headers=headers,
+    )
+    assert resp.status_code == 500
+    body = resp.get_json()
+    assert body["error"] == "server_error"
+    assert "details" not in body
+
+
+def test_questionnaire_v2_shared_access_validates_path_params(client, app):
+    resp = client.get("/api/v2/questionnaires/shared/x/$$$")
+    assert resp.status_code == 400
+    assert resp.json["error"] == "validation_error"
+
+
+def test_questionnaire_v2_pdf_download_rejects_outside_runtime_reports(client, app, monkeypatch):
+    _, token = _user_token(app, "owner_pdf_guard_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "caregiver", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    from api.routes import questionnaire_v2 as route_module
+
+    class _Export:
+        id = uuid.uuid4()
+        file_name = "fake.pdf"
+        file_path = str((Path.cwd() / "README.md").resolve())
+
+    monkeypatch.setattr(route_module.service, "latest_pdf", lambda _sid: _Export())
+
+    resp = client.get(f"/api/v2/questionnaires/history/{session_id}/pdf/download", headers=headers)
+    assert resp.status_code == 404
+    assert resp.json["error"] == "pdf_file_missing"
