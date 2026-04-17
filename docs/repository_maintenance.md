@@ -30,6 +30,8 @@ Keep CognIA backend maintainable while preserving methodological traceability.
 - Removed deprecated v1 questionnaire activation/clone endpoints and aligned docs/tests to admin equivalents.
 - Added explicit policy for runtime uploads and generated exports (`problem_reports` attachments and runtime PDFs).
 - Normalized `.gitattributes` and `.gitignore` rules for safer cross-platform behavior and artifact hygiene.
+- Consolidated OpenAPI source-of-truth in `docs/openapi.yaml`; moved legacy addendum to `docs/archive/openapi/`.
+- Added automated runtime-vs-spec guardrail test: `tests/contracts/test_openapi_runtime_alignment.py`.
 
 ## Pending non-destructive opportunities
 

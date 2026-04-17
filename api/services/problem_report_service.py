@@ -56,6 +56,18 @@ def _allowed_mime_types() -> set[str]:
     return {x.strip().lower() for x in str(configured).split(",") if x.strip()}
 
 
+def _content_signature_matches(content_type: str, payload: bytes) -> bool:
+    if not payload:
+        return False
+    if content_type == "image/png":
+        return payload.startswith(b"\x89PNG\r\n\x1a\n")
+    if content_type == "image/jpeg":
+        return payload.startswith(b"\xff\xd8")
+    if content_type == "image/webp":
+        return len(payload) >= 12 and payload[:4] == b"RIFF" and payload[8:12] == b"WEBP"
+    return False
+
+
 def _primary_reporter_role(user: AppUser, roles: list[str]) -> str:
     roles_set = {str(role).upper() for role in (roles or [])}
     if "ADMIN" in roles_set:
@@ -107,6 +119,8 @@ def _save_attachment(report: ProblemReport, attachment: FileStorage, actor_user_
         raise ValueError("attachment_empty")
     if size > _max_attachment_size():
         raise ValueError("attachment_too_large")
+    if not _content_signature_matches(content_type, payload):
+        raise ValueError("attachment_content_mismatch")
 
     original_filename = secure_filename(attachment.filename)
     suffix = Path(original_filename).suffix.lower()
