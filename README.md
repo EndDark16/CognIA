@@ -77,6 +77,7 @@ cognia_app/
 |  |  |- openapi/
 |  |     |- *.yaml
 |  |- OPENAPI_GUIDE.md
+|  |- endpoint_lifecycle_matrix.md
 |  |- api_full_reference.md
 |  |- questionnaire_backend_architecture.md
 |  |- questionnaire_api_contract.md
@@ -88,6 +89,7 @@ cognia_app/
 |  |- traceability_map.md
 |  |- HANDOFF.md
 |- scripts/
+|  |- openapi_professionalize.py
 |  |- *.py
 |- tests/
 |  |- *.py
@@ -127,6 +129,7 @@ Variables criticas:
 - `OPTIONAL_BLUEPRINTS_STRICT`
 - `OPTIONAL_BLUEPRINTS_REQUIRED`
 - `QV2_SHARED_ACCESS_RATE_LIMIT`
+- `PREDICT_RATE_LIMIT`
 - `PROBLEM_REPORT_UPLOAD_DIR`
 - `PROBLEM_REPORT_MAX_ATTACHMENT_BYTES`
 - `PROBLEM_REPORT_ALLOWED_MIME_TYPES`
@@ -142,6 +145,7 @@ Variables criticas:
 - Swagger UI: `GET /docs`
 - OpenAPI: `GET /openapi.yaml`
 - Fuente activa de contrato: `docs/openapi.yaml` (snapshots historicos en `docs/archive/openapi/`)
+- Matriz de ciclo de vida de endpoints: `docs/endpoint_lifecycle_matrix.md`
 - Referencia mantenedor: `docs/api_full_reference.md`
 
 ## Endpoints principales
@@ -181,6 +185,8 @@ Detalles: `docs/problem_reporting_backend.md`.
 - Ejecutar suite completa: `pytest -q`
 - Pruebas especificas de problem reports: `pytest tests/test_problem_reports.py -q`
 - Guardrail OpenAPI vs runtime: `pytest tests/contracts/test_openapi_runtime_alignment.py -q`
+- Guardrail de calidad documental OpenAPI: `pytest tests/contracts/test_openapi_documentation_quality.py -q`
+- Hardening de predict experimental: `pytest tests/test_predict.py -q`
 
 ## Reporting y dashboards
 - Endpoints v2 en `/api/v2/dashboard/*` y `/api/v2/reports/jobs`.

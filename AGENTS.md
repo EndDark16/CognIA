@@ -351,3 +351,22 @@ Contexto metodológico:
   - `pytest tests/api/test_app_blueprint_policy.py tests/api/test_questionnaire_v2_api.py tests/api/test_questionnaire_runtime_api.py tests/test_problem_reports.py tests/contracts/test_openapi_runtime_alignment.py -q` => `23 passed`.
 - `por confirmar`:
   - resultado de suite completa `pytest -q` en esta misma ventana antes de cierre final.
+
+## Actualizacion de estado (2026-04-17) - openapi_runtime_alignment_hardening_v2
+- Se rehizo la alineacion contractual OpenAPI con inventario runtime real (117 operaciones).
+- Script nuevo: `scripts/openapi_professionalize.py` (normaliza paths, summaries/descriptions en espanol, estado contractual y matriz de ciclo de vida).
+- Contrato actualizado:
+  - `docs/openapi.yaml` ahora cubre `117/117` operaciones runtime.
+  - Sin `description: Success`, sin descripciones vacias, y con `x-contract-status` por operacion.
+  - Se incorporaron endpoints legacy runtime faltantes:
+    - `POST /api/v1/questionnaires/{template_id}/activate`
+    - `POST /api/v1/questionnaires/active/clone`
+- Matriz de reemplazo/deprecacion/cierre agregada en `docs/endpoint_lifecycle_matrix.md`.
+- Hardening de seguridad aplicado:
+  - `api/routes/predict.py`: validacion robusta, envelope uniforme, excepciones sanitizadas y rate limit configurable (`PREDICT_RATE_LIMIT`).
+  - `api/routes/questionnaire_v2.py`: metadata PDF ya no expone `file_path`; ahora devuelve `download_url`.
+  - Configuracion: `config/settings.py` y `.env.example` con `PREDICT_RATE_LIMIT`.
+- Guardrails nuevos:
+  - `tests/contracts/test_openapi_documentation_quality.py` (calidad documental integral).
+  - `tests/test_predict.py` (validacion, sanitizacion de errores y rate limit en `/api/predict`).
+- `por confirmar`: resultado de suite completa `pytest -q` en esta misma ventana tras integrar todos los cambios.

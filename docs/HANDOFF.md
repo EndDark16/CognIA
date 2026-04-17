@@ -470,3 +470,19 @@ Verificacion ejecutada en esta ventana:
 
 Pendiente inmediato:
 - ejecutar `pytest -q` completo para cierre final de regresion de toda la base.
+
+## Actualizacion de sesion (2026-04-17) - OpenAPI runtime alignment + hardening v2
+- Se rehizo `docs/openapi.yaml` con alineacion total contra rutas runtime reales (`117/117` operaciones).
+- Se agrego `scripts/openapi_professionalize.py` para normalizar contrato OpenAPI de forma reproducible.
+- Se creo `docs/endpoint_lifecycle_matrix.md` con decision por endpoint/familia (keep, legacy, deprecate).
+- Se corrigieron endpoints legacy faltantes en contrato:
+  - `POST /api/v1/questionnaires/{template_id}/activate`
+  - `POST /api/v1/questionnaires/active/clone`
+- Seguridad endurecida:
+  - `api/routes/predict.py`: validacion robusta, errores sanitizados, rate limit configurable.
+  - `api/routes/questionnaire_v2.py`: metadata PDF sin `file_path`, solo `download_url`.
+  - Nuevas variables: `PREDICT_RATE_LIMIT` en `config/settings.py` y `.env.example`.
+- Guardrails agregados:
+  - `tests/contracts/test_openapi_documentation_quality.py`
+  - `tests/test_predict.py`
+- `por confirmar`: resultado de `pytest -q` completo de esta ventana.
