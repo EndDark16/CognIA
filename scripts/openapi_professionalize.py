@@ -1,721 +1,697 @@
-﻿from __future__ import annotations
-
+import os
 import re
-import unicodedata
+import sys
+from collections import defaultdict
 from pathlib import Path
 
 import yaml
 
-OPENAPI_PATH = Path('docs/openapi.yaml')
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
-ERROR_MEANING = {
-    '400': 'solicitud invalida o error de validacion de entrada',
-    '401': 'falta de autenticacion valida o token no aceptado',
-    '403': 'autenticado sin permiso suficiente o control CSRF/MFA no satisfecho',
-    '404': 'recurso solicitado no encontrado o no visible para el actor',
-    '409': 'conflicto de estado de negocio (duplicidad o transicion invalida)',
-    '410': 'recurso eliminado logicamente o no disponible por retencion',
-    '423': 'usuario temporalmente bloqueado por politicas de seguridad',
-    '429': 'limite de tasa excedido por politicas de proteccion',
-    '500': 'falla interna del servicio',
-    '503': 'dependencia critica no disponible (readiness/db)',
-}
+from api.app import create_app
+from config.settings import TestingConfig
 
 
-def _norm(text: str) -> str:
-    n = unicodedata.normalize('NFKD', text)
-    return ''.join(ch for ch in n if not unicodedata.combining(ch))
+HTTP_METHODS = {"get", "post", "put", "patch", "delete"}
 
 
-def _schema_name(schema_obj):
-    if not schema_obj:
-        return None
-    if '$ref' in schema_obj:
-        return schema_obj['$ref'].split('/')[-1]
-    if 'allOf' in schema_obj:
-        parts = [_schema_name(p) for p in schema_obj['allOf']]
-        parts = [p for p in parts if p]
-        return ' + '.join(parts) if parts else 'allOf'
-    if 'oneOf' in schema_obj:
-        parts = [_schema_name(p) for p in schema_obj['oneOf']]
-        parts = [p for p in parts if p]
-        return ' o '.join(parts) if parts else 'oneOf'
-    if 'type' in schema_obj:
-        if schema_obj['type'] == 'array':
-            return f"array<{_schema_name(schema_obj.get('items')) or 'item'}>"
-        return schema_obj['type']
-    return None
+def to_openapi_path(path: str) -> str:
+    normalized = path
+    normalized = normalized.replace("<string:", "<")
+    normalized = normalized.replace("<int:", "<")
+    normalized = normalized.replace("<uuid:", "<")
+    while "<" in normalized and ">" in normalized:
+        start = normalized.index("<")
+        end = normalized.index(">", start)
+        name = normalized[start + 1 : end].split(":")[-1]
+        normalized = normalized[:start] + "{" + name + "}" + normalized[end + 1 :]
+    return normalized
 
 
-def _ensure_missing_paths(spec: dict) -> None:
-    paths = spec.setdefault('paths', {})
-    if '/api/v1/questionnaires/{template_id}/activate' not in paths:
-        paths['/api/v1/questionnaires/{template_id}/activate'] = {
-            'post': {
-                'tags': ['Questionnaires'],
-                'x-roles': ['ADMIN'],
-                'security': [{'bearerAuth': []}],
-                'deprecated': True,
-                'parameters': [
-                    {
-                        'in': 'path',
-                        'name': 'template_id',
-                        'required': True,
-                        'schema': {'type': 'string', 'format': 'uuid'},
-                    }
-                ],
-                'responses': {
-                    '200': {
-                        'description': 'Template activated',
-                        'content': {
-                            'application/json': {
-                                'schema': {'$ref': '#/components/schemas/AdminTemplateActionResponse'}
-                            }
-                        },
-                    },
-                    '400': {'$ref': '#/components/responses/BadRequest'},
-                    '401': {'$ref': '#/components/responses/Unauthorized'},
-                    '403': {'$ref': '#/components/responses/Forbidden'},
-                    '404': {'$ref': '#/components/responses/NotFound'},
-                    '409': {'$ref': '#/components/responses/Conflict'},
-                    '500': {'$ref': '#/components/responses/ServerError'},
-                },
-            }
-        }
-
-    if '/api/v1/questionnaires/active/clone' not in paths:
-        paths['/api/v1/questionnaires/active/clone'] = {
-            'post': {
-                'tags': ['Questionnaires'],
-                'x-roles': ['ADMIN'],
-                'security': [{'bearerAuth': []}],
-                'deprecated': True,
-                'requestBody': {
-                    'required': True,
-                    'content': {
-                        'application/json': {
-                            'schema': {'$ref': '#/components/schemas/QuestionnaireCloneRequest'}
-                        }
-                    },
-                },
-                'responses': {
-                    '201': {
-                        'description': 'Template cloned',
-                        'content': {
-                            'application/json': {
-                                'schema': {'$ref': '#/components/schemas/QuestionnaireCloneResponse'}
-                            }
-                        },
-                    },
-                    '400': {'$ref': '#/components/responses/BadRequest'},
-                    '401': {'$ref': '#/components/responses/Unauthorized'},
-                    '403': {'$ref': '#/components/responses/Forbidden'},
-                    '404': {'$ref': '#/components/responses/NotFound'},
-                    '409': {'$ref': '#/components/responses/Conflict'},
-                    '500': {'$ref': '#/components/responses/ServerError'},
-                },
-            }
-        }
-
-    if '/api/admin/roles' in paths and 'post' not in paths['/api/admin/roles']:
-        paths['/api/admin/roles']['post'] = {
-            'tags': ['Admin'],
-            'x-roles': ['ADMIN'],
-            'security': [{'bearerAuth': []}],
-            'requestBody': {
-                'required': True,
-                'content': {
-                    'application/json': {
-                        'schema': {'$ref': '#/components/schemas/AdminRoleCreateRequest'}
-                    }
-                },
-            },
-            'responses': {
-                '201': {
-                    'description': 'Role created',
-                    'content': {
-                        'application/json': {
-                            'schema': {'$ref': '#/components/schemas/AdminRoleItem'}
-                        }
-                    },
-                },
-                '400': {'$ref': '#/components/responses/BadRequest'},
-                '401': {'$ref': '#/components/responses/Unauthorized'},
-                '403': {'$ref': '#/components/responses/Forbidden'},
-                '409': {'$ref': '#/components/responses/Conflict'},
-                '500': {'$ref': '#/components/responses/ServerError'},
-            },
-        }
-
-    if '/api/admin/impersonate/{user_id}' not in paths:
-        paths['/api/admin/impersonate/{user_id}'] = {
-            'post': {
-                'tags': ['Admin'],
-                'x-roles': ['ADMIN'],
-                'security': [{'bearerAuth': []}],
-                'parameters': [
-                    {
-                        'in': 'path',
-                        'name': 'user_id',
-                        'required': True,
-                        'schema': {'type': 'string', 'format': 'uuid'},
-                    }
-                ],
-                'responses': {
-                    '200': {
-                        'description': 'Impersonation token',
-                        'content': {
-                            'application/json': {
-                                'schema': {'$ref': '#/components/schemas/AdminImpersonateResponse'}
-                            }
-                        },
-                    },
-                    '400': {'$ref': '#/components/responses/BadRequest'},
-                    '401': {'$ref': '#/components/responses/Unauthorized'},
-                    '403': {'$ref': '#/components/responses/Forbidden'},
-                    '404': {'$ref': '#/components/responses/NotFound'},
-                    '409': {'$ref': '#/components/responses/Conflict'},
-                    '500': {'$ref': '#/components/responses/ServerError'},
-                },
-            }
-        }
+def canonical(path: str) -> str:
+    return re.sub(r"\{[^}]+\}", "{}", path)
 
 
-def _update_info_and_tags(spec: dict) -> None:
-    spec.setdefault('info', {})['description'] = (
-        'API backend de CognIA para screening y apoyo profesional en salud mental infantil (6 a 11 anos) '
-        'en entorno simulado.\\n\\n'
-        'Alcance funcional actual:\\n'
-        '- Autenticacion/autorizacion (JWT, refresh cookie, RBAC, MFA).\\n'
-        '- Cuestionarios v1 legacy, runtime v1 y operacional v2 (sesiones, historial, share, PDF).\\n'
-        '- Gobierno administrativo de usuarios, roles, cuestionarios, evaluaciones y auditoria.\\n'
-        '- Reportes de problema con adjuntos validados y trazabilidad.\\n'
-        '- Dashboards y reportes operativos v2.\\n\\n'
-        'Consideraciones metodologicas:\\n'
-        '- El sistema entrega alertas de riesgo para tamizaje/apoyo profesional.\\n'
-        '- No constituye diagnostico clinico automatico ni reemplaza criterio profesional.\\n\\n'
-        'Seguridad principal:\\n'
-        '- JWT para endpoints protegidos y refresh token rotativo en cookie HttpOnly.\\n'
-        '- CSRF double-submit en flujos con cookies.\\n'
-        '- MFA TOTP y politicas de hardening/rate limiting.\\n\\n'
-        'Gobernanza de contrato:\\n'
-        '- Fuente activa: docs/openapi.yaml.\\n'
-        '- Validacion automatizada runtime vs OpenAPI en tests de contrato.'
+def infer_tag(path: str) -> str:
+    if path in {"/healthz", "/readyz", "/metrics"}:
+        return "Health"
+    if path in {"/docs", "/openapi.yaml"}:
+        return "Docs"
+    if path.startswith("/api/auth"):
+        return "Auth"
+    if path.startswith("/api/mfa"):
+        return "MFA"
+    if path.startswith("/api/email"):
+        return "Email"
+    if path.startswith("/api/problem-reports") or path.startswith("/api/admin/problem-reports"):
+        return "ProblemReports"
+    if path.startswith("/api/admin"):
+        return "Admin"
+    if path.startswith("/api/v1/users"):
+        return "Users"
+    if path.startswith("/api/v1/evaluations"):
+        return "Evaluations"
+    if path.startswith("/api/v1/questionnaire-runtime/admin"):
+        return "QuestionnaireRuntimeAdmin"
+    if path.startswith("/api/v1/questionnaire-runtime"):
+        return "QuestionnaireRuntime"
+    if path.startswith("/api/v2/dashboard"):
+        return "Dashboard"
+    if path.startswith("/api/v2/reports"):
+        return "Reports"
+    if path.startswith("/api/v2/questionnaires"):
+        return "QuestionnaireV2"
+    if path.startswith("/api/v1/questionnaires"):
+        return "Questionnaires"
+    if path.startswith("/api/predict"):
+        return "Predict"
+    return "Misc"
+
+
+def infer_module(path: str) -> str:
+    if path.startswith("/api/v2/questionnaires"):
+        return "questionnaire_v2"
+    if path.startswith("/api/v2/dashboard"):
+        return "dashboard_v2"
+    if path.startswith("/api/v2/reports"):
+        return "reports_v2"
+    if path.startswith("/api/v1/questionnaire-runtime"):
+        return "questionnaire_runtime_v1"
+    if path.startswith("/api/v1/questionnaires"):
+        return "questionnaires_v1"
+    if path.startswith("/api/v1/users"):
+        return "users_v1"
+    if path.startswith("/api/admin/users"):
+        return "admin_users"
+    if path.startswith("/api/admin"):
+        return "admin"
+    if path.startswith("/api/problem-reports") or path.startswith("/api/admin/problem-reports"):
+        return "problem_reports"
+    if path.startswith("/api/auth"):
+        return "auth"
+    if path.startswith("/api/mfa"):
+        return "mfa"
+    if path.startswith("/api/email"):
+        return "email"
+    if path.startswith("/api/predict"):
+        return "predict_legacy"
+    if path in {"/healthz", "/readyz", "/metrics"}:
+        return "health"
+    if path in {"/docs", "/openapi.yaml"}:
+        return "docs"
+    return "misc"
+
+
+def classify_contract(path: str) -> dict:
+    replaced_by = None
+    reason = ""
+    status = "KEEP_ACTIVE"
+
+    if path == "/api/predict":
+        status = "DEPRECATE_PUBLIC"
+        reason = "Ruta experimental heredada sin contrato estable de producto."
+    elif path.startswith("/api/v1/questionnaires"):
+        status = "KEEP_ACTIVE_BUT_LEGACY"
+        reason = "Convive por compatibilidad con clientes v1; la ruta operativa principal es v2."
+        if path == "/api/v1/questionnaires/active":
+            replaced_by = "/api/v2/questionnaires/active"
+        elif path == "/api/v1/questionnaires/active/clone":
+            replaced_by = "/api/admin/questionnaires/{template_id}/clone"
+        elif path == "/api/v1/questionnaires/{template_id}/activate":
+            replaced_by = "/api/admin/questionnaires/{template_id}/publish"
+    elif path.startswith("/api/v1/questionnaire-runtime"):
+        status = "KEEP_ACTIVE_BUT_LEGACY"
+        reason = "Flujo runtime v1 mantenido por compatibilidad mientras se migra a cuestionarios v2."
+        if "questionnaire/active" in path:
+            replaced_by = "/api/v2/questionnaires/active"
+    elif path.startswith("/api/v1/users"):
+        status = "KEEP_ACTIVE_BUT_LEGACY"
+        replaced_by = "/api/admin/users"
+        reason = "Gestion de usuarios v1 mantenida por clientes legacy; administracion principal en /api/admin/users."
+    elif path.startswith("/api/v2"):
+        status = "KEEP_ACTIVE"
+        reason = "Contrato operativo actual para sesiones, historia, reportes y dashboards."
+    elif path.startswith("/api/admin"):
+        status = "KEEP_ACTIVE"
+        reason = "Contrato administrativo vigente para backoffice y operaciones de seguridad."
+    elif path.startswith("/api/problem-reports") or path.startswith("/api/admin/problem-reports"):
+        status = "KEEP_ACTIVE"
+        reason = "Contrato vigente para trazabilidad operativa de incidentes y soporte."
+    elif path in {"/docs", "/openapi.yaml"}:
+        status = "KEEP_ACTIVE"
+        reason = "Endpoint documental y de descubrimiento de contrato."
+    elif path in {"/healthz", "/readyz", "/metrics"}:
+        status = "KEEP_ACTIVE"
+        reason = "Endpoint operativo de observabilidad y estado del servicio."
+    elif path.startswith("/api/auth") or path.startswith("/api/mfa") or path.startswith("/api/email"):
+        status = "KEEP_ACTIVE"
+        reason = "Contrato de autenticacion, seguridad y soporte vigente."
+
+    if not reason:
+        reason = "Contrato vigente sin reemplazo directo en esta version."
+
+    action = {
+        "KEEP_ACTIVE": "mantener visible",
+        "KEEP_ACTIVE_BUT_LEGACY": "mantener visible y marcar deprecated",
+        "INTERNAL_ONLY": "documentar como internal",
+        "DEPRECATE_PUBLIC": "marcar deprecated",
+        "REMOVE_AFTER_COMPAT_WINDOW": "retirar del contrato publico",
+        "DUPLICATE_TO_CONSOLIDATE": "mantener visible con nota de consolidacion",
+    }.get(status, "mantener visible")
+
+    compat_risk = {
+        "KEEP_ACTIVE": "bajo",
+        "KEEP_ACTIVE_BUT_LEGACY": "medio",
+        "INTERNAL_ONLY": "bajo",
+        "DEPRECATE_PUBLIC": "alto",
+        "REMOVE_AFTER_COMPAT_WINDOW": "alto",
+        "DUPLICATE_TO_CONSOLIDATE": "medio",
+    }.get(status, "medio")
+
+    return {
+        "status": status,
+        "replaced_by": replaced_by,
+        "reason": reason,
+        "openapi_action": action,
+        "compat_risk": compat_risk,
+    }
+
+
+def security_requirements(path: str) -> tuple[list, list[str]]:
+    roles = []
+    if path in {"/healthz", "/readyz", "/docs", "/openapi.yaml"}:
+        return [], roles
+    if path == "/metrics":
+        return [{"metricsToken": []}, {}], roles
+    if path in {
+        "/api/auth/register",
+        "/api/auth/login",
+        "/api/auth/login/mfa",
+        "/api/auth/password/forgot",
+        "/api/auth/password/reset",
+        "/api/auth/password/reset/verify",
+        "/api/email/unsubscribe",
+        "/api/predict",
+    }:
+        return [], roles
+    if path == "/api/auth/refresh":
+        return [{"cookieAuth": [], "csrfHeader": []}], roles
+    if path.startswith("/api/admin") or path.startswith("/api/v1/users"):
+        roles = ["ADMIN"]
+        return [{"bearerAuth": []}], roles
+    if path.startswith("/api/v1/questionnaire-runtime/admin"):
+        roles = ["ADMIN"]
+        return [{"bearerAuth": []}], roles
+    return [{"bearerAuth": []}], roles
+
+
+def action_verb(method: str, path: str) -> str:
+    method = method.lower()
+    if method == "get":
+        return "Consultar"
+    if method == "delete":
+        return "Eliminar"
+    if method == "patch":
+        return "Actualizar"
+    if method == "put":
+        return "Reemplazar"
+    if method == "post":
+        if any(k in path for k in ["submit", "publish", "approve", "reject", "refresh", "login", "logout"]):
+            return "Ejecutar"
+        if "clone" in path:
+            return "Clonar"
+        if "activate" in path or "active" in path:
+            return "Activar"
+        return "Crear"
+    return "Operar"
+
+
+def collect_parameters(path_item: dict, op: dict, location: str) -> list[str]:
+    merged = []
+    for source in (path_item.get("parameters", []) or [], op.get("parameters", []) or []):
+        for p in source:
+            if isinstance(p, dict) and p.get("in") == location:
+                if "$ref" in p:
+                    merged.append(f"{p['$ref'].split('/')[-1]} (referencia)")
+                else:
+                    name = p.get("name", "param")
+                    required = "obligatorio" if p.get("required") else "opcional"
+                    merged.append(f"{name} ({required})")
+    return list(dict.fromkeys(merged))
+
+
+def ensure_path_parameters(path: str, path_item: dict):
+    placeholders = re.findall(r"\{([^}]+)\}", path)
+    if not placeholders:
+        return
+    params = path_item.setdefault("parameters", [])
+    existing = {p.get("name"): p for p in params if isinstance(p, dict) and p.get("in") == "path"}
+
+    if len(placeholders) == 1 and "id" in existing and placeholders[0] != "id":
+        existing["id"]["name"] = placeholders[0]
+        existing["id"]["description"] = f"Identificador del recurso `{placeholders[0]}` en la ruta."
+        existing[placeholders[0]] = existing["id"]
+        del existing["id"]
+
+    for name in placeholders:
+        if name not in existing:
+            params.append(
+                {
+                    "name": name,
+                    "in": "path",
+                    "required": True,
+                    "description": f"Identificador del recurso `{name}` en la ruta.",
+                    "schema": {"type": "string"},
+                }
+            )
+        else:
+            existing[name]["required"] = True
+            existing[name]["schema"] = existing[name].get("schema") or {"type": "string"}
+            existing[name]["description"] = existing[name].get("description") or f"Identificador del recurso `{name}` en la ruta."
+
+
+def success_description(code: str) -> str:
+    mapping = {
+        "200": "Operacion completada correctamente y la respuesta incluye el resultado solicitado.",
+        "201": "Recurso creado correctamente o accion iniciada con exito.",
+        "202": "Solicitud aceptada para procesamiento posterior.",
+        "204": "Operacion completada sin contenido de respuesta.",
+    }
+    return mapping.get(str(code), "Respuesta de exito de la operacion solicitada.")
+
+
+def error_description(code: str) -> str:
+    mapping = {
+        "400": "Solicitud invalida por formato, validacion o reglas de negocio.",
+        "401": "No autenticado o token invalido/expirado.",
+        "403": "Autenticado sin permisos suficientes para esta operacion.",
+        "404": "Recurso no encontrado o no visible para el actor autenticado.",
+        "409": "Conflicto de estado o de unicidad al ejecutar la operacion.",
+        "410": "Recurso retirado o ya no disponible.",
+        "422": "Entidad bien formada pero semanticamente invalida para la regla aplicada.",
+        "429": "Limite de tasa excedido; reintentar segun politicas de rate limit.",
+        "500": "Error interno del servidor sin exposicion de detalles sensibles.",
+        "503": "Servicio temporalmente no disponible (dependencia o base de datos).",
+    }
+    return mapping.get(str(code), "Respuesta de error documentada para esta operacion.")
+
+
+def generate_operation_id(method: str, path: str) -> str:
+    tokens = [t for t in re.split(r"[^a-zA-Z0-9]+", path) if t and t != "api"]
+    camel = "".join(token.capitalize() for token in tokens)
+    return f"{method.lower()}{camel}"
+
+
+def build_description(path: str, method: str, path_item: dict, op: dict, contract: dict, tag: str) -> str:
+    path_params = collect_parameters(path_item, op, "path")
+    query_params = collect_parameters(path_item, op, "query")
+    header_params = collect_parameters(path_item, op, "header")
+
+    request_body = op.get("requestBody") or {}
+    body_required = bool(request_body.get("required")) if isinstance(request_body, dict) else False
+    body_content = sorted((request_body.get("content") or {}).keys()) if isinstance(request_body, dict) else []
+
+    responses = op.get("responses") or {}
+    success_codes = sorted([c for c in responses if c.isdigit() and int(c) < 400]) or ["200"]
+    error_codes = sorted([c for c in responses if c.isdigit() and int(c) >= 400]) or ["400", "401", "403", "404", "500"]
+
+    security = op.get("security")
+    roles = op.get("x-roles") or []
+    if security in (None, []):
+        sec_line = "Endpoint publico; no requiere token JWT."
+    else:
+        schemes = []
+        for item in security:
+            if isinstance(item, dict):
+                schemes.extend(item.keys())
+        sec_line = f"Requiere esquema(s) de seguridad: {', '.join(sorted(set(schemes)))}."
+    if roles:
+        sec_line += f" Roles requeridos: {', '.join(roles)}."
+
+    actor = {
+        "Admin": "Administrador de plataforma o equipo de backoffice.",
+        "Users": "Administrador autenticado en gestion legacy de usuarios.",
+        "QuestionnaireRuntimeAdmin": "Administrador funcional del runtime v1.",
+        "QuestionnaireRuntime": "Usuario autenticado, profesional o actor operativo del runtime v1.",
+        "QuestionnaireV2": "Frontend autenticado del flujo de cuestionarios v2.",
+        "Dashboard": "Frontend/backoffice autenticado para analitica operacional.",
+        "Reports": "Frontend/backoffice autenticado para generar reportes.",
+        "Auth": "Clientes de autenticacion (frontend o integraciones seguras).",
+        "MFA": "Usuario autenticado en flujo de seguridad MFA.",
+        "Email": "Usuario final o cliente de soporte para unsubscribe.",
+        "ProblemReports": "Usuario autenticado o administrador de soporte.",
+        "Predict": "Integracion tecnica experimental (no contrato principal).",
+        "Health": "Operaciones, monitoreo y despliegue.",
+        "Docs": "Integradores, QA y desarrollo para discovery de contrato.",
+        "Evaluations": "Cliente autenticado que inicia evaluaciones v1.",
+        "Questionnaires": "Administrador o cliente legacy de cuestionarios v1.",
+    }.get(tag, "Cliente autenticado segun el modulo funcional.")
+
+    input_lines = [
+        f"- Metodo y ruta: `{method.upper()} {path}`.",
+        f"- Parametros de ruta: {', '.join(path_params) if path_params else 'no aplica'}.",
+        f"- Query params: {', '.join(query_params) if query_params else 'no aplica'}.",
+        f"- Headers adicionales: {', '.join(header_params) if header_params else 'no aplica'}.",
+    ]
+    if body_content:
+        req = "obligatorio" if body_required else "opcional"
+        input_lines.append(f"- Body `{req}` en: {', '.join(body_content)}.")
+    else:
+        input_lines.append("- Body: no aplica.")
+
+    error_lines = [f"- `{code}`: {error_description(code)}" for code in error_codes]
+    status_line = contract["status"]
+    if contract.get("replaced_by"):
+        status_line += f". Reemplazo recomendado: `{contract['replaced_by']}`."
+
+    return "\n".join(
+        [
+            "**Objetivo funcional**",
+            f"Este endpoint permite {action_verb(method, path).lower()} el recurso de `{infer_module(path)}`.",
+            "",
+            "**Cuando debe usarse**",
+            f"Usalo cuando el flujo requiera invocar `{method.upper()} {path}` y mantener trazabilidad contractual.",
+            "",
+            "**Actor que lo consume**",
+            actor,
+            "",
+            "**Seguridad aplicable**",
+            f"- {sec_line}",
+            "",
+            "**Entrada esperada**",
+            *input_lines,
+            "",
+            "**Resultado exitoso**",
+            f"- Codigos de exito documentados: {', '.join(success_codes)}.",
+            "- La respuesta representa el estado procesado por el backend y mantiene compatibilidad con el esquema documentado.",
+            "",
+            "**Errores posibles y causa funcional**",
+            *error_lines,
+            "",
+            "**Estado contractual**",
+            f"- `{status_line}`",
+            f"- Motivo: {contract['reason']}",
+            f"- Accion OpenAPI: {contract['openapi_action']}",
+        ]
     )
 
-    tag_desc = {
-        'Health': 'Salud del servicio, readiness de base de datos y metricas del proceso.',
-        'Auth': 'Registro, login, refresh, logout y recuperacion de contrasena.',
-        'MFA': 'Enrolamiento, confirmacion y desactivacion de autenticacion multifactor.',
-        'Email': 'Desuscripcion de correos y cumplimiento de comunicaciones.',
-        'Admin': 'Gobernanza administrativa y operaciones de supervision.',
-        'Users': 'Gestion administrativa v1 de usuarios (compatibilidad legacy).',
-        'Questionnaires': 'Plantillas de cuestionario v1 y endpoints legacy de compatibilidad.',
-        'Evaluations': 'Creacion de evaluaciones v1 basadas en plantilla activa.',
-        'Predict': 'Inferencia experimental heredada, no recomendada para nuevas integraciones.',
-        'QuestionnaireRuntime': 'Flujo runtime v1 de evaluaciones y acceso profesional.',
-        'QuestionnaireRuntimeAdmin': 'Gobierno runtime v1 de templates/versiones/secciones.',
-        'QuestionnaireV2': 'Flujo operacional v2 de sesiones, historial, tags, share y PDF.',
-        'Dashboard': 'Consultas de analitica y monitoreo operativo v2.',
-        'Reports': 'Creacion de jobs de reporte operativo v2.',
-        'Docs': 'Swagger UI y especificacion OpenAPI estatica.',
-        'ProblemReports': 'Registro y gestion de reportes de problema.',
+
+def clean_response_descriptions(op: dict):
+    responses = op.setdefault("responses", {})
+    for code, response in responses.items():
+        if not isinstance(response, dict) or "$ref" in response:
+            continue
+        desc = str(response.get("description") or "").strip()
+        if not desc or desc.lower() in {"success", "ok"}:
+            response["description"] = success_description(str(code)) if str(code).isdigit() and int(code) < 400 else error_description(str(code))
+        content = (response.get("content") or {}).get("application/json")
+        if not content:
+            continue
+        schema = content.get("schema") or {}
+        if schema.get("type") == "object" and not schema.get("properties") and "$ref" not in schema:
+            schema.setdefault(
+                "description",
+                "Objeto JSON de respuesta cuyo detalle depende del flujo operativo; revisar ejemplos y reglas del endpoint.",
+            )
+            schema.setdefault("additionalProperties", True)
+            content["schema"] = schema
+
+
+def ensure_tags(spec: dict):
+    expected = {
+        "Health": "Endpoints de salud, readiness y metricas operativas.",
+        "Auth": "Autenticacion, registro, renovacion de token y sesion.",
+        "MFA": "Flujos MFA (TOTP) para configuracion, confirmacion y desactivacion.",
+        "Email": "Soporte de unsubscribe y salud de canal de correo.",
+        "Admin": "Backoffice administrativo con controles de rol, auditoria y seguridad.",
+        "Users": "Gestion legacy de usuarios v1 (compatibilidad).",
+        "Questionnaires": "Questionnaires v1 legacy y operaciones de compatibilidad.",
+        "Evaluations": "Creacion de evaluaciones v1 usando plantilla activa.",
+        "Predict": "Ruta experimental heredada de prediccion.",
+        "QuestionnaireRuntime": "Runtime v1 para flujos operativos de evaluacion.",
+        "QuestionnaireRuntimeAdmin": "Gobierno administrativo runtime v1.",
+        "QuestionnaireV2": "Contrato operativo principal de cuestionarios v2.",
+        "Dashboard": "Endpoints de dashboards operativos de producto.",
+        "Reports": "Generacion y gestion de reportes operativos.",
+        "ProblemReports": "Registro y seguimiento de reportes de problema.",
+        "Docs": "Documentacion OpenAPI y UI Swagger.",
+        "Misc": "Endpoints no clasificados explicitamente.",
     }
-    tags = spec.setdefault('tags', [])
-    names = {t.get('name') for t in tags}
-    for t in tags:
-        name = t.get('name')
-        if name in tag_desc:
-            t['description'] = tag_desc[name]
-    if 'ProblemReports' not in names:
-        tags.append({'name': 'ProblemReports', 'description': tag_desc['ProblemReports']})
-
-def _summary(method: str, path: str) -> str:
-    method = method.upper()
-
-    if path == '/healthz':
-        return 'Verificar liveness del backend'
-    if path == '/readyz':
-        return 'Verificar readiness con base de datos'
-    if path == '/metrics':
-        return 'Consultar metricas internas del proceso'
-    if path == '/api/predict':
-        return 'Ejecutar inferencia experimental (legacy)'
-    if path == '/docs':
-        return 'Visualizar Swagger UI de CognIA'
-    if path == '/openapi.yaml':
-        return 'Descargar especificacion OpenAPI vigente'
-
-    if path.startswith('/api/auth'):
-        mapping = {
-            '/api/auth/register': 'Registrar cuenta de usuario',
-            '/api/auth/login': 'Autenticar usuario con credenciales',
-            '/api/auth/login/mfa': 'Completar autenticacion MFA de login',
-            '/api/auth/refresh': 'Renovar token de acceso con refresh cookie',
-            '/api/auth/logout': 'Cerrar sesion y revocar refresh tokens',
-            '/api/auth/me': 'Consultar perfil del usuario autenticado',
-            '/api/auth/password/change': 'Cambiar contrasena del usuario autenticado',
-            '/api/auth/password/forgot': 'Solicitar inicio de recuperacion de contrasena',
-            '/api/auth/password/reset': 'Restablecer contrasena con token de recuperacion',
-            '/api/auth/password/reset/verify': 'Validar token de recuperacion de contrasena',
-        }
-        if path in mapping:
-            return mapping[path]
-
-    if path.startswith('/api/mfa'):
-        return {
-            '/api/mfa/setup': 'Iniciar configuracion MFA TOTP',
-            '/api/mfa/confirm': 'Confirmar MFA y emitir codigos de recuperacion',
-            '/api/mfa/disable': 'Deshabilitar MFA con verificacion reforzada',
-        }.get(path, 'Operar flujo MFA')
-
-    if path.startswith('/api/email/unsubscribe'):
-        return 'Procesar desuscripcion de correo' + (' one-click (POST)' if method == 'POST' else ' por enlace')
-
-    if path.startswith('/api/problem-reports'):
-        return 'Registrar reporte de problema' if method == 'POST' else 'Listar reportes de problema del usuario actual'
-
-    if path.startswith('/api/admin/problem-reports'):
-        if method == 'GET' and path.endswith('/{id}'):
-            return 'Consultar detalle de reporte de problema'
-        if method == 'PATCH':
-            return 'Actualizar estado y notas de reporte de problema'
-        return 'Listar reportes de problema para administracion'
-
-    if path.startswith('/api/admin'):
-        if path == '/api/admin/roles' and method == 'POST':
-            return 'Crear rol de sistema'
-        last = path.split('/')[-1]
-        if '/users/' in path and method == 'PATCH':
-            return 'Actualizar usuario desde administracion'
-        if path.endswith('/password-reset'):
-            return 'Forzar reinicio de contrasena de usuario'
-        if path.endswith('/mfa/reset'):
-            return 'Reiniciar estado MFA de usuario'
-        if path.endswith('/roles') and method == 'POST':
-            return 'Asignar roles a usuario'
-        if path.endswith('/roles') and method == 'GET':
-            return 'Listar roles disponibles del sistema'
-        if path.endswith('/audit-logs'):
-            return 'Consultar bitacora de auditoria'
-        if path.endswith('/questionnaires'):
-            return 'Listar cuestionarios para administracion'
-        if path.endswith('/publish'):
-            return 'Publicar plantilla de cuestionario'
-        if path.endswith('/archive'):
-            return 'Archivar plantilla de cuestionario'
-        if path.endswith('/clone'):
-            return 'Clonar plantilla de cuestionario'
-        if path.endswith('/approve'):
-            return 'Aprobar validacion profesional de psicologo'
-        if path.endswith('/reject'):
-            return 'Rechazar validacion profesional de psicologo'
-        if '/evaluations' in path and method == 'GET':
-            return 'Listar evaluaciones para supervision administrativa'
-        if path.endswith('/status') and method == 'PATCH':
-            return 'Actualizar estado administrativo de evaluacion'
-        if path.endswith('/email/unsubscribes'):
-            return 'Listar desuscripciones de correo'
-        if path.endswith('/remove'):
-            return 'Eliminar registro de desuscripcion'
-        if path.endswith('/email/health'):
-            return 'Consultar salud de configuracion de correo'
-        if path.endswith('/metrics'):
-            return 'Consultar snapshot administrativo de metricas'
-        if '/impersonate/' in path:
-            return 'Emitir token de impersonacion administrativa'
-        return 'Ejecutar operacion administrativa'
-
-    if path.startswith('/api/v1/users'):
-        if method == 'GET' and path.endswith('/{user_id}'):
-            return 'Consultar usuario v1 por identificador'
-        if method == 'PATCH':
-            return 'Actualizar usuario v1 por identificador'
-        if method == 'DELETE':
-            return 'Desactivar usuario v1 por identificador'
-        if method == 'POST':
-            return 'Crear usuario v1 (admin, legacy)'
-        return 'Listar usuarios v1 (admin, legacy)'
-
-    if path.startswith('/api/v1/questionnaires'):
-        if path.endswith('/active') and method == 'GET':
-            return 'Obtener plantilla activa de cuestionario v1'
-        if path.endswith('/questions'):
-            return 'Agregar preguntas a plantilla v1'
-        if path.endswith('/activate'):
-            return 'Activar plantilla v1 (legacy)'
-        if path.endswith('/active/clone'):
-            return 'Clonar plantilla activa v1 (legacy)'
-        return 'Crear plantilla de cuestionario v1'
-
-    if path.startswith('/api/v1/evaluations'):
-        return 'Crear evaluacion v1 sobre plantilla activa'
-
-    if path.startswith('/api/v1/questionnaire-runtime/admin'):
-        if path.endswith('/bootstrap'):
-            return 'Inicializar catalogo runtime v1'
-        if path.endswith('/questions'):
-            return 'Agregar preguntas a seccion runtime v1'
-        if path.endswith('/templates') and method == 'POST':
-            return 'Crear template runtime v1'
-        if path.endswith('/active'):
-            return 'Activar template runtime v1'
-        if path.endswith('/versions') and method == 'GET':
-            return 'Listar versiones de template runtime v1'
-        if path.endswith('/versions') and method == 'POST':
-            return 'Crear version de template runtime v1'
-        if '/versions/' in path and method == 'GET':
-            return 'Consultar detalle de version runtime v1'
-        if path.endswith('/disclosures'):
-            return 'Agregar disclosure a version runtime v1'
-        if path.endswith('/publish'):
-            return 'Publicar version runtime v1'
-        if path.endswith('/sections'):
-            return 'Agregar seccion a version runtime v1'
-
-    if path.startswith('/api/v1/questionnaire-runtime'):
-        if path.endswith('/questionnaire/active'):
-            return 'Obtener cuestionario activo runtime v1'
-        if path.endswith('/evaluations/draft') and method == 'POST':
-            return 'Crear borrador de evaluacion runtime v1'
-        if path.endswith('/evaluations/history'):
-            return 'Listar historial de evaluaciones runtime v1'
-        if path.endswith('/draft') and method == 'PATCH':
-            return 'Guardar respuestas parciales de borrador runtime v1'
-        if path.endswith('/export'):
-            return 'Exportar evaluacion runtime v1'
-        if path.endswith('/heartbeat'):
-            return 'Registrar heartbeat de evaluacion runtime v1'
-        if path.endswith('/responses') and '/professional/' in path:
-            return 'Consultar respuestas con acceso profesional runtime v1'
-        if path.endswith('/responses'):
-            return 'Consultar respuestas de evaluacion runtime v1'
-        if path.endswith('/results') and '/professional/' in path:
-            return 'Consultar resultados con acceso profesional runtime v1'
-        if path.endswith('/results'):
-            return 'Consultar resultados de evaluacion runtime v1'
-        if path.endswith('/status'):
-            return 'Consultar estado de evaluacion runtime v1'
-        if path.endswith('/submit'):
-            return 'Enviar evaluacion runtime v1 para procesamiento'
-        if path.endswith('/validate-section'):
-            return 'Validar completitud de seccion runtime v1'
-        if path.endswith('/notifications'):
-            return 'Listar notificaciones runtime v1'
-        if path.endswith('/read'):
-            return 'Marcar notificacion runtime v1 como leida'
-        if path.endswith('/professional/access'):
-            return 'Abrir acceso profesional a evaluacion runtime v1'
-        if path.endswith('/access') and method == 'DELETE':
-            return 'Revocar acceso profesional a evaluacion runtime v1'
-        if path.endswith('/tag'):
-            return 'Etiquetar evaluacion en flujo profesional runtime v1'
-        if method == 'DELETE' and '/evaluations/' in path:
-            return 'Eliminar logicamente evaluacion runtime v1'
-
-    if path.startswith('/api/v2/dashboard'):
-        base = path.split('/')[-1].replace('-', ' ')
-        return f'Consultar {base} en dashboard operativo v2'
-
-    if path.startswith('/api/v2/reports/jobs'):
-        return 'Crear job de reporte operacional v2'
-
-    if path.startswith('/api/v2/questionnaires'):
-        if path.endswith('/active'):
-            return 'Obtener cuestionario activo v2 paginado'
-        if path.endswith('/admin/bootstrap'):
-            return 'Ejecutar bootstrap administrativo de cuestionario v2'
-        if path.endswith('/history'):
-            return 'Listar historial de sesiones v2'
-        if '/history/' in path and path.endswith('/results'):
-            return 'Consultar resultados historicos de sesion v2'
-        if '/history/' in path and path.endswith('/pdf'):
-            return 'Consultar metadata del PDF de sesion v2'
-        if '/history/' in path and path.endswith('/pdf/download'):
-            return 'Descargar PDF de sesion v2'
-        if '/history/' in path and path.endswith('/pdf/generate'):
-            return 'Generar PDF de sesion v2'
-        if '/history/' in path and path.endswith('/share'):
-            return 'Crear codigo de comparticion para sesion v2'
-        if '/history/' in path and path.endswith('/tags') and method == 'POST':
-            return 'Asignar etiqueta a sesion v2'
-        if '/history/' in path and '/tags/' in path and method == 'DELETE':
-            return 'Eliminar etiqueta de sesion v2'
-        if '/sessions' in path and method == 'POST':
-            return 'Crear sesion de cuestionario v2'
-        if '/sessions/' in path and path.endswith('/answers'):
-            return 'Guardar respuestas parciales de sesion v2'
-        if '/sessions/' in path and path.endswith('/page'):
-            return 'Consultar pagina de sesion v2'
-        if '/sessions/' in path and path.endswith('/submit'):
-            return 'Enviar sesion v2 para procesamiento final'
-        if '/sessions/' in path and method == 'GET':
-            return 'Consultar sesion de cuestionario v2'
-        if '/history/' in path and method == 'GET':
-            return 'Consultar detalle historico de sesion v2'
-        if '/shared/' in path:
-            return 'Acceder a resultados compartidos de cuestionario v2'
-
-    verb = {'GET': 'Consultar', 'POST': 'Ejecutar', 'PATCH': 'Actualizar', 'DELETE': 'Eliminar', 'PUT': 'Reemplazar'}.get(method, 'Operar')
-    return f'{verb} recurso de API'
+    existing = {item.get("name"): item for item in spec.get("tags", []) if isinstance(item, dict)}
+    tags = []
+    for name, desc in expected.items():
+        tags.append({"name": name, "description": existing.get(name, {}).get("description") or desc})
+    spec["tags"] = tags
 
 
-def _make_operation_id(summary: str, used: set[str]) -> str:
-    words = re.sub(r'[^a-z0-9]+', ' ', _norm(summary).lower()).strip().split()
-    stop = {'de', 'del', 'la', 'el', 'los', 'las', 'para', 'con', 'por', 'y', 'v1', 'v2'}
-    words = [w for w in words if w not in stop]
-    if not words:
-        words = ['operacion']
-    op_id = words[0] + ''.join(w.capitalize() for w in words[1:])
-    base = op_id
-    idx = 2
-    while op_id in used:
-        op_id = f'{base}{idx}'
-        idx += 1
-    used.add(op_id)
-    return op_id
+def ensure_info_description(spec: dict):
+    info = spec.setdefault("info", {})
+    info["description"] = (
+        "API backend de CognIA para soporte de screening y alerta temprana en salud mental infantil (6 a 11 anos) en entorno academico simulado.\n\n"
+        "Alcance funcional:\n"
+        "- Auth JWT + MFA, usuarios/admin, cuestionarios v1/runtime v1/v2, dashboards, reportes y problem reports.\n"
+        "- Contratos legacy documentados con estado contractual explicito.\n\n"
+        "Caveat clinico:\n"
+        "- La API genera alertas de riesgo para screening/apoyo profesional.\n"
+        "- No es diagnostico clinico automatico ni definitivo.\n\n"
+        "Seguridad:\n"
+        "- JWT/cookies segun endpoint, CSRF en refresh y rate limits por endpoint critico.\n"
+        "- Endpoints admin restringidos por rol ADMIN.\n"
+        "- Errores endurecidos sin fuga de detalles sensibles."
+    )
 
 
-def actor_for(path_key: str) -> str:
-    if path_key.startswith('/api/admin'):
-        return 'Administrador del sistema con rol ADMIN y sesion autenticada.'
-    if '/professional/' in path_key:
-        return 'Psicologo autorizado (o administrador con permisos equivalentes) en flujo profesional.'
-    if path_key.startswith('/api/v2/dashboard') or path_key.startswith('/api/v2/reports'):
-        return 'Equipo operativo/analitica autenticado para monitoreo y reportes.'
-    if path_key.startswith('/api/v2/questionnaires/shared'):
-        return 'Consumidor externo con identificador de cuestionario y share code validos.'
-    if path_key.startswith('/api/problem-reports'):
-        return 'Usuario autenticado que reporta incidentes del producto.'
-    if path_key.startswith('/api/v1/questionnaire-runtime/admin'):
-        return 'Administrador funcional del runtime v1 con permisos de gobierno de templates/versiones.'
-    if path_key.startswith('/api/v1/questionnaire-runtime'):
-        return 'Usuario autenticado del flujo runtime v1 (cuidador/psicologo segun endpoint).'
-    if path_key.startswith('/api/v2/questionnaires'):
-        return 'Usuario autenticado que opera sesiones, historial y resultados del cuestionario v2.'
-    if path_key.startswith('/api/auth'):
-        return 'Frontend de autenticacion y usuario final durante ciclo de acceso y recuperacion.'
-    if path_key.startswith('/api/mfa'):
-        return 'Usuario autenticado en proceso de habilitar o administrar MFA.'
-    if path_key.startswith('/api/email/unsubscribe'):
-        return 'Servicio de correo, cliente web o usuario final mediante enlace/token de desuscripcion.'
-    if path_key.startswith('/api/v1/users'):
-        return 'Administrador usando endpoints v1 mantenidos por compatibilidad legacy.'
-    if path_key.startswith('/api/v1/questionnaires'):
-        return 'Administrador de contenidos de cuestionario en API v1 (compatibilidad legacy).'
-    if path_key.startswith('/api/v1/evaluations'):
-        return 'Usuario autenticado que registra una evaluacion v1 con respuestas estructuradas.'
-    if path_key in {'/healthz', '/readyz', '/metrics'}:
-        return 'Infraestructura, observabilidad y operaciones de plataforma.'
-    if path_key in {'/docs', '/openapi.yaml'}:
-        return 'Desarrolladores, QA e integradores que consultan contrato y UI de API.'
-    if path_key == '/api/predict':
-        return 'Consumo tecnico experimental para pruebas de inferencia heredada.'
-    return 'Consumidor autenticado conforme al control de acceso declarado por el endpoint.'
-
-
-def _security_text(path_key: str, op: dict) -> str:
-    sec = op.get('security')
-    roles = op.get('x-roles')
-    role_text = f" Roles requeridos documentados: {', '.join(roles)}." if roles else ''
-    if not sec:
-        return 'No declara esquema de autenticacion obligatorio en OpenAPI; puede ser publico segun configuracion.' + role_text
-
-    labels = []
-    for item in sec:
-        if not item:
-            labels.append('acceso anonimo permitido segun configuracion')
+def build_runtime_inventory():
+    app = create_app(TestingConfig)
+    runtime_paths = defaultdict(set)
+    for rule in app.url_map.iter_rules():
+        if rule.endpoint == "static":
             continue
-        for key in item.keys():
-            labels.append(
+        path = to_openapi_path(rule.rule)
+        for method in sorted(rule.methods):
+            ml = method.lower()
+            if ml in HTTP_METHODS:
+                runtime_paths[path].add(ml)
+    return runtime_paths
+
+
+def ensure_missing_questionnaire_legacy_ops(paths: dict):
+    if "/api/v1/questionnaires/{template_id}/activate" not in paths:
+        paths["/api/v1/questionnaires/{template_id}/activate"] = {
+            "parameters": [
                 {
-                    'bearerAuth': 'JWT Bearer de acceso valido',
-                    'cookieAuth': 'cookie refresh_token',
-                    'csrfCookie': 'cookie csrf_refresh_token',
-                    'csrfHeader': 'header X-CSRF-Token',
-                    'metricsToken': 'token de metricas en Authorization',
-                    'mfaEnrollmentToken': 'token temporal de enrolamiento MFA',
-                }.get(key, f'esquema {key}')
-            )
-    labels = list(dict.fromkeys(labels))
-    return 'Requiere: ' + '; '.join(labels) + '.' + role_text
+                    "name": "template_id",
+                    "in": "path",
+                    "required": True,
+                    "description": "ID del template legacy a activar.",
+                    "schema": {"type": "string"},
+                }
+            ],
+            "post": {
+                "tags": ["Questionnaires"],
+                "summary": "Activar template legacy v1",
+                "operationId": "postApiV1QuestionnairesTemplateIdActivate",
+                "deprecated": True,
+                "x-contract-status": "KEEP_ACTIVE_BUT_LEGACY",
+                "x-replaced-by": "/api/admin/questionnaires/{template_id}/publish",
+                "security": [{"bearerAuth": []}],
+                "x-roles": ["ADMIN"],
+                "responses": {
+                    "200": {
+                        "description": "Template v1 activado correctamente.",
+                        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/QuestionnaireTemplate"}}},
+                    },
+                    "400": {"$ref": "#/components/responses/BadRequest"},
+                    "401": {"$ref": "#/components/responses/Unauthorized"},
+                    "403": {"$ref": "#/components/responses/Forbidden"},
+                    "404": {"$ref": "#/components/responses/NotFound"},
+                    "500": {"$ref": "#/components/responses/ServerError"},
+                },
+            },
+        }
+
+    if "/api/v1/questionnaires/active/clone" not in paths:
+        paths["/api/v1/questionnaires/active/clone"] = {
+            "post": {
+                "tags": ["Questionnaires"],
+                "summary": "Clonar cuestionario activo legacy v1",
+                "operationId": "postApiV1QuestionnairesActiveClone",
+                "deprecated": True,
+                "x-contract-status": "KEEP_ACTIVE_BUT_LEGACY",
+                "x-replaced-by": "/api/admin/questionnaires/{template_id}/clone",
+                "security": [{"bearerAuth": []}],
+                "x-roles": ["ADMIN"],
+                "requestBody": {
+                    "required": True,
+                    "content": {"application/json": {"schema": {"$ref": "#/components/schemas/QuestionnaireCloneRequest"}}},
+                },
+                "responses": {
+                    "201": {
+                        "description": "Template clonado correctamente en flujo legacy.",
+                        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/QuestionnaireCloneResponse"}}},
+                    },
+                    "400": {"$ref": "#/components/responses/BadRequest"},
+                    "401": {"$ref": "#/components/responses/Unauthorized"},
+                    "403": {"$ref": "#/components/responses/Forbidden"},
+                    "409": {"$ref": "#/components/responses/Conflict"},
+                    "500": {"$ref": "#/components/responses/ServerError"},
+                },
+            }
+        }
 
 
-def _params_text(spec: dict, op: dict) -> str:
-    comp = spec.get('components', {}).get('parameters', {})
-    buckets = {'path': [], 'query': [], 'header': [], 'cookie': []}
-    for p in op.get('parameters', []) or []:
-        pobj = comp.get(p['$ref'].split('/')[-1], {}) if '$ref' in p else p
-        where = pobj.get('in', 'query')
-        name = pobj.get('name', 'parametro')
-        req = 'obligatorio' if pobj.get('required') else 'opcional'
-        sch = pobj.get('schema') or {}
-        t = _schema_name(sch) or sch.get('format') or sch.get('type') or 'valor'
-        buckets.setdefault(where, []).append(f'{name} ({req}, tipo {t})')
-    out = []
-    for where, label in [('path', 'Ruta'), ('query', 'Query'), ('header', 'Headers'), ('cookie', 'Cookies')]:
-        vals = buckets.get(where) or []
-        out.append(f"- {label}: {'; '.join(vals)}." if vals else f'- {label}: sin parametros declarados en este contrato.')
-    return '\\n'.join(out)
+def main():
+    openapi_path = Path(PROJECT_ROOT) / "docs" / "openapi.yaml"
+    matrix_path = Path(PROJECT_ROOT) / "docs" / "endpoint_lifecycle_matrix.md"
 
+    spec = yaml.safe_load(openapi_path.read_text(encoding="utf-8"))
+    ensure_info_description(spec)
+    ensure_tags(spec)
 
-def _body_text(op: dict) -> str:
-    rb = op.get('requestBody')
-    if not rb:
-        return 'No aplica body en este endpoint segun la especificacion.'
-    req = 'obligatorio' if rb.get('required') else 'opcional'
-    parts = []
-    for ctype, cobj in (rb.get('content') or {}).items():
-        parts.append(f"{ctype} usando {_schema_name((cobj or {}).get('schema')) or 'schema por confirmar'}")
-    return f"Body {req}. Tipos de contenido esperados: {'; '.join(parts)}." if parts else f'Body {req}.'
+    runtime = build_runtime_inventory()
+    runtime_canonical = {canonical(p): p for p in runtime.keys()}
 
-
-def _success_text(op: dict) -> str:
-    parts = []
-    for code, resp in (op.get('responses') or {}).items():
-        c = str(code)
-        if not re.match(r'^2\d\d$', c):
+    paths = spec.setdefault("paths", {})
+    normalized_paths = {}
+    for spec_path, path_item in paths.items():
+        target = runtime_canonical.get(canonical(spec_path), spec_path)
+        if target not in normalized_paths:
+            normalized_paths[target] = path_item
             continue
-        desc = resp.get('description', 'respuesta exitosa') if isinstance(resp, dict) else 'respuesta exitosa'
-        schemas = []
-        if isinstance(resp, dict):
-            for cobj in (resp.get('content') or {}).values():
-                s = _schema_name((cobj or {}).get('schema'))
-                if s:
-                    schemas.append(s)
-        schemas = list(dict.fromkeys(schemas))
-        parts.append(f"{c}: {desc}" + (f" (estructura: {', '.join(schemas)})" if schemas else ''))
-    return '; '.join(parts) + '.' if parts else 'No tiene codigos 2xx documentados; revisar contrato.'
-
-
-def _error_text(op: dict) -> str:
-    errors = []
-    for code in (op.get('responses') or {}).keys():
-        c = str(code)
-        if re.match(r'^[45]\d\d$', c):
-            errors.append(f"{c} ({ERROR_MEANING.get(c, 'error operacional documentado')})")
-    return '; '.join(errors) + '.' if errors else 'No declara errores 4xx/5xx adicionales fuera de manejadores globales.'
-
-
-def _classification(path_key: str, op: dict) -> str:
-    c = []
-    if op.get('deprecated'):
-        c.append('legacy/deprecated')
-    if path_key.startswith('/api/admin'):
-        c.append('admin')
-    if path_key.startswith('/api/v1'):
-        c.append('versionado-v1')
-    if path_key.startswith('/api/v2'):
-        c.append('versionado-v2')
-    if path_key.startswith('/api/v1/questionnaire-runtime'):
-        c.append('runtime-cuestionario-v1')
-    if path_key.startswith('/api/v2/questionnaires'):
-        c.append('runtime-cuestionario-v2')
-    if path_key.startswith('/api/v2/dashboard'):
-        c.append('dashboard-operativo')
-    if path_key.startswith('/api/v2/reports'):
-        c.append('reporting-operativo')
-    if path_key in {'/docs', '/openapi.yaml'}:
-        c.append('documentacion-operativa')
-    if path_key == '/api/predict':
-        c.append('experimental')
-    if not c:
-        c.append('publico' if not op.get('security') else 'autenticado')
-    return ', '.join(c)
-
-
-def run() -> None:
-    spec = yaml.safe_load(OPENAPI_PATH.read_text(encoding='utf-8'))
-    _ensure_missing_paths(spec)
-    _update_info_and_tags(spec)
-
-    used_ids: set[str] = set()
-    for pth, item in spec.get('paths', {}).items():
-        for m in ['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace']:
-            op = item.get(m)
-            if not op:
-                continue
-            method = m.upper()
-            summary = _summary(method, pth)
-            op['summary'] = summary
-            op['operationId'] = _make_operation_id(summary, used_ids)
-
-            when = {
-                'GET': 'Usar cuando necesites lectura o consulta del estado actual sin mutar el recurso.',
-                'POST': 'Usar cuando necesites crear recurso o ejecutar una accion de negocio.',
-                'PATCH': 'Usar cuando necesites actualizar parcialmente un recurso existente.',
-                'DELETE': 'Usar cuando necesites revocar/eliminar logicamente un recurso.',
-                'PUT': 'Usar cuando necesites reemplazar la representacion del recurso.',
-            }.get(method, 'Usar segun el flujo operativo definido para este endpoint.')
-
-            behavior = []
-            if method == 'GET':
-                behavior.append('Operacion de lectura; no debe mutar estado de negocio salvo telemetria tecnica.')
+        for key, value in path_item.items():
+            if key in HTTP_METHODS:
+                normalized_paths[target][key] = value
+            elif key == "parameters":
+                normalized_paths[target].setdefault("parameters", [])
+                normalized_paths[target]["parameters"].extend(value or [])
             else:
-                behavior.append('Operacion potencialmente mutante sobre estado de negocio.')
-            if '/submit' in pth:
-                behavior.append('Dispara transicion de workflow y puede activar procesamiento/inferencia.')
-            if '/heartbeat' in pth:
-                behavior.append('Actualiza presencia/actividad de sesion.')
-            if '/pdf/generate' in pth:
-                behavior.append('Genera artefacto PDF para consulta/descarga posterior.')
-            if '/pdf/download' in pth:
-                behavior.append('Retorna archivo adjunto si existe artefacto y autorizacion.')
-            if '/share' in pth:
-                behavior.append('Gestiona acceso compartido sujeto a vigencia y controles de permiso.')
-            if '/bootstrap' in pth:
-                behavior.append('Sincroniza catalogos base; uso operacional controlado.')
-            if pth == '/api/predict':
-                behavior.append('Endpoint experimental y no recomendado para nuevas integraciones.')
+                normalized_paths[target][key] = value
+    paths = normalized_paths
 
-            persistence = (
-                'No modifica persistencia de negocio de forma directa; responde datos de consulta.'
-                if method == 'GET' and pth not in {'/metrics', '/healthz', '/readyz'}
-                else 'Puede crear/actualizar estado persistido y dejar trazabilidad de workflow/auditoria.'
+    ensure_missing_questionnaire_legacy_ops(paths)
+
+    for runtime_path, methods in runtime.items():
+        path_item = paths.setdefault(runtime_path, {})
+        for method in methods:
+            if method in path_item:
+                continue
+            tag = infer_tag(runtime_path)
+            sec, roles = security_requirements(runtime_path)
+            op = {
+                "tags": [tag],
+                "summary": f"{action_verb(method, runtime_path)} {runtime_path}",
+                "operationId": generate_operation_id(method, runtime_path),
+                "responses": {
+                    "200": {
+                        "description": success_description("200"),
+                        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MessageResponse"}}},
+                    },
+                    "400": {"$ref": "#/components/responses/BadRequest"},
+                    "401": {"$ref": "#/components/responses/Unauthorized"},
+                    "403": {"$ref": "#/components/responses/Forbidden"},
+                    "404": {"$ref": "#/components/responses/NotFound"},
+                    "500": {"$ref": "#/components/responses/ServerError"},
+                },
+            }
+            if sec:
+                op["security"] = sec
+            if roles:
+                op["x-roles"] = roles
+            path_item[method] = op
+
+    lifecycle_rows = []
+    used_operation_ids = set()
+
+    for path in sorted(paths.keys()):
+        path_item = paths[path]
+        ensure_path_parameters(path, path_item)
+        for method, op in list(path_item.items()):
+            if method not in HTTP_METHODS or not isinstance(op, dict):
+                continue
+            tag = infer_tag(path)
+            op["tags"] = [tag]
+
+            sec, roles = security_requirements(path)
+            if sec and "security" not in op:
+                op["security"] = sec
+            if roles:
+                op["x-roles"] = roles
+
+            contract = classify_contract(path)
+            op["x-contract-status"] = contract["status"]
+            if contract.get("replaced_by"):
+                op["x-replaced-by"] = contract["replaced_by"]
+            if contract["status"] in {"KEEP_ACTIVE_BUT_LEGACY", "DEPRECATE_PUBLIC"}:
+                op["deprecated"] = True
+
+            op["summary"] = op.get("summary") or f"{action_verb(method, path)} {path}"
+            op_id = generate_operation_id(method, path)
+            if op_id in used_operation_ids:
+                i = 2
+                while f"{op_id}{i}" in used_operation_ids:
+                    i += 1
+                op_id = f"{op_id}{i}"
+            used_operation_ids.add(op_id)
+            op["operationId"] = op_id
+
+            op["description"] = build_description(path, method, path_item, op, contract, tag)
+            clean_response_descriptions(op)
+
+            clients = {
+                "Admin": "backoffice/admin",
+                "Users": "admin legacy",
+                "QuestionnaireRuntime": "frontend runtime v1",
+                "QuestionnaireRuntimeAdmin": "admin runtime v1",
+                "QuestionnaireV2": "frontend cuestionario v2",
+                "Dashboard": "analitica operativa",
+                "Reports": "reporting",
+                "ProblemReports": "usuarios + soporte",
+                "Auth": "frontend auth",
+                "MFA": "usuarios autenticados",
+                "Email": "soporte de correo",
+                "Predict": "integracion experimental",
+                "Health": "operaciones",
+                "Docs": "integradores/QA",
+                "Questionnaires": "clientes legacy v1",
+                "Evaluations": "clientes v1",
+            }.get(tag, "consumidor autenticado")
+
+            lifecycle_rows.append(
+                {
+                    "endpoint": f"{method.upper()} {path}",
+                    "module": infer_module(path),
+                    "replaced_by": contract.get("replaced_by") or "N/A",
+                    "reason": contract["reason"],
+                    "clients": clients,
+                    "compat_risk": contract["compat_risk"],
+                    "decision": contract["status"],
+                    "openapi_action": contract["openapi_action"],
+                }
             )
-            if method == 'DELETE':
-                persistence = 'Impacta estado persistido mediante desactivacion/eliminacion logica segun reglas del servicio.'
-            if pth in {'/metrics', '/healthz', '/readyz', '/docs', '/openapi.yaml'}:
-                persistence = 'Sin persistencia de negocio; endpoint de salud/observabilidad/documentacion.'
 
-            caveats = []
-            if op.get('deprecated'):
-                caveats.append('Marcado como deprecated por compatibilidad; planificar migracion.')
-            if pth in {'/docs', '/openapi.yaml'}:
-                caveats.append('Disponible solo cuando SWAGGER_ENABLED esta habilitado en entorno.')
-            if pth == '/metrics':
-                caveats.append('Puede requerir token si METRICS_TOKEN_REQUIRED esta activo.')
-            if '/shared/' in pth:
-                caveats.append('Sujeto a rate limit y validez de share code.')
+    spec["paths"] = dict(sorted(paths.items(), key=lambda x: x[0]))
+    openapi_path.write_text(yaml.safe_dump(spec, sort_keys=False, allow_unicode=False, width=120), encoding="utf-8")
 
-            desc = (
-                f"**Objetivo funcional real:** {summary}.\\n\\n"
-                f"**Recurso/proceso que gestiona:** `{method} {pth}`.\\n"
-                f"**Cuando debe usarse:** {when}\\n"
-                f"**Actor o rol que suele consumirlo:** {_summary('GET', pth) if pth in {'/docs','/openapi.yaml'} else ''}"  # placeholder removed below
-            )
-            desc = desc.replace(
-                "**Actor o rol que suele consumirlo:** " + (_summary('GET', pth) if pth in {'/docs','/openapi.yaml'} else ''),
-                f"**Actor o rol que suele consumirlo:** {actor_for(pth)}"
-            )
-            desc += (
-                f"\\n**Seguridad aplicable:** {_security_text(pth, op)}\\n\\n"
-                "**Parametros de entrada:**\\n"
-                f"{_params_text(spec, op)}\\n\\n"
-                f"**Body de solicitud:** {_body_text(op)}\\n\\n"
-                f"**Comportamiento esperado del endpoint:** {' '.join(behavior)}\\n\\n"
-                f"**Respuesta exitosa y significado funcional:** {_success_text(op)}\\n"
-                f"**Errores posibles documentados:** {_error_text(op)}\\n"
-                f"**Persistencia / workflow / trazabilidad:** {persistence}\\n"
-                f"**Clasificacion del endpoint:** {_classification(pth, op)}."
-            )
-            if caveats:
-                desc += "\\n**Caveats y restricciones relevantes:** " + ' '.join(caveats)
-            op['description'] = desc
+    lines = [
+        "# Matriz de reemplazo, deprecacion y cierre de endpoints",
+        "",
+        "Fuente: inventario runtime real (`api/app.py`) + contrato publicado (`docs/openapi.yaml`).",
+        "",
+        "| Endpoint actual | Modulo/version | Endpoint que lo reemplaza | Motivo de reemplazo o convivencia | Clientes/flujo afectados | Riesgo compatibilidad | Decision final | Accion OpenAPI |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for row in sorted(lifecycle_rows, key=lambda x: x["endpoint"]):
+        lines.append(
+            f"| `{row['endpoint']}` | `{row['module']}` | `{row['replaced_by']}` | {row['reason']} | {row['clients']} | {row['compat_risk']} | `{row['decision']}` | {row['openapi_action']} |"
+        )
+    matrix_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    OPENAPI_PATH.write_text(yaml.safe_dump(spec, sort_keys=False, allow_unicode=False, width=110), encoding='utf-8')
+    print(f"OpenAPI actualizado: {openapi_path}")
+    print(f"Matriz de ciclo de vida: {matrix_path}")
 
 
-if __name__ == '__main__':
-    run()
-    print('ok')
+if __name__ == "__main__":
+    main()
+

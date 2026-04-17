@@ -110,6 +110,7 @@ class Config:
     QR_PIN_MAX_ATTEMPTS = int(os.getenv("QR_PIN_MAX_ATTEMPTS", "5"))
     QR_PIN_LOCK_MINUTES = int(os.getenv("QR_PIN_LOCK_MINUTES", "10"))
     QV2_SHARED_ACCESS_RATE_LIMIT = os.getenv("QV2_SHARED_ACCESS_RATE_LIMIT", "30 per minute")
+    PREDICT_RATE_LIMIT = os.getenv("PREDICT_RATE_LIMIT", "30 per minute")
 
     # Problem reports
     PROBLEM_REPORT_UPLOAD_DIR = os.getenv("PROBLEM_REPORT_UPLOAD_DIR", "artifacts/problem_reports/uploads")
