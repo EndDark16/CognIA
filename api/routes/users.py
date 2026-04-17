@@ -5,9 +5,10 @@ from datetime import datetime, timezone
 
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import get_jwt, get_jwt_identity
-from marshmallow import ValidationError, Schema, fields, validate
+from marshmallow import ValidationError
 
 from api.decorators import roles_required
+from api.schemas.user_schema import UserCreateSchema, UserListQuerySchema, UserUpdateSchema
 from api.security import hash_password, log_audit, password_policy_errors
 from api.services.email_service import send_welcome_email
 from api.routes.auth import (
@@ -25,27 +26,6 @@ from app.models import AppUser, Role, UserRole, db
 
 
 users_bp = Blueprint("users", __name__, url_prefix="/api/v1/users")
-
-
-class UserCreateSchema(Schema):
-    username = fields.String(required=True)
-    email = fields.String(required=True)
-    password = fields.String(required=True, validate=validate.Length(min=8, max=128))
-    full_name = fields.String(allow_none=True)
-    user_type = fields.String(required=True)
-    professional_card_number = fields.String(allow_none=True)
-    roles = fields.List(fields.String(), allow_none=True)
-    is_active = fields.Boolean(load_default=True)
-
-
-class UserUpdateSchema(Schema):
-    email = fields.String(allow_none=True)
-    password = fields.String(allow_none=True, validate=validate.Length(min=8, max=128))
-    full_name = fields.String(allow_none=True)
-    user_type = fields.String(allow_none=True)
-    professional_card_number = fields.String(allow_none=True)
-    roles = fields.List(fields.String(), allow_none=True)
-    is_active = fields.Boolean(allow_none=True)
 
 
 def _parse_uuid(value):
@@ -124,8 +104,13 @@ def list_users():
     guard = _ensure_admin_token()
     if guard:
         return guard
-    page = max(int(request.args.get("page", 1)), 1)
-    page_size = min(max(int(request.args.get("page_size", 20)), 1), 100)
+    query_schema = UserListQuerySchema()
+    try:
+        query = query_schema.load(request.args)
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
+    page = query["page"]
+    page_size = query["page_size"]
     query = AppUser.query.order_by(AppUser.created_at.desc())
     total = query.count()
     items = query.offset((page - 1) * page_size).limit(page_size).all()
