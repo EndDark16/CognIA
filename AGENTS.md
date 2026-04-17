@@ -366,3 +366,23 @@ Contexto metodológico:
   - parseo OpenAPI exitoso (YAML valido)
   - `pytest tests/contracts/test_openapi_runtime_alignment.py -q` => `1 passed`
 - Alcance de cambio: documentacion/contrato (`docs/openapi.yaml`) sin cambios de runtime.
+
+## Actualizacion de estado (2026-04-17) - openapi_runtime_hardening_v2_comprehensive
+- Se ejecuto nueva intervencion integral de contrato + backend con foco en calidad documental endpoint-por-endpoint y consistencia runtime.
+- OpenAPI (`docs/openapi.yaml`):
+  - Cobertura actualizada a `117` operaciones (se agregaron rutas v1 legacy montadas en runtime y faltantes en spec):
+    - `POST /api/v1/questionnaires/{template_id}/activate`
+    - `POST /api/v1/questionnaires/active/clone`
+  - Se normalizaron `summary`, `operationId`, `description` para toda la API con descripcion detallada en espanol por endpoint.
+  - Se actualizo `info.description` en espanol profesional y descripciones de tags.
+- Seguridad/hardening:
+  - `api/decorators.py`: `roles_required` ahora bloquea tokens de enrolamiento MFA (`mfa_enrollment_only`) y estandariza error de permisos.
+  - `api/routes/docs.py`: `GET /openapi.yaml` valida existencia del archivo y evita error interno por archivo faltante.
+- DTOs/schemas:
+  - Nuevo `api/schemas/user_schema.py`; `api/routes/users.py` migra DTOs inline a schema dedicado y valida query de paginacion.
+  - Nuevo `api/schemas/mfa_schema.py`; `api/routes/mfa.py` aplica validacion formal en `confirm` y `disable`.
+- Documentacion de soporte:
+  - `README.md`, `docs/OPENAPI_GUIDE.md`, `docs/api_full_reference.md` actualizados para reflejar calidad de contrato y estado real de endpoints legacy.
+- Validacion en ventana:
+  - `pytest tests/contracts/test_openapi_runtime_alignment.py -q` en verde tras corregir desalineacion runtime/spec.
+  - `por confirmar`: corrida final de `pytest -q` completo en esta misma intervencion antes de cierre.
