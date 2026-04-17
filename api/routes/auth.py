@@ -822,8 +822,11 @@ def change_password():
 @auth_bp.post("/password/forgot")
 @limiter.limit(
     lambda: current_app.config.get(
-        "PASSWORD_FORGOT_RATE_LIMIT_IP",
-        current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "20 per 10 minutes"),
+        "PASSWORD_FORGOT_RATE_LIMIT",
+        current_app.config.get(
+            "PASSWORD_FORGOT_RATE_LIMIT_IP",
+            "20 per 10 minutes",
+        ),
     ),
     key_func=get_remote_address,
 )

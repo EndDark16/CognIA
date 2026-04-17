@@ -1,9 +1,14 @@
 from functools import wraps
+
 from flask import jsonify
 from flask_jwt_extended import get_jwt, get_jwt_identity, verify_jwt_in_request
 
 from app.models import AppUser, db
 from api.security import requires_mfa_enrollment
+
+
+def _error(message: str, code: str, status: int):
+    return jsonify({"msg": message, "error": code}), status
 
 def roles_required(*required_roles):
     """
@@ -15,13 +20,15 @@ def roles_required(*required_roles):
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
             claims = get_jwt()
-            user_roles = claims.get("roles", [])
-            
-            # Check intersection of user roles and required roles
-            if not set(required_roles).isdisjoint(user_roles):
+            if claims.get("mfa_enrollment"):
+                return _error("Enrollment token not allowed", "mfa_enrollment_only", 403)
+
+            user_roles = {str(role).upper() for role in (claims.get("roles", []) or [])}
+            required = {str(role).upper() for role in required_roles}
+
+            if user_roles & required:
                 return fn(*args, **kwargs)
-            else:
-                return jsonify(msg="Insufficient permissions"), 403
+            return _error("Insufficient permissions", "insufficient_permissions", 403)
         return decorator
     return wrapper
 
