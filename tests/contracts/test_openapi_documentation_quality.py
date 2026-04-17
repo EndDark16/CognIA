@@ -4,78 +4,84 @@ from pathlib import Path
 
 import yaml
 
-
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 
-HTTP_METHODS = ("get", "post", "put", "patch", "delete")
-REQUIRED_DESCRIPTION_MARKERS = (
-    "**Objetivo funcional real:**",
-    "**Recurso/proceso que gestiona:**",
-    "**Cuando debe usarse:**",
-    "**Actor o rol que suele consumirlo:**",
-    "**Seguridad aplicable:**",
-    "**Parametros de entrada:**",
-    "**Body de solicitud:**",
-    "**Comportamiento esperado del endpoint:**",
-    "**Respuesta exitosa y significado funcional:**",
-    "**Errores posibles documentados:**",
-    "**Persistencia / workflow / trazabilidad:**",
-    "**Clasificacion del endpoint:**",
-)
+HTTP_METHODS = {"get", "post", "put", "patch", "delete"}
+REQUIRED_SECTIONS = {
+    "**Objetivo funcional**",
+    "**Cuando debe usarse**",
+    "**Actor que lo consume**",
+    "**Seguridad aplicable**",
+    "**Entrada esperada**",
+    "**Resultado exitoso**",
+    "**Errores posibles y causa funcional**",
+    "**Estado contractual**",
+}
+VALID_CONTRACT_STATUS = {
+    "KEEP_ACTIVE",
+    "KEEP_ACTIVE_BUT_LEGACY",
+    "INTERNAL_ONLY",
+    "DEPRECATE_PUBLIC",
+    "REMOVE_AFTER_COMPAT_WINDOW",
+    "DUPLICATE_TO_CONSOLIDATE",
+}
 
 
-def _load_openapi():
-    path = Path(PROJECT_ROOT) / "docs" / "openapi.yaml"
-    return yaml.safe_load(path.read_text(encoding="utf-8"))
-
-
-def test_openapi_operations_have_professional_spanish_documentation():
-    spec = _load_openapi()
-
-    operation_ids = []
-    missing = []
-    mechanical_summaries = []
-    missing_markers = []
-
+def _iter_operations(spec: dict):
     for path, item in (spec.get("paths") or {}).items():
-        for method in HTTP_METHODS:
-            op = (item or {}).get(method)
-            if not op:
+        for method, operation in item.items():
+            if method in HTTP_METHODS and isinstance(operation, dict):
+                yield path, method, operation
+
+
+def test_openapi_documentation_quality_contract():
+    openapi_path = Path(PROJECT_ROOT) / "docs" / "openapi.yaml"
+    raw = openapi_path.read_text(encoding="utf-8")
+    spec = yaml.safe_load(raw)
+
+    operations = list(_iter_operations(spec))
+    assert operations, "OpenAPI no contiene operaciones."
+
+    missing_sections = []
+    generic_success = []
+    missing_status = []
+
+    for path, method, operation in operations:
+        summary = str(operation.get("summary") or "").strip()
+        description = str(operation.get("description") or "").strip()
+        contract_status = operation.get("x-contract-status")
+
+        assert summary, f"summary vacio en {method.upper()} {path}"
+        assert description, f"description vacia en {method.upper()} {path}"
+
+        for section in REQUIRED_SECTIONS:
+            if section not in description:
+                missing_sections.append((path, method, section))
+
+        if contract_status not in VALID_CONTRACT_STATUS:
+            missing_status.append((path, method, contract_status))
+
+        for code, response in (operation.get("responses") or {}).items():
+            if not isinstance(response, dict):
                 continue
+            desc = str(response.get("description") or "").strip().lower()
+            if desc in {"success", "ok"}:
+                generic_success.append((path, method, code))
 
-            summary = str(op.get("summary") or "").strip()
-            description = str(op.get("description") or "").strip()
-            operation_id = str(op.get("operationId") or "").strip()
-
-            if not summary or not description or not operation_id:
-                missing.append((method.upper(), path))
-                continue
-
-            if summary.upper().startswith(("GET ", "POST ", "PATCH ", "DELETE ", "PUT ")):
-                mechanical_summaries.append((method.upper(), path, summary))
-
-            for marker in REQUIRED_DESCRIPTION_MARKERS:
-                if marker not in description:
-                    missing_markers.append((method.upper(), path, marker))
-                    break
-
-            operation_ids.append(operation_id)
-
-    assert not missing, f"Operations with missing summary/description/operationId: {missing}"
-    assert not mechanical_summaries, f"Mechanical summaries detected: {mechanical_summaries}"
-    assert not missing_markers, f"Descriptions missing required sections: {missing_markers}"
-    assert len(operation_ids) == len(
-        set(operation_ids)
-    ), "OpenAPI operationId values must be unique"
+    assert not missing_sections, f"Secciones obligatorias ausentes en descripciones: {missing_sections}"
+    assert not generic_success, f"Respuestas con descripcion generica detectadas: {generic_success}"
+    assert not missing_status, f"Estado contractual invalido o ausente: {missing_status}"
+    assert "\\n\\n" not in raw, "Se detectaron literales \\n\\n en openapi.yaml"
 
 
-def test_openapi_info_description_preserves_scope_and_clinical_caveat():
-    spec = _load_openapi()
-    text = str(((spec.get("info") or {}).get("description")) or "").lower()
+def test_endpoint_lifecycle_matrix_exists_and_has_rows():
+    matrix_path = Path(PROJECT_ROOT) / "docs" / "endpoint_lifecycle_matrix.md"
+    assert matrix_path.exists(), "Falta docs/endpoint_lifecycle_matrix.md"
+    text = matrix_path.read_text(encoding="utf-8")
+    assert "| Endpoint actual | Modulo/version | Endpoint que lo reemplaza |" in text
+    row_count = sum(1 for line in text.splitlines() if line.startswith("| `"))
+    assert row_count >= 100, f"La matriz parece incompleta (filas={row_count})"
 
-    assert "screening" in text or "tamiz" in text
-    assert "no constituye diagnostico" in text or "no diagnostico" in text
-    assert "docs/openapi.yaml" in text

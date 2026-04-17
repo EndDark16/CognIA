@@ -380,39 +380,48 @@ class DomainRuntime:
         self.version = metadata.get("version") or metadata.get("version_tag") or "unknown"
 
 
-class _TestingBinaryModel:
-    def __init__(self, positive_probability: float = 0.35):
-        self.positive_probability = float(positive_probability)
-
-    def predict_proba(self, X):
-        rows = len(X.index) if hasattr(X, "index") else len(X)
-        negative = max(0.0, min(1.0, 1.0 - self.positive_probability))
-        return [[negative, self.positive_probability] for _ in range(rows)]
-
-
-_TESTING_FEATURE_BY_DOMAIN = {
-    "adhd": "conners_attention_proxy",
-    "conduct": "ari_behavior_proxy",
-    "elimination": "cbcl_elimination_proxy",
-    "anxiety": "scared_anxiety_proxy",
-    "depression": "mfq_mood_proxy",
-}
+class _TestingFallbackModel:
+    def predict_proba(self, X: pd.DataFrame):
+        rows = []
+        for _, row in X.iterrows():
+            numeric_values = []
+            for value in row.tolist():
+                maybe = _safe_float(value)
+                if maybe is not None:
+                    numeric_values.append(float(maybe))
+            avg = sum(numeric_values) / len(numeric_values) if numeric_values else 0.0
+            probability = max(0.05, min(0.95, 0.5 + (avg / 20.0 - 0.25)))
+            rows.append([1.0 - probability, probability])
+        return rows
 
 
-def _testing_runtime_fallback(domain: str, reason: str) -> DomainRuntime:
-    feature_name = _TESTING_FEATURE_BY_DOMAIN.get(domain, f"{domain}_proxy_feature")
-    metadata = {
-        "feature_columns": ["age_years", "sex_assigned_at_birth", "site", "release", feature_name],
-        "recommended_threshold": 0.5,
-        "risk_band_policy": {"low_lt": 0.33, "moderate_lt": 0.66, "high_ge": 0.66},
-        "top_features": [f"num__{feature_name}"],
-        "version": "testing_fallback",
-        "fallback_reason": reason,
-    }
+def _testing_fallback_runtime(domain: str, metadata: dict[str, Any] | None = None) -> DomainRuntime:
+    contract = _feature_contract_map()
+    feature_columns = [
+        feature
+        for feature, spec in contract.items()
+        if (spec.get("domain") or "").strip().lower() == domain
+    ][:25]
+    if not feature_columns:
+        feature_columns = [
+            "age_years",
+            "sex_assigned_at_birth",
+            f"{domain}_symptom_1",
+            f"{domain}_symptom_2",
+            "sleep_problems",
+        ]
+
+    merged = dict(metadata or {})
+    merged.setdefault("feature_columns", feature_columns)
+    merged.setdefault("recommended_threshold", 0.5)
+    merged.setdefault("risk_band_policy", {"low_lt": 0.33, "moderate_lt": 0.66, "high_ge": 0.66})
+    merged.setdefault("top_features", feature_columns[:5])
+    merged.setdefault("version", "testing_fallback")
+
     return DomainRuntime(
         domain=domain,
-        model=_TestingBinaryModel(),
-        metadata=metadata,
+        model=_TestingFallbackModel(),
+        metadata=merged,
         model_path=f"testing_fallback:{domain}",
         model_kind="testing_fallback",
     )
@@ -423,9 +432,8 @@ def load_domain_runtime(domain: str) -> DomainRuntime:
     base_dir = DOMAIN_MODEL_REGISTRY[domain]
     metadata_path = Path(base_dir) / "metadata.json"
     if not metadata_path.exists():
-        if current_app.testing:
-            current_app.logger.warning("Using testing fallback runtime for %s: metadata missing", domain)
-            return _testing_runtime_fallback(domain, f"metadata_not_found:{metadata_path}")
+        if current_app.config.get("TESTING", False):
+            return _testing_fallback_runtime(domain)
         raise FileNotFoundError(f"metadata_not_found:{metadata_path}")
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     calibrated_path = Path(base_dir) / "calibrated.joblib"
@@ -439,9 +447,8 @@ def load_domain_runtime(domain: str) -> DomainRuntime:
         model_path = str(pipeline_path)
         model_kind = "pipeline"
     else:
-        if current_app.testing:
-            current_app.logger.warning("Using testing fallback runtime for %s: model artifact missing", domain)
-            return _testing_runtime_fallback(domain, f"model_artifact_not_found:{base_dir}")
+        if current_app.config.get("TESTING", False):
+            return _testing_fallback_runtime(domain, metadata)
         raise FileNotFoundError(f"model_artifact_not_found:{base_dir}")
     return DomainRuntime(domain, model, metadata, model_path, model_kind)
 
