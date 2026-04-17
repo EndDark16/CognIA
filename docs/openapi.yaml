@@ -56,6 +56,18 @@ tags:
     description: Create evaluations using the active questionnaire.
   - name: Predict
     description: Experimental model inference (placeholder).
+  - name: QuestionnaireRuntime
+    description: Runtime v1 questionnaire flows for draft/save/submit/results and professional access.
+  - name: QuestionnaireRuntimeAdmin
+    description: Runtime v1 questionnaire governance endpoints for template/version publishing.
+  - name: QuestionnaireV2
+    description: Operational v2 questionnaire sessions, history, tags, share codes and PDF artifacts.
+  - name: Dashboard
+    description: Operational and adoption dashboard endpoints (v2).
+  - name: Reports
+    description: Reporting job endpoints (v2).
+  - name: Docs
+    description: OpenAPI spec and Swagger UI endpoints.
 
 paths:
   /healthz:
@@ -1015,103 +1027,6 @@ paths:
                   value:
                     template_id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
                     created: 2
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-        "500":
-          $ref: "#/components/responses/ServerError"
-
-  /api/v1/questionnaires/{template_id}/activate:
-    post:
-      tags: [Questionnaires]
-      summary: Activate a template
-      description: |
-        Activates a template and deactivates all others. Ensures exactly one
-        active template exists globally.
-      operationId: activateQuestionnaire
-      x-roles: [ADMIN]
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: template_id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        "200":
-          description: Template activated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseMsg"
-              examples:
-                activated:
-                  summary: Activated
-                  value:
-                    msg: template activated
-                    template_id: "2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-        "500":
-          $ref: "#/components/responses/ServerError"
-
-  /api/v1/questionnaires/active/clone:
-    post:
-      tags: [Questionnaires]
-      summary: Clone active template
-      description: |
-        Creates a new draft template by cloning the current active template.
-        Requires a new version string. The cloned template is not activated.
-      operationId: cloneActiveQuestionnaire
-      x-roles: [ADMIN]
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/QuestionnaireCloneRequest"
-            examples:
-              typical:
-                summary: Clone active template
-                value:
-                  version: "v2"
-                  name: "Conners Short"
-                  description: "Ajustes de redacción"
-      responses:
-        "201":
-          description: Template cloned
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/QuestionnaireCloneResponse"
-              examples:
-                cloned:
-                  summary: Cloned
-                  value:
-                    template_id: "8a8dd2c1-4c8c-4c48-baa6-1b1e9bf6fa0d"
-                    name: "Conners Short"
-                    version: "v2"
-                    is_active: false
-                    question_count: 42
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -2087,45 +2002,6 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/ServerError" }
-    post:
-      tags: [Admin]
-      summary: Create role
-      operationId: createAdminRole
-      x-roles: [ADMIN]
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminRoleCreateRequest"
-            examples:
-              analyst:
-                summary: Create role
-                value:
-                  name: ANALYST
-                  description: Analista de calidad
-      responses:
-        "201":
-          description: Role created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AdminRoleItem"
-              examples:
-                created:
-                  summary: Created
-                  value:
-                    id: "f7b1f123-2f2a-4f2c-8c4e-9a9f1b9c0b9a"
-                    name: ANALYST
-                    description: Analista de calidad
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "409": { $ref: "#/components/responses/Conflict" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "403": { $ref: "#/components/responses/Forbidden" }
-        "429": { $ref: "#/components/responses/RateLimited" }
-        "500": { $ref: "#/components/responses/ServerError" }
 
   /api/admin/users/{id}/roles:
     post:
@@ -2287,11 +2163,121 @@ paths:
         "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/ServerError" }
 
-  /api/admin/impersonate/{id}:
+  /api/problem-reports:
     post:
-      tags: [Admin]
-      summary: Impersonate user (admin)
-      operationId: impersonateUser
+      tags: [ProblemReports]
+      summary: Create a problem report
+      operationId: createProblemReport
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProblemReportCreateRequest"
+            examples:
+              basic:
+                summary: Report issue without attachment
+                value:
+                  issue_type: questionnaire
+                  description: No me deja continuar al siguiente bloque del cuestionario.
+                  source_module: questionnaire
+                  source_path: /questionnaire/session/abc/page/2
+      responses:
+        "201":
+          description: Problem report created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemReportCreateResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/problem-reports/mine:
+    get:
+      tags: [ProblemReports]
+      summary: List current user problem reports
+      operationId: listMyProblemReports
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+      responses:
+        "200":
+          description: My problem reports
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemReportListResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/problem-reports:
+    get:
+      tags: [Admin, ProblemReports]
+      summary: List problem reports (admin)
+      operationId: adminListProblemReports
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [open, triaged, in_progress, resolved, rejected]
+        - in: query
+          name: issue_type
+          schema:
+            type: string
+            enum: [bug, ui_issue, data_issue, performance, questionnaire, model_result, other]
+        - in: query
+          name: reporter_role
+          schema:
+            type: string
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: from_date
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: to_date
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [created_at, updated_at, resolved_at, status, issue_type]
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: Problem reports list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemReportListResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/admin/problem-reports/{id}:
+    get:
+      tags: [Admin, ProblemReports]
+      summary: Get problem report detail (admin)
+      operationId: adminGetProblemReport
       x-roles: [ADMIN]
       security:
         - bearerAuth: []
@@ -2299,19 +2285,1852 @@ paths:
         - in: path
           name: id
           required: true
-          schema: { type: string, format: uuid }
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
-          description: Impersonation token
+          description: Problem report detail
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AdminImpersonateResponse"
+                $ref: "#/components/schemas/ProblemReportDetailResponse"
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    patch:
+      tags: [Admin, ProblemReports]
+      summary: Update problem report status or admin notes
+      operationId: adminUpdateProblemReport
+      x-roles: [ADMIN]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProblemReportUpdateRequest"
+      responses:
+        "200":
+          description: Problem report updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemReportDetailResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /api/v1/questionnaire-runtime/admin/bootstrap:
+    post:
+      tags: [QuestionnaireRuntimeAdmin]
+      summary: POST bootstrap
+      operationId: post_api_v1_questionnaire_runtime_admin_bootstrap
+      x-roles:
+        - ADMIN
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
         "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/admin/sections/{section_id}/questions:
+    post:
+      tags: [QuestionnaireRuntimeAdmin]
+      summary: POST questions
+      operationId: post_api_v1_questionnaire_runtime_admin_sections_section_id_questions
+      x-roles:
+        - ADMIN
+      parameters:
+        - in: path
+          name: section_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/admin/templates:
+    post:
+      tags: [QuestionnaireRuntimeAdmin]
+      summary: POST templates
+      operationId: post_api_v1_questionnaire_runtime_admin_templates
+      x-roles:
+        - ADMIN
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/admin/templates/{template_id}/active:
+    post:
+      tags: [QuestionnaireRuntimeAdmin]
+      summary: POST active
+      operationId: post_api_v1_questionnaire_runtime_admin_templates_template_id_active
+      x-roles:
+        - ADMIN
+      parameters:
+        - in: path
+          name: template_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/admin/templates/{template_id}/versions:
+    get:
+      tags: [QuestionnaireRuntimeAdmin]
+      summary: GET versions
+      operationId: get_api_v1_questionnaire_runtime_admin_templates_template_id_versions
+      x-roles:
+        - ADMIN
+      parameters:
+        - in: path
+          name: template_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    post:
+      tags: [QuestionnaireRuntimeAdmin]
+      summary: POST versions
+      operationId: post_api_v1_questionnaire_runtime_admin_templates_template_id_versions
+      x-roles:
+        - ADMIN
+      parameters:
+        - in: path
+          name: template_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/admin/versions/{version_id}:
+    get:
+      tags: [QuestionnaireRuntimeAdmin]
+      summary: GET version id
+      operationId: get_api_v1_questionnaire_runtime_admin_versions_version_id
+      x-roles:
+        - ADMIN
+      parameters:
+        - in: path
+          name: version_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/admin/versions/{version_id}/disclosures:
+    post:
+      tags: [QuestionnaireRuntimeAdmin]
+      summary: POST disclosures
+      operationId: post_api_v1_questionnaire_runtime_admin_versions_version_id_disclosures
+      x-roles:
+        - ADMIN
+      parameters:
+        - in: path
+          name: version_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/admin/versions/{version_id}/publish:
+    post:
+      tags: [QuestionnaireRuntimeAdmin]
+      summary: POST publish
+      operationId: post_api_v1_questionnaire_runtime_admin_versions_version_id_publish
+      x-roles:
+        - ADMIN
+      parameters:
+        - in: path
+          name: version_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/admin/versions/{version_id}/sections:
+    post:
+      tags: [QuestionnaireRuntimeAdmin]
+      summary: POST sections
+      operationId: post_api_v1_questionnaire_runtime_admin_versions_version_id_sections
+      x-roles:
+        - ADMIN
+      parameters:
+        - in: path
+          name: version_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/evaluations/draft:
+    post:
+      tags: [QuestionnaireRuntime]
+      summary: POST draft
+      operationId: post_api_v1_questionnaire_runtime_evaluations_draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/evaluations/history:
+    get:
+      tags: [QuestionnaireRuntime]
+      summary: GET history
+      operationId: get_api_v1_questionnaire_runtime_evaluations_history
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}:
+    delete:
+      tags: [QuestionnaireRuntime]
+      summary: DELETE evaluation id
+      operationId: delete_api_v1_questionnaire_runtime_evaluations_evaluation_id
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/draft:
+    patch:
+      tags: [QuestionnaireRuntime]
+      summary: PATCH draft
+      operationId: patch_api_v1_questionnaire_runtime_evaluations_evaluation_id_draft
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/export:
+    get:
+      tags: [QuestionnaireRuntime]
+      summary: GET export
+      operationId: get_api_v1_questionnaire_runtime_evaluations_evaluation_id_export
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: "#/components/parameters/RuntimeExportModeParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/heartbeat:
+    post:
+      tags: [QuestionnaireRuntime]
+      summary: POST heartbeat
+      operationId: post_api_v1_questionnaire_runtime_evaluations_evaluation_id_heartbeat
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/responses:
+    get:
+      tags: [QuestionnaireRuntime]
+      summary: GET responses
+      operationId: get_api_v1_questionnaire_runtime_evaluations_evaluation_id_responses
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results:
+    get:
+      tags: [QuestionnaireRuntime]
+      summary: GET results
+      operationId: get_api_v1_questionnaire_runtime_evaluations_evaluation_id_results
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/status:
+    get:
+      tags: [QuestionnaireRuntime]
+      summary: GET status
+      operationId: get_api_v1_questionnaire_runtime_evaluations_evaluation_id_status
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/submit:
+    post:
+      tags: [QuestionnaireRuntime]
+      summary: POST submit
+      operationId: post_api_v1_questionnaire_runtime_evaluations_evaluation_id_submit
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "202":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/validate-section:
+    post:
+      tags: [QuestionnaireRuntime]
+      summary: POST validate section
+      operationId: post_api_v1_questionnaire_runtime_evaluations_evaluation_id_validate_section
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/notifications:
+    get:
+      tags: [QuestionnaireRuntime]
+      summary: GET notifications
+      operationId: get_api_v1_questionnaire_runtime_notifications
+      parameters:
+        - $ref: "#/components/parameters/UnreadOnlyParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/notifications/{notification_id}/read:
+    patch:
+      tags: [QuestionnaireRuntime]
+      summary: PATCH read
+      operationId: patch_api_v1_questionnaire_runtime_notifications_notification_id_read
+      parameters:
+        - in: path
+          name: notification_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/professional/access:
+    post:
+      tags: [QuestionnaireRuntime]
+      summary: POST access
+      operationId: post_api_v1_questionnaire_runtime_professional_access
+      x-roles:
+        - ADMIN
+        - PSYCHOLOGIST
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/access:
+    delete:
+      tags: [QuestionnaireRuntime]
+      summary: DELETE access
+      operationId: delete_api_v1_questionnaire_runtime_professional_evaluations_evaluation_id_access
+      x-roles:
+        - ADMIN
+        - PSYCHOLOGIST
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/responses:
+    get:
+      tags: [QuestionnaireRuntime]
+      summary: GET responses
+      operationId: get_api_v1_questionnaire_runtime_professional_evaluations_evaluation_id_responses
+      x-roles:
+        - ADMIN
+        - PSYCHOLOGIST
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/results:
+    get:
+      tags: [QuestionnaireRuntime]
+      summary: GET results
+      operationId: get_api_v1_questionnaire_runtime_professional_evaluations_evaluation_id_results
+      x-roles:
+        - ADMIN
+        - PSYCHOLOGIST
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/tag:
+    patch:
+      tags: [QuestionnaireRuntime]
+      summary: PATCH tag
+      operationId: patch_api_v1_questionnaire_runtime_professional_evaluations_evaluation_id_tag
+      x-roles:
+        - ADMIN
+        - PSYCHOLOGIST
+      parameters:
+        - in: path
+          name: evaluation_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v1/questionnaire-runtime/questionnaire/active:
+    get:
+      tags: [QuestionnaireRuntime]
+      summary: GET active
+      operationId: get_api_v1_questionnaire_runtime_questionnaire_active
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/adoption-history:
+    get:
+      tags: [Dashboard]
+      summary: GET adoption history
+      operationId: get_api_v2_dashboard_adoption_history
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/api-health:
+    get:
+      tags: [Dashboard]
+      summary: GET api health
+      operationId: get_api_v2_dashboard_api_health
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/data-quality:
+    get:
+      tags: [Dashboard]
+      summary: GET data quality
+      operationId: get_api_v2_dashboard_data_quality
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/drift:
+    get:
+      tags: [Dashboard]
+      summary: GET drift
+      operationId: get_api_v2_dashboard_drift
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/equity:
+    get:
+      tags: [Dashboard]
+      summary: GET equity
+      operationId: get_api_v2_dashboard_equity
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/executive-summary:
+    get:
+      tags: [Dashboard]
+      summary: GET executive summary
+      operationId: get_api_v2_dashboard_executive_summary
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/funnel:
+    get:
+      tags: [Dashboard]
+      summary: GET funnel
+      operationId: get_api_v2_dashboard_funnel
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/human-review:
+    get:
+      tags: [Dashboard]
+      summary: GET human review
+      operationId: get_api_v2_dashboard_human_review
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/model-monitoring:
+    get:
+      tags: [Dashboard]
+      summary: GET model monitoring
+      operationId: get_api_v2_dashboard_model_monitoring
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/productivity:
+    get:
+      tags: [Dashboard]
+      summary: GET productivity
+      operationId: get_api_v2_dashboard_productivity
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/questionnaire-quality:
+    get:
+      tags: [Dashboard]
+      summary: GET questionnaire quality
+      operationId: get_api_v2_dashboard_questionnaire_quality
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/questionnaire-volume:
+    get:
+      tags: [Dashboard]
+      summary: GET questionnaire volume
+      operationId: get_api_v2_dashboard_questionnaire_volume
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/retention:
+    get:
+      tags: [Dashboard]
+      summary: GET retention
+      operationId: get_api_v2_dashboard_retention
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/dashboard/user-growth:
+    get:
+      tags: [Dashboard]
+      summary: GET user growth
+      operationId: get_api_v2_dashboard_user_growth
+      parameters:
+        - $ref: "#/components/parameters/MonthsParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/active:
+    get:
+      tags: [QuestionnaireV2]
+      summary: GET active
+      operationId: get_api_v2_questionnaires_active
+      parameters:
+        - $ref: "#/components/parameters/ModeParamV2"
+        - $ref: "#/components/parameters/RoleParamV2"
+        - $ref: "#/components/parameters/IncludeFullParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/admin/bootstrap:
+    post:
+      tags: [QuestionnaireV2]
+      summary: POST bootstrap
+      operationId: post_api_v2_questionnaires_admin_bootstrap
+      x-roles:
+        - ADMIN
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/history:
+    get:
+      tags: [QuestionnaireV2]
+      summary: GET history
+      operationId: get_api_v2_questionnaires_history
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+        - $ref: "#/components/parameters/SessionStatusParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/history/{session_id}:
+    get:
+      tags: [QuestionnaireV2]
+      summary: GET session id
+      operationId: get_api_v2_questionnaires_history_session_id
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/history/{session_id}/pdf:
+    get:
+      tags: [QuestionnaireV2]
+      summary: GET pdf
+      operationId: get_api_v2_questionnaires_history_session_id_pdf
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/history/{session_id}/pdf/download:
+    get:
+      tags: [QuestionnaireV2]
+      summary: GET download
+      operationId: get_api_v2_questionnaires_history_session_id_pdf_download
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/history/{session_id}/pdf/generate:
+    post:
+      tags: [QuestionnaireV2]
+      summary: POST generate
+      operationId: post_api_v2_questionnaires_history_session_id_pdf_generate
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/history/{session_id}/results:
+    get:
+      tags: [QuestionnaireV2]
+      summary: GET results
+      operationId: get_api_v2_questionnaires_history_session_id_results
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/history/{session_id}/share:
+    post:
+      tags: [QuestionnaireV2]
+      summary: POST share
+      operationId: post_api_v2_questionnaires_history_session_id_share
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/history/{session_id}/tags:
+    post:
+      tags: [QuestionnaireV2]
+      summary: POST tags
+      operationId: post_api_v2_questionnaires_history_session_id_tags
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/history/{session_id}/tags/{tag_id}:
+    delete:
+      tags: [QuestionnaireV2]
+      summary: DELETE tag id
+      operationId: delete_api_v2_questionnaires_history_session_id_tags_tag_id
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: tag_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/sessions:
+    post:
+      tags: [QuestionnaireV2]
+      summary: POST sessions
+      operationId: post_api_v2_questionnaires_sessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/sessions/{session_id}:
+    get:
+      tags: [QuestionnaireV2]
+      summary: GET session id
+      operationId: get_api_v2_questionnaires_sessions_session_id
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/sessions/{session_id}/answers:
+    patch:
+      tags: [QuestionnaireV2]
+      summary: PATCH answers
+      operationId: patch_api_v2_questionnaires_sessions_session_id_answers
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/sessions/{session_id}/page:
+    get:
+      tags: [QuestionnaireV2]
+      summary: GET page
+      operationId: get_api_v2_questionnaires_sessions_session_id_page
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/sessions/{session_id}/submit:
+    post:
+      tags: [QuestionnaireV2]
+      summary: POST submit
+      operationId: post_api_v2_questionnaires_sessions_session_id_submit
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/questionnaires/shared/{questionnaire_id}/{share_code}:
+    get:
+      tags: [QuestionnaireV2]
+      summary: Access shared questionnaire results
+      operationId: get_api_v2_questionnaires_shared_questionnaire_id_share_code
+      parameters:
+        - in: path
+          name: questionnaire_id
+          required: true
+          schema:
+            type: string
+            minLength: 6
+            maxLength: 64
+        - in: path
+          name: share_code
+          required: true
+          schema:
+            type: string
+            minLength: 6
+            maxLength: 64
+      responses:
+        "200":
+          description: Shared results payload
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/v2/reports/jobs:
+    post:
+      tags: [Reports]
+      summary: POST jobs
+      operationId: post_api_v2_reports_jobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /docs:
+    get:
+      tags: [Docs]
+      summary: Swagger UI
+      operationId: get_docs
+      responses:
+        "200":
+          description: Swagger UI HTML document
+          content:
+            text/html:
+              schema:
+                type: string
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /openapi.yaml:
+    get:
+      tags: [Docs]
+      summary: OpenAPI static specification
+      operationId: get_openapi_yaml
+      responses:
+        "200":
+          description: OpenAPI YAML document
+          content:
+            application/yaml:
+              schema:
+                type: string
+        "404": { $ref: "#/components/responses/NotFound" }
         "500": { $ref: "#/components/responses/ServerError" }
 
 components:
@@ -2351,6 +4170,67 @@ components:
         enum: [asc, desc]
         default: desc
       description: Sort order.
+    MonthsParam:
+      in: query
+      name: months
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 120
+        default: 12
+      description: Number of months for dashboard/reporting aggregations.
+    UnreadOnlyParam:
+      in: query
+      name: unread_only
+      required: false
+      schema:
+        type: boolean
+        default: false
+      description: When true, only unread notifications are returned.
+    RuntimeExportModeParam:
+      in: query
+      name: mode
+      required: false
+      schema:
+        type: string
+        enum: [responses_only, results_only, responses_and_results]
+        default: responses_and_results
+      description: Export projection for questionnaire runtime artifacts.
+    ModeParamV2:
+      in: query
+      name: mode
+      required: false
+      schema:
+        type: string
+        enum: [short, medium, complete]
+        default: short
+      description: Questionnaire mode for v2 active definition retrieval.
+    RoleParamV2:
+      in: query
+      name: role
+      required: false
+      schema:
+        type: string
+        enum: [caregiver, psychologist]
+        default: caregiver
+      description: Respondent role for v2 active definition retrieval.
+    IncludeFullParam:
+      in: query
+      name: include_full
+      required: false
+      schema:
+        type: boolean
+        default: false
+      description: When true, returns full question set without pagination slicing.
+    SessionStatusParam:
+      in: query
+      name: status
+      required: false
+      schema:
+        type: string
+        enum: [draft, in_progress, submitted, processed, failed, archived]
+      description: Optional status filter for session history.
 
   securitySchemes:
     bearerAuth:
@@ -3665,4 +5545,138 @@ components:
             "200": 54
             "401": 2
             "500": 1
+    ProblemReportAttachment:
+      type: object
+      properties:
+        attachment_id:
+          type: string
+          format: uuid
+        storage_kind:
+          type: string
+          example: local
+        original_filename:
+          type: string
+        mime_type:
+          type: string
+          nullable: true
+        size_bytes:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+    ProblemReportItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        report_code:
+          type: string
+          example: PRB-20260415-A1B2C3
+        reporter_user_id:
+          type: string
+          format: uuid
+        reporter_role:
+          type: string
+          example: GUARDIAN
+        issue_type:
+          type: string
+          enum: [bug, ui_issue, data_issue, performance, questionnaire, model_result, other]
+        description:
+          type: string
+        status:
+          type: string
+          enum: [open, triaged, in_progress, resolved, rejected]
+        source_module:
+          type: string
+          nullable: true
+        source_path:
+          type: string
+          nullable: true
+        related_questionnaire_session_id:
+          type: string
+          format: uuid
+          nullable: true
+        related_questionnaire_history_id:
+          type: string
+          nullable: true
+        admin_notes:
+          type: string
+          nullable: true
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        attachment_count:
+          type: integer
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProblemReportAttachment"
+        metadata:
+          type: object
+          additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    ProblemReportCreateRequest:
+      type: object
+      required: [issue_type, description]
+      properties:
+        issue_type:
+          type: string
+          enum: [bug, ui_issue, data_issue, performance, questionnaire, model_result, other]
+        description:
+          type: string
+          minLength: 10
+          maxLength: 4000
+        source_module:
+          type: string
+          maxLength: 120
+        source_path:
+          type: string
+          maxLength: 255
+        related_questionnaire_session_id:
+          type: string
+          format: uuid
+        related_questionnaire_history_id:
+          type: string
+          maxLength: 64
+        metadata:
+          type: object
+          additionalProperties: true
+    ProblemReportCreateResponse:
+      type: object
+      properties:
+        report:
+          $ref: "#/components/schemas/ProblemReportItem"
+    ProblemReportListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProblemReportItem"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+    ProblemReportDetailResponse:
+      type: object
+      properties:
+        report:
+          $ref: "#/components/schemas/ProblemReportItem"
+    ProblemReportUpdateRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [open, triaged, in_progress, resolved, rejected]
+        admin_notes:
+          type: string
+          maxLength: 5000
 

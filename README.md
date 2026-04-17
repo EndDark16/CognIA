@@ -1,78 +1,210 @@
-# CognIA Backend - Cierre de Iteracion
+# CognIA Backend
 
-Sistema backend para alerta temprana experimental en ninos de 6 a 11 anos, basado en Random Forest, con HBN como nucleo empirico y DSM-5 como norma formal.
+Backend del proyecto CognIA para tamizaje/apoyo profesional en salud mental infantil (6-11 anos) en entorno simulado.
 
-**Estado actual:** iteracion cerrada documental y metodologicamente (sin nuevas campañas de mejora).
+## Proposito del proyecto
+CognIA expone una API para:
+- autenticacion/autorizacion,
+- entrega y procesamiento de cuestionarios,
+- inferencia de modelos activos por dominio/modo,
+- historial y reportes operativos,
+- gobierno admin y trazabilidad.
 
-## Resumen Ejecutivo
-- 5 dominios del producto: `adhd`, `conduct`, `elimination`, `anxiety`, `depression`.
-- Modelo principal: Random Forest.
-- Auditoria final de cierre completada en `data/final_closure_audit_v1/`.
-- Scope final de producto experimental: `adhd`, `anxiety`, `conduct`, `depression`.
-- `elimination` queda como linea experimental util, fuera de producto en esta iteracion.
-- Inferencia vigente: `artifacts/inference_v4/`.
+Importante: los resultados son de **screening/apoyo profesional**, no diagnostico automatico ni definitivo.
 
-## Objetivo del Sistema
-Proveer una salida probabilistica de riesgo para alerta temprana en entorno simulado.
+## Contexto y alcance
+- Base empirica y metodologica: HBN + DSM-5 (segun artefactos internos).
+- Dominios operativos: `adhd`, `conduct`, `elimination`, `anxiety`, `depression`.
+- Backend incluye flujos legacy v1, runtime v1 y flujo operacional v2.
 
-> Este sistema **no** es diagnostico clinico definitivo.
+## Arquitectura general
+- Framework: Flask (Blueprints).
+- Persistencia: SQLAlchemy + PostgreSQL.
+- Migraciones: Alembic.
+- Seguridad: JWT, RBAC, MFA, rate limiting.
+- Contratos: Marshmallow + OpenAPI.
+- Testing: pytest.
 
-## Arquitectura Metodologica
-- HBN = fuente empirica.
-- DSM-5 = capa normativa formal.
-- Capa interna = unidades diagnosticas exactas.
-- Capa externa = 5 dominios de producto.
-- strict_no_leakage = referencia principal.
-- research_extended = referencia secundaria controlada.
+Capas:
+- `api/routes`: endpoints.
+- `api/schemas`: validacion de payloads/query.
+- `api/services`: logica de dominio.
+- `app/models.py`: entidades ORM.
+- `migrations/versions`: evolucion de esquema.
 
-## Estado Final por Dominio (Iteracion Cerrada)
-| Dominio | Modelo final | Precision | Recall | Specificity | Balanced Accuracy | Estado final |
-| --- | --- | --- | --- | --- | --- | --- |
-| adhd | `adhd_trial_compact_signal` | 0.9797 | 0.9006 | 0.9760 | 0.9383 | `recovered_generalizing_model` |
-| anxiety | `retrained_anxiety_anti_overfit_v1` | 0.9701 | 0.9848 | 0.9909 (derivada) | 0.9879 | `accepted_but_experimental` |
-| conduct | `domain_conduct_research_full` | 0.9753 | 0.9875 | 0.9903 (derivada) | 0.9889 | `accepted_but_experimental` |
-| depression | `domain_depression_strict_full` | 0.9739 | 0.9739 | 0.9825 (derivada) | 0.9782 | `accepted_but_experimental` |
-| elimination | `V5_T02_composite_clinical` | 0.9438 | 0.9379 | 0.9280 | 0.9329 | `experimental_line_more_useful_not_product_ready` |
+## Stack tecnologico
+- Python 3.12+
+- Flask, Flask-JWT-Extended, Flask-Limiter, Flask-CORS
+- SQLAlchemy, Alembic, psycopg
+- Marshmallow
+- pandas, scikit-learn (runtime/model integration)
+- pytest
 
-## Alcance Final: Tesis vs Producto
-### Tesis
-- Incluye los 5 dominios.
-- Elimination entra con caveat metodologico explicito (experimental, no product-ready).
+## Estructura del proyecto
+```text
+cognia_app/
+|- api/
+|  |- app.py
+|  |- decorators.py
+|  |- extensions.py
+|  |- security.py
+|  |- routes/
+|  |  |- auth.py
+|  |  |- admin.py
+|  |  |- predict.py
+|  |  |- questionnaires.py
+|  |  |- evaluations.py
+|  |  |- questionnaire_runtime.py
+|  |  |- questionnaire_v2.py
+|  |  |- problem_reports.py
+|  |  |- users.py
+|  |  |- health.py
+|  |  |- docs.py
+|  |  |- email.py
+|  |- schemas/
+|  |  |- *.py
+|  |- services/
+|     |- *.py
+|- app/
+|  |- models.py
+|- config/
+|  |- settings.py
+|- migrations/
+|  |- versions/
+|- docs/
+|  |- openapi.yaml
+|  |- archive/
+|  |  |- openapi/
+|  |     |- *.yaml
+|  |- OPENAPI_GUIDE.md
+|  |- api_full_reference.md
+|  |- questionnaire_backend_architecture.md
+|  |- questionnaire_api_contract.md
+|  |- model_registry_and_inference.md
+|  |- reporting_and_dashboards.md
+|  |- problem_reporting_backend.md
+|  |- security_hardening_20260416.md
+|  |- repository_artifact_policy.md
+|  |- traceability_map.md
+|  |- continuidad.md
+|- scripts/
+|  |- *.py
+|- tests/
+|  |- *.py
+|  |- api/
+|  |- contracts/
+|  |- services/
+|- data/
+|- artifacts/
+|- reports/
+|- models/
+|- static/
+|- templates/
+|- README.md
+|- docs/traceability_map.md
+|- CONTRIBUTING.md
+|- REPO_CONTENT_POLICY.md
+|- requirements.txt
+|- run.py
+```
 
-### Producto (iteracion actual)
-- Incluye: `adhd`, `anxiety`, `conduct`, `depression`.
-- Excluye: `elimination`.
+## Configuracion local
+1. Crear entorno virtual.
+2. Instalar dependencias: `pip install -r requirements.txt`.
+3. Configurar variables en `.env` (no versionar secretos).
+4. Ejecutar migraciones: `alembic upgrade head`.
+5. Iniciar app: `python run.py`.
 
-## Scope de Inferencia Vigente
-Se mantiene `artifacts/inference_v4/promotion_scope.json`:
-- `active_domains`: `adhd`, `anxiety`, `conduct`, `depression`
-- `hold_domains`: `elimination`
+## Variables de entorno clave
+Ver `.env.example` para plantilla completa.
 
-No se requiere `inference_v5` para esta iteracion.
+Variables criticas:
+- `SECRET_KEY`
+- `MFA_ENCRYPTION_KEY`
+- `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_SSL_MODE`
+- `CORS_ORIGINS`
+- `RATELIMIT_ENABLED`
+- `OPTIONAL_BLUEPRINTS_STRICT`
+- `OPTIONAL_BLUEPRINTS_REQUIRED`
+- `QV2_SHARED_ACCESS_RATE_LIMIT`
+- `PROBLEM_REPORT_UPLOAD_DIR`
+- `PROBLEM_REPORT_MAX_ATTACHMENT_BYTES`
+- `PROBLEM_REPORT_ALLOWED_MIME_TYPES`
 
-## Carpetas/Versiones Clave
-- `data/processed_hybrid_dsm5_v2/`
-- `data/finalization_and_recovery_v1/`
-- `data/elimination_iterative_recovery_v2/`
-- `data/elimination_refinement_v3/`
-- `data/elimination_target_redesign_v4/`
-- `data/elimination_feature_engineering_v5/`
-- `data/final_closure_audit_v1/`
-- `reports/final_closure/`
+## Migraciones y bootstrap
+- Revisiones en `migrations/versions/`.
+- Flujo recomendado:
+  - `alembic upgrade head`
+- Para backend v2 de cuestionarios:
+  - `python scripts/bootstrap_questionnaire_backend_v2.py load-all`
 
-## Cierre de Iteracion
-La auditoria final valido:
-- modelos validados honestamente,
-- sin inconsistencias materiales,
-- `status_match` 5/5,
-- recomendacion final: `close_iteration_now`.
+## API y contratos
+- Swagger UI: `GET /docs`
+- OpenAPI: `GET /openapi.yaml`
+- Fuente activa de contrato: `docs/openapi.yaml` (snapshots historicos en `docs/archive/openapi/`)
+- Referencia mantenedor: `docs/api_full_reference.md`
 
-Documentacion de cierre:
-- `reports/final_closure/final_project_closure_report.md`
-- `reports/final_closure/final_project_executive_summary.md`
-- `reports/final_closure/thesis_scope_final.md`
-- `reports/final_closure/product_scope_final.md`
-- `reports/final_closure/inference_scope_final.md`
+## Endpoints principales
+- Auth/MFA: `/api/auth/*`, `/api/mfa/*`
+- Admin: `/api/admin/*`
+- Questionnaires legacy: `/api/v1/questionnaires/*`
+- Questionnaire runtime v1: `/api/v1/questionnaire-runtime/*`
+- Questionnaire v2: `/api/v2/*`
+- Problem reports:
+  - `POST /api/problem-reports`
+  - `GET /api/problem-reports/mine`
+  - `GET /api/admin/problem-reports`
+  - `GET /api/admin/problem-reports/{id}`
+  - `PATCH /api/admin/problem-reports/{id}`
 
-## Nota de Uso
-El sistema debe usarse como apoyo de alerta temprana experimental y nunca como sustituto de evaluacion clinica profesional.
+## Reporte de problemas (nuevo)
+Soporta captura de incidentes desde frontend (tipo, descripcion, captura opcional) con:
+- persistencia en DB,
+- control de acceso (ADMIN para gestion global),
+- filtros/paginacion,
+- auditoria de cambios.
+
+Detalles: `docs/problem_reporting_backend.md`.
+
+## Modelos activos e inferencia
+- Activacion vigente por modo/dominio en artefactos de freeze operativa.
+- El backend mantiene claim metodologico: screening/apoyo profesional.
+- Evitar lenguaje diagnostico.
+
+## Autenticacion y permisos
+- JWT Bearer para rutas protegidas.
+- RBAC por claims `roles` (`ADMIN`, `PSYCHOLOGIST`, etc.).
+- MFA requerido para roles sensibles.
+- Hardening y decisiones de seguridad: `docs/security_hardening_20260416.md`.
+
+## Testing
+- Ejecutar suite completa: `pytest -q`
+- Pruebas especificas de problem reports: `pytest tests/test_problem_reports.py -q`
+- Guardrail OpenAPI vs runtime: `pytest tests/contracts/test_openapi_runtime_alignment.py -q`
+
+## Reporting y dashboards
+- Endpoints v2 en `/api/v2/dashboard/*` y `/api/v2/reports/jobs`.
+- Ver `docs/reporting_and_dashboards.md`.
+
+## Trazabilidad
+- Estado y decisiones: `docs/traceability_map.md`, `docs/traceability_map.md`.
+- Mapa de trazabilidad: `docs/traceability_map.md`.
+- Cierre final: `reports/final_closure/`.
+
+## Politica de artefactos del repositorio
+- Politica detallada: `docs/repository_artifact_policy.md`.
+- Regla: versionar fuente de verdad y codigo; excluir runtime/generated/secrets.
+
+## Convenciones de ramas y PR
+- Flujo recomendado: feature branch -> `dev.enddark` -> `development`.
+- Usar plantilla de PR en `.github/pull_request_template.md`.
+
+## Troubleshooting rapido
+- `401/403` en endpoints protegidos: validar JWT, roles y MFA.
+- `503` en readiness: revisar conectividad DB y variables.
+- Errores de migracion: verificar `alembic.ini`, `APP_CONFIG_CLASS` y credenciales.
+- Upload de captura rechazado: validar MIME permitido y tamano maximo.
+
+## Limitaciones
+- Entorno simulado para apoyo operativo.
+- No sustituye juicio clinico profesional.

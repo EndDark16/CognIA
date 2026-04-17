@@ -42,6 +42,8 @@ htmlcov/
 *.temp
 tmp/
 temp/
+*.bak
+*.orig
 
 # -----------------------------
 # OS / IDE
@@ -51,16 +53,16 @@ Thumbs.db
 desktop.ini
 .vscode/
 .idea/
+.history/
+
 
 # -----------------------------
 # Secrets / local context
 # -----------------------------
 .env
 .env.*
-docs/traceability_map.md
-
-# Keep env template
 !.env.example
+docs/traceability_map.md
 
 # -----------------------------
 # Large ML binaries (regenerable)
@@ -88,6 +90,12 @@ artifacts/inference_v5/
 !artifacts/inference_v4/
 !artifacts/inference_v4/**
 
+# Runtime-generated exports/uploads (never commit)
+artifacts/runtime_reports/
+artifacts/problem_reports/uploads/
+artifacts/**/uploads/
+catboost_info/
+
 # -----------------------------
 # Heavy generated data/intermediates
 # -----------------------------
@@ -108,3 +116,6 @@ data/**/dataset_participant_normative_evidence_long.csv
 # -----------------------------
 !reports/final_closure/
 !reports/final_closure/**
+
+# Local notebooks/output noise
+notebooks/.ipynb_checkpoints/
