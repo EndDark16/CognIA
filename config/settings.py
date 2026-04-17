@@ -109,6 +109,7 @@ class Config:
     QR_RETENTION_NOTIFICATION_DAYS = int(os.getenv("QR_RETENTION_NOTIFICATION_DAYS", "180"))
     QR_PIN_MAX_ATTEMPTS = int(os.getenv("QR_PIN_MAX_ATTEMPTS", "5"))
     QR_PIN_LOCK_MINUTES = int(os.getenv("QR_PIN_LOCK_MINUTES", "10"))
+    QV2_SHARED_ACCESS_RATE_LIMIT = os.getenv("QV2_SHARED_ACCESS_RATE_LIMIT", "30 per minute")
 
     # Problem reports
     PROBLEM_REPORT_UPLOAD_DIR = os.getenv("PROBLEM_REPORT_UPLOAD_DIR", "artifacts/problem_reports/uploads")
@@ -139,6 +140,16 @@ class Config:
     PROXY_FIX_X_HOST = int(os.getenv("PROXY_FIX_X_HOST", "1"))
     PROXY_FIX_X_PORT = int(os.getenv("PROXY_FIX_X_PORT", "1"))
     PROXY_FIX_X_PREFIX = int(os.getenv("PROXY_FIX_X_PREFIX", "1"))
+    OPTIONAL_BLUEPRINTS_STRICT = _bool_env("OPTIONAL_BLUEPRINTS_STRICT", True)
+    _optional_blueprints_required = os.getenv(
+        "OPTIONAL_BLUEPRINTS_REQUIRED",
+        "questionnaire_runtime,questionnaire_v2",
+    )
+    OPTIONAL_BLUEPRINTS_REQUIRED = [
+        item.strip()
+        for item in _optional_blueprints_required.split(",")
+        if item.strip()
+    ]
     SECURITY_HEADERS_ENABLED = _bool_env("SECURITY_HEADERS_ENABLED", True)
     SECURITY_HSTS_SECONDS = int(os.getenv("SECURITY_HSTS_SECONDS", "31536000"))
     SECURITY_HSTS_INCLUDE_SUBDOMAINS = _bool_env("SECURITY_HSTS_INCLUDE_SUBDOMAINS", True)

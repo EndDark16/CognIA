@@ -21,6 +21,7 @@ This policy defines:
   - `tests/`
 - Product/API docs:
   - `README.md`, `docs/`
+  - OpenAPI activo en `docs/openapi.yaml` (snapshots historicos en `docs/archive/openapi/`)
 - Governance and continuidad:
   - `docs/traceability_map.md`, `docs/traceability_map.md`
 - Traceability source-of-truth artifacts that are compact and non-secret:
@@ -51,6 +52,7 @@ If an artifact is large, regenerated, or duplicative, prefer external storage + 
   - `venv/`, `.venv/`, `env/`
 - Editor/OS noise:
   - `.vscode/`, `.idea/`, `.DS_Store`, `Thumbs.db`
+  - `` (contexto local de herramientas locales)
 - Heavy model/data binaries unless explicitly approved:
   - `*.pkl`, `*.joblib`, `*.onnx`, `*.npy`, `*.npz`
   - generated intermediate datasets/exports

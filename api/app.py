@@ -3,6 +3,7 @@
 import os
 import sys
 import time
+import importlib
 from datetime import timedelta, datetime, timezone
 from sqlalchemy import inspect
 
@@ -35,16 +36,6 @@ from sqlalchemy.exc import SQLAlchemyError, OperationalError, DBAPIError
 from flask_limiter.errors import RateLimitExceeded
 from marshmallow import ValidationError
 from werkzeug.middleware.proxy_fix import ProxyFix
-
-try:
-    from api.routes.questionnaire_runtime import questionnaire_runtime_bp
-except Exception:
-    questionnaire_runtime_bp = None
-
-try:
-    from api.routes.questionnaire_v2 import questionnaire_v2_bp
-except Exception:
-    questionnaire_v2_bp = None
 
 
 def create_app(config_class=DevelopmentConfig):
@@ -199,10 +190,45 @@ def create_app(config_class=DevelopmentConfig):
     app.register_blueprint(users_bp)
     app.register_blueprint(email_bp)
     app.register_blueprint(admin_bp)
-    if questionnaire_runtime_bp is not None:
-        app.register_blueprint(questionnaire_runtime_bp)
-    if questionnaire_v2_bp is not None:
-        app.register_blueprint(questionnaire_v2_bp)
+    def _normalize_required_optional_blueprints(value) -> set[str]:
+        if value is None:
+            return set()
+        if isinstance(value, str):
+            return {item.strip() for item in value.split(",") if item.strip()}
+        if isinstance(value, (list, tuple, set)):
+            return {str(item).strip() for item in value if str(item).strip()}
+        return set()
+
+    def _register_optional_blueprint(module_path: str, blueprint_name: str, blueprint_key: str) -> None:
+        strict = bool(app.config.get("OPTIONAL_BLUEPRINTS_STRICT", True))
+        required = _normalize_required_optional_blueprints(
+            app.config.get("OPTIONAL_BLUEPRINTS_REQUIRED", [])
+        )
+        is_required = blueprint_key in required
+        try:
+            module = importlib.import_module(module_path)
+            blueprint = getattr(module, blueprint_name)
+        except Exception as exc:
+            app.logger.exception(
+                "Optional blueprint import failed: %s (%s)", blueprint_key, module_path
+            )
+            if strict and is_required:
+                raise RuntimeError(
+                    f"Required blueprint '{blueprint_key}' failed to import"
+                ) from exc
+            return
+        app.register_blueprint(blueprint)
+
+    _register_optional_blueprint(
+        "api.routes.questionnaire_runtime",
+        "questionnaire_runtime_bp",
+        "questionnaire_runtime",
+    )
+    _register_optional_blueprint(
+        "api.routes.questionnaire_v2",
+        "questionnaire_v2_bp",
+        "questionnaire_v2",
+    )
     app.register_blueprint(problem_reports_bp)
 
     # Token Blocklist Callback
