@@ -12,6 +12,18 @@ Objetivo: mantener una especificacion OpenAPI 3.0.3 consistente, clara y alinead
 - `tags`: por dominio funcional (`Auth`, `MFA`, `Admin`, `Questionnaires`, `Evaluations`, `ProblemReports`, etc.).
 - Reutilizar `components/schemas` y evitar esquemas inline innecesarios.
 - Mantener naming de payloads consistente con la API real.
+- `summary`: accion concreta y legible para consumidor funcional (evitar `GET foo`, `POST bar`).
+- `description` por endpoint: obligatoria y en espanol tecnico, incluyendo:
+  - objetivo funcional real;
+  - actor/rol esperado;
+  - seguridad aplicable;
+  - parametros (path/query/header/cookie);
+  - body (obligatorio/opcional y content-type);
+  - comportamiento esperado;
+  - respuesta exitosa + significado;
+  - errores posibles;
+  - persistencia/workflow/trazabilidad;
+  - clasificacion (publico/autenticado/admin/legacy/experimental).
 
 ## Paginacion estandar
 Para listados:
@@ -43,7 +55,9 @@ Documentar segun aplique: `400`, `401`, `403`, `404`, `409`, `429`, `500`.
 3. Errores y codigos HTTP consistentes.
 4. Ejemplos validos y realistas.
 5. Rutas nuevas agregadas al spec y a docs operativas.
-6. Validacion runtime-vs-spec en `tests/contracts/test_openapi_runtime_alignment.py` en verde.
+6. Cero endpoints sin `description`.
+7. Sin summaries mecanicos tipo `GET x` / `POST y`.
+8. Validacion runtime-vs-spec en `tests/contracts/test_openapi_runtime_alignment.py` en verde.
 
 ## Referencias
 - `docs/openapi.yaml`

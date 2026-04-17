@@ -53,14 +53,14 @@ Operational API reference for backend consumers and maintainers.
 - `/api/v1/questionnaires/active`
 - `/api/v1/questionnaires`
 - `/api/v1/questionnaires/{template_id}/questions`
+- `/api/v1/questionnaires/{template_id}/activate` (legacy/deprecated, compatibilidad)
+- `/api/v1/questionnaires/active/clone` (legacy/deprecated, compatibilidad)
 
-Legacy v1 endpoints removed in 2026-04-15:
-- `POST /api/v1/questionnaires/{template_id}/activate`
-- `POST /api/v1/questionnaires/active/clone`
-
-Operational replacements:
+Recomendacion operativa para nuevos consumidores:
 - `POST /api/admin/questionnaires/{template_id}/publish`
 - `POST /api/admin/questionnaires/{template_id}/clone`
+
+Nota: los endpoints legacy anteriores siguen montados por compatibilidad con clientes v1; se mantienen marcados como `deprecated` en OpenAPI.
 
 ## 4) Evaluations v1
 - `/api/v1/evaluations` (create/list/get/update/delete)

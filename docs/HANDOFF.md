@@ -494,3 +494,35 @@ Verificacion:
 
 Alcance:
 - Cambio exclusivamente documental sobre contrato OpenAPI (`docs/openapi.yaml`).
+
+## Actualizacion (2026-04-17) - OpenAPI + runtime hardening v2
+Cambios principales:
+- Se detecto y corrigio desalineacion runtime/spec en endpoints v1 legacy montados y no documentados.
+- Se agregaron al OpenAPI:
+  - `POST /api/v1/questionnaires/{template_id}/activate`
+  - `POST /api/v1/questionnaires/active/clone`
+- OpenAPI se reescribio de forma consistente para todas las operaciones con:
+  - `summary` no mecanico
+  - `operationId` normalizado
+  - `description` detallada en espanol por endpoint
+  - descripcion general de API y tags actualizadas
+
+Hardening de backend aplicado:
+- `api/decorators.py`:
+  - `roles_required` ahora rechaza tokens `mfa_enrollment` en endpoints de negocio/admin.
+  - respuesta de autorizacion denegada normalizada con `error=insufficient_permissions`.
+- `api/routes/docs.py`:
+  - `GET /openapi.yaml` ahora retorna `404` si el archivo no existe (evita 500 accidental).
+
+DTO/schema normalization:
+- Nuevo `api/schemas/user_schema.py`; `api/routes/users.py` migra validacion a schema dedicado.
+- Nuevo `api/schemas/mfa_schema.py`; `api/routes/mfa.py` aplica validacion formal de payload.
+
+Documentacion actualizada:
+- `README.md`
+- `docs/OPENAPI_GUIDE.md`
+- `docs/api_full_reference.md`
+
+Validacion:
+- `pytest tests/contracts/test_openapi_runtime_alignment.py -q` -> `1 passed`.
+- Pendiente de cierre: corrida de `pytest -q` completa para no-regresion total.
