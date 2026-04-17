@@ -351,3 +351,18 @@ Contexto metodológico:
   - `pytest tests/api/test_app_blueprint_policy.py tests/api/test_questionnaire_v2_api.py tests/api/test_questionnaire_runtime_api.py tests/test_problem_reports.py tests/contracts/test_openapi_runtime_alignment.py -q` => `23 passed`.
 - `por confirmar`:
   - resultado de suite completa `pytest -q` en esta misma ventana antes de cierre final.
+
+## Actualizacion de estado (2026-04-17) - openapi_descripciones_es_endpoint_complete
+- Se actualizaron las descripciones de endpoints en `docs/openapi.yaml` para cobertura completa en espanol.
+- Cobertura final: `115/115` operaciones documentadas con `description` (sin omisiones).
+- Cada descripcion ahora explicita, por endpoint:
+  - objetivo funcional
+  - ruta y metodo
+  - requisitos de seguridad declarados en OpenAPI
+  - parametros de entrada
+  - body request (si aplica)
+  - codigos de respuesta de exito/error documentados
+- Validacion ejecutada:
+  - parseo OpenAPI exitoso (YAML valido)
+  - `pytest tests/contracts/test_openapi_runtime_alignment.py -q` => `1 passed`
+- Alcance de cambio: documentacion/contrato (`docs/openapi.yaml`) sin cambios de runtime.
