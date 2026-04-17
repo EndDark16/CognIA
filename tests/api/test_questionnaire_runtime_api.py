@@ -294,3 +294,21 @@ def test_questionnaire_runtime_admin_versioning_flow(client, app):
     )
     assert publish.status_code == 200
     assert publish.json["is_published"] is True
+
+
+def test_questionnaire_runtime_create_draft_validates_payload(client, app):
+    _, token = _create_user_with_token(
+        app,
+        username=f"guardian_invalid_{uuid.uuid4().hex[:6]}",
+        email=f"guardian_invalid_{uuid.uuid4().hex[:6]}@example.com",
+        user_type="guardian",
+    )
+    headers = _auth_headers(token)
+
+    invalid = client.post(
+        "/api/v1/questionnaire-runtime/evaluations/draft",
+        json={"respondent_type": "caregiver", "child_age_years": 3},
+        headers=headers,
+    )
+    assert invalid.status_code == 400
+    assert invalid.json["error"] == "validation_error"

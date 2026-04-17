@@ -323,3 +323,31 @@ Contexto metodológico:
   - `pytest tests/services/test_questionnaire_v2_loader.py tests/api/test_questionnaire_runtime_api.py tests/api/test_questionnaire_v2_api.py -q` => `10 passed`.
   - `pytest tests/models/test_questionnaire_runtime_service.py tests/smoke/test_questionnaire_runtime_smoke.py -q` => `4 passed`.
   - `alembic heads` => `20260415_01 (head)` con cadena de revisiones consistente.
+
+## Actualizacion de estado (2026-04-16) - api_platform_hardening_openapi_alignment_v1
+- Se ejecuto intervencion integral de plataforma API con foco en contratos, seguridad y coherencia repo/runtime.
+- OpenAPI:
+  - `docs/openapi.yaml` se alineo con inventario real de rutas montadas en runtime (incluye `questionnaire_runtime` v1, `questionnaire_v2`, dashboards/reportes y rutas de docs).
+  - Se agregaron tags operativos: `QuestionnaireRuntime`, `QuestionnaireRuntimeAdmin`, `QuestionnaireV2`, `Dashboard`, `Reports`, `Docs`.
+  - Se agregaron parametros reutilizables para query comun en v1/v2 (`months`, `mode`, `role`, `include_full`, `status`, `unread_only`, `runtime export mode`).
+  - `docs/openapi_questionnaire_runtime_v1.yaml` se movio a `docs/archive/openapi/openapi_questionnaire_runtime_v1.yaml` como referencia historica (fuente activa unica: `docs/openapi.yaml`).
+- Guardrail de contrato:
+  - Test nuevo `tests/contracts/test_openapi_runtime_alignment.py` valida runtime real vs spec para evitar desalineacion futura.
+- Seguridad/hardening backend:
+  - `api/app.py` elimina fail-silent critico para blueprints opcionales mediante politica configurable:
+    - `OPTIONAL_BLUEPRINTS_STRICT` (default `true`)
+    - `OPTIONAL_BLUEPRINTS_REQUIRED` (default `questionnaire_runtime,questionnaire_v2`)
+  - `api/routes/questionnaire_v2.py` y `api/routes/problem_reports.py` ya no exponen `str(exc)` en responses 5xx.
+  - Se agrego rate limit a shared access publico v2 (`QV2_SHARED_ACCESS_RATE_LIMIT`, default `30 per minute`).
+  - Se agrego validacion de path seguro para descarga PDF en v2 (`resolve_download_path`).
+  - Se agrego validacion de firma binaria para adjuntos en problem reports (PNG/JPEG/WEBP), mitigando spoof MIME.
+- DTOs/schemas:
+  - Nuevo `api/schemas/questionnaire_runtime_schema.py` y adopcion en rutas runtime v1 para payloads user/professional/admin.
+  - Normalizacion adicional en admin clone mediante `QuestionnaireCloneRequestSchema`.
+- Repo/documentacion:
+  - README, `docs/OPENAPI_GUIDE.md`, `docs/api_full_reference.md`, `docs/repository_artifact_policy.md`, `docs/repository_maintenance.md` actualizados.
+  - Nueva evidencia de seguridad: `docs/security_hardening_20260416.md`.
+- Verificacion parcial de regresion en esta ventana:
+  - `pytest tests/api/test_app_blueprint_policy.py tests/api/test_questionnaire_v2_api.py tests/api/test_questionnaire_runtime_api.py tests/test_problem_reports.py tests/contracts/test_openapi_runtime_alignment.py -q` => `23 passed`.
+- `por confirmar`:
+  - resultado de suite completa `pytest -q` en esta misma ventana antes de cierre final.

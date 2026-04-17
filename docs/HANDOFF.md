@@ -422,3 +422,51 @@ Validacion tecnica:
   - `4 passed` en tests model/smoke runtime.
 - Alembic:
   - `alembic heads` resuelve en `20260415_01 (head)` (cadena consistente incluyendo `20260330_01` y `20260414_01`).
+
+## Actualizacion (2026-04-16) - API hardening + OpenAPI runtime alignment
+Resumen de la intervencion:
+- Se alineo `docs/openapi.yaml` con el inventario real de endpoints registrados en runtime.
+- Se incorporo cobertura de rutas `questionnaire_runtime` v1 y `questionnaire_v2` (incluye dashboards/reportes/docs).
+- Se unifico criterio de contrato activo:
+  - activo: `docs/openapi.yaml`
+  - historico: `docs/archive/openapi/openapi_questionnaire_runtime_v1.yaml`
+
+Cambios de seguridad aplicados:
+- Carga de blueprints opcionales con politica fail-fast configurable en `api/app.py`:
+  - `OPTIONAL_BLUEPRINTS_STRICT=true` (default)
+  - `OPTIONAL_BLUEPRINTS_REQUIRED=questionnaire_runtime,questionnaire_v2`
+- Eliminado leakage de `str(exc)` en respuestas 5xx de:
+  - `api/routes/questionnaire_v2.py`
+  - `api/routes/problem_reports.py`
+- Shared access v2 endurecido:
+  - rate limit (`QV2_SHARED_ACCESS_RATE_LIMIT`, default `30 per minute`)
+  - validacion explicita de parametros (`SharedAccessSchema`)
+- Descarga PDF v2 endurecida:
+  - solo permite paths dentro de `artifacts/runtime_reports` (`resolve_download_path`)
+- Upload de adjuntos problem reports endurecido:
+  - validacion de firma binaria para PNG/JPEG/WEBP
+
+DTOs/schemas normalizados:
+- Nuevo `api/schemas/questionnaire_runtime_schema.py`.
+- Runtime v1 ahora valida payloads en endpoints user/professional/admin.
+- Admin clone valida request con `QuestionnaireCloneRequestSchema`.
+
+Documentacion y estructura:
+- README actualizado (estructura real, variables criticas nuevas, guardrail de contrato).
+- `docs/OPENAPI_GUIDE.md` actualizado con regla de fuente activa + test de alineacion.
+- `docs/api_full_reference.md` actualizado con naming real de params.
+- `docs/repository_artifact_policy.md` y `docs/repository_maintenance.md` actualizados.
+- Nueva evidencia: `docs/security_hardening_20260416.md`.
+
+Guardrails/tests agregados o actualizados:
+- `tests/contracts/test_openapi_runtime_alignment.py`
+- `tests/api/test_app_blueprint_policy.py`
+- `tests/api/test_questionnaire_v2_api.py` (hardening errores compartidos/PDF)
+- `tests/test_problem_reports.py` (firma binaria adjuntos)
+- `tests/api/test_questionnaire_runtime_api.py` (validacion payload runtime)
+
+Verificacion ejecutada en esta ventana:
+- `pytest tests/api/test_app_blueprint_policy.py tests/api/test_questionnaire_v2_api.py tests/api/test_questionnaire_runtime_api.py tests/test_problem_reports.py tests/contracts/test_openapi_runtime_alignment.py -q` => `23 passed`.
+
+Pendiente inmediato:
+- ejecutar `pytest -q` completo para cierre final de regresion de toda la base.

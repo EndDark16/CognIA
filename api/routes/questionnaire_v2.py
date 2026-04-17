@@ -1,11 +1,11 @@
 import uuid
-from pathlib import Path
 
-from flask import Blueprint, jsonify, request, send_file
-from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
+from flask import Blueprint, current_app, jsonify, request, send_file
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 
 from api.decorators import roles_required
+from api.extensions import limiter
 from api.schemas.questionnaire_v2_schema import (
     DashboardQuerySchema,
     ReportRequestSchema,
@@ -15,6 +15,7 @@ from api.schemas.questionnaire_v2_schema import (
     SessionPageQuerySchema,
     SessionSubmitSchema,
     ShareCreateSchema,
+    SharedAccessSchema,
     TagAssignSchema,
 )
 from api.services import questionnaire_v2_loader_service as loader_service
@@ -39,6 +40,11 @@ def _error(message: str, error: str, code: int, details=None):
     return jsonify(payload), code
 
 
+def _server_error(message: str, error: str = "server_error"):
+    current_app.logger.error("questionnaire_v2_error error=%s message=%s", error, message, exc_info=True)
+    return _error(message, error, 500)
+
+
 def _current_user() -> tuple[uuid.UUID | None, AppUser | None]:
     user_id = _parse_uuid(get_jwt_identity())
     if not user_id:
@@ -58,9 +64,9 @@ def bootstrap_questionnaire_v2():
     user_id, _ = _current_user()
     try:
         result = loader_service.bootstrap_questionnaire_backend_v2(created_by=user_id)
-    except Exception as exc:
+    except Exception:
         db.session.rollback()
-        return _error("bootstrap_failed", "bootstrap_failed", 500, {"reason": str(exc)})
+        return _server_error("bootstrap_failed", "bootstrap_failed")
     return jsonify(result), 201
 
 
@@ -87,8 +93,8 @@ def get_active_questionnaire():
         )
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
-    except Exception as exc:
-        return _error("internal_error", "internal_error", 500, {"reason": str(exc)})
+    except Exception:
+        return _server_error("internal_error")
 
     return jsonify(payload), 200
 
@@ -107,9 +113,12 @@ def create_session():
 
     try:
         session = service.create_session(owner_user_id=user_id, payload=payload)
-    except Exception as exc:
+    except ValueError as exc:
         db.session.rollback()
-        return _error("session_create_failed", "session_create_failed", 400, {"reason": str(exc)})
+        return _error("validation_error", str(exc), 400)
+    except Exception:
+        db.session.rollback()
+        return _server_error("session_create_failed")
 
     return jsonify({"session": service.get_session_payload(session)}), 201
 
@@ -193,9 +202,9 @@ def patch_answers(session_id: str):
         return _error("forbidden", str(exc), 403)
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
-    except Exception as exc:
+    except Exception:
         db.session.rollback()
-        return _error("save_failed", "save_failed", 500, {"reason": str(exc)})
+        return _server_error("save_failed")
 
     return jsonify(result), 200
 
@@ -225,9 +234,9 @@ def submit_session(session_id: str):
         return _error("forbidden", str(exc), 403)
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
-    except Exception as exc:
+    except Exception:
         db.session.rollback()
-        return _error("submit_failed", "submit_failed", 500, {"reason": str(exc)})
+        return _server_error("submit_failed")
 
     return jsonify(result), 200
 
@@ -360,17 +369,29 @@ def share(session_id: str):
         result = service.create_share(session=session, user_id=user_id, payload=payload)
     except LookupError as exc:
         return _error("not_found", str(exc), 404)
-    except Exception as exc:
+    except ValueError as exc:
+        return _error("validation_error", str(exc), 400)
+    except Exception:
         db.session.rollback()
-        return _error("share_failed", "share_failed", 500, {"reason": str(exc)})
+        return _server_error("share_failed")
 
     return jsonify(result), 201
 
 
 @questionnaire_v2_bp.get("/questionnaires/shared/<questionnaire_id>/<share_code>")
+@limiter.limit(lambda: current_app.config.get("QV2_SHARED_ACCESS_RATE_LIMIT", "30 per minute"))
 def shared_access(questionnaire_id: str, share_code: str):
+    schema = SharedAccessSchema()
     try:
-        session = service.get_shared_session(questionnaire_id=questionnaire_id, share_code=share_code)
+        params = schema.load({"questionnaire_id": questionnaire_id, "share_code": share_code})
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
+
+    try:
+        session = service.get_shared_session(
+            questionnaire_id=params["questionnaire_id"],
+            share_code=params["share_code"],
+        )
         payload = service.get_results_payload(session)
     except LookupError as exc:
         return _error("not_found", str(exc), 404)
@@ -458,8 +479,8 @@ def pdf_download(session_id: str):
     if not export:
         return _error("not_found", "pdf_not_found", 404)
 
-    path = Path(export.file_path)
-    if not path.exists():
+    path = service.resolve_download_path(export.file_path)
+    if path is None or not path.exists():
         return _error("not_found", "pdf_file_missing", 404)
     return send_file(path, as_attachment=True, download_name=export.file_name)
 
@@ -479,7 +500,10 @@ def dashboard_adoption_history():
 @jwt_required()
 def dashboard_questionnaire_volume():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_questionnaire_volume(months=params["months"])), 200
 
 
@@ -487,7 +511,10 @@ def dashboard_questionnaire_volume():
 @jwt_required()
 def dashboard_user_growth():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_user_growth(months=params["months"])), 200
 
 
@@ -495,7 +522,10 @@ def dashboard_user_growth():
 @jwt_required()
 def dashboard_funnel():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_funnel(months=params["months"])), 200
 
 
@@ -503,7 +533,10 @@ def dashboard_funnel():
 @jwt_required()
 def dashboard_retention():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_adoption_history(months=params["months"])), 200
 
 
@@ -511,7 +544,10 @@ def dashboard_retention():
 @jwt_required()
 def dashboard_productivity():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_funnel(months=params["months"])), 200
 
 
@@ -519,7 +555,10 @@ def dashboard_productivity():
 @jwt_required()
 def dashboard_questionnaire_quality():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_questionnaire_volume(months=params["months"])), 200
 
 
@@ -527,7 +566,10 @@ def dashboard_questionnaire_quality():
 @jwt_required()
 def dashboard_data_quality():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_questionnaire_volume(months=params["months"])), 200
 
 
@@ -535,7 +577,10 @@ def dashboard_data_quality():
 @jwt_required()
 def dashboard_api_health():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_questionnaire_volume(months=params["months"])), 200
 
 
@@ -543,7 +588,10 @@ def dashboard_api_health():
 @jwt_required()
 def dashboard_model_monitoring():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_adoption_history(months=params["months"])), 200
 
 
@@ -551,7 +599,10 @@ def dashboard_model_monitoring():
 @jwt_required()
 def dashboard_drift():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_adoption_history(months=params["months"])), 200
 
 
@@ -559,7 +610,10 @@ def dashboard_drift():
 @jwt_required()
 def dashboard_equity():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_adoption_history(months=params["months"])), 200
 
 
@@ -567,7 +621,10 @@ def dashboard_equity():
 @jwt_required()
 def dashboard_human_review():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_funnel(months=params["months"])), 200
 
 
@@ -575,7 +632,10 @@ def dashboard_human_review():
 @jwt_required()
 def dashboard_executive_summary():
     schema = DashboardQuerySchema()
-    params = schema.load(request.args)
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
     return jsonify(service.dashboard_adoption_history(months=params["months"])), 200
 
 
@@ -600,8 +660,8 @@ def create_report_job():
         )
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
-    except Exception as exc:
+    except Exception:
         db.session.rollback()
-        return _error("report_failed", "report_failed", 500, {"reason": str(exc)})
+        return _server_error("report_failed")
 
     return jsonify(result), 201

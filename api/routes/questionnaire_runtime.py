@@ -2,9 +2,24 @@ import uuid
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
+from marshmallow import ValidationError
 
 from api.decorators import roles_required
 from api.security import log_audit
+from api.schemas.questionnaire_runtime_schema import (
+    RuntimeAdminDisclosureSchema,
+    RuntimeAdminQuestionSchema,
+    RuntimeAdminSectionSchema,
+    RuntimeAdminTemplateActiveSchema,
+    RuntimeAdminTemplateCreateSchema,
+    RuntimeAdminVersionCreateSchema,
+    RuntimeCreateDraftSchema,
+    RuntimeProfessionalAccessSchema,
+    RuntimeProfessionalTagSchema,
+    RuntimeSaveDraftSchema,
+    RuntimeSubmitSchema,
+    RuntimeValidateSectionSchema,
+)
 from api.services import questionnaire_runtime_service as qr_service
 from app.models import AppUser, QRQuestionnaireVersion, db
 
@@ -68,7 +83,11 @@ def create_draft_evaluation():
     if not user.is_active:
         return _error_response("Inactive account", "inactive_account", 403)
 
-    payload = request.get_json(silent=True) or {}
+    schema = RuntimeCreateDraftSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
     try:
         evaluation, pin = qr_service.create_evaluation_draft(user_id=user_id, payload=payload)
     except ValueError as exc:
@@ -98,7 +117,11 @@ def save_draft(evaluation_id):
     if not eval_uuid:
         return _error_response("Invalid evaluation_id", "invalid_evaluation_id", 400)
 
-    payload = request.get_json(silent=True) or {}
+    schema = RuntimeSaveDraftSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
     answers = payload.get("answers") or []
 
     try:
@@ -130,10 +153,12 @@ def validate_section(evaluation_id):
     if not eval_uuid:
         return _error_response("Invalid evaluation_id", "invalid_evaluation_id", 400)
 
-    payload = request.get_json(silent=True) or {}
-    section_key = (payload.get("section_key") or "").strip()
-    if not section_key:
-        return _error_response("section_key is required", "missing_section_key", 400)
+    schema = RuntimeValidateSectionSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
+    section_key = payload["section_key"].strip()
 
     try:
         evaluation = qr_service.get_user_evaluation_or_404(eval_uuid, user_id)
@@ -158,7 +183,11 @@ def submit_evaluation(evaluation_id):
     if not eval_uuid:
         return _error_response("Invalid evaluation_id", "invalid_evaluation_id", 400)
 
-    payload = request.get_json(silent=True) or {}
+    schema = RuntimeSubmitSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
     wait_live_result = bool(payload.get("wait_live_result", True))
 
     try:
@@ -344,11 +373,13 @@ def professional_open_access():
     if not _require_professional_role(user):
         return _error_response("Forbidden", "professional_role_required", 403)
 
-    payload = request.get_json(silent=True) or {}
-    reference_id = (payload.get("reference_id") or "").strip()
-    pin = (payload.get("pin") or "").strip()
-    if not reference_id or not pin:
-        return _error_response("reference_id and pin are required", "missing_reference_or_pin", 400)
+    schema = RuntimeProfessionalAccessSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
+    reference_id = payload["reference_id"].strip()
+    pin = payload["pin"].strip()
 
     try:
         evaluation = qr_service.professional_access(reference_id, pin, psychologist_user_id=user_id)
@@ -426,8 +457,12 @@ def professional_tag(evaluation_id):
     eval_uuid = _parse_uuid(evaluation_id)
     if not eval_uuid:
         return _error_response("Invalid evaluation_id", "invalid_evaluation_id", 400)
-    payload = request.get_json(silent=True) or {}
-    tag = payload.get("tag")
+    schema = RuntimeProfessionalTagSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
+    tag = payload["tag"]
 
     try:
         evaluation = qr_service.professional_guard(eval_uuid, user_id)
@@ -518,7 +553,11 @@ def admin_bootstrap():
 @roles_required("ADMIN")
 def admin_create_template():
     user_id, _ = _current_user_uuid()
-    payload = request.get_json(silent=True) or {}
+    schema = RuntimeAdminTemplateCreateSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
     try:
         template = qr_service.create_template(payload, created_by=user_id)
     except ValueError as exc:
@@ -533,7 +572,11 @@ def admin_create_version(template_id):
     tpl_uuid = _parse_uuid(template_id)
     if not tpl_uuid:
         return _error_response("Invalid template_id", "invalid_template_id", 400)
-    payload = request.get_json(silent=True) or {}
+    schema = RuntimeAdminVersionCreateSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
     try:
         version = qr_service.create_template_version(tpl_uuid, payload, created_by=user_id)
     except LookupError as exc:
@@ -549,7 +592,11 @@ def admin_set_template_active(template_id):
     tpl_uuid = _parse_uuid(template_id)
     if not tpl_uuid:
         return _error_response("Invalid template_id", "invalid_template_id", 400)
-    payload = request.get_json(silent=True) or {}
+    schema = RuntimeAdminTemplateActiveSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
     is_active = bool(payload.get("is_active", True))
     try:
         template = qr_service.set_template_active(tpl_uuid, is_active=is_active)
@@ -590,7 +637,11 @@ def admin_upsert_disclosure(version_id):
     ver_uuid = _parse_uuid(version_id)
     if not ver_uuid:
         return _error_response("Invalid version_id", "invalid_version_id", 400)
-    payload = request.get_json(silent=True) or {}
+    schema = RuntimeAdminDisclosureSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
     try:
         row = qr_service.create_or_update_disclosure(ver_uuid, payload, created_by=user_id)
     except LookupError as exc:
@@ -606,7 +657,11 @@ def admin_create_section(version_id):
     ver_uuid = _parse_uuid(version_id)
     if not ver_uuid:
         return _error_response("Invalid version_id", "invalid_version_id", 400)
-    payload = request.get_json(silent=True) or {}
+    schema = RuntimeAdminSectionSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
     try:
         section = qr_service.create_section(ver_uuid, payload)
     except LookupError as exc:
@@ -622,7 +677,11 @@ def admin_create_question(section_id):
     sec_uuid = _parse_uuid(section_id)
     if not sec_uuid:
         return _error_response("Invalid section_id", "invalid_section_id", 400)
-    payload = request.get_json(silent=True) or {}
+    schema = RuntimeAdminQuestionSchema()
+    try:
+        payload = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
     try:
         question = qr_service.create_question(sec_uuid, payload)
     except LookupError as exc:
