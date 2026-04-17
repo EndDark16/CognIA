@@ -5,6 +5,7 @@ Objetivo: mantener una especificacion OpenAPI 3.0.3 consistente, clara y alinead
 ## Alcance
 - Aplica a endpoints nuevos y cambios de endpoints existentes.
 - La fuente oficial vive en `docs/openapi.yaml`.
+- `docs/archive/openapi/` conserva snapshots historicos y no debe usarse como contrato activo.
 
 ## Convenciones
 - `operationId`: unico y estable, formato verbo+sustantivo.
@@ -42,6 +43,7 @@ Documentar segun aplique: `400`, `401`, `403`, `404`, `409`, `429`, `500`.
 3. Errores y codigos HTTP consistentes.
 4. Ejemplos validos y realistas.
 5. Rutas nuevas agregadas al spec y a docs operativas.
+6. Validacion runtime-vs-spec en `tests/contracts/test_openapi_runtime_alignment.py` en verde.
 
 ## Referencias
 - `docs/openapi.yaml`

@@ -1083,6 +1083,8 @@ def create_share(session: QuestionnaireSession, user_id: uuid.UUID, payload: dic
 
     grantee_id = payload.get("grantee_user_id")
     if grantee_id:
+        if not db.session.get(AppUser, grantee_id):
+            raise ValueError("grantee_not_found")
         grant = QuestionnaireAccessGrant.query.filter_by(session_id=session.id, grantee_user_id=grantee_id).first()
         if not grant:
             grant = QuestionnaireAccessGrant(session_id=session.id, owner_user_id=user_id, grantee_user_id=grantee_id)
@@ -1140,6 +1142,19 @@ def _pdf_output_dir() -> Path:
     path = (Path.cwd() / "artifacts" / "runtime_reports").resolve()
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def resolve_download_path(raw_path: str | None) -> Path | None:
+    if not raw_path:
+        return None
+    candidate = Path(raw_path).resolve()
+    base = _pdf_output_dir()
+    try:
+        candidate.relative_to(base)
+    except ValueError:
+        current_app.logger.warning("Rejected download path outside runtime_reports: %s", candidate)
+        return None
+    return candidate
 
 
 def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> QuestionnaireSessionPdfExport:

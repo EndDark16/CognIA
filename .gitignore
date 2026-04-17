@@ -54,6 +54,7 @@ desktop.ini
 .vscode/
 .idea/
 .history/
+.codex/
 
 # -----------------------------
 # Secrets / local context

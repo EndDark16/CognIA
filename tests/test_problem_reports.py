@@ -108,6 +108,23 @@ def test_create_problem_report_with_attachment(client, app):
     assert saved
 
 
+def test_create_problem_report_rejects_mime_signature_mismatch(client, app):
+    _, token = _user_token(app, "problem_user_sig_mismatch")
+    resp = client.post(
+        "/api/problem-reports",
+        headers={"Authorization": f"Bearer {token}"},
+        data={
+            "issue_type": "ui_issue",
+            "description": "Captura con contenido invalido para probar validacion de firma binaria.",
+            "source_module": "help_center",
+            "attachment": (io.BytesIO(b"NOT_A_REAL_PNG_FILE"), "evidence.png"),
+        },
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 400
+    assert resp.json["error"] == "attachment_content_mismatch"
+
+
 def test_create_problem_report_requires_auth(client):
     resp = client.post(
         "/api/problem-reports",
