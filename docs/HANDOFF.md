@@ -470,3 +470,27 @@ Verificacion ejecutada en esta ventana:
 
 Pendiente inmediato:
 - ejecutar `pytest -q` completo para cierre final de regresion de toda la base.
+
+## Actualizacion (2026-04-17) - Descripciones Swagger en espanol por endpoint
+Objetivo ejecutado:
+- Se completo la documentacion de descripciones en espanol para todos los endpoints de `docs/openapi.yaml`.
+
+Resultado de cobertura:
+- Total de operaciones OpenAPI: `115`
+- Operaciones con `description` en espanol: `115`
+- Omisiones: `0`
+
+Estandar aplicado por endpoint:
+- objetivo funcional
+- ruta/metodo
+- seguridad declarada
+- parametros de entrada
+- body request si aplica
+- respuestas de exito/error documentadas
+
+Verificacion:
+- Parseo YAML/OpenAPI correcto.
+- `pytest tests/contracts/test_openapi_runtime_alignment.py -q` => `1 passed`.
+
+Alcance:
+- Cambio exclusivamente documental sobre contrato OpenAPI (`docs/openapi.yaml`).
