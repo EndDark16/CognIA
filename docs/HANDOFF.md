@@ -471,58 +471,18 @@ Verificacion ejecutada en esta ventana:
 Pendiente inmediato:
 - ejecutar `pytest -q` completo para cierre final de regresion de toda la base.
 
-## Actualizacion (2026-04-17) - Descripciones Swagger en espanol por endpoint
-Objetivo ejecutado:
-- Se completo la documentacion de descripciones en espanol para todos los endpoints de `docs/openapi.yaml`.
-
-Resultado de cobertura:
-- Total de operaciones OpenAPI: `115`
-- Operaciones con `description` en espanol: `115`
-- Omisiones: `0`
-
-Estandar aplicado por endpoint:
-- objetivo funcional
-- ruta/metodo
-- seguridad declarada
-- parametros de entrada
-- body request si aplica
-- respuestas de exito/error documentadas
-
-Verificacion:
-- Parseo YAML/OpenAPI correcto.
-- `pytest tests/contracts/test_openapi_runtime_alignment.py -q` => `1 passed`.
-
-Alcance:
-- Cambio exclusivamente documental sobre contrato OpenAPI (`docs/openapi.yaml`).
-
-## Actualizacion (2026-04-17) - OpenAPI + runtime hardening v2
-Cambios principales:
-- Se detecto y corrigio desalineacion runtime/spec en endpoints v1 legacy montados y no documentados.
-- Se agregaron al OpenAPI:
+## Actualizacion de sesion (2026-04-17) - OpenAPI runtime alignment + hardening v2
+- Se rehizo `docs/openapi.yaml` con alineacion total contra rutas runtime reales (`117/117` operaciones).
+- Se agrego `scripts/openapi_professionalize.py` para normalizar contrato OpenAPI de forma reproducible.
+- Se creo `docs/endpoint_lifecycle_matrix.md` con decision por endpoint/familia (keep, legacy, deprecate).
+- Se corrigieron endpoints legacy faltantes en contrato:
   - `POST /api/v1/questionnaires/{template_id}/activate`
   - `POST /api/v1/questionnaires/active/clone`
-- OpenAPI se reescribio de forma consistente para todas las operaciones con:
-  - `summary` no mecanico
-  - `operationId` normalizado
-  - `description` detallada en espanol por endpoint
-  - descripcion general de API y tags actualizadas
-
-Hardening de backend aplicado:
-- `api/decorators.py`:
-  - `roles_required` ahora rechaza tokens `mfa_enrollment` en endpoints de negocio/admin.
-  - respuesta de autorizacion denegada normalizada con `error=insufficient_permissions`.
-- `api/routes/docs.py`:
-  - `GET /openapi.yaml` ahora retorna `404` si el archivo no existe (evita 500 accidental).
-
-DTO/schema normalization:
-- Nuevo `api/schemas/user_schema.py`; `api/routes/users.py` migra validacion a schema dedicado.
-- Nuevo `api/schemas/mfa_schema.py`; `api/routes/mfa.py` aplica validacion formal de payload.
-
-Documentacion actualizada:
-- `README.md`
-- `docs/OPENAPI_GUIDE.md`
-- `docs/api_full_reference.md`
-
-Validacion:
-- `pytest tests/contracts/test_openapi_runtime_alignment.py -q` -> `1 passed`.
-- Pendiente de cierre: corrida de `pytest -q` completa para no-regresion total.
+- Seguridad endurecida:
+  - `api/routes/predict.py`: validacion robusta, errores sanitizados, rate limit configurable.
+  - `api/routes/questionnaire_v2.py`: metadata PDF sin `file_path`, solo `download_url`.
+  - Nuevas variables: `PREDICT_RATE_LIMIT` en `config/settings.py` y `.env.example`.
+- Guardrails agregados:
+  - `tests/contracts/test_openapi_documentation_quality.py`
+  - `tests/test_predict.py`
+- `por confirmar`: resultado de `pytest -q` completo de esta ventana.
