@@ -16,6 +16,9 @@ def openapi_yaml():
     path = os.path.abspath(
         os.path.join(current_app.root_path, "..", "docs", "openapi.yaml")
     )
+    if not os.path.exists(path):
+        current_app.logger.error("OpenAPI file not found at %s", path)
+        return Response("Not found", status=404)
     return send_file(path, mimetype="application/yaml")
 
 

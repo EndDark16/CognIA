@@ -34,6 +34,11 @@ class RoleAssignSchema(Schema):
     roles = fields.List(fields.String(), required=True, validate=validate.Length(min=1))
 
 
+class RoleCreateSchema(Schema):
+    name = fields.String(required=True, validate=validate.Length(min=2, max=80))
+    description = fields.String(load_default=None, validate=validate.Length(max=500))
+
+
 class AuditLogQuerySchema(PaginationSchema):
     user_id = fields.String(load_default=None)
     action = fields.String(load_default=None)

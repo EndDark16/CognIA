@@ -143,11 +143,18 @@ Variables criticas:
 - OpenAPI: `GET /openapi.yaml`
 - Fuente activa de contrato: `docs/openapi.yaml` (snapshots historicos en `docs/archive/openapi/`)
 - Referencia mantenedor: `docs/api_full_reference.md`
+- Calidad documental esperada: cada endpoint debe tener `summary` y `description` detallada en espanol alineada al runtime real.
 
 ## Endpoints principales
 - Auth/MFA: `/api/auth/*`, `/api/mfa/*`
 - Admin: `/api/admin/*`
 - Questionnaires legacy: `/api/v1/questionnaires/*`
+  - Incluye compatibilidad deprecada:
+    - `POST /api/v1/questionnaires/{template_id}/activate`
+    - `POST /api/v1/questionnaires/active/clone`
+  - Reemplazo recomendado para nuevas integraciones:
+    - `POST /api/admin/questionnaires/{template_id}/publish`
+    - `POST /api/admin/questionnaires/{template_id}/clone`
 - Questionnaire runtime v1: `/api/v1/questionnaire-runtime/*`
 - Questionnaire v2: `/api/v2/*`
 - Problem reports:
@@ -181,6 +188,7 @@ Detalles: `docs/problem_reporting_backend.md`.
 - Ejecutar suite completa: `pytest -q`
 - Pruebas especificas de problem reports: `pytest tests/test_problem_reports.py -q`
 - Guardrail OpenAPI vs runtime: `pytest tests/contracts/test_openapi_runtime_alignment.py -q`
+- Guardrail de calidad documental OpenAPI: `pytest tests/contracts/test_openapi_documentation_quality.py -q`
 
 ## Reporting y dashboards
 - Endpoints v2 en `/api/v2/dashboard/*` y `/api/v2/reports/jobs`.
