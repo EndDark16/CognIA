@@ -7,6 +7,7 @@ from http.cookies import SimpleCookie
 import pyotp
 import pytest
 from flask import jsonify
+from flask_jwt_extended import create_access_token
 
 # Garantiza que la raiz del proyecto este en el sys.path al ejecutar pytest
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -647,6 +648,31 @@ def test_roles_required_enforces_claims(client, app):
         "/api/admin-only", headers={"Authorization": f"Bearer {access_token2}"}
     )
     assert resp_forbidden.status_code == 403
+
+
+def test_roles_required_blocks_mfa_enrollment_token(client, app):
+    def _protected():
+        return jsonify({"ok": True}), 200
+
+    app.add_url_rule(
+        "/api/admin-only-enrollment-block",
+        "admin_only_enrollment_block",
+        roles_required("ADMIN")(_protected),
+        methods=["GET"],
+    )
+
+    with app.app_context():
+        enrollment_token = create_access_token(
+            identity=str(uuid.uuid4()),
+            additional_claims={"roles": ["ADMIN"], "mfa_enrollment": True},
+        )
+
+    resp = client.get(
+        "/api/admin-only-enrollment-block",
+        headers={"Authorization": f"Bearer {enrollment_token}"},
+    )
+    assert resp.status_code == 403
+    assert resp.json.get("error") == "mfa_enrollment_only"
 
 
 def test_auth_me_returns_profile(client):

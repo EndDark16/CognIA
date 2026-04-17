@@ -97,3 +97,35 @@ def test_admin_can_create_and_list_users(client, app):
     resp_list = client.get("/api/v1/users", headers=headers)
     assert resp_list.status_code == 200
     assert resp_list.json["total"] >= 1
+
+
+def test_users_list_rejects_invalid_pagination(client, app):
+    token = _admin_token(client, app)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    resp = client.get("/api/v1/users?page=0&page_size=500", headers=headers)
+    assert resp.status_code == 400
+    assert resp.json.get("error") == "validation_error"
+
+
+def test_users_patch_requires_at_least_one_field(client, app):
+    token = _admin_token(client, app)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    resp_create = client.post(
+        "/api/v1/users",
+        headers=headers,
+        json={
+            "username": f"user_{uuid.uuid4().hex[:6]}",
+            "email": f"user_{uuid.uuid4().hex[:6]}@example.com",
+            "password": "StrongPassword123!",
+            "full_name": "User To Patch",
+            "user_type": "guardian",
+        },
+    )
+    assert resp_create.status_code == 201
+    user_id = resp_create.json["id"]
+
+    resp_patch = client.patch(f"/api/v1/users/{user_id}", headers=headers, json={})
+    assert resp_patch.status_code == 400
+    assert resp_patch.json.get("error") == "validation_error"
