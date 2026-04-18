@@ -6732,7 +6732,83 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required:
+              - key
+              - feature_key
+              - prompt
+              - response_type
+              properties:
+                key:
+                  type: string
+                feature_key:
+                  type: string
+                domain:
+                  type: string
+                prompt:
+                  type: string
+                help_text:
+                  type: string
+                response_type:
+                  type: string
+                  enum: [single_choice, multi_choice, boolean, integer, likert_single, numeric_range, consent/info_only]
+                requiredness:
+                  type: string
+                  enum: [required, optional]
+                position:
+                  type: integer
+                min_value:
+                  type: number
+                max_value:
+                  type: number
+                step_value:
+                  type: number
+                allowed_values:
+                  oneOf:
+                  - type: array
+                    items:
+                      oneOf: [{type: string}, {type: number}, {type: integer}, {type: boolean}]
+                  - type: object
+                    additionalProperties: true
+                visibility_rule:
+                  type: object
+                  additionalProperties: true
+                is_active:
+                  type: boolean
+                options:
+                  type: array
+                  items:
+                    type: object
+                    required: [value, label]
+                    properties:
+                      value:
+                        type: string
+                      label:
+                        type: string
+              example:
+                key: q_attention_01
+                feature_key: adhd_attention_q01
+                domain: adhd
+                prompt: En la ultima semana, el nino tuvo dificultad para sostener la atencion en tareas escolares.
+                help_text: Responde segun la frecuencia observada.
+                response_type: likert_single
+                requiredness: required
+                position: 1
+                min_value: 0
+                max_value: 3
+                step_value: 1
+                allowed_values: [0, 1, 2, 3]
+                visibility_rule:
+                  always: true
+                is_active: true
+                options:
+                - value: "0"
+                  label: Nunca
+                - value: "1"
+                  label: A veces
+                - value: "2"
+                  label: Frecuente
+                - value: "3"
+                  label: Casi siempre
       security:
       - bearerAuth: []
       responses:
@@ -6858,7 +6934,21 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [slug, name]
+              properties:
+                slug:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                is_active:
+                  type: boolean
+              example:
+                slug: questionnaire_runtime_v1
+                name: Cuestionario Runtime V1
+                description: Plantilla operativa para evaluaciones guiadas runtime.
+                is_active: true
       security:
       - bearerAuth: []
       responses:
@@ -6986,12 +7076,16 @@ paths:
           type: string
           format: uuid
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              properties:
+                is_active:
+                  type: boolean
+              example:
+                is_active: true
       security:
       - bearerAuth: []
       responses:
@@ -7247,7 +7341,18 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [version_label]
+              properties:
+                version_label:
+                  type: string
+                changelog:
+                  type: string
+                clone_from_active:
+                  type: boolean
+              example:
+                version_label: v1.0.0
+                changelog: Primera version productiva con secciones activas.
+                clone_from_active: true
       security:
       - bearerAuth: []
       responses:
@@ -7505,7 +7610,22 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [disclosure_type, title, content_markdown]
+              properties:
+                disclosure_type:
+                  type: string
+                  enum: [consent_pre, disclaimer_pre, disclaimer_result, disclaimer_pdf]
+                version_label:
+                  type: string
+                title:
+                  type: string
+                content_markdown:
+                  type: string
+              example:
+                disclosure_type: consent_pre
+                version_label: v1.0.0
+                title: Consentimiento informado
+                content_markdown: El uso de esta herramienta es para screening y apoyo profesional en entorno simulado.
       security:
       - bearerAuth: []
       responses:
@@ -7763,7 +7883,24 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [key, title]
+              properties:
+                key:
+                  type: string
+                title:
+                  type: string
+                description:
+                  type: string
+                position:
+                  type: integer
+                is_required:
+                  type: boolean
+              example:
+                key: antecedentes_familiares
+                title: Antecedentes familiares y contexto
+                description: Seccion inicial para contexto del nino y su entorno.
+                position: 1
+                is_required: true
       security:
       - bearerAuth: []
       responses:
@@ -7887,7 +8024,41 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [child_age_years]
+              properties:
+                respondent_type:
+                  type: string
+                  enum: [caregiver, psychologist]
+                child_age_years:
+                  type: integer
+                  minimum: 6
+                  maximum: 11
+                child_sex_assigned_at_birth:
+                  type: string
+                consent_accepted:
+                  type: boolean
+                is_waiting_live_result:
+                  type: boolean
+                answers:
+                  type: array
+                  items:
+                    type: object
+                    required: [question_id, value]
+                    properties:
+                      question_id:
+                        type: string
+                        format: uuid
+                      value:
+                        oneOf: [{type: string}, {type: number}, {type: integer}, {type: boolean}, {type: array}, {type: object}]
+              example:
+                respondent_type: caregiver
+                child_age_years: 8
+                child_sex_assigned_at_birth: male
+                consent_accepted: true
+                is_waiting_live_result: true
+                answers:
+                - question_id: 11111111-1111-1111-1111-111111111111
+                  value: 2
       security:
       - bearerAuth: []
       responses:
@@ -8260,7 +8431,25 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              properties:
+                answers:
+                  type: array
+                  items:
+                    type: object
+                    required: [question_id, value]
+                    properties:
+                      question_id:
+                        type: string
+                        format: uuid
+                      value:
+                        oneOf: [{type: string}, {type: number}, {type: integer}, {type: boolean}, {type: array}, {type: object}]
+                consent_accepted:
+                  type: boolean
+              example:
+                answers:
+                - question_id: 11111111-1111-1111-1111-111111111111
+                  value: 3
+                consent_accepted: true
       security:
       - bearerAuth: []
       responses:
@@ -8508,13 +8697,6 @@ paths:
         schema:
           type: string
           format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties: true
       security:
       - bearerAuth: []
       responses:
@@ -9008,12 +9190,16 @@ paths:
           type: string
           format: uuid
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              properties:
+                wait_live_result:
+                  type: boolean
+              example:
+                wait_live_result: true
       security:
       - bearerAuth: []
       responses:
@@ -9143,7 +9329,12 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [section_key]
+              properties:
+                section_key:
+                  type: string
+              example:
+                section_key: antecedentes_familiares
       security:
       - bearerAuth: []
       responses:
@@ -9385,13 +9576,6 @@ paths:
         schema:
           type: string
           format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties: true
       security:
       - bearerAuth: []
       responses:
@@ -9517,7 +9701,15 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [reference_id, pin]
+              properties:
+                reference_id:
+                  type: string
+                pin:
+                  type: string
+              example:
+                reference_id: EVAL-AB12CD34
+                pin: "4821"
       security:
       - bearerAuth: []
       responses:
@@ -10028,7 +10220,12 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [tag]
+              properties:
+                tag:
+                  type: string
+              example:
+                tag: seguimiento_prioritario
       security:
       - bearerAuth: []
       responses:
@@ -12036,13 +12233,6 @@ paths:
       operationId: post_api_v2_questionnaires_admin_bootstrap
       x-roles:
       - ADMIN
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties: true
       security:
       - bearerAuth: []
       responses:
@@ -12656,13 +12846,6 @@ paths:
         schema:
           type: string
           format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties: true
       security:
       - bearerAuth: []
       responses:
@@ -12911,12 +13094,29 @@ paths:
           type: string
           format: uuid
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              properties:
+                expires_in_hours:
+                  type: integer
+                max_uses:
+                  type: integer
+                grantee_user_id:
+                  type: string
+                  format: uuid
+                grant_can_tag:
+                  type: boolean
+                grant_can_download_pdf:
+                  type: boolean
+              example:
+                expires_in_hours: 72
+                max_uses: 3
+                grantee_user_id: 22222222-2222-2222-2222-222222222222
+                grant_can_tag: true
+                grant_can_download_pdf: true
       security:
       - bearerAuth: []
       responses:
@@ -13047,7 +13247,19 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [tag]
+              properties:
+                tag:
+                  type: string
+                color:
+                  type: string
+                visibility:
+                  type: string
+                  enum: [private, shared]
+              example:
+                tag: revisar_en_comite
+                color: "#F59E0B"
+                visibility: private
       security:
       - bearerAuth: []
       responses:
@@ -13299,7 +13511,31 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [mode, role]
+              properties:
+                mode:
+                  type: string
+                  enum: [short, medium, complete]
+                role:
+                  type: string
+                  enum: [caregiver, psychologist]
+                child_age_years:
+                  type: integer
+                  minimum: 6
+                  maximum: 11
+                child_sex_assigned_at_birth:
+                  type: string
+                metadata:
+                  type: object
+                  additionalProperties: true
+              example:
+                mode: short
+                role: caregiver
+                child_age_years: 9
+                child_sex_assigned_at_birth: female
+                metadata:
+                  source: mobile_app
+                  clinic_id: CLINIC-001
       security:
       - bearerAuth: []
       responses:
@@ -13553,7 +13789,29 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [answers]
+              properties:
+                answers:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [question_id, answer]
+                    properties:
+                      question_id:
+                        type: string
+                        format: uuid
+                      answer:
+                        oneOf: [{type: string}, {type: number}, {type: integer}, {type: boolean}, {type: array}, {type: object}]
+                mark_final:
+                  type: boolean
+              example:
+                answers:
+                - question_id: 33333333-3333-3333-3333-333333333333
+                  answer: 1
+                - question_id: 44444444-4444-4444-4444-444444444444
+                  answer: true
+                mark_final: false
       security:
       - bearerAuth: []
       responses:
@@ -13803,12 +14061,16 @@ paths:
           type: string
           format: uuid
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              properties:
+                force_reprocess:
+                  type: boolean
+              example:
+                force_reprocess: false
       security:
       - bearerAuth: []
       responses:
@@ -14049,7 +14311,16 @@ paths:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              required: [report_type]
+              properties:
+                report_type:
+                  type: string
+                  enum: [executive_monthly, adoption_history, model_monitoring, operational_productivity, security_compliance, traceability_audit]
+                months:
+                  type: integer
+              example:
+                report_type: executive_monthly
+                months: 12
       security:
       - bearerAuth: []
       responses:

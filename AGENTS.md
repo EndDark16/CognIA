@@ -431,3 +431,17 @@ Contexto metodológico:
   - `POST /api/v2/questionnaires/admin/bootstrap` => `201` en reejecucion.
   - `/openapi.yaml` y `/docs` siguen operativos con `docs/openapi.yaml` como fuente activa.
   - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/api/test_questionnaire_v2_api.py tests/test_problem_reports.py -q` => `21 passed`.
+
+## Actualizacion de estado (2026-04-18) - openapi_request_body_examples_hardening
+- Se corrigieron los `requestBody` de OpenAPI que Swagger renderizaba con ejemplo generico `additionalProp1`.
+- Alcance aplicado en `docs/openapi.yaml`:
+  - 22 operaciones actualizadas en runtime v1 y cuestionarios/reportes v2.
+  - Endpoints sin body real ahora no exponen `requestBody` (p. ej. heartbeat, mark-read de notificacion, bootstrap admin v2, generacion PDF v2).
+  - Endpoints con body real ahora declaran `properties`, `required` y `example` alineados a los schemas runtime (`questionnaire_runtime_schema.py` y `questionnaire_v2_schema.py`).
+- Verificacion automatica:
+  - auditoria de spec: `problem_request_bodies=0` (sin request bodies genericos sin ejemplo).
+  - parseo YAML: `openapi_yaml_valid`.
+  - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py -q` => `5 passed`.
+- Fuente activa Swagger sin cambios:
+  - `/openapi.yaml` sigue sirviendo `docs/openapi.yaml`.
+  - `/docs` sigue consumiendo esa misma spec.

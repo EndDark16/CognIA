@@ -572,3 +572,28 @@ Fix aplicado durante la validacion:
 Validacion regresion asociada:
 - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/api/test_questionnaire_v2_api.py tests/test_problem_reports.py -q` -> `21 passed`.
 - `/openapi.yaml` y `/docs` operativos, consumiendo `docs/openapi.yaml`.
+
+## Actualizacion (2026-04-18) - hardening de examples en requestBody OpenAPI
+Objetivo ejecutado:
+- Eliminar por completo en Swagger UI los request body con render por defecto tipo `additionalProp1` y reemplazarlos por payloads reales del contrato.
+
+Cambios realizados en `docs/openapi.yaml`:
+- Se actualizaron 22 operaciones con `requestBody` de runtime v1 y v2.
+- Para endpoints que no consumen body en runtime, se retiro `requestBody`:
+  - `POST /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/heartbeat`
+  - `PATCH /api/v1/questionnaire-runtime/notifications/{notification_id}/read`
+  - `POST /api/v2/questionnaires/admin/bootstrap`
+  - `POST /api/v2/questionnaires/history/{session_id}/pdf/generate`
+- Para endpoints con body real, se definieron `properties`, `required` y `example` exactos segun schemas backend:
+  - runtime v1 admin/evaluations/professional access/tag.
+  - v2 sessions/answers/submit, history tags/share y reports jobs.
+
+Verificacion:
+- Auditoria automatica sobre request bodies: `problem_request_bodies=0` (sin cuerpos genericos sin ejemplo).
+- Parseo YAML: `openapi_yaml_valid`.
+- Tests:
+  - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py -q` -> `5 passed`.
+
+Swagger/OpenAPI:
+- Se mantiene fuente unica activa `docs/openapi.yaml`.
+- `/openapi.yaml` y `/docs` siguen alineados con esa spec.
