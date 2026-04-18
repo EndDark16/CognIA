@@ -541,3 +541,34 @@ Verificacion post-fix:
 Swagger/OpenAPI:
 - `/openapi.yaml` sigue sirviendo `docs/openapi.yaml`.
 - `/docs` sigue consumiendo esa spec.
+
+## Actualizacion (2026-04-18) - openapi actualizado + smoke masivo de endpoints
+Objetivo ejecutado:
+- Se adopto el `docs/openapi.yaml` actualizado en workspace como contrato activo de Swagger.
+- Se validaron todos los endpoints runtime registrados sin modificar seguridad persistente.
+
+Ajustes de contrato OpenAPI:
+- Se agregaron rutas faltantes en la spec para alinear runtime real:
+  - `POST /api/admin/impersonate/{user_id}`
+  - `POST /api/v1/questionnaires/active/clone`
+  - `POST /api/v1/questionnaires/{template_id}/activate`
+  - `POST /api/admin/roles`
+- Validacion: `pytest tests/contracts/test_openapi_runtime_alignment.py -q` -> `1 passed`.
+
+Smoke de endpoints (runtime real):
+- Ejecucion automatica contra `app.url_map` (metodos GET/POST/PUT/PATCH/DELETE, excluyendo static/HEAD/OPTIONS).
+- Cobertura: `118` reglas, `119` requests.
+- Resultado final: `2xx=41`, `4xx=78`, `5xx/exceptions=0`.
+- Evidencia: `artifacts/api_smoke/endpoint_smoke_report.json`.
+
+Fix aplicado durante la validacion:
+- Endpoint afectado: `POST /api/v2/questionnaires/admin/bootstrap` (fallo de idempotencia en reejecucion).
+- Archivo: `api/services/questionnaire_v2_loader_service.py`.
+- Correcciones:
+  - upsert de `ModelArtifactRegistry` para evitar duplicate key en `(model_version_id, artifact_kind)`.
+  - reemplazo de activaciones previas por `(domain, mode_key, role)` antes de crear la activa para evitar colision unique en `model_mode_domain_activation`.
+- Resultado: bootstrap v2 vuelve a responder `201` en reintentos.
+
+Validacion regresion asociada:
+- `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/api/test_questionnaire_v2_api.py tests/test_problem_reports.py -q` -> `21 passed`.
+- `/openapi.yaml` y `/docs` operativos, consumiendo `docs/openapi.yaml`.

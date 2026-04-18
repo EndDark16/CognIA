@@ -411,3 +411,23 @@ Contexto metodológico:
   - `GET /api/v1/questionnaire-runtime/questionnaire/active` => 200
 - OpenAPI/Swagger:
   - se mantiene fuente unica `docs/openapi.yaml` (`/openapi.yaml` y `/docs` verificados).
+
+## Actualizacion de estado (2026-04-18) - openapi_swagger_sync_and_full_endpoint_smoke
+- Se tomo como fuente de verdad el `docs/openapi.yaml` actualizado en workspace local y se dejo como spec activa servida por Swagger.
+- Se reforzo alineacion runtime/openapi agregando rutas faltantes del runtime real:
+  - `POST /api/admin/impersonate/{user_id}`
+  - `POST /api/v1/questionnaires/active/clone`
+  - `POST /api/v1/questionnaires/{template_id}/activate`
+  - `POST /api/admin/roles`
+- Se ejecuto smoke test de endpoints registrados en runtime (`app.url_map`) sin dejar bypass persistente de autorizacion en codigo:
+  - cobertura: `118` reglas / `119` requests
+  - resultado final: `2xx=41`, `4xx=78`, `5xx/exceptions=0`
+  - reporte generado en `artifacts/api_smoke/endpoint_smoke_report.json`.
+- Se corrigio idempotencia de bootstrap v2 para evitar fallos 5xx en reejecuciones:
+  - `api/services/questionnaire_v2_loader_service.py`
+  - fix 1: upsert de `ModelArtifactRegistry` (`runtime_model`) por `(model_version_id, artifact_kind)`.
+  - fix 2: reemplazo de activaciones previas por tuple `(domain, mode_key, role)` para evitar colision de unique en `model_mode_domain_activation`.
+- Verificacion posterior:
+  - `POST /api/v2/questionnaires/admin/bootstrap` => `201` en reejecucion.
+  - `/openapi.yaml` y `/docs` siguen operativos con `docs/openapi.yaml` como fuente activa.
+  - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/api/test_questionnaire_v2_api.py tests/test_problem_reports.py -q` => `21 passed`.
