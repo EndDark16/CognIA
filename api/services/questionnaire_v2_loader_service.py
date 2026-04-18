@@ -487,12 +487,14 @@ def sync_active_models() -> dict[str, Any]:
         db.session.add(version)
         db.session.flush()
 
+        # Keep sync idempotent: replace prior rows for this domain/mode/role tuple
+        # instead of toggling to false, because the table has unique constraints on
+        # (domain, mode_key, role, active_flag) and can otherwise collide on reruns.
         ModelModeDomainActivation.query.filter_by(
             domain=domain,
             mode_key=mode_key,
             role=role,
-            active_flag=True,
-        ).update({"active_flag": False, "valid_to": _utcnow()}, synchronize_session=False)
+        ).delete(synchronize_session=False)
 
         activation = ModelModeDomainActivation(
             domain=domain,
@@ -550,15 +552,19 @@ def sync_active_models() -> dict[str, Any]:
                 )
             )
 
-        db.session.add(
-            ModelArtifactRegistry(
+        artifact = ModelArtifactRegistry.query.filter_by(
+            model_version_id=version.id,
+            artifact_kind="runtime_model",
+        ).first()
+        if not artifact:
+            artifact = ModelArtifactRegistry(
                 model_version_id=version.id,
                 artifact_kind="runtime_model",
-                artifact_locator=artifact_path or fallback_path or "por_confirmar",
-                is_available=bool(artifact_path or fallback_path),
-                metadata_json={"source": "active_modes_sync"},
             )
-        )
+        artifact.artifact_locator = artifact_path or fallback_path or "por_confirmar"
+        artifact.is_available = bool(artifact_path or fallback_path)
+        artifact.metadata_json = {"source": "active_modes_sync"}
+        db.session.add(artifact)
 
     return {
         "models_synced": int(active_df.shape[0]),
