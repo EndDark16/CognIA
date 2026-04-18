@@ -486,3 +486,29 @@ Pendiente inmediato:
   - `tests/contracts/test_openapi_documentation_quality.py`
   - `tests/test_predict.py`
 - `por confirmar`: resultado de `pytest -q` completo de esta ventana.
+
+## Actualizacion (2026-04-17) - recovery de worktrees y fuente unica Swagger
+Contexto:
+- Se detecto estado de trabajo fragmentado por multiples worktrees con ruido local y potencial de confusion operativa.
+- Se fijo como baseline canonico `origin/development`.
+
+Auditoria:
+- Inventario completo de worktrees auditado y clasificado.
+- No se hallaron commits por delante de `origin/development` en los worktrees revisados.
+- Worktrees secundarios con cambios locales mostraron diffs no sustantivos (line-ending churn) y se clasificaron `REJECT_AS_NOISY`.
+- Detalle versionado en `docs/worktree_recovery_20260417.md`.
+
+Proteccion no destructiva previa:
+- Se exportaron snapshots de estado por worktree (status/diff/untracked) a respaldo local versionado.
+- Se crearon tags de seguridad `safety/worktree_20260417_190150_*`.
+- Se removieron worktrees obsoletos/noisy luego del respaldo, sin eliminar ramas ni trazabilidad.
+
+Hardening documental/operativo aplicado:
+- `.gitignore` ahora ignora `.worktrees/` para evitar contaminacion del arbol principal.
+- README y `docs/repository_maintenance.md` actualizados con politica de rama canonica y gobernanza de worktrees.
+- `docs/OPENAPI_GUIDE.md` reforzado para exigir que `/docs` consuma `/openapi.yaml` servido desde `docs/openapi.yaml`.
+- Test nuevo: `tests/test_docs_metrics.py::test_swagger_openapi_source_of_truth_is_docs_openapi_yaml`.
+
+Estado:
+- Se mantiene `development` como fuente canonica operativa.
+- OpenAPI activo sigue unificado en `docs/openapi.yaml` (sin fuentes paralelas activas).

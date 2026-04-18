@@ -63,3 +63,20 @@ def test_swagger_disabled_returns_404():
         assert resp_docs.status_code == 404
     finally:
         _teardown(app)
+
+
+def test_swagger_openapi_source_of_truth_is_docs_openapi_yaml():
+    client, app = _client_with_config()
+    try:
+        resp_openapi = client.get("/openapi.yaml")
+        assert resp_openapi.status_code == 200
+        spec_path = os.path.join(PROJECT_ROOT, "docs", "openapi.yaml")
+        with open(spec_path, "rb") as f:
+            expected = f.read()
+        assert resp_openapi.data == expected
+
+        resp_docs = client.get("/docs")
+        assert resp_docs.status_code == 200
+        assert b'url: "/openapi.yaml"' in resp_docs.data
+    finally:
+        _teardown(app)

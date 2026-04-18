@@ -370,3 +370,21 @@ Contexto metodológico:
   - `tests/contracts/test_openapi_documentation_quality.py` (calidad documental integral).
   - `tests/test_predict.py` (validacion, sanitizacion de errores y rate limit en `/api/predict`).
 - `por confirmar`: resultado de suite completa `pytest -q` en esta misma ventana tras integrar todos los cambios.
+
+## Actualizacion de estado (2026-04-17) - worktree_recovery_and_openapi_single_source
+- Se ejecuto auditoria integral de worktrees con baseline `origin/development` y clasificacion por riesgo/utilidad.
+- Hallazgo clave: no se detectaron commits por delante de `origin/development` en los worktrees auditados.
+- Cambios locales fuera de `cognia_app` quedaron clasificados como ruido de fin de linea (`REJECT_AS_NOISY`) sin delta funcional sustantivo.
+- Se aplico proteccion no destructiva previa:
+  - snapshots por worktree (status/diff/untracked) en backup local versionado.
+  - tags de seguridad `safety/worktree_20260417_190150_*`.
+- Se documento auditoria y clasificacion en `docs/worktree_recovery_20260417.md`.
+- Se removieron worktrees obsoletos/noisy tras respaldo, manteniendo solo el workspace principal y el worktree de consolidacion canonica.
+- Se reforzo gobernanza repo:
+  - `development` declarado canonico operativo en documentacion de mantenimiento.
+  - reglas de trabajo con worktrees y recuperacion conservadora documentadas.
+- OpenAPI/Swagger:
+  - se reafirma `docs/openapi.yaml` como fuente unica activa.
+  - se agrego guardrail de test para verificar que `/openapi.yaml` sirve exactamente `docs/openapi.yaml` y que `/docs` consume esa ruta.
+- `por confirmar`:
+  - promocion final del branch de recuperacion a `development` tras verificacion final de tests de regresion.

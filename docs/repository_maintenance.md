@@ -33,6 +33,23 @@ Keep CognIA backend maintainable while preserving methodological traceability.
 - Consolidated OpenAPI source-of-truth in `docs/openapi.yaml`; moved legacy addendum to `docs/archive/openapi/`.
 - Added automated runtime-vs-spec guardrail test: `tests/contracts/test_openapi_runtime_alignment.py`.
 
+## Canonical branch and worktree governance
+
+- Canonical operational branch: `development`.
+- For any consolidation/recovery operation:
+  1. Use `origin/development` as comparison baseline.
+  2. Audit every worktree before edits/removal.
+  3. Snapshot dirty state (`status`, `diff`, `untracked`) before cleanup.
+  4. Classify differences as:
+     - `KEEP_IN_DEVELOPMENT_ALREADY`
+     - `CHERRY_PICK_SAFE`
+     - `MANUAL_PORT_REQUIRED`
+     - `REJECT_AS_NOISY`
+     - `REJECT_AS_DANGEROUS`
+     - `KEEP_ONLY_AS_BACKUP`
+- Do not promote worktree-local state over `development` without explicit validation.
+- Keep Swagger/OpenAPI single source of truth in `docs/openapi.yaml`; archival specs stay historical only.
+
 ## Pending non-destructive opportunities
 
 - Incremental normalization of legacy docs that still duplicate historical narratives.
