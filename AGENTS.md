@@ -445,3 +445,26 @@ Contexto metodológico:
 - Fuente activa Swagger sin cambios:
   - `/openapi.yaml` sigue sirviendo `docs/openapi.yaml`.
   - `/docs` sigue consumiendo esa misma spec.
+
+## Actualizacion de estado (2026-04-18) - openapi_response_examples_endpoint_by_endpoint_v2
+- Se ejecuto una pasada integral endpoint-por-endpoint sobre `docs/openapi.yaml` para eliminar placeholders de respuesta tipo schema generico en Swagger.
+- Resultado de cobertura:
+  - `responses_without_example=0` en respuestas JSON/PDF documentadas.
+  - `required_requestbody_without_example=0`.
+  - `optional_requestbody_with_example=0` (los request body no obligatorios quedaron sin ejemplo de input).
+- Se agregaron ejemplos de respuesta concretos para 75 respuestas que aun no tenian example, incluyendo:
+  - health/readiness/metrics y `GET /api/auth/me`.
+  - legacy admin/questionnaire (`impersonate`, `roles`, activacion/clonado v1).
+  - problem reports (`POST /api/problem-reports`, listados y detalle admin).
+  - runtime v1 (draft/save/submit/status/results/export/admin bootstrap/versioning/notifications/professional).
+  - cuestionarios v2 (active, sessions, history, tags/share, submit, dashboards y reports jobs).
+- Se corrigio salida exacta de descarga PDF:
+  - `GET /api/v2/questionnaires/history/{session_id}/pdf/download` ahora documenta `application/pdf` (binario) en 200.
+- Se enriquecieron descripciones de operaciones con seccion profesional adicional por endpoint:
+  - seguridad operativa,
+  - codigos contractuales auditados,
+  - comportamiento condicional por HTTP,
+  - trazabilidad recomendada y criterio de uso.
+- Validacion ejecutada:
+  - parseo YAML: `openapi_yaml_valid`.
+  - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/api/test_questionnaire_v2_api.py tests/test_problem_reports.py -q` => `21 passed`.

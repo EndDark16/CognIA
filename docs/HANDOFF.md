@@ -597,3 +597,39 @@ Verificacion:
 Swagger/OpenAPI:
 - Se mantiene fuente unica activa `docs/openapi.yaml`.
 - `/openapi.yaml` y `/docs` siguen alineados con esa spec.
+
+## Actualizacion (2026-04-18) - respuesta endpoint-por-endpoint y descripciones profesionales
+Objetivo ejecutado:
+- Resolver de forma completa la documentacion de respuestas en Swagger para evitar placeholders genericos y dejar ejemplos operativos por endpoint.
+
+Acciones aplicadas en `docs/openapi.yaml`:
+- Inputs:
+  - se quitaron examples de request body en operaciones con body no obligatorio (`required: false`).
+  - se garantizaron examples en todos los request body obligatorios (`required: true`).
+- Outputs:
+  - se agregaron examples concretos en todas las respuestas que no tenian example (75 respuestas cubiertas en esta pasada).
+  - cobertura final auditada: `responses_without_example=0`.
+  - no quedan respuestas que Swagger renderice con body por defecto tipo `additionalProp1`.
+- Ajuste de exactitud de formato:
+  - `GET /api/v2/questionnaires/history/{session_id}/pdf/download` (200) documentado como `application/pdf` binario.
+
+Enriquecimiento profesional de descripciones:
+- Se agrego seccion adicional por operacion con:
+  - punto de control contractual (metodo+ruta),
+  - seguridad y roles operativos,
+  - respuestas HTTP auditadas,
+  - comportamiento condicional por codigo de respuesta,
+  - trazabilidad recomendada para auditoria.
+
+Validacion:
+- Parseo YAML: `openapi_yaml_valid`.
+- Auditorias OpenAPI:
+  - `responses_without_example=0`
+  - `required_requestbody_without_example=0`
+  - `optional_requestbody_with_example=0`
+- Tests:
+  - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/api/test_questionnaire_v2_api.py tests/test_problem_reports.py -q` -> `21 passed`.
+
+Swagger/OpenAPI:
+- Fuente activa unica confirmada: `docs/openapi.yaml`.
+- `/openapi.yaml` y `/docs` continúan consistentes con esa spec.
