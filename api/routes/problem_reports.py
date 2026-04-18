@@ -3,6 +3,7 @@ import uuid
 from flask import Blueprint, current_app, jsonify, request
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from marshmallow import ValidationError
+from sqlalchemy.exc import DBAPIError, OperationalError, SQLAlchemyError
 
 from api.decorators import roles_required
 from api.schemas.problem_report_schema import (
@@ -34,6 +35,17 @@ def _error(message: str, error: str, status_code: int, details=None):
 def _server_error(message: str, error: str):
     current_app.logger.error("problem_reports_error error=%s message=%s", error, message, exc_info=True)
     return _error(message, error, 500)
+
+
+def _handle_backend_failure(exc: Exception, fallback_message: str, fallback_error: str):
+    db.session.rollback()
+    if isinstance(exc, (OperationalError, DBAPIError)):
+        current_app.logger.error("problem_reports_db_unavailable: %s", exc, exc_info=True)
+        return _error("Service unavailable", "db_unavailable", 503)
+    if isinstance(exc, SQLAlchemyError):
+        current_app.logger.error("problem_reports_db_error: %s", exc, exc_info=True)
+        return _error("Database error", "db_error", 500)
+    return _server_error(fallback_message, fallback_error)
 
 
 def _current_user() -> tuple[uuid.UUID | None, AppUser | None]:
@@ -79,9 +91,8 @@ def create_problem_report():
         )
     except ValueError as exc:
         return _error("Validation error", str(exc), 400)
-    except Exception:
-        db.session.rollback()
-        return _server_error("problem_report_create_failed", "problem_report_create_failed")
+    except Exception as exc:
+        return _handle_backend_failure(exc, "problem_report_create_failed", "problem_report_create_failed")
 
     return jsonify({"report": service.serialize_problem_report(row, include_private=False)}), 201
 
@@ -166,8 +177,7 @@ def update_problem_report_admin(report_id: str):
         return _error("Not found", str(exc), 404)
     except ValueError as exc:
         return _error("Validation error", str(exc), 400)
-    except Exception:
-        db.session.rollback()
-        return _server_error("problem_report_update_failed", "problem_report_update_failed")
+    except Exception as exc:
+        return _handle_backend_failure(exc, "problem_report_update_failed", "problem_report_update_failed")
 
     return jsonify({"report": service.serialize_problem_report(row, include_private=True)}), 200

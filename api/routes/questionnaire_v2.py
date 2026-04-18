@@ -3,6 +3,7 @@ import uuid
 from flask import Blueprint, current_app, jsonify, request, send_file
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
+from sqlalchemy.exc import DBAPIError, OperationalError, SQLAlchemyError
 
 from api.decorators import roles_required
 from api.extensions import limiter
@@ -45,6 +46,20 @@ def _server_error(message: str, error: str = "server_error"):
     return _error(message, error, 500)
 
 
+def _handle_backend_failure(exc: Exception, fallback_message: str, fallback_error: str = "server_error"):
+    db.session.rollback()
+    if isinstance(exc, FileNotFoundError):
+        current_app.logger.error("questionnaire_v2_dependency_unavailable: %s", exc, exc_info=True)
+        return _error("Service unavailable", "runtime_assets_unavailable", 503)
+    if isinstance(exc, (OperationalError, DBAPIError)):
+        current_app.logger.error("questionnaire_v2_db_unavailable: %s", exc, exc_info=True)
+        return _error("Service unavailable", "db_unavailable", 503)
+    if isinstance(exc, SQLAlchemyError):
+        current_app.logger.error("questionnaire_v2_db_error: %s", exc, exc_info=True)
+        return _error("Database error", "db_error", 500)
+    return _server_error(fallback_message, fallback_error)
+
+
 def _current_user() -> tuple[uuid.UUID | None, AppUser | None]:
     user_id = _parse_uuid(get_jwt_identity())
     if not user_id:
@@ -64,9 +79,8 @@ def bootstrap_questionnaire_v2():
     user_id, _ = _current_user()
     try:
         result = loader_service.bootstrap_questionnaire_backend_v2(created_by=user_id)
-    except Exception:
-        db.session.rollback()
-        return _server_error("bootstrap_failed", "bootstrap_failed")
+    except Exception as exc:
+        return _handle_backend_failure(exc, "bootstrap_failed", "bootstrap_failed")
     return jsonify(result), 201
 
 
@@ -93,8 +107,8 @@ def get_active_questionnaire():
         )
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
-    except Exception:
-        return _server_error("internal_error")
+    except Exception as exc:
+        return _handle_backend_failure(exc, "internal_error")
 
     return jsonify(payload), 200
 
@@ -116,9 +130,8 @@ def create_session():
     except ValueError as exc:
         db.session.rollback()
         return _error("validation_error", str(exc), 400)
-    except Exception:
-        db.session.rollback()
-        return _server_error("session_create_failed")
+    except Exception as exc:
+        return _handle_backend_failure(exc, "session_create_failed")
 
     return jsonify({"session": service.get_session_payload(session)}), 201
 
@@ -202,9 +215,8 @@ def patch_answers(session_id: str):
         return _error("forbidden", str(exc), 403)
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
-    except Exception:
-        db.session.rollback()
-        return _server_error("save_failed")
+    except Exception as exc:
+        return _handle_backend_failure(exc, "save_failed")
 
     return jsonify(result), 200
 
@@ -234,9 +246,8 @@ def submit_session(session_id: str):
         return _error("forbidden", str(exc), 403)
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
-    except Exception:
-        db.session.rollback()
-        return _server_error("submit_failed")
+    except Exception as exc:
+        return _handle_backend_failure(exc, "submit_failed")
 
     return jsonify(result), 200
 
@@ -371,9 +382,8 @@ def share(session_id: str):
         return _error("not_found", str(exc), 404)
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
-    except Exception:
-        db.session.rollback()
-        return _server_error("share_failed")
+    except Exception as exc:
+        return _handle_backend_failure(exc, "share_failed")
 
     return jsonify(result), 201
 
@@ -660,8 +670,7 @@ def create_report_job():
         )
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
-    except Exception:
-        db.session.rollback()
-        return _server_error("report_failed")
+    except Exception as exc:
+        return _handle_backend_failure(exc, "report_failed")
 
     return jsonify(result), 201
