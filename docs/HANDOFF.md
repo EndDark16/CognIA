@@ -512,3 +512,32 @@ Hardening documental/operativo aplicado:
 Estado:
 - Se mantiene `development` como fuente canonica operativa.
 - OpenAPI activo sigue unificado en `docs/openapi.yaml` (sin fuentes paralelas activas).
+
+## Actualizacion (2026-04-17) - recovery Alembic/DB y guardas contra 500
+Auditoria Alembic/DB:
+- `alembic current` confirmado en `20260415_01 (head)`.
+- `alembic upgrade head` ejecutado sin pendientes.
+- `alembic_version` en BD verificado en `20260415_01`.
+- Comparativa ORM vs esquema real (tablas/columnas/indices/FK por definicion): sin faltantes.
+
+Hallazgo de causa real del 500:
+- El 500 reproducido en `GET /api/v1/questionnaire-runtime/questionnaire/active` no era por migraciones faltantes; era `FileNotFoundError` por artefactos de modelo ausentes (`models/champions/rf_*`) durante bootstrap de preguntas por defecto.
+
+Correccion aplicada:
+- `api/services/questionnaire_runtime_service.py`:
+  - `_default_question_features()` ahora hace fallback seguro por dominio al contrato de features cuando faltan artefactos, evitando caida del endpoint de cuestionario activo.
+- `api/routes/questionnaire_v2.py`:
+  - manejo de excepciones backend reforzado para mapear dependencias/DB a `503 runtime_assets_unavailable` o `503 db_unavailable` (evita `500 internal_error` ambiguo).
+- `api/routes/problem_reports.py`:
+  - manejo de excepciones DB reforzado para devolver `503 db_unavailable` cuando corresponda.
+
+Verificacion post-fix:
+- `GET /api/admin/problem-reports` -> 200
+- `GET /api/problem-reports/mine` -> 200
+- `GET /api/v2/questionnaires/active` -> 200
+- `GET /api/v1/questionnaire-runtime/questionnaire/active` -> 200
+- Tests relevantes: `pytest tests/test_problem_reports.py tests/api/test_questionnaire_runtime_api.py tests/api/test_questionnaire_v2_api.py tests/contracts/test_openapi_runtime_alignment.py -q` -> `21 passed`.
+
+Swagger/OpenAPI:
+- `/openapi.yaml` sigue sirviendo `docs/openapi.yaml`.
+- `/docs` sigue consumiendo esa spec.
