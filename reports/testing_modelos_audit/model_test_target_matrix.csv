@@ -1,0 +1,10 @@
+component,path,criticality,needs_unit,needs_integration,needs_smoke,needs_contract,needs_artifact_consistency,notes
+predictor_loader,core/models/predictor.py,high,yes,no,yes,no,yes,Resuelve ruta models/{name}_model.pkl y carga binario
+model_service_probability,api/services/model_service.py,high,yes,yes,yes,no,yes,Define columnas esperadas y dominio adhd activo en runtime actual
+predict_endpoint,api/routes/predict.py,high,no,yes,yes,yes,no,Entrada/salida minima de inferencia legacy
+inference_scope_file,artifacts/inference_v4/promotion_scope.json,high,yes,no,yes,no,yes,Debe mantener active_domains y hold_domains finales
+runtime_model_binary,models/adhd_model.pkl,high,no,no,yes,no,yes,Asset minimo obligatorio para runtime actual
+settings_model_related,config/settings.py,medium,yes,no,no,no,no,Defaults de edad/status y secret/model path
+app_boot_model_path,run.py + api/app.py,medium,no,no,yes,no,no,Import/arranque sin romper rutas de inferencia
+final_scope_docs,reports/final_closure/*,medium,no,no,no,no,yes,Regresion de consistencia operativa del cierre
+elimination_hold_guard,model_service + inference_v4,high,yes,yes,yes,yes,yes,Prevenir activacion accidental en producto

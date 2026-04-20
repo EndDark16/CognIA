@@ -1,0 +1,11 @@
+entity_name,entity_kind,purpose,current_schema_support,real_questionnaire_fit,key_gaps,recommended_action,evidence,owner_scope
+questionnaire_template,table,Versionado de templates,name/version/is_active/is_archived,acceptable,No modela secciones/branching/version_contract metadata,extend,app/models.py:131-143,backend_db
+question,table,Definicion de preguntas,code/text/response_type/position/min-max-step/options,fragile,No section_id ni branching_rule ni required_if,refactor,app/models.py:145-170; migration 20260124_04,backend_db
+question_disorder,table,Mapeo multi-trastorno,N:M question<->disorder,acceptable,Falta granularidad de peso/tipo de contribucion,keep_with_minor_changes,app/models.py:9-14; migration 20260124_05,backend_db
+evaluation,table,Sesion de evaluacion,status/age/date/subject/template/context/raw_symptoms/processed_features,acceptable,No lifecycle robusto de draft por seccion,extend,app/models.py:191-217,backend_db
+evaluation_response,table,Persistencia por pregunta,PK evaluation_id+question_id + value text,fragile,Sin auditoria de cambios ni metadata de respondiente/fuente,refactor,app/models.py:219-228,backend_db
+evaluation_prediction + detail + report,table_group,Salida por evaluacion,probability/label/risk/explanation_json,latent_unwired,No flujo API user-facing conectado para lectura/escritura en cuestionario actual,keep_with_minor_changes,app/models.py:310-356,backend_db
+questionnaire_section,missing_table,Agrupar preguntas por seccion,no,insufficient,No existe entidad de secciones,add_new_table,No tabla equivalente en app/models.py,backend_db
+question_branching_rule,missing_table,Branching/skip logic,no,insufficient,No existe entidad de visibilidad condicional,add_new_table,No tabla equivalente en app/models.py,backend_db
+evaluation_draft_state,missing_table_or_columns,Guardar progreso parcial,parcial (status draft),insufficient,No endpoint/tabla para progreso por seccion y reanudacion,add_or_extend,docs/openapi.yaml:3574 + docs frontend de futuro guardado parcial,backend_db
+response_audit_log,missing_table,Auditoria de cambios de respuestas,no,insufficient,No historial de cambios por respuesta,add_new_table,evaluation_response actual no versiona cambios,backend_db

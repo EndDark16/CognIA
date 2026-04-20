@@ -1,0 +1,6 @@
+domain,winner_balanced_accuracy,winner_adjusted_score,recommended_hybrid_route,notes
+adhd,C,C,C,usar ruta con mejor score ajustado y deuda metodologica controlada
+conduct,B,C,C,usar ruta con mejor score ajustado y deuda metodologica controlada
+elimination,C,C,C,usar ruta con mejor score ajustado y deuda metodologica controlada
+anxiety,B,C,C,usar ruta con mejor score ajustado y deuda metodologica controlada
+depression,C,C,C,usar ruta con mejor score ajustado y deuda metodologica controlada

@@ -1,0 +1,4 @@
+scenario,total_inputs_required,direct_inputs_filled,derived_inputs_filled,missing_or_default_inputs,has_flags_available,notes
+caregiver,47,13,2,32,0,mode_ref=caregiver; role_split_source=questionnaire_role_split_final.csv
+psychologist_no_has,283,271,12,0,10,mode_ref=psychologist; role_split_source=questionnaire_role_split_final.csv
+psychologist_with_has,283,281,2,0,10,mode_ref=psychologist; role_split_source=questionnaire_role_split_final.csv

@@ -1,0 +1,90 @@
+{
+  "line": "final_hardening_v10",
+  "selected_policies": [
+    {
+      "mode": "caregiver",
+      "domain": "adhd",
+      "selected_policy": "threshold_hardened",
+      "selected_threshold": 0.4549999999999999,
+      "selection_reason": "adhd_depression_hardening"
+    },
+    {
+      "mode": "caregiver",
+      "domain": "conduct",
+      "selected_policy": "base",
+      "selected_threshold": 0.135,
+      "selection_reason": "default_keep_v9"
+    },
+    {
+      "mode": "caregiver",
+      "domain": "elimination",
+      "selected_policy": "light_ensemble_blend",
+      "selected_threshold": 0.505,
+      "selection_reason": "elimination_final_attack"
+    },
+    {
+      "mode": "caregiver",
+      "domain": "anxiety",
+      "selected_policy": "base",
+      "selected_threshold": 0.1,
+      "selection_reason": "default_keep_v9"
+    },
+    {
+      "mode": "caregiver",
+      "domain": "depression",
+      "selected_policy": "threshold_hardened",
+      "selected_threshold": 0.0999999999999999,
+      "selection_reason": "adhd_depression_hardening"
+    },
+    {
+      "mode": "psychologist",
+      "domain": "adhd",
+      "selected_policy": "threshold_hardened",
+      "selected_threshold": 0.505,
+      "selection_reason": "adhd_depression_hardening"
+    },
+    {
+      "mode": "psychologist",
+      "domain": "conduct",
+      "selected_policy": "base",
+      "selected_threshold": 0.335,
+      "selection_reason": "default_keep_v9"
+    },
+    {
+      "mode": "psychologist",
+      "domain": "elimination",
+      "selected_policy": "recall_first_low_thr",
+      "selected_threshold": 0.425,
+      "selection_reason": "elimination_final_attack"
+    },
+    {
+      "mode": "psychologist",
+      "domain": "anxiety",
+      "selected_policy": "base",
+      "selected_threshold": 0.1,
+      "selection_reason": "default_keep_v9"
+    },
+    {
+      "mode": "psychologist",
+      "domain": "depression",
+      "selected_policy": "threshold_hardened",
+      "selected_threshold": 0.0799999999999999,
+      "selection_reason": "adhd_depression_hardening"
+    }
+  ],
+  "macro_delta": [
+    {
+      "mode": "caregiver",
+      "delta_balanced_accuracy": 0.001242236024844723,
+      "delta_recall": 0.002484472049689446,
+      "delta_brier": -0.0004472091351016491
+    },
+    {
+      "mode": "psychologist",
+      "delta_balanced_accuracy": 0.0006211180124223725,
+      "delta_recall": 0.001242236024844745,
+      "delta_brier": 3.694961003830599e-17
+    }
+  ],
+  "decision": "- decision: CLOSE_WITH_CAVEATS"
+}

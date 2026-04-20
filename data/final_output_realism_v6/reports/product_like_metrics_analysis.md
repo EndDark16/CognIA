@@ -1,0 +1,83 @@
+# Product-like metrics analysis
+
+        mode      domain             metric     value
+   caregiver        adhd     avg_confidence 61.345237
+   caregiver        adhd          band_rate  0.250000
+   caregiver        adhd    calibration_gap  0.120773
+   caregiver        adhd caveat_strong_rate  0.000000
+   caregiver        adhd                npv  0.816410
+   caregiver        adhd overconfident_rate  0.005479
+   caregiver        adhd                ppv  0.996875
+   caregiver        adhd   uncertainty_rate  0.063014
+   caregiver     anxiety     avg_confidence 53.148810
+   caregiver     anxiety          band_rate  0.250000
+   caregiver     anxiety    calibration_gap  0.025761
+   caregiver     anxiety caveat_strong_rate  0.000000
+   caregiver     anxiety                npv  0.990942
+   caregiver     anxiety overconfident_rate  0.010959
+   caregiver     anxiety                ppv  0.972603
+   caregiver     anxiety   uncertainty_rate  0.043836
+   caregiver     conduct     avg_confidence 47.720988
+   caregiver     conduct          band_rate  0.250000
+   caregiver     conduct    calibration_gap  0.155102
+   caregiver     conduct caveat_strong_rate  0.000000
+   caregiver     conduct                npv  0.738327
+   caregiver     conduct overconfident_rate  0.002740
+   caregiver     conduct                ppv  0.987805
+   caregiver     conduct   uncertainty_rate  0.071233
+   caregiver  depression     avg_confidence 48.142081
+   caregiver  depression          band_rate  0.250000
+   caregiver  depression    calibration_gap  0.129110
+   caregiver  depression caveat_strong_rate  0.000000
+   caregiver  depression                npv  0.852064
+   caregiver  depression overconfident_rate  0.002740
+   caregiver  depression                ppv  0.643939
+   caregiver  depression   uncertainty_rate  0.041096
+   caregiver elimination     avg_confidence 53.355767
+   caregiver elimination          band_rate  0.250000
+   caregiver elimination    calibration_gap  0.124234
+   caregiver elimination caveat_strong_rate  1.000000
+   caregiver elimination                npv  0.345539
+   caregiver elimination overconfident_rate  0.027397
+   caregiver elimination                ppv  0.992593
+   caregiver elimination   uncertainty_rate  0.030137
+psychologist        adhd     avg_confidence 62.484987
+psychologist        adhd          band_rate  0.250000
+psychologist        adhd    calibration_gap  0.128900
+psychologist        adhd caveat_strong_rate  0.000000
+psychologist        adhd                npv  0.489469
+psychologist        adhd overconfident_rate  0.005479
+psychologist        adhd                ppv  1.000000
+psychologist        adhd   uncertainty_rate  0.183562
+psychologist     anxiety     avg_confidence 52.368444
+psychologist     anxiety          band_rate  0.250000
+psychologist     anxiety    calibration_gap  0.041907
+psychologist     anxiety caveat_strong_rate  0.000000
+psychologist     anxiety                npv  0.945944
+psychologist     anxiety overconfident_rate  0.000000
+psychologist     anxiety                ppv  1.000000
+psychologist     anxiety   uncertainty_rate  0.071233
+psychologist     conduct     avg_confidence 64.145862
+psychologist     conduct          band_rate  0.250000
+psychologist     conduct    calibration_gap  0.230964
+psychologist     conduct caveat_strong_rate  0.000000
+psychologist     conduct                npv  0.979087
+psychologist     conduct overconfident_rate  0.000000
+psychologist     conduct                ppv  0.993266
+psychologist     conduct   uncertainty_rate  0.005479
+psychologist  depression     avg_confidence 49.874192
+psychologist  depression          band_rate  0.250000
+psychologist  depression    calibration_gap  0.127183
+psychologist  depression caveat_strong_rate  0.000000
+psychologist  depression                npv  0.973810
+psychologist  depression overconfident_rate  0.005479
+psychologist  depression                ppv  0.726510
+psychologist  depression   uncertainty_rate  0.016438
+psychologist elimination     avg_confidence 54.462351
+psychologist elimination          band_rate  0.250000
+psychologist elimination    calibration_gap  0.168566
+psychologist elimination caveat_strong_rate  1.000000
+psychologist elimination                npv  0.509442
+psychologist elimination overconfident_rate  0.013699
+psychologist elimination                ppv  0.996078
+psychologist elimination   uncertainty_rate  0.032877

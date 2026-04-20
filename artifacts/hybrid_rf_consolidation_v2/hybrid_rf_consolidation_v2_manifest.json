@@ -1,0 +1,131 @@
+{
+  "campaign_line": "hybrid_rf_consolidation_v2",
+  "created_at_utc": "2026-04-12T16:07:57.669397+00:00",
+  "source_dataset": "data/hybrid_dsm5_rebuild_v1/hybrid_dataset_synthetic_complete_final.csv",
+  "source_v1_line": "hybrid_rf_ceiling_push_v1",
+  "candidate_count": 13,
+  "promotion_counts": {
+    "PROMOTE_NOW": 0,
+    "PROMOTE_WITH_CAVEAT": 7,
+    "HOLD_FOR_TARGETED_FIX": 6,
+    "REJECT_AS_PRIMARY": 0
+  },
+  "close_main_modeling_stage": "no",
+  "generated_files": [
+    {
+      "path": "data/hybrid_rf_consolidation_v2/inventory/hybrid_rf_consolidation_inventory.csv",
+      "size_bytes": 455,
+      "sha256": "b841e742a0182bc37191c77a38cb24b3e53331f5c91e8191534a62f0d7f0a2a3"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/inventory/hybrid_rf_consolidation_inventory.md",
+      "size_bytes": 5057,
+      "sha256": "dfa12e7d3c16f27528982b8e79820cfd989c905df1e7a4cab34a00f5e68b850e"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/reproduction/hybrid_rf_reproduced_candidates.csv",
+      "size_bytes": 11770,
+      "sha256": "d225e5094a1735681d33879c4e4ee8cfb1ece69fcb0defd59672863961287daf"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/bootstrap/hybrid_rf_bootstrap_intervals.csv",
+      "size_bytes": 5662,
+      "sha256": "3b6b1383ae1073e505b245a3d8851ba9156c0dd2bb7d9630e8609e5858490f9e"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/stability/hybrid_rf_seed_stability.csv",
+      "size_bytes": 18327,
+      "sha256": "a838bf0f923330b80ecec5f7c024eb00df20e0d0dd3645e7f44f49f145c30171"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/calibration/hybrid_rf_candidate_calibration.csv",
+      "size_bytes": 14569,
+      "sha256": "07f2707a5cb7ee1dfdd26062df310b6dc1437b6f08a767a92df3762668fe6d22"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/ablation/hybrid_rf_candidate_ablation.csv",
+      "size_bytes": 105860,
+      "sha256": "81c563470abefe84dee8dab0b4909d199f0f9dbb0ec4c9247942221c39cedd58"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/stress/hybrid_rf_candidate_stress.csv",
+      "size_bytes": 33924,
+      "sha256": "5985dc91eccd2a0b218f8a6e083db55028c9d8a91a4f8f272250c8653bf63886"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/tables/hybrid_rf_2_3_vs_full_comparison.csv",
+      "size_bytes": 1106,
+      "sha256": "264bc75012812148d2d1d6f95c39e0c9fafa607e184ac731f7ad1f224b063712"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/tables/hybrid_rf_candidate_operating_points.csv",
+      "size_bytes": 16570,
+      "sha256": "8f4bd545b6ff6acde81964a09d9bd4e643ef82518ce01fdd4144453848b5ac62"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/tables/hybrid_rf_candidate_stability_summary.csv",
+      "size_bytes": 5821,
+      "sha256": "318877d5e810c9f297d45593d4085628d8295d68423ff8bfe12eec2cc464487e"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/tables/hybrid_rf_dsm5_contribution_analysis.csv",
+      "size_bytes": 5834,
+      "sha256": "77a1d0ef52a563c11a657221d0944678cd8d2e556eea26bc5a88227680f62799"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/tables/hybrid_rf_dsm5_domain_gain_summary.csv",
+      "size_bytes": 864,
+      "sha256": "0ceabf6f331718ede4fd51c27bb05d5e68b41997677a523ecef5bc1699653adb"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/tables/hybrid_rf_final_champions.csv",
+      "size_bytes": 1511,
+      "sha256": "a5830cb88a89ee87438963e6f199deb4c8c71ced5c512d0f8f9974ba381a237e"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/tables/hybrid_rf_final_promotion_decisions.csv",
+      "size_bytes": 8126,
+      "sha256": "857195dd1e51f0a218e6b4cd596c8eabb1fecefe02500d74790903e5faa1529f"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/tables/hybrid_rf_mode_feature_coverage_recheck.csv",
+      "size_bytes": 387,
+      "sha256": "b4fb722d50614ae8bdff5596751b206ff06c0a42181cbbabe09daf70c3438123"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/tables/hybrid_rf_split_registry_reused.csv",
+      "size_bytes": 1345,
+      "sha256": "7d4d2f795827a1709f349fcbe416c28009f4b7f6a55572ce673f31f7f0064fc1"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/reports/hybrid_rf_consolidation_analysis.md",
+      "size_bytes": 6778,
+      "sha256": "099fd14634fd7b67b34e89d9a09879960565a3fb8de2aeeeb2cbe031c369f383"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/reports/hybrid_rf_dsm5_value_report.md",
+      "size_bytes": 5746,
+      "sha256": "3cd9b35e1e1304d2f985ed68f9246e936694ff516b0ada0338d3580b0d46ac0b"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/reports/hybrid_rf_executive_summary_v2.md",
+      "size_bytes": 1682,
+      "sha256": "5bdd865a8d06a1fc684ed35310d2b831b91022a26d5d323314d1dc4c715142c1"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/reports/hybrid_rf_final_promotion_report.md",
+      "size_bytes": 8911,
+      "sha256": "a5ad4b3d75aa9b7e26d3f31d0ae853e9e4e39005025c37d581cbc928145e105c"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/reports/hybrid_rf_generalization_confirmation.md",
+      "size_bytes": 1882,
+      "sha256": "9dcf6564040626be9e6313e66d0c7084ef048090ab46836d31fbf406c8acf597"
+    },
+    {
+      "path": "data/hybrid_rf_consolidation_v2/reports/hybrid_rf_overfitting_resolution.md",
+      "size_bytes": 1799,
+      "sha256": "b53c0e6bf02a7463190896f5edb9d3aeff47fa08563e08a8c88a0d4dd7273efb"
+    }
+  ]
+}

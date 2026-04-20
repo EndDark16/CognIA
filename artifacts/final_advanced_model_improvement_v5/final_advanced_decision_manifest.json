@@ -1,0 +1,96 @@
+{
+  "caregiver": [
+    {
+      "domain": "adhd",
+      "family": "rf",
+      "feature_variant": "engineered",
+      "target_variant": "baseline",
+      "threshold_policy": "precision_guarded"
+    },
+    {
+      "domain": "conduct",
+      "family": "rf",
+      "feature_variant": "engineered",
+      "target_variant": "baseline",
+      "threshold_policy": "balanced"
+    },
+    {
+      "domain": "elimination",
+      "family": "xgboost",
+      "feature_variant": "engineered",
+      "target_variant": "elimination_any_baseline",
+      "threshold_policy": "precision_guarded"
+    },
+    {
+      "domain": "anxiety",
+      "family": "lightgbm",
+      "feature_variant": "engineered",
+      "target_variant": "baseline",
+      "threshold_policy": "precision_guarded"
+    },
+    {
+      "domain": "depression",
+      "family": "catboost",
+      "feature_variant": "engineered",
+      "target_variant": "baseline",
+      "threshold_policy": "precision_guarded"
+    }
+  ],
+  "psychologist": [
+    {
+      "domain": "adhd",
+      "family": "rf",
+      "feature_variant": "base",
+      "target_variant": "baseline",
+      "threshold_policy": "precision_guarded"
+    },
+    {
+      "domain": "conduct",
+      "family": "catboost",
+      "feature_variant": "engineered",
+      "target_variant": "baseline",
+      "threshold_policy": "balanced"
+    },
+    {
+      "domain": "elimination",
+      "family": "lightgbm",
+      "feature_variant": "engineered",
+      "target_variant": "elimination_any_baseline",
+      "threshold_policy": "precision_guarded"
+    },
+    {
+      "domain": "anxiety",
+      "family": "lightgbm",
+      "feature_variant": "engineered",
+      "target_variant": "baseline",
+      "threshold_policy": "precision_guarded"
+    },
+    {
+      "domain": "depression",
+      "family": "catboost",
+      "feature_variant": "engineered",
+      "target_variant": "baseline",
+      "threshold_policy": "balanced"
+    }
+  ],
+  "caregiver_macro": {
+    "precision": 0.9500476665707307,
+    "recall": 0.8266782734174039,
+    "specificity": 0.9688159345111822,
+    "balanced_accuracy": 0.897747103964293,
+    "f1": 0.8796521887361687,
+    "roc_auc": 0.954871656285162,
+    "pr_auc": 0.9473208044940591,
+    "brier": 0.06676771822444487
+  },
+  "psychologist_macro": {
+    "precision": 0.9513456287482978,
+    "recall": 0.8585093167701864,
+    "specificity": 0.9630938008943118,
+    "balanced_accuracy": 0.9108015588322491,
+    "f1": 0.8992439348416432,
+    "roc_auc": 0.9561505329347206,
+    "pr_auc": 0.9502934044526601,
+    "brier": 0.06316070541811647
+  }
+}

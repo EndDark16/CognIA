@@ -1,0 +1,13 @@
+{
+  "campaign": "elimination_feature_engineering_v11_audit",
+  "decision": "HOLD_V11_NEEDS_REVISION",
+  "holdout_ordered_hash": "9529927227be7db57bfc27568de0e2cc43b9195a635c2f47559f15068fa0fe4a",
+  "holdout_set_hash": "be5c57d800b8da9a394599b21e324eeb07813cac1e2898e7f1e8e1edb5ab7b38",
+  "confidence_display_policy": {
+    "user_min": 0.01,
+    "user_max": 0.99,
+    "professional_min": 0.005,
+    "professional_max": 0.995,
+    "internal_raw_preserved": true
+  }
+}

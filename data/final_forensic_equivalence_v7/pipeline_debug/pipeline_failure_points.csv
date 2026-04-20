@@ -1,0 +1,15 @@
+failure_point,category,severity,evidence,suspected_root_cause,impact_domain_s,fix_candidate
+equivalence::conners_total,derived,high,exact_current=0.000,formula_or_flag,adhd,legacy-first + deterministic fallback
+equivalence::icut_total,derived,high,exact_current=0.000,formula_or_flag,conduct,legacy-first + deterministic fallback
+equivalence::scared_p_total,derived,high,exact_current=0.000,formula_or_flag,anxiety,legacy-first + deterministic fallback
+equivalence::scared_sr_total,derived,high,exact_current=0.000,formula_or_flag,anxiety,legacy-first + deterministic fallback
+equivalence::swan_total,derived,high,exact_current=0.010,formula_or_flag,adhd,legacy-first + deterministic fallback
+equivalence::has_conners,presence_flag,high,exact_current=0.026,formula_or_flag,adhd,legacy-first + deterministic fallback
+equivalence::has_ysr,presence_flag,high,exact_current=0.027,formula_or_flag,adhd,legacy-first + deterministic fallback
+equivalence::has_ari_sr,presence_flag,high,exact_current=0.672,formula_or_flag,conduct,legacy-first + deterministic fallback
+equivalence::mfq_p_total,derived,high,exact_current=0.724,formula_or_flag,depression,legacy-first + deterministic fallback
+equivalence::has_scared_p,presence_flag,high,exact_current=0.725,formula_or_flag,anxiety,legacy-first + deterministic fallback
+equivalence::has_ari_p,presence_flag,high,exact_current=0.729,formula_or_flag,conduct,legacy-first + deterministic fallback
+equivalence::has_scared_sr,presence_flag,high,exact_current=0.731,formula_or_flag,anxiety,legacy-first + deterministic fallback
+metric::caregiver:elimination,operating_point,medium,recall=0.683;ba=0.818,threshold_calibration_tradeoff,elimination,domain threshold refinement with recall guard
+metric::psychologist:elimination,operating_point,medium,recall=0.702;ba=0.823,threshold_calibration_tradeoff,elimination,domain threshold refinement with recall guard

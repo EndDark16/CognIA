@@ -1,0 +1,10 @@
+{
+  "run_id": "hybrid_active_modes_freeze_v1",
+  "active_models": 30,
+  "inputs_exported": 203,
+  "artifacts": {
+    "active_models": "data\\hybrid_active_modes_freeze_v1\\tables\\hybrid_active_models_30_modes.csv",
+    "inputs_master": "data\\hybrid_active_modes_freeze_v1\\tables\\hybrid_questionnaire_inputs_master.csv",
+    "summary": "data\\hybrid_active_modes_freeze_v1\\tables\\hybrid_active_modes_summary.csv"
+  }
+}

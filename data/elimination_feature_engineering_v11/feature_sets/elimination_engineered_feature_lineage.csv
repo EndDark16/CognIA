@@ -1,0 +1,29 @@
+feature_name,feature_family,source_variables,rationale,leakage_risk
+v11_core_sum,symptom_burden_composites,"cbcl_108,cbcl_112,sdq_impact",Core elimination burden from parent-observable symptoms and impact.,low
+v11_core_mean,symptom_burden_composites,"cbcl_108,cbcl_112,sdq_impact",Stabilized core burden average.,low
+v11_core_missing_count,missingness_indicators,"cbcl_108,cbcl_112,sdq_impact",Core evidence missingness count.,low
+v11_core_all_present,missingness_indicators,"cbcl_108,cbcl_112,sdq_impact",Full core evidence availability flag.,low
+v11_behavior_burden,symptom_burden_composites,"cbcl_aggressive_behavior_proxy,cbcl_rule_breaking_proxy,sdq_conduct_problems",Externalizing burden potentially confounding elimination risk.,low
+v11_internalizing_burden_parent,context_comorbidity_composites,"cbcl_internalizing_proxy,sdq_emotional_symptoms,scared_p_total",Parent internalizing context burden.,low
+v11_externalizing_burden_parent,context_comorbidity_composites,"cbcl_externalizing_proxy,sdq_hyperactivity_inattention,conners_conduct_problems",Parent externalizing context burden.,low
+v11_neurodev_overlap_parent,context_comorbidity_composites,"cbcl_attention_problems_proxy,conners_total,swan_total",Neurodevelopment overlap burden.,low
+v11_irritability_parent,impact_composites,"ari_p_symptom_total,ari_p_impairment_item",Parent irritability plus impairment composite.,low
+v11_parent_source_count,source_mix_indicators,"has_cbcl,has_sdq,has_conners,has_swan,has_scared_p,has_ari_p,has_icut,has_mfq_p",Count of parent source instruments available.,low
+v11_parent_nonmissing_ratio,missingness_indicators,"cbcl_108,cbcl_112,sdq_impact,sdq_conduct_problems,sdq_total_difficulties,conners_total,swan_total,scared_p_total,ari_p_symptom_total,icut_total,mfq_p_total",Parent non-missing ratio over elimination-relevant sources.,low
+v11_parent_signal_density,symptom_burden_composites,"v11_core_sum,conners_total,swan_total,scared_p_total,v11_core_missing_count",Signal density robust to partial missingness.,low
+v11_parent_impact_combo,impact_composites,"sdq_impact,ari_p_impairment_item",Parent impact burden composite.,low
+v11_core_balance_diff,subtype_aware_composites,"cbcl_108,cbcl_112",Difference between enuresis/encopresis-like core indicators.,low
+v11_subtype_enuresis_proxy,subtype_aware_composites,cbcl_108,Enuresis-oriented proxy signal.,low
+v11_subtype_encopresis_proxy,subtype_aware_composites,cbcl_112,Encopresis-oriented proxy signal.,low
+v11_subtype_gap_proxy,subtype_aware_composites,"cbcl_108,cbcl_112",Signed subtype skew indicator.,low
+v11_context_cross_domain_parent,context_comorbidity_composites,"v11_internalizing_burden_parent,v11_externalizing_burden_parent,v11_neurodev_overlap_parent",Cross-domain symptom context derived from parent signals.,low
+v11_context_site_release,source_mix_indicators,"site,release",Context label for source/instrument regime.,low
+v11_missingness_regime,missingness_indicators,v11_parent_nonmissing_ratio,Discrete missingness regime indicator.,low
+v11_self_internalizing_burden,source_semantics_aware,"ysr_internalizing_proxy,scared_sr_total,cdi_total,mfq_sr_total",Self-report internalizing burden under professional administration.,low
+v11_self_irritability,source_semantics_aware,"ari_sr_symptom_total,ari_sr_impairment_item",Self-report irritability with impairment.,low
+v11_parent_self_gap_scared,agreement_disagreement,"scared_p_total,scared_sr_total",Parent-self disagreement on anxiety burden.,low
+v11_parent_self_gap_ari,agreement_disagreement,"ari_p_symptom_total,ari_sr_symptom_total",Parent-self disagreement on irritability burden.,low
+v11_parent_self_gap_internalizing,agreement_disagreement,"cbcl_internalizing_proxy,ysr_internalizing_proxy",Parent-self disagreement on internalizing proxy.,low
+v11_self_source_count,source_mix_indicators,"has_ysr,has_scared_sr,has_ari_sr,has_cdi,has_mfq_sr",Self-report source availability count.,low
+v11_source_mix_full,source_mix_indicators,"v11_parent_source_count,v11_self_source_count",Total source mix count in professional mode.,low
+v11_cross_source_agreement,agreement_disagreement,"v11_parent_self_gap_scared,v11_parent_self_gap_ari,v11_parent_self_gap_internalizing",Cross-source agreement score (higher means more agreement).,low
