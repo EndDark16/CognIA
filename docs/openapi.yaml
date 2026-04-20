@@ -2405,6 +2405,276 @@ paths:
           description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación
             del flujo.
       x-contract-status: ACTIVE_BUT_LEGACY
+  /api/v1/questionnaires/{template_id}/activate:
+    post:
+      tags:
+      - Questionnaires
+      summary: Activar una plantilla clasica de cuestionario
+      description: |-
+        Que hace:
+        Activa una plantilla clasica existente para que quede como plantilla activa.
+
+        Cuando usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/v1/questionnaires/{template_id}/activate`.
+
+        Quien lo usa:
+        Lo consume tipicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Reglas obligatorias:
+        Debe respetar los parametros declarados en ruta o query: template_id.
+
+        Resultado exitoso:
+        Activa correctamente la plantilla solicitada y devuelve su identificador.
+
+        Errores posibles:
+        Este endpoint documenta explicitamente los codigos 200, 400, 401, 403, 404, 409, 500. Cada codigo debe interpretarse con la causa funcional descrita en la seccion de respuestas, no como un fallo generico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clasico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+      operationId: activateQuestionnaire
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: template_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: La accion se ejecuto correctamente y el backend devuelve el estado activado del recurso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  template_id:
+                    type: string
+                    format: uuid
+                required:
+                - msg
+                - template_id
+              examples:
+                activated:
+                  summary: Activated
+                  value:
+                    msg: template activated
+                    template_id: 2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: invalid template_id
+                    error: invalid_template_id
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticacion valida, el token expiro o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_questionnaires_template_id_activate
+                    error: forbidden_api_v1_questionnaires_template_id_activate
+          description: La cuenta esta autenticada pero no tiene permiso suficiente, o fallo una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: template not found
+                    error: template_not_found
+          description: El recurso objetivo no existe, no esta habilitado en este entorno o no es visible para el actor actual.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                template_archived:
+                  value:
+                    msg: template archived
+                    error: template_archived
+                template_empty:
+                  value:
+                    msg: template has no questions
+                    error: template_empty
+          description: La operacion entra en conflicto con el estado actual del recurso o con una restriccion de unicidad, transicion o concurrencia.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: database error
+                    error: db_error
+          description: El backend encontro una falla interna durante consulta, persistencia, generacion, inferencia o coordinacion del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+  /api/v1/questionnaires/active/clone:
+    post:
+      tags:
+      - Questionnaires
+      summary: Clonar la plantilla clasica activa
+      description: |-
+        Que hace:
+        Clona la plantilla clasica activa y crea una nueva plantilla en estado no activo.
+
+        Cuando usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/v1/questionnaires/active/clone`.
+
+        Quien lo usa:
+        Lo consume tipicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: QuestionnaireCloneRequest.
+
+        Resultado exitoso:
+        Crea correctamente una plantilla clonada y devuelve su metadata operativa.
+
+        Errores posibles:
+        Este endpoint documenta explicitamente los codigos 201, 400, 401, 403, 404, 409, 500. Cada codigo debe interpretarse con la causa funcional descrita en la seccion de respuestas, no como un fallo generico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clasico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+      operationId: cloneActiveQuestionnaire
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionnaireCloneRequest'
+            examples:
+              clone:
+                summary: Clone active template
+                value:
+                  version: v2
+                  name: Cuestionario Inicial
+                  description: Copia para ajustes internos
+      responses:
+        '201':
+          description: La operacion de creacion o bootstrap se completo correctamente y el backend devuelve el recurso creado o su metadata operativa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionnaireCloneResponse'
+              examples:
+                cloned:
+                  summary: Cloned
+                  value:
+                    template_id: 8a8dd2c1-4c8c-4c48-baa6-1b1e9bf6fa0d
+                    name: Cuestionario Inicial
+                    version: v2
+                    is_active: false
+                    question_count: 42
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: validation error
+                    error: validation_error
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticacion valida, el token expiro o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_questionnaires_active_clone
+                    error: forbidden_api_v1_questionnaires_active_clone
+          description: La cuenta esta autenticada pero no tiene permiso suficiente, o fallo una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: no active questionnaire template
+                    error: no_active_template
+          description: El recurso objetivo no existe, no esta habilitado en este entorno o no es visible para el actor actual.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_409:
+                  value:
+                    msg: template already exists
+                    error: template_exists
+          description: La operacion entra en conflicto con el estado actual del recurso o con una restriccion de unicidad, transicion o concurrencia.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: database error
+                    error: db_error
+          description: El backend encontro una falla interna durante consulta, persistencia, generacion, inferencia o coordinacion del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
   /api/v1/evaluations:
     post:
       tags:
