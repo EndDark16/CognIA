@@ -1,0 +1,33 @@
+# Hybrid Operational Freeze v1 - Overfit Decision
+
+     domain              mode source_campaign  overfit_gap_train_val_ba overfit_flag
+       adhd     caregiver_1_3      rebuild_v2                  0.019210           no
+       adhd     caregiver_2_3      rebuild_v2                  0.011594           no
+       adhd    caregiver_full      rebuild_v2                  0.060256           no
+       adhd  psychologist_1_3      rebuild_v2                  0.036095           no
+       adhd  psychologist_2_3      rebuild_v2                  0.030482           no
+       adhd psychologist_full      rebuild_v2                  0.015957           no
+    anxiety     caregiver_1_3      rebuild_v2                  0.043590           no
+    anxiety     caregiver_2_3      rebuild_v2                  0.056133           no
+    anxiety    caregiver_full      rebuild_v2                  0.046689           no
+    anxiety  psychologist_1_3      rebuild_v2                  0.030939           no
+    anxiety  psychologist_2_3      rebuild_v2                  0.045843           no
+    anxiety psychologist_full      rebuild_v2                  0.046689           no
+    conduct     caregiver_1_3      rebuild_v2                  0.069628           no
+    conduct     caregiver_2_3      rebuild_v2                  0.004702           no
+    conduct    caregiver_full      rebuild_v2                  0.004702           no
+    conduct  psychologist_1_3      rebuild_v2                  0.091631           no
+    conduct  psychologist_2_3      rebuild_v2                  0.004702           no
+    conduct psychologist_full      rebuild_v2                  0.004702           no
+ depression     caregiver_1_3      rebuild_v2                  0.123502          yes
+ depression     caregiver_2_3      rebuild_v2                  0.034396           no
+ depression    caregiver_full      boosted_v3                  0.033723           no
+ depression  psychologist_1_3      rebuild_v2                  0.114653          yes
+ depression  psychologist_2_3      rebuild_v2                  0.077835           no
+ depression psychologist_full      boosted_v3                  0.029474           no
+elimination     caregiver_1_3      boosted_v3                  0.002874           no
+elimination     caregiver_2_3      rebuild_v2                  0.010005           no
+elimination    caregiver_full      rebuild_v2                  0.038462           no
+elimination  psychologist_1_3      boosted_v3                  0.002874           no
+elimination  psychologist_2_3      rebuild_v2                  0.038462           no
+elimination psychologist_full      rebuild_v2                  0.030014           no

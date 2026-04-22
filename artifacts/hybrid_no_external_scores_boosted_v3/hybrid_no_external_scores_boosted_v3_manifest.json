@@ -1,0 +1,12 @@
+{
+  "run_id": "hybrid_no_external_scores_boosted_v3",
+  "n_trials": 249,
+  "n_candidates": 13,
+  "artifacts": {
+    "inventory": "data\\hybrid_no_external_scores_boosted_v3\\inventory\\hybrid_no_external_scores_boosted_inventory.csv",
+    "trials": "data\\hybrid_no_external_scores_boosted_v3\\trials\\hybrid_no_external_scores_boosted_trial_metrics_full.csv",
+    "final_ranked": "data\\hybrid_no_external_scores_boosted_v3\\tables\\hybrid_no_external_scores_boosted_final_ranked_models.csv",
+    "final_champions": "data\\hybrid_no_external_scores_boosted_v3\\tables\\hybrid_no_external_scores_boosted_final_champions.csv",
+    "comparison_vs_v2": "data\\hybrid_no_external_scores_boosted_v3\\tables\\hybrid_no_external_scores_boosted_vs_v2_comparison.csv"
+  }
+}

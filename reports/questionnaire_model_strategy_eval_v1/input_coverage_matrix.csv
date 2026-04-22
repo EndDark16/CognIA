@@ -1,0 +1,354 @@
+input_key,domain,source_instrument_or_origin,input_type,caregiver_answerable_yes_no,self_report_only_yes_no,can_be_derived_yes_no,can_be_system_filled_yes_no,should_remain_missing_yes_no,required_by_current_runtime_yes_no,required_by_all_domains_yes_no,proposed_question_needed_yes_no,proposed_question_text_if_applicable,response_type,response_scale,section,priority,notes
+age_years,adhd,demographic_or_system,numeric_range,yes,no,no,no,no,yes,yes,yes,Edad del niño o niña (años cumplidos),numeric_range,6.0|11.0,contexto,high,
+sex_assigned_at_birth,adhd,demographic_or_system,single_choice,yes,no,no,no,no,yes,yes,yes,Sexo asignado al nacer,single_choice,Female|Male|Unknown,contexto,high,
+site,adhd,demographic_or_system,single_choice,yes,no,no,yes,no,yes,no,no,,single_choice,CBIC|CUNY|RUBIC|Staten Island,contexto,medium,system_filled_candidate
+release,adhd,demographic_or_system,numeric_range,yes,no,no,yes,no,yes,no,no,,numeric_range,11.0|11.0,contexto,medium,system_filled_candidate
+has_swan,adhd,instrument_availability,boolean,yes,no,no,yes,no,yes,no,no,,boolean,0|1,dominio_adhd,medium,system_filled_candidate
+swan_hyperactive_impulsive_total,adhd,SWAN_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SWAN hyperactive impulsive total,numeric_range,-17.0|18.0,dominio_adhd,medium,
+swan_inattention_total,adhd,SWAN_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SWAN inattention total,numeric_range,-27.0|27.0,dominio_adhd,medium,
+swan_total,adhd,SWAN_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SWAN total,numeric_range,-43.0|44.0,dominio_adhd,medium,
+has_conners,adhd,instrument_availability,boolean,yes,no,no,yes,no,yes,no,no,,boolean,0|1,dominio_adhd,medium,system_filled_candidate
+conners_cognitive_problems,adhd,Conners,numeric_range,no,yes,no,no,yes,yes,no,no,,numeric_range,6.0|15.0,dominio_adhd,low,self_report_only
+conners_conduct_problems,adhd,Conners,numeric_range,no,yes,no,no,yes,yes,no,no,,numeric_range,2.0|22.0,dominio_adhd,low,self_report_only
+conners_hyperactivity,adhd,Conners,numeric_range,no,yes,no,no,yes,yes,no,no,,numeric_range,0.0|27.0,dominio_adhd,low,self_report_only
+conners_total,adhd,Conners,numeric_range,no,yes,no,no,yes,yes,no,no,,numeric_range,11.0|63.0,dominio_adhd,low,self_report_only
+has_cbcl,adhd,instrument_availability,boolean,yes,no,no,yes,no,yes,yes,no,,boolean,0|1,dominio_adhd,high,system_filled_candidate
+cbcl_aggressive_behavior_proxy,adhd,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL aggressive behavior proxy,numeric_range,1.0|19.0,dominio_conduct,high,
+cbcl_anxious_depressed_proxy,adhd,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL anxious depressed proxy,numeric_range,0.0|20.0,dominio_depression,high,
+cbcl_attention_problems_proxy,adhd,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL attention problems proxy,numeric_range,0.0|20.0,dominio_adhd,high,
+cbcl_externalizing_proxy,adhd,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL externalizing proxy,numeric_range,2.0|40.0,dominio_adhd,high,
+cbcl_internalizing_proxy,adhd,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL internalizing proxy,numeric_range,0.0|38.0,dominio_adhd,high,
+cbcl_rule_breaking_proxy,adhd,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL rule breaking proxy,numeric_range,0.0|22.0,dominio_conduct,high,
+has_sdq,adhd,instrument_availability,boolean,yes,no,no,yes,no,yes,yes,no,,boolean,0|1,dominio_adhd,high,system_filled_candidate
+sdq_conduct_problems,adhd,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ conduct problems,numeric_range,0.0|10.0,dominio_conduct,high,
+sdq_emotional_symptoms,adhd,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ emotional symptoms,numeric_range,0.0|8.0,dominio_adhd,high,
+sdq_hyperactivity_inattention,adhd,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ hyperactivity inattention,numeric_range,0.0|10.0,dominio_adhd,high,
+sdq_impact,adhd,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ impact,numeric_range,0.0|7.0,dominio_adhd,high,
+sdq_peer_problems,adhd,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SDQ peer problems,numeric_range,0.0|10.0,dominio_adhd,medium,
+sdq_prosocial_behavior,adhd,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SDQ prosocial behavior,numeric_range,0.0|8.0,dominio_adhd,medium,
+sdq_total_difficulties,adhd,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ total difficulties,numeric_range,0.0|38.0,dominio_adhd,high,
+has_ysr,adhd,instrument_availability,boolean,yes,no,yes,yes,no,yes,no,no,,boolean,0|1,dominio_adhd,medium,derivable_or_proxy;system_filled_candidate
+ysr_aggressive_behavior_proxy,adhd,YSR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,2.0|22.0,dominio_conduct,low,self_report_only;derivable_or_proxy
+ysr_anxious_depressed_proxy,adhd,YSR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|18.0,dominio_depression,low,self_report_only;derivable_or_proxy
+ysr_attention_problems_proxy,adhd,YSR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|20.0,dominio_adhd,low,self_report_only;derivable_or_proxy
+ysr_externalizing_proxy,adhd,YSR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,4.0|39.0,dominio_adhd,low,self_report_only;derivable_or_proxy
+ysr_internalizing_proxy,adhd,YSR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,3.0|32.0,dominio_adhd,low,self_report_only;derivable_or_proxy
+ysr_rule_breaking_proxy,adhd,YSR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,1.0|17.0,dominio_conduct,low,self_report_only;derivable_or_proxy
+age_years,conduct,demographic_or_system,numeric_range,yes,no,no,no,no,yes,yes,yes,Edad del niño o niña (años cumplidos),numeric_range,6.0|11.0,contexto,high,
+sex_assigned_at_birth,conduct,demographic_or_system,single_choice,yes,no,no,no,no,yes,yes,yes,Sexo asignado al nacer,single_choice,Female|Male|Unknown,contexto,high,
+site,conduct,demographic_or_system,single_choice,yes,no,no,yes,no,yes,no,no,,single_choice,CBIC|CUNY|RUBIC|Staten Island,contexto,medium,system_filled_candidate
+release,conduct,demographic_or_system,numeric_range,yes,no,no,yes,no,yes,no,no,,numeric_range,11.0|11.0,contexto,medium,system_filled_candidate
+has_icut,conduct,instrument_availability,boolean,yes,no,no,yes,no,yes,no,no,,boolean,0|1,dominio_conduct,medium,system_filled_candidate
+icut_total,conduct,ICU_parent,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: ICU total,numeric_range,6.0|60.0,dominio_conduct,medium,
+has_ari_p,conduct,instrument_availability,boolean,yes,no,no,yes,no,yes,no,no,,boolean,0|1,dominio_conduct,medium,system_filled_candidate
+ari_p_symptom_total,conduct,ARI_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: ARI p symptom total,numeric_range,0.0|12.0,dominio_conduct,medium,
+has_ari_sr,conduct,instrument_availability,boolean,yes,no,yes,yes,no,yes,no,no,,boolean,0|1,dominio_conduct,medium,derivable_or_proxy;system_filled_candidate
+ari_sr_symptom_total,conduct,ARI_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|12.0,dominio_conduct,low,self_report_only;derivable_or_proxy
+has_cbcl,conduct,instrument_availability,boolean,yes,no,no,yes,no,yes,yes,no,,boolean,0|1,dominio_conduct,high,system_filled_candidate
+cbcl_aggressive_behavior_proxy,conduct,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL aggressive behavior proxy,numeric_range,1.0|19.0,dominio_conduct,high,
+cbcl_anxious_depressed_proxy,conduct,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL anxious depressed proxy,numeric_range,0.0|20.0,dominio_depression,high,
+cbcl_attention_problems_proxy,conduct,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL attention problems proxy,numeric_range,0.0|20.0,dominio_adhd,high,
+cbcl_externalizing_proxy,conduct,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL externalizing proxy,numeric_range,2.0|40.0,dominio_conduct,high,
+cbcl_internalizing_proxy,conduct,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL internalizing proxy,numeric_range,0.0|38.0,dominio_conduct,high,
+cbcl_rule_breaking_proxy,conduct,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL rule breaking proxy,numeric_range,0.0|22.0,dominio_conduct,high,
+has_sdq,conduct,instrument_availability,boolean,yes,no,no,yes,no,yes,yes,no,,boolean,0|1,dominio_conduct,high,system_filled_candidate
+sdq_conduct_problems,conduct,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ conduct problems,numeric_range,0.0|10.0,dominio_conduct,high,
+sdq_emotional_symptoms,conduct,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ emotional symptoms,numeric_range,0.0|8.0,dominio_conduct,high,
+sdq_hyperactivity_inattention,conduct,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ hyperactivity inattention,numeric_range,0.0|10.0,dominio_adhd,high,
+sdq_impact,conduct,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ impact,numeric_range,0.0|7.0,dominio_conduct,high,
+sdq_total_difficulties,conduct,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ total difficulties,numeric_range,0.0|38.0,dominio_conduct,high,
+age_years,elimination,demographic_or_system,numeric_range,yes,no,no,no,no,yes,yes,yes,Edad del niño o niña (años cumplidos),numeric_range,6.0|11.0,contexto,high,
+sex_assigned_at_birth,elimination,demographic_or_system,single_choice,yes,no,no,no,no,yes,yes,yes,Sexo asignado al nacer,single_choice,Female|Male|Unknown,contexto,high,
+site,elimination,demographic_or_system,single_choice,yes,no,no,yes,no,yes,no,no,,single_choice,CBIC|CUNY|RUBIC|Staten Island,contexto,medium,system_filled_candidate
+release,elimination,demographic_or_system,numeric_range,yes,no,no,yes,no,yes,no,no,,numeric_range,11.0|11.0,contexto,medium,system_filled_candidate
+has_cbcl,elimination,instrument_availability,boolean,yes,no,no,yes,no,yes,yes,no,,boolean,0|1,dominio_elimination,high,system_filled_candidate
+cbcl_aggressive_behavior_proxy,elimination,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL aggressive behavior proxy,numeric_range,1.0|19.0,dominio_conduct,high,
+cbcl_anxious_depressed_proxy,elimination,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL anxious depressed proxy,numeric_range,0.0|20.0,dominio_depression,high,
+cbcl_attention_problems_proxy,elimination,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL attention problems proxy,numeric_range,0.0|20.0,dominio_adhd,high,
+cbcl_externalizing_proxy,elimination,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL externalizing proxy,numeric_range,2.0|40.0,dominio_elimination,high,
+cbcl_internalizing_proxy,elimination,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL internalizing proxy,numeric_range,0.0|38.0,dominio_elimination,high,
+cbcl_rule_breaking_proxy,elimination,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL rule breaking proxy,numeric_range,0.0|22.0,dominio_conduct,high,
+has_sdq,elimination,instrument_availability,boolean,yes,no,no,yes,no,yes,yes,no,,boolean,0|1,dominio_elimination,high,system_filled_candidate
+sdq_conduct_problems,elimination,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ conduct problems,numeric_range,0.0|10.0,dominio_conduct,high,
+sdq_emotional_symptoms,elimination,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ emotional symptoms,numeric_range,0.0|8.0,dominio_elimination,high,
+sdq_hyperactivity_inattention,elimination,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ hyperactivity inattention,numeric_range,0.0|10.0,dominio_adhd,high,
+sdq_impact,elimination,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ impact,numeric_range,0.0|7.0,dominio_elimination,high,
+sdq_total_difficulties,elimination,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ total difficulties,numeric_range,0.0|38.0,dominio_elimination,high,
+age_years,anxiety,demographic_or_system,numeric_range,yes,no,no,no,no,yes,yes,yes,Edad del niño o niña (años cumplidos),numeric_range,6.0|11.0,contexto,high,
+sex_assigned_at_birth,anxiety,demographic_or_system,single_choice,yes,no,no,no,no,yes,yes,yes,Sexo asignado al nacer,single_choice,Female|Male|Unknown,contexto,high,
+site,anxiety,demographic_or_system,single_choice,yes,no,no,yes,no,yes,no,no,,single_choice,CBIC|CUNY|RUBIC|Staten Island,contexto,medium,system_filled_candidate
+release,anxiety,demographic_or_system,numeric_range,yes,no,no,yes,no,yes,no,no,,numeric_range,11.0|11.0,contexto,medium,system_filled_candidate
+has_scared_p,anxiety,instrument_availability,boolean,yes,no,no,yes,no,yes,no,no,,boolean,0|1,dominio_anxiety,medium,system_filled_candidate
+scared_p_01,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_02,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_03,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_04,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_05,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_06,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_07,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_08,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_09,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_10,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_11,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_12,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_13,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_14,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_15,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_16,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_17,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_18,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_19,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_20,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_21,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_22,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_23,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_24,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_25,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_26,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_27,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_28,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_29,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_30,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_31,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_32,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_33,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_34,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_35,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_36,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_37,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_38,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_39,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_40,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_41,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+scared_p_generalized_anxiety,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SCARED p generalized anxiety,numeric_range,0.0|14.0,dominio_anxiety,medium,
+scared_p_panic_somatic,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SCARED p panic somatic,numeric_range,0.0|20.0,dominio_anxiety,medium,
+scared_p_possible_anxiety_disorder_cut25,anxiety,SCARED_P_caregiver,boolean,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SCARED p possible anxiety disorder cut25,boolean,0|1,dominio_anxiety,medium,
+scared_p_school_avoidance,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SCARED p school avoidance,numeric_range,0.0|8.0,dominio_anxiety,medium,
+scared_p_separation_anxiety,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SCARED p separation anxiety,numeric_range,0.0|14.0,dominio_anxiety,medium,
+scared_p_social_anxiety,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SCARED p social anxiety,numeric_range,0.0|11.0,dominio_anxiety,medium,
+scared_p_total,anxiety,SCARED_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SCARED p total,numeric_range,3.0|66.0,dominio_anxiety,medium,
+has_scared_sr,anxiety,instrument_availability,boolean,yes,no,yes,yes,no,yes,no,no,,boolean,0|1,dominio_anxiety,medium,derivable_or_proxy;system_filled_candidate
+scared_sr_01,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_02,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_03,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_04,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_05,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_06,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_07,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_08,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_09,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_10,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_11,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_12,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_13,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_14,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_15,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_16,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_17,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_18,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_19,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_20,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_21,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_22,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_23,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_24,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_25,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_26,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_27,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_28,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_29,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_30,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_31,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_32,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_33,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_34,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_35,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_36,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_37,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_38,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_39,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_40,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_41,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_generalized_anxiety,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|18.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_panic_somatic,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|22.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_possible_anxiety_disorder_cut25,anxiety,SCARED_SR_self_report,boolean,no,yes,yes,no,no,yes,no,no,,boolean,0|1,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_school_avoidance,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|8.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_separation_anxiety,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|16.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_social_anxiety,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,0.0|14.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+scared_sr_total,anxiety,SCARED_SR_self_report,numeric_range,no,yes,yes,no,no,yes,no,no,,numeric_range,1.0|78.0,dominio_anxiety,low,self_report_only;derivable_or_proxy
+has_cbcl,anxiety,instrument_availability,boolean,yes,no,no,yes,no,yes,yes,no,,boolean,0|1,dominio_anxiety,high,system_filled_candidate
+cbcl_001,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_002,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_003,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_004,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_005,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_006,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_007,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_008,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_009,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_010,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_011,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_012,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_013,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_014,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_015,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_016,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_017,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_018,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_019,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_020,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_021,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_022,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_023,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_024,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_025,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: CBCL 025,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_026,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_027,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_028,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_029,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_030,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_031,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_032,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_033,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_034,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_035,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_036,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_037,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_038,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_039,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_040,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_041,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_042,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_043,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_044,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_045,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_046,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_047,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_048,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_049,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_050,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_051,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_052,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_053,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_054,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_055,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_056,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_057,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: CBCL 057,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_058,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: CBCL 058,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_059,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_060,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: CBCL 060,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_061,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: CBCL 061,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_062,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: CBCL 062,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_063,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: CBCL 063,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_064,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: CBCL 064,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_065,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: CBCL 065,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_066,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: CBCL 066,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_067,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_068,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_069,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_070,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: CBCL 070,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_071,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_072,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_073,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_074,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_075,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_076,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_077,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_078,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_079,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_080,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_081,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_082,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_083,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_084,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_085,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_086,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_087,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_088,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_089,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_090,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_091,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_092,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_093,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_094,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_095,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_096,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_097,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_098,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_099,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_100,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_101,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_102,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_103,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_104,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_105,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_106,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_107,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_108,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_109,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_110,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_111,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_112,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_113,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_114,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_115,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_116,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_117,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_118,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+cbcl_aggressive_behavior_proxy,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL aggressive behavior proxy,numeric_range,1.0|19.0,dominio_conduct,high,
+cbcl_anxious_depressed_proxy,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL anxious depressed proxy,numeric_range,0.0|20.0,dominio_depression,high,
+cbcl_attention_problems_proxy,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL attention problems proxy,numeric_range,0.0|20.0,dominio_adhd,high,
+cbcl_externalizing_proxy,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL externalizing proxy,numeric_range,2.0|40.0,dominio_anxiety,high,
+cbcl_internalizing_proxy,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL internalizing proxy,numeric_range,0.0|38.0,dominio_anxiety,high,
+cbcl_rule_breaking_proxy,anxiety,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL rule breaking proxy,numeric_range,0.0|22.0,dominio_conduct,high,
+has_sdq,anxiety,instrument_availability,boolean,yes,no,no,yes,no,yes,yes,no,,boolean,0|1,dominio_anxiety,high,system_filled_candidate
+sdq_01,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_02,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_03,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_04,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_05,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_06,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_07,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_08,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_09,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_10,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_11,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_12,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_13,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_14,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_15,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_16,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_17,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_18,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_19,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_20,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_21,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_22,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_23,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_24,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_25,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,no,,numeric_range,0.0|2.0,dominio_anxiety,medium,
+sdq_conduct_problems,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ conduct problems,numeric_range,0.0|10.0,dominio_conduct,high,
+sdq_emotional_symptoms,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ emotional symptoms,numeric_range,0.0|8.0,dominio_anxiety,high,
+sdq_hyperactivity_inattention,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ hyperactivity inattention,numeric_range,0.0|10.0,dominio_adhd,high,
+sdq_impact,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ impact,numeric_range,0.0|7.0,dominio_anxiety,high,
+sdq_peer_problems,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SDQ peer problems,numeric_range,0.0|10.0,dominio_anxiety,medium,
+sdq_prosocial_behavior,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SDQ prosocial behavior,numeric_range,0.0|8.0,dominio_anxiety,medium,
+sdq_total_difficulties,anxiety,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ total difficulties,numeric_range,0.0|38.0,dominio_anxiety,high,
+cbcl_internalizing_proxy,depression,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL internalizing proxy,numeric_range,0.0|38.0,dominio_depression,high,
+cbcl_anxious_depressed_proxy,depression,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL anxious depressed proxy,numeric_range,0.0|20.0,dominio_depression,high,
+mfq_p_total,depression,MFQ_P_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: MFQ p total,numeric_range,0.0|60.0,dominio_depression,medium,
+sdq_total_difficulties,depression,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ total difficulties,numeric_range,0.0|38.0,dominio_depression,high,
+sdq_peer_problems,depression,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SDQ peer problems,numeric_range,0.0|10.0,dominio_depression,medium,
+sdq_emotional_symptoms,depression,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ emotional symptoms,numeric_range,0.0|8.0,dominio_depression,high,
+sdq_hyperactivity_inattention,depression,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ hyperactivity inattention,numeric_range,0.0|10.0,dominio_adhd,high,
+sdq_conduct_problems,depression,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ conduct problems,numeric_range,0.0|10.0,dominio_conduct,high,
+sdq_prosocial_behavior,depression,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,no,yes,Reporte cuidador: SDQ prosocial behavior,numeric_range,0.0|8.0,dominio_depression,medium,
+sdq_impact,depression,SDQ_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: SDQ impact,numeric_range,0.0|7.0,dominio_depression,high,
+cbcl_attention_problems_proxy,depression,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL attention problems proxy,numeric_range,0.0|20.0,dominio_adhd,high,
+cbcl_externalizing_proxy,depression,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL externalizing proxy,numeric_range,2.0|40.0,dominio_depression,high,
+cbcl_aggressive_behavior_proxy,depression,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL aggressive behavior proxy,numeric_range,1.0|19.0,dominio_conduct,high,
+cbcl_rule_breaking_proxy,depression,CBCL_caregiver,numeric_range,yes,no,no,no,no,yes,yes,yes,Reporte cuidador: CBCL rule breaking proxy,numeric_range,0.0|22.0,dominio_conduct,high,
+age_years,depression,demographic_or_system,numeric_range,yes,no,no,no,no,yes,yes,yes,Edad del niño o niña (años cumplidos),numeric_range,6.0|11.0,contexto,high,
+has_cbcl,depression,instrument_availability,boolean,yes,no,no,yes,no,yes,yes,no,,boolean,0|1,dominio_depression,high,system_filled_candidate
+has_sdq,depression,instrument_availability,boolean,yes,no,no,yes,no,yes,yes,no,,boolean,0|1,dominio_depression,high,system_filled_candidate
+sex_assigned_at_birth,depression,demographic_or_system,single_choice,yes,no,no,no,no,yes,yes,yes,Sexo asignado al nacer,single_choice,Female|Male|Unknown,contexto,high,

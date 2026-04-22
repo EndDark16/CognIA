@@ -1,0 +1,12 @@
+item,value
+campaign_line,hybrid_rf_consolidation_v2
+dataset_path,data/hybrid_dsm5_rebuild_v1/hybrid_dataset_synthetic_complete_final.csv
+dataset_n_rows,2400
+dataset_n_columns,229
+candidates_requested,13
+candidates_loaded,13
+audit_scope,targeted_candidates_only
+seed_variants,0|17|43
+alt_split_seeds,20260721|20260819
+threshold_policies,default_0_5|precision_oriented|balanced|recall_constrained
+created_at_utc,2026-04-12T15:56:28.524356+00:00

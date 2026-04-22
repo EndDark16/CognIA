@@ -1,0 +1,3 @@
+architecture_id,description,expected_benefit
+single_stage,single classifier + threshold + abstention band,baseline
+two_stage_precision_filter,stage1 detect + stage2 stricter precision filter,reduce FP at cost of recall

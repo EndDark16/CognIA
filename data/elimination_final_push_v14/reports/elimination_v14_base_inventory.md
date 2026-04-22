@@ -1,0 +1,5 @@
+# elimination v14 base inventory
+
+        mode  baseline_precision  baseline_recall  baseline_ba  baseline_pr_auc  baseline_brier baseline_output_status                                             holdout_hash_ordered                                                 holdout_hash_set                                 open_limitations confidence_user_clip confidence_prof_clip
+   caregiver            0.868421         0.819876     0.829938         0.915299        0.135959  uncertainty_preferred 9529927227be7db57bfc27568de0e2cc43b9195a635c2f47559f15068fa0fe4a be5c57d800b8da9a394599b21e324eeb07813cac1e2898e7f1e8e1edb5ab7b38 FN pressure + coverage fragility under CBCL drop          [0.01,0.99]        [0.005,0.995]
+psychologist            0.847561         0.863354     0.831677         0.912164        0.134631  uncertainty_preferred 9529927227be7db57bfc27568de0e2cc43b9195a635c2f47559f15068fa0fe4a be5c57d800b8da9a394599b21e324eeb07813cac1e2898e7f1e8e1edb5ab7b38 FN pressure + coverage fragility under CBCL drop          [0.01,0.99]        [0.005,0.995]

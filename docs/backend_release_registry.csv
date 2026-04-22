@@ -1,0 +1,2 @@
+﻿release_id,backend_version,release_date,base_commit_short,pytest_passed,pytest_skipped,status,notes_path,manifest_path
+backend_release_2026-04-22_r1,2026.04.22-r1,2026-04-22,05f8f12,139,3,published,docs/releases/backend_release_2026-04-22_r1.md,artifacts/backend_release_registry/backend_release_2026-04-22_r1_manifest.json

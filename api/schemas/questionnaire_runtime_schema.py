@@ -1,7 +1,7 @@
 from marshmallow import EXCLUDE, Schema, ValidationError, fields, validate, validates_schema
 
 
-ALLOWED_RESPONDENT_TYPES = ("caregiver", "psychologist")
+ALLOWED_RESPONDENT_TYPES = ("guardian", "psychologist")
 ALLOWED_DISCLOSURE_TYPES = (
     "consent_pre",
     "disclaimer_pre",
@@ -31,7 +31,7 @@ class RuntimeAnswerItemSchema(BaseSchema):
 
 class RuntimeCreateDraftSchema(BaseSchema):
     respondent_type = fields.String(
-        load_default="caregiver",
+        load_default="guardian",
         validate=validate.OneOf(ALLOWED_RESPONDENT_TYPES),
     )
     child_age_years = fields.Integer(
