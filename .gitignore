@@ -59,6 +59,7 @@ desktop.ini
 .idea/
 .history/
 .codex/
+.worktrees/
 
 # -----------------------------
 # Secrets / local context

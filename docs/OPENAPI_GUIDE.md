@@ -6,6 +6,7 @@ Objetivo: mantener una especificacion OpenAPI 3.0.3 profesional, consistente y a
 - Contrato publico activo: `docs/openapi.yaml`.
 - Referencias historicas: `docs/archive/openapi/` (no usar como fuente operativa).
 - Matriz contractual de endpoints: `docs/endpoint_lifecycle_matrix.md`.
+- Swagger UI (`GET /docs`) debe consumir `GET /openapi.yaml` y esa ruta debe servir exactamente `docs/openapi.yaml`.
 
 ## Alcance obligatorio de documentacion
 Cada operacion (`get/post/put/patch/delete`) debe incluir:

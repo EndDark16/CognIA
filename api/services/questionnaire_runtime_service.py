@@ -659,16 +659,30 @@ def _active_version() -> QRQuestionnaireVersion | None:
 def _default_question_features() -> list[str]:
     selected: list[str] = ["age_years", "sex_assigned_at_birth", "site", "release"]
     seen = set(selected)
+    contract = _feature_contract_map()
     for domain in DOMAIN_ORDER:
-        runtime = load_domain_runtime(domain)
-        top = runtime.top_features or []
-        extracted = []
-        for feat in top:
-            base = _extract_feature_from_top(feat)
-            if base:
-                extracted.append(base)
-        if not extracted:
-            extracted = runtime.feature_columns[:12]
+        extracted: list[str] = []
+        try:
+            runtime = load_domain_runtime(domain)
+            top = runtime.top_features or []
+            for feat in top:
+                base = _extract_feature_from_top(feat)
+                if base:
+                    extracted.append(base)
+            if not extracted:
+                extracted = runtime.feature_columns[:12]
+        except FileNotFoundError as exc:
+            # Allow questionnaire bootstrap/listing even when model artifacts are absent.
+            current_app.logger.warning(
+                "runtime_artifacts_unavailable_for_default_questions domain=%s error=%s",
+                domain,
+                exc,
+            )
+            extracted = [
+                feature
+                for feature, spec in contract.items()
+                if (spec.get("domain") or "").strip().lower() == domain
+            ][:12]
         for feat in extracted[:12]:
             if feat and feat not in seen:
                 seen.add(feat)

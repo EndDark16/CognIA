@@ -234,6 +234,18 @@ Detalles: `docs/problem_reporting_backend.md`.
 - Flujo recomendado: feature branch -> `dev.enddark` -> `development`.
 - Usar plantilla de PR en `.github/pull_request_template.md`.
 
+## Rama canonica y politica de worktrees
+- Rama canonica operativa: `development` (sin sobrescribirla desde ramas atrasadas o experimentales).
+- Antes de limpiar/remover worktrees:
+  - exportar estado (`git status`, `git diff`, `git ls-files --others`) y crear snapshot de seguridad.
+  - clasificar cambios contra `origin/development` (`KEEP`, `CHERRY_PICK_SAFE`, `MANUAL_PORT_REQUIRED`, `REJECT_*`).
+- No usar worktrees como fuente paralela de contrato API.
+- Si un worktree queda obsoleto:
+  - preservar respaldo no destructivo,
+  - remover worktree,
+  - mantener la rama para trazabilidad si aplica.
+- Evitar crear worktrees dentro del repo que puedan contaminar el arbol principal; si se usan, quedan ignorados por `.gitignore`.
+
 ## Troubleshooting rapido
 - `401/403` en endpoints protegidos: validar JWT, roles y MFA.
 - `503` en readiness: revisar conectividad DB y variables.
