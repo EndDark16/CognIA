@@ -366,6 +366,8 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
 
     pdf_meta = client.get(f"/api/v2/questionnaires/history/{session_id}/pdf", headers=owner_headers)
     assert pdf_meta.status_code == 200
+    assert "file_path" not in pdf_meta.json
+    assert pdf_meta.json["download_url"].endswith(f"/api/v2/questionnaires/history/{session_id}/pdf/download")
 
     pdf_download = client.get(f"/api/v2/questionnaires/history/{session_id}/pdf/download", headers=owner_headers)
     assert pdf_download.status_code == 200

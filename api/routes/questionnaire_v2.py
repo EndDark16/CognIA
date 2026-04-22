@@ -451,7 +451,7 @@ def pdf_metadata(session_id: str):
         {
             "pdf_id": str(export.id),
             "file_name": export.file_name,
-            "file_path": export.file_path,
+            "download_url": f"/api/v2/questionnaires/history/{session_id}/pdf/download",
             "created_at": export.created_at.isoformat() if export.created_at else None,
         }
     ), 200
