@@ -1,0 +1,7 @@
+feature_set_id,avg_n_features,min_n_features,max_n_features,mode_domain_coverage,winner_count
+precision_oriented_subset,50.0,24,81,30,8
+compact_robust_subset,56.333333333333336,27,91,30,3
+stability_pruned_subset,62.5,30,101,30,6
+balanced_subset,68.66666666666667,32,111,30,6
+top_importance_filtered,87.33333333333333,41,141,30,0
+full_eligible,125.0,59,202,30,7

@@ -1,0 +1,7 @@
+mode,role,direct_features_from_priority_matrix,direct_features_usable_in_dataset,transparent_derived_eligible,total_eligible_features
+caregiver_1_3,caregiver,49,49,10,59
+caregiver_2_3,caregiver,98,98,15,113
+caregiver_full,caregiver,147,147,22,169
+psychologist_1_3,psychologist,60,60,11,71
+psychologist_2_3,psychologist,120,120,16,136
+psychologist_full,psychologist,180,180,22,202

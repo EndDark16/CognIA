@@ -1,0 +1,3 @@
+mode,direct_questions_count,inputs_covered_directly,inputs_covered_by_derivation,total_inputs_covered,total_inputs_missing,self_report_only_inputs,clinician_only_inputs,system_filled_inputs,presence_flags,estimated_minutes_if_complete,main_risks,notes
+caregiver,32,32,15,47,0,0,0,2,6,23,elimination uncertainty_preferred; equivalencia historica por_confirmar,Cobertura anclada a modelos finales v15/v4
+psychologist,258,258,25,283,0,59,236,2,10,141,elimination uncertainty_preferred; equivalencia historica por_confirmar,Cobertura anclada a modelos finales v15/v4

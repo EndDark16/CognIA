@@ -1,0 +1,9 @@
+suite,test_file,tests_passed,tests_failed,status,notes
+questionnaire_runtime_v1,tests/models/test_questionnaire_runtime_service.py,3,0,passed,unit_policy_and_pin
+questionnaire_runtime_v1,tests/smoke/test_questionnaire_runtime_smoke.py,1,0,passed,smoke_active_endpoint
+questionnaire_runtime_v1,tests/api/test_questionnaire_runtime_api.py,3,0,passed,user_professional_admin_flows
+regression_subset,tests/test_questionnaires.py,5,0,passed,legacy_questionnaire_ok
+regression_subset,tests/test_evaluations.py,5,0,passed,legacy_evaluation_ok
+regression_subset,tests/models/test_model_service_runtime.py,3,0,passed,legacy_model_service_ok
+regression_subset,tests/api/test_predict_api_runtime.py,1,0,passed,legacy_predict_endpoint_ok
+aggregate,selected_suite_total,21,0,passed,full_selected_suite_green

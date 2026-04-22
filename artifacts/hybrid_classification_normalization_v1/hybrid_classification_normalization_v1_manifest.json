@@ -1,0 +1,17 @@
+{
+  "run_id": "hybrid_classification_normalization_v1",
+  "generated_at_utc": "2026-04-22T00:58:19.893079+00:00",
+  "source_operational_v2": "data\\hybrid_operational_freeze_v2\\tables\\hybrid_operational_final_champions.csv",
+  "source_active_v2": "data\\hybrid_active_modes_freeze_v2\\tables\\hybrid_active_models_30_modes.csv",
+  "source_operational_v3": "data\\hybrid_operational_freeze_v3\\tables\\hybrid_operational_final_champions.csv",
+  "source_active_v3": "data\\hybrid_active_modes_freeze_v3\\tables\\hybrid_active_models_30_modes.csv",
+  "shortcut_inventory": "data\\hybrid_secondary_honest_retrain_v1\\tables\\non_conduct_suspect_inventory.csv",
+  "outputs": {
+    "summary": "data\\hybrid_classification_normalization_v1\\tables\\hybrid_classification_normalization_summary.csv",
+    "normalized_v2": "data\\hybrid_classification_normalization_v1\\tables\\hybrid_operational_classification_normalized_v2.csv",
+    "review_v2": "data\\hybrid_classification_normalization_v1\\inventory\\hybrid_classification_review_list_v2.csv",
+    "focus_full_2_3_v2": "data\\hybrid_classification_normalization_v1\\inventory\\hybrid_classification_review_priority_full_2_3_v2.csv"
+  },
+  "policy_violation_count_v2": 0,
+  "policy_violation_count_v3": 0
+}

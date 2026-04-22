@@ -154,6 +154,9 @@ Variables criticas:
 - Questionnaires legacy: `/api/v1/questionnaires/*`
 - Questionnaire runtime v1: `/api/v1/questionnaire-runtime/*`
 - Questionnaire v2: `/api/v2/*`
+- Nota de migracion:
+  - `POST /api/v1/questionnaires/{template_id}/activate` se mantiene por compatibilidad, pero el reemplazo operativo recomendado es `POST /api/admin/questionnaires/{template_id}/publish`.
+  - `POST /api/v1/questionnaires/active/clone` se mantiene por compatibilidad, pero el reemplazo operativo recomendado es `POST /api/admin/questionnaires/{template_id}/clone`.
 - Problem reports:
   - `POST /api/problem-reports`
   - `GET /api/problem-reports/mine`
@@ -195,6 +198,16 @@ Detalles: `docs/problem_reporting_backend.md`.
 ## Trazabilidad
 - Estado y decisiones: `AGENTS.md`, `docs/HANDOFF.md`.
 - Mapa de trazabilidad: `docs/traceability_map.md`.
+- Matriz de brechas backend 9-25: `docs/backend_gap_matrix_20260422.md`.
+- Ingesta de playbook de despliegue externo: `docs/deployment_playbook_ingest_20260422.md`.
+- Versionado backend:
+  - `VERSION`
+  - `CHANGELOG.md`
+  - `docs/backend_versioning_policy.md`
+  - `docs/backend_release_workflow.md`
+  - `docs/backend_release_registry.csv`
+  - `docs/releases/backend_release_2026-04-22_r1.md`
+  - `artifacts/backend_release_registry/backend_release_2026-04-22_r1_manifest.json`
 - Cierre final: `reports/final_closure/`.
 
 ## Politica de artefactos del repositorio

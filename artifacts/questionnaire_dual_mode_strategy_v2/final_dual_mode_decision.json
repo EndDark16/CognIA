@@ -1,0 +1,46 @@
+{
+  "caregiver_winner_route": "C",
+  "psychologist_strategy": "P",
+  "caregiver_macro": [
+    {
+      "route": "A",
+      "precision": 0.8911963679555063,
+      "recall": 0.8769311123658949,
+      "specificity": 0.9232362163622255,
+      "balanced_accuracy": 0.9000836643640604,
+      "f1": 0.8810810164293923,
+      "roc_auc": 0.9632190077007612,
+      "pr_auc": 0.9658433405418382,
+      "brier": 0.06628652837491601,
+      "imputed_fill_pct": 0.0,
+      "derived_fill_pct": 0.0
+    },
+    {
+      "route": "B",
+      "precision": 0.8882468503968856,
+      "recall": 0.8414983687809775,
+      "specificity": 0.9309521548305402,
+      "balanced_accuracy": 0.8862252618057589,
+      "f1": 0.8557106425174004,
+      "roc_auc": 0.9577805735421073,
+      "pr_auc": 0.9576736629781729,
+      "brier": 0.07244689814773295,
+      "imputed_fill_pct": 0.22255635766947984,
+      "derived_fill_pct": 0.0955355346994143
+    },
+    {
+      "route": "C",
+      "precision": 0.91538796324887,
+      "recall": 0.890241075349771,
+      "specificity": 0.9419939459318101,
+      "balanced_accuracy": 0.9161175106407905,
+      "f1": 0.90093791002625,
+      "roc_auc": 0.9757043972792132,
+      "pr_auc": 0.970637673921918,
+      "brier": 0.058817170422667084,
+      "imputed_fill_pct": 0.0,
+      "derived_fill_pct": 0.0
+    }
+  ],
+  "psychologist_macro_balanced_accuracy": 0.8934127483214006
+}

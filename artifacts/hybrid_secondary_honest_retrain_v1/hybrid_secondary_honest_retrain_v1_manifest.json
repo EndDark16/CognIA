@@ -1,0 +1,84 @@
+{
+  "line": "hybrid_secondary_honest_retrain_v1",
+  "generated_at_utc": "2026-04-21T23:40:58.773905+00:00",
+  "priority_targets": [
+    "depression/caregiver_1_3",
+    "depression/psychologist_1_3"
+  ],
+  "source_truth_updates": {
+    "operational": "data/hybrid_operational_freeze_v3/tables/hybrid_operational_final_champions.csv",
+    "active": "data/hybrid_active_modes_freeze_v3/tables/hybrid_active_models_30_modes.csv"
+  },
+  "generated_files": [
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/ablation/secondary_honest_ablation.csv",
+      "sha256": "f2b1e7ef35ce4b32eb9361d174166b8a06ecc5bd5f675e01500fcd8f4ba58cce",
+      "bytes": 1485
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/bootstrap/secondary_honest_bootstrap_intervals.csv",
+      "sha256": "4b2d0e65448e21f7df0790bb325011cce45554a674b26b5fef06a28c26b578df",
+      "bytes": 15205
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/inventory/models_demoted.csv",
+      "sha256": "8aa20b1217b26b645aa2d67bb74e663340b91f9d5b26793a737c19132d5b67c2",
+      "bytes": 791
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/reports/hybrid_secondary_honest_retrain_summary.md",
+      "sha256": "f2b5af342829a9e8b75a7dd7f18b6a3f8af09f4a78b7c545aaaa846e7cf2e002",
+      "bytes": 4623
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/reports/secondary_demotion_decision.md",
+      "sha256": "a31b3d72fc898835c6ae065a03e329cf873346bef85510bea2983ca1ff5a9023",
+      "bytes": 112
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/stability/secondary_honest_seed_stability.csv",
+      "sha256": "a4348a697462a1d0e5c5ca327e3a7bbceff5be03e9afc71506a8f82abad4013a",
+      "bytes": 982
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/stress/secondary_honest_stress.csv",
+      "sha256": "45524e1ae2ed2a384d44e8f5fdad4417196309b95a41dbd49108358f49fbc765",
+      "bytes": 1780
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/tables/non_conduct_suspect_inventory.csv",
+      "sha256": "641a76859fab3f27e773a164522f8ce27ad2d942286ca63f262445a67f16058f",
+      "bytes": 8044
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/tables/retrain_targets.csv",
+      "sha256": "1bdfee5fd330682a65295aeb1eb95f5bfabddc4ca9efe120b1fbf4d37fe414e4",
+      "bytes": 694
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/tables/secondary_honest_retrain_selected_models.csv",
+      "sha256": "31353493a016777b9587606bdac0870ef349e6789ae4dd141b6ea01f0b20079d",
+      "bytes": 7369
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/tables/secondary_old_vs_new_comparison.csv",
+      "sha256": "92555138a56aff4115c79fdfd548bfb7945060918e236b1a81580df906b307b2",
+      "bytes": 3327
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/trials/secondary_honest_retrain_trials.csv",
+      "sha256": "e33d68df26d4c5fe5e9ce5d256d517dd582a157399644eafe67db9a279acb494",
+      "bytes": 251255
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/validation/duplicate_audit_global.csv",
+      "sha256": "5927efab2036e5cdb20b8725165e2bb06b595e82511c584c3019064dd00a0e8f",
+      "bytes": 54
+    },
+    {
+      "path": "data/hybrid_secondary_honest_retrain_v1/validation/split_registry.csv",
+      "sha256": "53f8b7d4ce6bf1511e1a944b5799d2115729395a8abc3c8d47b85eef327136ab",
+      "bytes": 676
+    }
+  ]
+}

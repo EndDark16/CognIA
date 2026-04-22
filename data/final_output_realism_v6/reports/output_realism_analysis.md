@@ -1,0 +1,42 @@
+# Output realism analysis
+
+- Casos simulados: 730
+- Predicciones evaluadas: 3650
+- Incluye escenarios base, parciales y de tensión en modo cuidador y psicólogo.
+
+        mode      domain risk_band   n
+   caregiver        adhd      high 160
+   caregiver        adhd       low 141
+   caregiver        adhd  moderate  41
+   caregiver        adhd uncertain  23
+   caregiver     anxiety      high  73
+   caregiver     anxiety  moderate 276
+   caregiver     anxiety uncertain  16
+   caregiver     conduct      high  82
+   caregiver     conduct  moderate 257
+   caregiver     conduct uncertain  26
+   caregiver  depression      high 132
+   caregiver  depression  moderate 218
+   caregiver  depression uncertain  15
+   caregiver elimination      high 135
+   caregiver elimination       low 216
+   caregiver elimination  moderate   3
+   caregiver elimination uncertain  11
+psychologist        adhd      high 163
+psychologist        adhd       low 132
+psychologist        adhd  moderate   3
+psychologist        adhd uncertain  67
+psychologist     anxiety      high  88
+psychologist     anxiety  moderate 251
+psychologist     anxiety uncertain  26
+psychologist     conduct      high  99
+psychologist     conduct       low 263
+psychologist     conduct  moderate   1
+psychologist     conduct uncertain   2
+psychologist  depression      high 149
+psychologist  depression  moderate 210
+psychologist  depression uncertain   6
+psychologist elimination      high 170
+psychologist elimination       low 136
+psychologist elimination  moderate  47
+psychologist elimination uncertain  12

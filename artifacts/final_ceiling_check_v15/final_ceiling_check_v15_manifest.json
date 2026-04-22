@@ -1,0 +1,18 @@
+{
+  "generated_at_utc": "2026-04-06T13:24:25.121761+00:00",
+  "line": "final_ceiling_check_v15",
+  "generated_files": [
+    "data/final_ceiling_check_v15/inventory/final_model_inventory.csv",
+    "data/final_ceiling_check_v15/reports/final_model_inventory.md",
+    "data/final_ceiling_check_v15/comparison/domain_version_progression.csv",
+    "data/final_ceiling_check_v15/reports/domain_version_progression.md",
+    "data/final_ceiling_check_v15/bootstrap/bootstrap_metric_intervals.csv",
+    "data/final_ceiling_check_v15/reports/bootstrap_metric_analysis.md",
+    "data/final_ceiling_check_v15/stability/final_stability_matrix.csv",
+    "data/final_ceiling_check_v15/reports/final_stability_analysis.md",
+    "data/final_ceiling_check_v15/tables/ceiling_status_matrix.csv",
+    "data/final_ceiling_check_v15/reports/ceiling_status_analysis.md",
+    "data/final_ceiling_check_v15/reports/elimination_ceiling_analysis.md",
+    "data/final_ceiling_check_v15/reports/thesis_ceiling_conclusion.md"
+  ]
+}

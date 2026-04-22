@@ -1,0 +1,36 @@
+domain,check,n_train,n_val,n_test,value,status,notes
+adhd,participant_overlap,1333,286,286,0.0,pass,"overlap train-val=0, train-test=0, val-test=0"
+adhd,duplicate_ids_within_split,1333,286,286,0.0,pass,"duplicates train=0, val=0, test=0"
+adhd,exact_feature_hash_overlap,1333,286,286,0.0,informational,"hash_overlap train-test=0, val-test=0"
+adhd,distribution_gap_sex_assigned_at_birth_train_vs_test,1333,286,286,0.020420314868927036,pass,max_abs_share_gap=0.0204
+adhd,distribution_gap_site_train_vs_test,1333,286,286,0.054288921880819824,pass,max_abs_share_gap=0.0543
+adhd,distribution_gap_release_train_vs_test,1333,286,286,0.0,pass,max_abs_share_gap=0.0000
+adhd,age_mean_gap_train_vs_test,1333,286,286,0.09855523321389903,pass,"mean_train=9.023, mean_test=8.924"
+conduct,participant_overlap,1333,286,286,0.0,pass,"overlap train-val=0, train-test=0, val-test=0"
+conduct,duplicate_ids_within_split,1333,286,286,0.0,pass,"duplicates train=0, val=0, test=0"
+conduct,exact_feature_hash_overlap,1333,286,286,0.0,informational,"hash_overlap train-test=0, val-test=0"
+conduct,distribution_gap_sex_assigned_at_birth_train_vs_test,1333,286,286,0.02329253642081852,pass,max_abs_share_gap=0.0233
+conduct,distribution_gap_site_train_vs_test,1333,286,286,0.027536604430827977,pass,max_abs_share_gap=0.0275
+conduct,distribution_gap_release_train_vs_test,1333,286,286,0.0,pass,max_abs_share_gap=0.0000
+conduct,age_mean_gap_train_vs_test,1333,286,286,0.06794836821093675,pass,"mean_train=8.987, mean_test=9.055"
+elimination,participant_overlap,1333,286,286,0.0,pass,"overlap train-val=0, train-test=0, val-test=0"
+elimination,duplicate_ids_within_split,1333,286,286,0.0,pass,"duplicates train=0, val=0, test=0"
+elimination,exact_feature_hash_overlap,1333,286,286,0.0,informational,"hash_overlap train-test=0, val-test=0"
+elimination,distribution_gap_sex_assigned_at_birth_train_vs_test,1333,286,286,0.012435801258006807,pass,max_abs_share_gap=0.0124
+elimination,distribution_gap_site_train_vs_test,1333,286,286,0.0367644358642108,pass,max_abs_share_gap=0.0368
+elimination,distribution_gap_release_train_vs_test,1333,286,286,0.0,pass,max_abs_share_gap=0.0000
+elimination,age_mean_gap_train_vs_test,1333,286,286,0.037966309759259076,pass,"mean_train=9.017, mean_test=9.055"
+anxiety,participant_overlap,1333,286,286,0.0,pass,"overlap train-val=0, train-test=0, val-test=0"
+anxiety,duplicate_ids_within_split,1333,286,286,0.0,pass,"duplicates train=0, val=0, test=0"
+anxiety,exact_feature_hash_overlap,1333,286,286,0.0,informational,"hash_overlap train-test=0, val-test=0"
+anxiety,distribution_gap_sex_assigned_at_birth_train_vs_test,1333,286,286,0.043280050781926205,pass,max_abs_share_gap=0.0433
+anxiety,distribution_gap_site_train_vs_test,1333,286,286,0.04563553475781529,pass,max_abs_share_gap=0.0456
+anxiety,distribution_gap_release_train_vs_test,1333,286,286,0.0,pass,max_abs_share_gap=0.0000
+anxiety,age_mean_gap_train_vs_test,1333,286,286,0.03820185815684596,pass,"mean_train=8.992, mean_test=8.954"
+depression,participant_overlap,1333,286,286,0.0,pass,"overlap train-val=0, train-test=0, val-test=0"
+depression,duplicate_ids_within_split,1333,286,286,0.0,pass,"duplicates train=0, val=0, test=0"
+depression,exact_feature_hash_overlap,1333,286,286,0.0,informational,"hash_overlap train-test=0, val-test=0"
+depression,distribution_gap_sex_assigned_at_birth_train_vs_test,1333,286,286,0.0020721963707709956,pass,max_abs_share_gap=0.0021
+depression,distribution_gap_site_train_vs_test,1333,286,286,0.031075076461423046,pass,max_abs_share_gap=0.0311
+depression,distribution_gap_release_train_vs_test,1333,286,286,0.0,pass,max_abs_share_gap=0.0000
+depression,age_mean_gap_train_vs_test,1333,286,286,0.022424050068460488,pass,"mean_train=9.017, mean_test=8.995"

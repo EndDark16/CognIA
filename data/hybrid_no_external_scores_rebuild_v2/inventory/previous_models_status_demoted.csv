@@ -1,0 +1,6 @@
+line,status_1,status_2,updated_at_utc
+hybrid_rf_ceiling_push_v1,historical_trace_only,not_functional_for_new_primary_line,2026-04-13T16:27:01.082577+00:00
+hybrid_rf_consolidation_v2,historical_trace_only,not_functional_for_new_primary_line,2026-04-13T16:27:01.082577+00:00
+hybrid_rf_final_ceiling_push_v3,historical_trace_only,not_functional_for_new_primary_line,2026-04-13T16:27:01.082577+00:00
+hybrid_rf_targeted_fix_v4,historical_trace_only,not_functional_for_new_primary_line,2026-04-13T16:27:01.082577+00:00
+hybrid_final_freeze_v1,historical_trace_only,not_functional_for_new_primary_line,2026-04-13T16:27:01.082577+00:00

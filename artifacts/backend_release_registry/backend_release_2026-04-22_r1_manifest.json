@@ -1,0 +1,35 @@
+﻿{
+  "release_id": "backend_release_2026-04-22_r1",
+  "backend_version": "2026.04.22-r1",
+  "release_date": "2026-04-22",
+  "base_commit_short": "05f8f12",
+  "source_of_truth": {
+    "version_file": "VERSION",
+    "changelog": "CHANGELOG.md",
+    "release_note": "docs/releases/backend_release_2026-04-22_r1.md",
+    "versioning_policy": "docs/backend_versioning_policy.md"
+  },
+  "highlights": [
+    "Documentacion backend 9-25 cerrada con evidencia",
+    "OpenAPI y referencia API alineadas para legacy v1 y reemplazos admin/v2",
+    "Se agregan POST /api/admin/roles y POST /api/admin/impersonate/{user_id}",
+    "Ajuste de rate limit en POST /api/auth/password/forgot",
+    "Ingesta de playbook externo de despliegue"
+  ],
+  "validation": {
+    "openapi_runtime_alignment": "passed",
+    "pytest_q": {
+      "passed": 139,
+      "skipped": 3,
+      "failed": 0
+    }
+  },
+  "methodological_claim": {
+    "screening_support_simulated_environment": true,
+    "automatic_clinical_diagnosis": false
+  },
+  "pending_confirmations": [
+    "Versionado en este repo de todos los artefactos de deploy descritos en el playbook externo",
+    "Evidencia operativa final multi-repo/infra para declarar plataforma unica definitiva"
+  ]
+}

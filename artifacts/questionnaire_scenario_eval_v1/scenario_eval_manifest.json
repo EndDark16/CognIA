@@ -1,0 +1,24 @@
+{
+  "line": "questionnaire_scenario_eval_v1",
+  "generated_at_utc": "2026-04-11T17:41:43.382560+00:00",
+  "scope": {
+    "non_elimination_valid_from": "final_hardening_v10",
+    "elimination_valid_from": "elimination_clean_rebuild_v12",
+    "no_retraining": true,
+    "split": "strict_full_test"
+  },
+  "scenarios": [
+    "caregiver",
+    "psychologist_no_has",
+    "psychologist_with_has"
+  ],
+  "best_scenario_global": "psychologist_no_has",
+  "has_flags_material_effect": "no_material",
+  "files": [
+    "data\\questionnaire_scenario_eval_v1\\scenario_results.csv",
+    "data\\questionnaire_scenario_eval_v1\\scenario_metrics_by_domain.csv",
+    "data\\questionnaire_scenario_eval_v1\\scenario_coverage_summary.csv",
+    "data\\questionnaire_scenario_eval_v1\\tables\\scenario_delta_vs_best.csv",
+    "data\\questionnaire_scenario_eval_v1\\reports\\scenario_decision_report.md"
+  ]
+}

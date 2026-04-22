@@ -13,6 +13,7 @@ def _error(message: str, error: str, status_code: int, details=None):
     payload = {"msg": message, "error": error}
     if details is not None:
         payload["details"] = details
+        payload["errors"] = details
     return jsonify(payload), status_code
 
 

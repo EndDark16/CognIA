@@ -1,9 +1,13 @@
-# Questionnaire API Contract (v2)
+ï»¿# Questionnaire API Contract (v2)
 
 Base path: `/api/v2`
 
+## Alcance metodologico obligatorio
+- Backend orientado a entorno simulado para screening/apoyo profesional.
+- No usar este contrato para afirmar diagnostico clinico automatico.
+
 ## Cuestionario y sesiones
-- `GET /questionnaires/active?mode=short|medium|complete&role=caregiver|psychologist`
+- `GET /questionnaires/active?mode=short|medium|complete&role=guardian|psychologist`
 - `POST /questionnaires/sessions`
 - `GET /questionnaires/sessions/{id}`
 - `GET /questionnaires/sessions/{id}/page?page=1&page_size=20`
@@ -50,8 +54,15 @@ Base path: `/api/v2`
 ## Admin bootstrap
 - `POST /questionnaires/admin/bootstrap` (requiere `ADMIN`)
 
+## Compatibilidad y migracion v1 -> v2/admin
+- El flujo recomendado para integraciones nuevas es v2 (`/api/v2/questionnaires/*`).
+- Los endpoints legacy de `api/v1/questionnaires` se mantienen por compatibilidad, pero deben considerarse deprecados para desarrollo nuevo.
+- Mapeo de reemplazo operativo:
+  - `POST /api/v1/questionnaires/{template_id}/activate` -> `POST /api/admin/questionnaires/{template_id}/publish`
+  - `POST /api/v1/questionnaires/active/clone` -> `POST /api/admin/questionnaires/{template_id}/clone`
+
 ## Respuesta de resultados por dominio
-Cada dominio retorna mínimo:
+Cada dominio retorna minimo:
 - `probability`
 - `alert_level`
 - `confidence_pct`
@@ -64,4 +75,4 @@ Cada dominio retorna mínimo:
 - `result_summary`
 - `needs_professional_review`
 
-Nota: contrato de apoyo de screening; no diagnóstico automático.
+Nota: contrato de apoyo de screening; no diagnostico automatico.

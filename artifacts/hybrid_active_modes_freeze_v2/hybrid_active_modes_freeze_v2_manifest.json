@@ -1,0 +1,8 @@
+{
+  "run_id": "hybrid_active_modes_freeze_v2",
+  "base_line": "hybrid_active_modes_freeze_v1",
+  "replacement_line": "hybrid_conduct_honest_retrain_v1",
+  "replaced_pairs": 4,
+  "path": "data/hybrid_active_modes_freeze_v2/tables/hybrid_active_models_30_modes.csv",
+  "generated_at_utc": "2026-04-21T07:02:01.315571+00:00"
+}
