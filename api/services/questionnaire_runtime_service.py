@@ -1219,8 +1219,10 @@ def create_evaluation_draft(user_id: uuid.UUID, payload: dict[str, Any]) -> tupl
         current_app.config.get("EVALUATION_MAX_AGE", 11)
     ):
         raise ValueError("invalid_child_age")
-    respondent_type = (payload.get("respondent_type") or "caregiver").strip().lower()
-    if respondent_type not in {"caregiver", "psychologist"}:
+    respondent_type = (payload.get("respondent_type") or "guardian").strip().lower()
+    if respondent_type == "caregiver":
+        respondent_type = "guardian"
+    if respondent_type not in {"guardian", "psychologist"}:
         raise ValueError("invalid_respondent_type")
 
     disclosures = _disclosures_for_new_evaluation(version.id)

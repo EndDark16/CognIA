@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 import uuid
 
@@ -97,7 +97,7 @@ def test_questionnaire_runtime_user_flow_completed_and_results(client, app):
     assert len(first_questions) >= 1
 
     draft_payload = {
-        "respondent_type": "caregiver",
+        "respondent_type": "guardian",
         "child_age_years": 9,
         "child_sex_assigned_at_birth": "Male",
         "consent_accepted": True,
@@ -187,7 +187,7 @@ def test_questionnaire_runtime_professional_access_and_soft_delete(client, app):
     draft = client.post(
         "/api/v1/questionnaire-runtime/evaluations/draft",
         json={
-            "respondent_type": "caregiver",
+            "respondent_type": "guardian",
             "child_age_years": 10,
             "child_sex_assigned_at_birth": "Female",
             "consent_accepted": True,
@@ -307,8 +307,9 @@ def test_questionnaire_runtime_create_draft_validates_payload(client, app):
 
     invalid = client.post(
         "/api/v1/questionnaire-runtime/evaluations/draft",
-        json={"respondent_type": "caregiver", "child_age_years": 3},
+        json={"respondent_type": "guardian", "child_age_years": 3},
         headers=headers,
     )
     assert invalid.status_code == 400
     assert invalid.json["error"] == "validation_error"
+

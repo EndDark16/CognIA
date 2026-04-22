@@ -1,0 +1,103 @@
+{
+  "line": "hybrid_final_honest_improvement_v1",
+  "generated_at_utc": "2026-04-21T23:00:45.401636+00:00",
+  "focus": {
+    "domains": [
+      "anxiety",
+      "depression",
+      "elimination"
+    ],
+    "mode_suffix": [
+      "_2_3",
+      "_full"
+    ],
+    "source_operational": "data/hybrid_operational_freeze_v2/tables/hybrid_operational_final_champions.csv",
+    "source_active": "data/hybrid_active_modes_freeze_v2/tables/hybrid_active_models_30_modes.csv"
+  },
+  "source_truth_updates": {
+    "operational": "data/hybrid_operational_freeze_v4/tables/hybrid_operational_final_champions.csv",
+    "active": "data/hybrid_active_modes_freeze_v4/tables/hybrid_active_models_30_modes.csv"
+  },
+  "stats": {
+    "focus_slots": 12,
+    "deep_targets": 12,
+    "promoted": 9
+  },
+  "generated_files": [
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/ablation/final_honest_ablation.csv",
+      "sha256": "4896e64c5c43e4d671b9f04c8a886b1350de7901c7b6b691adbdaeecec45e58c",
+      "bytes": 3884
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/bootstrap/final_honest_bootstrap_intervals.csv",
+      "sha256": "3b4dfb685378b0ae373218f493bcc3a3e7ba7a6565ef0720e2deeb7d242cfaba",
+      "bytes": 103992
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/inventory/models_demoted.csv",
+      "sha256": "cf269689583316ab63df0d7973064b7a6733bf26fdb96e8f4d47f25562dc9f7d",
+      "bytes": 27566
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/reports/hybrid_final_honest_improvement_summary.md",
+      "sha256": "25439c5586aff41c9193a9c6cc0dcb7e672b3b8613418b20986e9489e28995a4",
+      "bytes": 58614
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/stability/final_honest_seed_stability.csv",
+      "sha256": "c7287b2d356c1720278f8c199efac594341740d44838ca2ae6316e1808736a54",
+      "bytes": 4066
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/stress/final_honest_stress.csv",
+      "sha256": "13f8481a0422df348c480abdba9e0fd8a8d09bec3fac8eb9e55db17d41499367",
+      "bytes": 5257
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/tables/deep_retrain_targets.csv",
+      "sha256": "cdfe9ebc5171d6437f836387dabd9d37d04723dee7b466044edb13e63cc2e889",
+      "bytes": 8694
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/tables/final_honest_improvement_selected_models.csv",
+      "sha256": "8e48ed12b7961b56c9783ed51cdb3febe2323c7c246167736696965daaa0aeef",
+      "bytes": 39624
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/tables/final_old_vs_new_comparison.csv",
+      "sha256": "ef6a78b9c02c39dc000ef6ef859e738f121db022aa137ec05004b6e019993b65",
+      "bytes": 7684
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/tables/focus_margin_audit.csv",
+      "sha256": "039bfc58fa54e957cda0fd11e668ac3905a9f6304888ddc8a4c5dd16dfea97ac",
+      "bytes": 8694
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/tables/focus_slots_inventory.csv",
+      "sha256": "500a8c7f2a56a5778a090537bcf349fbcfeeeb05060338b5dc10d8f6938e83ff",
+      "bytes": 6917
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/trials/final_honest_improvement_trials.csv",
+      "sha256": "f2f96e37024b56077e5633effdc7d11f781e1a8cb083021c80cf274dd5166268",
+      "bytes": 1100052
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/trials/focus_margin_trials.csv",
+      "sha256": "329dea9448e8908d830b29772a5435325d0874d036454e47234aabd145148908",
+      "bytes": 730659
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/validation/duplicate_audit_global.csv",
+      "sha256": "5927efab2036e5cdb20b8725165e2bb06b595e82511c584c3019064dd00a0e8f",
+      "bytes": 54
+    },
+    {
+      "path": "data/hybrid_final_honest_improvement_v1/validation/split_registry.csv",
+      "sha256": "53f8b7d4ce6bf1511e1a944b5799d2115729395a8abc3c8d47b85eef327136ab",
+      "bytes": 676
+    }
+  ]
+}

@@ -19,7 +19,7 @@ info:
     - endpoint experimental o legacy de predicción.
 
     Aclaración metodológica:
-    Los resultados entregados por CognIA son de apoyo operativo y de screening temprano. No constituyen diagnóstico clínico automático.
+    Los resultados entregados por CognIA son de apoyo operativo y de screening temprano en entorno simulado. No constituyen diagnóstico clínico automático.
 
     Gobernanza de contrato:
     - `docs/openapi.yaml` es la fuente oficial del Swagger servido por el backend.
@@ -513,10 +513,15 @@ paths:
             schema:
               $ref: '#/components/schemas/LoginRequest'
             examples:
-              typical:
+              username:
                 summary: Username/password
                 value:
                   username: guardian_01
+                  password: P4ssw0rd!
+              email:
+                summary: Email/password
+                value:
+                  identifier: guardian@example.com
                   password: P4ssw0rd!
       responses:
         '200':
@@ -2029,6 +2034,197 @@ paths:
           description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación
             del flujo.
       x-contract-status: ACTIVE
+  /api/mfa/recovery-codes/status:
+    get:
+      tags:
+      - MFA
+      summary: Consultar estado operativo de códigos de recuperación MFA
+      description: |-
+        Qué hace:
+        Consultar el inventario operativo de recovery codes del usuario autenticado (disponibles, usados, expirados y recomendación de rotación).
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `GET /api/mfa/recovery-codes/status`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend autenticado durante seguridad de cuenta.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        MFA debe estar habilitado para la cuenta.
+
+        Resultado exitoso:
+        Devuelve estado consolidado de recovery codes para soporte de decisión operativa.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 429. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+      operationId: getMfaRecoveryCodesStatus
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Devuelve el estado de códigos de recuperación para el usuario autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MFARecoveryStatusResponse'
+              examples:
+                status:
+                  summary: Recovery status
+                  value:
+                    mfa_enabled: true
+                    recovery_codes_available: 8
+                    recovery_codes_used: 2
+                    recovery_codes_expired_unused: 0
+                    rotation_recommended: false
+        '400':
+          description: La solicitud no cumple precondiciones operativas del endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: El recurso objetivo no existe o no es visible para el actor actual.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-contract-status: ACTIVE
+  /api/mfa/recovery-codes/regenerate:
+    post:
+      tags:
+      - MFA
+      summary: Regenerar recovery codes MFA con verificación fuerte
+      description: |-
+        Qué hace:
+        Regenera el set completo de recovery codes del usuario autenticado, invalidando los anteriores.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/mfa/recovery-codes/regenerate`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend autenticado durante seguridad de cuenta.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: MFARecoveryRegenerateRequest.
+
+        Reglas obligatorias:
+        Debe enviarse contraseña y un segundo factor válido (`code` TOTP o `recovery_code` vigente).
+
+        Resultado exitoso:
+        Devuelve el nuevo set de recovery codes en texto plano para resguardo inmediato.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+      operationId: regenerateMfaRecoveryCodes
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MFARecoveryRegenerateRequest'
+            examples:
+              totp:
+                summary: Regenerate with TOTP
+                value:
+                  password: P4ssw0rd!
+                  code: '123456'
+              recovery:
+                summary: Regenerate with recovery code
+                value:
+                  password: P4ssw0rd!
+                  recovery_code: a1b2c3d4
+      responses:
+        '200':
+          description: Regeneración ejecutada correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MFARecoveryRegenerateResponse'
+              examples:
+                regenerated:
+                  summary: New recovery codes
+                  value:
+                    recovery_codes:
+                    - n4p9q1z7
+                    - k2m8r5t0
+        '400':
+          description: La solicitud no cumple validaciones o precondiciones de negocio del endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No existe autenticación válida o el factor enviado no es aceptado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: El recurso objetivo no existe o no es visible para el actor actual.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: El backend encontró una falla interna durante la regeneración.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-contract-status: ACTIVE
   /api/v1/questionnaires/active:
     get:
       tags:
@@ -2434,10 +2630,12 @@ paths:
 
         Limitaciones actuales:
         Este bloque pertenece al contrato clasico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+        Se considera deprecado para desarrollo nuevo. Reemplazo recomendado: `POST /api/admin/questionnaires/{template_id}/publish`.
 
         Estado contractual:
         `ACTIVE_BUT_LEGACY`
       operationId: activateQuestionnaire
+      deprecated: true
       x-roles:
       - ADMIN
       security:
@@ -2571,10 +2769,12 @@ paths:
 
         Limitaciones actuales:
         Este bloque pertenece al contrato clasico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+        Se considera deprecado para desarrollo nuevo. Reemplazo recomendado: `POST /api/admin/questionnaires/{template_id}/clone`.
 
         Estado contractual:
         `ACTIVE_BUT_LEGACY`
       operationId: cloneActiveQuestionnaire
+      deprecated: true
       x-roles:
       - ADMIN
       security:
@@ -5503,6 +5703,88 @@ paths:
                     error: server_error
           description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación
             del flujo.
+    post:
+      tags:
+      - Admin
+      summary: Crear un rol administrativo nuevo
+      description: |-
+        Qué hace:
+        Crea un rol reutilizable para gobierno de permisos.
+
+        Cuándo usarlo:
+        Debe invocarse cuando administración necesita registrar un nuevo rol funcional.
+
+        Quién lo usa:
+        Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: AdminRoleCreateRequest.
+
+        Resultado exitoso:
+        Devuelve el rol creado y su identificador.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 201, 400, 401, 403, 409, 429, 500.
+
+        Estado contractual:
+        `ACTIVE`
+      operationId: createAdminRole
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminRoleCreateRequest'
+      responses:
+        '201':
+          description: Rol creado correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminRoleItem'
+        '400':
+          description: Solicitud invalida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Token invalido o expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos administrativos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: El rol ya existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Se superó el límite de solicitudes permitido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Falla interna del backend.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       x-contract-status: ACTIVE
   /api/admin/users/{id}/roles:
     post:
@@ -6100,6 +6382,113 @@ paths:
                     error: server_error
           description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación
             del flujo.
+      x-contract-status: ACTIVE
+  /api/admin/impersonate/{user_id}:
+    post:
+      tags:
+      - Admin
+      summary: Emitir un access token de impersonacion para un usuario objetivo
+      description: |-
+        Qué hace:
+        Emite un token de acceso temporal para que un administrador pueda reproducir el contexto operativo de un usuario objetivo.
+
+        Cuándo usarlo:
+        Debe invocarse cuando se requiere depuracion o soporte sobre el flujo del usuario sin compartir credenciales.
+
+        Quién lo usa:
+        Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Reglas obligatorias:
+        Debe respetar los parametros declarados en ruta o query: user_id.
+
+        Resultado exitoso:
+        Devuelve un `access_token` temporal con metadata de expiracion para la sesion de impersonacion.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 409, 429, 500.
+
+        Estado contractual:
+        `ACTIVE`
+      operationId: postAdminImpersonateUser
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Token temporal de impersonacion emitido correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                    example: bearer
+                  expires_in:
+                    type: integer
+                  impersonated_user_id:
+                    type: string
+                    format: uuid
+                required:
+                - access_token
+                - token_type
+                - expires_in
+                - impersonated_user_id
+        '400':
+          description: Solicitud invalida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Token invalido o expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos administrativos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Usuario objetivo no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Usuario objetivo inactivo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Se superó el límite de solicitudes permitido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Falla interna del backend.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       x-contract-status: ACTIVE
   /api/problem-reports:
     post:
@@ -14431,9 +14820,9 @@ components:
       schema:
         type: string
         enum:
-        - caregiver
+        - guardian
         - psychologist
-        default: caregiver
+        default: guardian
     IncludeFullParam:
       in: query
       name: include_full
@@ -14671,15 +15060,27 @@ components:
     LoginRequest:
       type: object
       required:
-      - username
       - password
       properties:
+        identifier:
+          type: string
+          description: Username o email. Si se envía, tiene prioridad.
+          minLength: 3
+          maxLength: 254
+          example: guardian@example.com
         username:
           type: string
+          description: Legacy login field (username). Compatible.
           minLength: 3
           maxLength: 32
           pattern: ^[A-Za-z0-9._-]{3,32}$
           example: testuser
+        email:
+          type: string
+          description: Legacy login field (email). Compatible.
+          maxLength: 254
+          format: email
+          example: test@example.com
         password:
           type: string
           format: password
@@ -15422,6 +15823,57 @@ components:
           type: string
         recovery_code:
           type: string
+    MFARecoveryStatusResponse:
+      type: object
+      properties:
+        mfa_enabled:
+          type: boolean
+          example: true
+        recovery_codes_available:
+          type: integer
+          example: 8
+        recovery_codes_used:
+          type: integer
+          example: 2
+        recovery_codes_expired_unused:
+          type: integer
+          example: 0
+        rotation_recommended:
+          type: boolean
+          example: false
+    MFARecoveryRegenerateRequest:
+      type: object
+      required:
+      - password
+      anyOf:
+      - required:
+        - code
+      - required:
+        - recovery_code
+      properties:
+        password:
+          type: string
+          format: password
+        code:
+          type: string
+          description: TOTP code
+          minLength: 6
+          maxLength: 10
+          example: '123456'
+        recovery_code:
+          type: string
+          description: One-time recovery code vigente
+          example: a1b2c3d4
+    MFARecoveryRegenerateResponse:
+      type: object
+      properties:
+        recovery_codes:
+          type: array
+          items:
+            type: string
+          example:
+          - n4p9q1z7
+          - k2m8r5t0
     PasswordChangeRequest:
       type: object
       required:

@@ -28,14 +28,48 @@ Where:
 - Runtime/API contract references:
   - `docs/questionnaire_api_contract.md`
   - `docs/questionnaire_backend_architecture.md`
+  - `docs/auth_mfa_recovery_flow_and_endpoint_versioning_20260421.md`
+  - `docs/backend_gap_matrix_20260422.md`
+  - `docs/deployment_playbook_ingest_20260422.md`
+
+### Backend release governance
+- `VERSION`
+- `CHANGELOG.md`
+- `docs/backend_versioning_policy.md`
+- `docs/backend_release_workflow.md`
+- `docs/backend_release_registry.csv`
+- `docs/releases/backend_release_2026-04-22_r1.md`
+- `artifacts/backend_release_registry/backend_release_2026-04-22_r1_manifest.json`
 
 ### Model activation and champions
 - Active 30-mode activation:
-  - `data/hybrid_active_modes_freeze_v1/`
-  - `artifacts/hybrid_active_modes_freeze_v1/`
+  - `data/hybrid_active_modes_freeze_v4/`
+  - `artifacts/hybrid_active_modes_freeze_v4/`
 - Operational champions:
-  - `data/hybrid_operational_freeze_v1/`
-  - `artifacts/hybrid_operational_freeze_v1/`
+  - `data/hybrid_operational_freeze_v4/`
+  - `artifacts/hybrid_operational_freeze_v4/`
+
+Audit lines:
+- `data/hybrid_secondary_honest_retrain_v1/`
+- `data/hybrid_final_honest_improvement_v1/`
+- `data/hybrid_operational_freeze_v3/`
+- `data/hybrid_operational_freeze_v4/`
+- `data/hybrid_active_modes_freeze_v3/`
+- `data/hybrid_active_modes_freeze_v4/`
+- `artifacts/hybrid_secondary_honest_retrain_v1/`
+- `artifacts/hybrid_final_honest_improvement_v1/`
+- `artifacts/hybrid_operational_freeze_v3/`
+- `artifacts/hybrid_operational_freeze_v4/`
+- `artifacts/hybrid_active_modes_freeze_v3/`
+- `artifacts/hybrid_active_modes_freeze_v4/`
+- Estado (2026-04-21): evidencia versionada de auditoria secundaria con `replaced_pairs=0`.
+- Estado (2026-04-22): campana final `hybrid_final_honest_improvement_v1` con `replaced_pairs=1` desplaza la fuente operativa a `*_freeze_v4`.
+
+Historical lines retained for traceability:
+- `data/hybrid_active_modes_freeze_v1/`
+- `data/hybrid_operational_freeze_v1/`
+ - `data/hybrid_active_modes_freeze_v2/`
+ - `data/hybrid_operational_freeze_v2/`
 
 ### Final closure and methodological scope
 - Final closure reports:

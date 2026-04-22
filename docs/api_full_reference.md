@@ -20,7 +20,7 @@ Operational API reference for backend consumers and maintainers.
 
 ## 1) Auth and MFA
 - `/api/auth/register`
-- `/api/auth/login`
+- `/api/auth/login` (acepta `identifier|username|email` + `password`)
 - `/api/auth/login/mfa`
 - `/api/auth/refresh`
 - `/api/auth/logout`
@@ -32,6 +32,8 @@ Operational API reference for backend consumers and maintainers.
 - `/api/mfa/setup`
 - `/api/mfa/confirm`
 - `/api/mfa/disable`
+- `/api/mfa/recovery-codes/status`
+- `/api/mfa/recovery-codes/regenerate`
 
 ## 2) Admin
 - `/api/admin/users` (list, patch)
@@ -53,12 +55,10 @@ Operational API reference for backend consumers and maintainers.
 - `/api/v1/questionnaires/active`
 - `/api/v1/questionnaires`
 - `/api/v1/questionnaires/{template_id}/questions`
+- `/api/v1/questionnaires/{template_id}/activate` (legacy, deprecado; compatibilidad)
+- `/api/v1/questionnaires/active/clone` (legacy, deprecado; compatibilidad)
 
-Legacy v1 endpoints removed in 2026-04-15:
-- `POST /api/v1/questionnaires/{template_id}/activate`
-- `POST /api/v1/questionnaires/active/clone`
-
-Operational replacements:
+Reemplazos operativos recomendados:
 - `POST /api/admin/questionnaires/{template_id}/publish`
 - `POST /api/admin/questionnaires/{template_id}/clone`
 

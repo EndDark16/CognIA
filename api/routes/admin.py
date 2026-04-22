@@ -14,6 +14,7 @@ from api.schemas.admin_schema import (
     EvaluationStatusSchema,
     PsychologistDecisionSchema,
     QuestionnaireCloneRequestSchema,
+    RoleCreateSchema,
     QuestionnaireListQuerySchema,
     RoleAssignSchema,
     UserListQuerySchema,
@@ -519,6 +520,39 @@ def admin_list_roles():
     return jsonify({"items": [{"id": str(r.id), "name": r.name, "description": r.description} for r in roles]}), 200
 
 
+@admin_bp.post("/roles")
+@roles_required("ADMIN")
+@limiter.limit(lambda: current_app.config.get("ADMIN_MUTATION_RATE_LIMIT", "20 per minute"))
+def admin_create_role():
+    guard = _ensure_admin_token()
+    if guard:
+        return guard
+    schema = RoleCreateSchema()
+    try:
+        data = schema.load(request.get_json(silent=True) or {})
+    except ValidationError as exc:
+        return _error_response("Validation error", "validation_error", 400, exc.messages)
+    admin_id = _admin_id()
+    if not admin_id:
+        return _error_response("Invalid admin", "invalid_admin", 401)
+
+    name = (data["name"] or "").strip().upper()
+    description = (data.get("description") or "").strip() or None
+    if not name:
+        return _error_response("Invalid role name", "invalid_role_name", 400)
+
+    try:
+        role = admin_service.create_role(name=name, description=description, admin_id=admin_id)
+    except ValueError as exc:
+        if str(exc) == "role_exists":
+            return _error_response("Role already exists", "role_exists", 409)
+        return _error_response("Invalid request", "invalid_request", 400)
+    except Exception:
+        current_app.logger.error("Create role failed", exc_info=True)
+        return _error_response("Database error", "db_error", 500)
+    return jsonify({"id": str(role.id), "name": role.name, "description": role.description}), 201
+
+
 @admin_bp.post("/users/<user_id>/roles")
 @roles_required("ADMIN")
 @limiter.limit(lambda: current_app.config.get("ADMIN_MUTATION_RATE_LIMIT", "20 per minute"))
@@ -627,3 +661,39 @@ def admin_metrics():
         current_app.logger.error("Admin metrics failed", exc_info=True)
         return _error_response("Metrics error", "metrics_error", 500)
     return jsonify(snapshot), 200
+
+
+@admin_bp.post("/impersonate/<user_id>")
+@roles_required("ADMIN")
+@limiter.limit(lambda: current_app.config.get("ADMIN_SECURITY_RATE_LIMIT", "10 per minute"))
+def admin_impersonate(user_id):
+    guard = _ensure_admin_token()
+    if guard:
+        return guard
+    user_uuid = _parse_uuid(user_id)
+    if not user_uuid:
+        return _error_response("Invalid user_id", "invalid_user_id", 400)
+    user = db.session.get(AppUser, user_uuid)
+    if not user:
+        return _error_response("User not found", "user_not_found", 404)
+    if not user.is_active:
+        return _error_response("User inactive", "user_inactive", 409)
+    admin_id = _admin_id()
+    if not admin_id:
+        return _error_response("Invalid admin", "invalid_admin", 401)
+    try:
+        access_token, ttl = admin_service.impersonate_user(admin_id=admin_id, user=user)
+    except Exception:
+        current_app.logger.error("Admin impersonate failed", exc_info=True)
+        return _error_response("Database error", "db_error", 500)
+    return (
+        jsonify(
+            {
+                "access_token": access_token,
+                "token_type": "bearer",
+                "expires_in": ttl,
+                "impersonated_user_id": str(user.id),
+            }
+        ),
+        200,
+    )

@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 import uuid
 from pathlib import Path
@@ -257,14 +257,14 @@ def test_questionnaire_v2_session_flow(client, app):
     _, token = _user_token(app, "owner_qv2")
     headers = {"Authorization": f"Bearer {token}"}
 
-    active = client.get("/api/v2/questionnaires/active?mode=short&role=caregiver", headers=headers)
+    active = client.get("/api/v2/questionnaires/active?mode=short&role=guardian", headers=headers)
     assert active.status_code == 200
     codes = [row["question_code"] for row in active.json["questions"]]
     assert "Q003" not in codes
 
     created = client.post(
         "/api/v2/questionnaires/sessions",
-        json={"mode": "short", "role": "caregiver", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
+        json={"mode": "short", "role": "guardian", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
         headers=headers,
     )
     assert created.status_code == 201
@@ -314,7 +314,7 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
 
     created = client.post(
         "/api/v2/questionnaires/sessions",
-        json={"mode": "medium", "role": "caregiver", "child_age_years": 10, "child_sex_assigned_at_birth": "female"},
+        json={"mode": "medium", "role": "guardian", "child_age_years": 10, "child_sex_assigned_at_birth": "female"},
         headers=owner_headers,
     )
     session_id = created.json["session"]["session_id"]
@@ -392,7 +392,7 @@ def test_questionnaire_v2_permissions_block_ungranted_user(client, app):
 
     created = client.post(
         "/api/v2/questionnaires/sessions",
-        json={"mode": "short", "role": "caregiver", "child_age_years": 8, "child_sex_assigned_at_birth": "male"},
+        json={"mode": "short", "role": "guardian", "child_age_years": 8, "child_sex_assigned_at_birth": "male"},
         headers=owner_headers,
     )
     session_id = created.json["session"]["session_id"]
@@ -435,7 +435,7 @@ def test_questionnaire_v2_internal_error_hides_exception_details(client, app, mo
 
     resp = client.post(
         "/api/v2/questionnaires/sessions",
-        json={"mode": "short", "role": "caregiver", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
+        json={"mode": "short", "role": "guardian", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
         headers=headers,
     )
     assert resp.status_code == 500
@@ -456,7 +456,7 @@ def test_questionnaire_v2_pdf_download_rejects_outside_runtime_reports(client, a
 
     created = client.post(
         "/api/v2/questionnaires/sessions",
-        json={"mode": "short", "role": "caregiver", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
+        json={"mode": "short", "role": "guardian", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
         headers=headers,
     )
     assert created.status_code == 201
@@ -474,3 +474,4 @@ def test_questionnaire_v2_pdf_download_rejects_outside_runtime_reports(client, a
     resp = client.get(f"/api/v2/questionnaires/history/{session_id}/pdf/download", headers=headers)
     assert resp.status_code == 404
     assert resp.json["error"] == "pdf_file_missing"
+

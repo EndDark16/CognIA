@@ -39,6 +39,44 @@ def _validate_challenge(challenge_id: str, user_id) -> MFALoginChallenge | None:
     return ch
 
 
+def _recovery_cutoff() -> datetime:
+    max_days = int(current_app.config.get("RECOVERY_CODE_MAX_AGE_DAYS", 90))
+    return datetime.now(timezone.utc) - timedelta(days=max_days)
+
+
+def _as_utc(dt: datetime | None) -> datetime | None:
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def _valid_recovery_entries(user_id):
+    cutoff = _recovery_cutoff()
+    return (
+        RecoveryCode.query.filter_by(user_id=user_id, used_at=None)
+        .filter(RecoveryCode.created_at >= cutoff)
+        .all()
+    )
+
+
+def _consume_recovery_code(user_id, recovery_code: str) -> bool:
+    for item in _valid_recovery_entries(user_id):
+        if check_password(recovery_code, item.code_hash):
+            item.used_at = datetime.now(timezone.utc)
+            return True
+    return False
+
+
+def _replace_recovery_codes(user_id) -> list[str]:
+    RecoveryCode.query.filter_by(user_id=user_id).delete()
+    codes_plain = generate_recovery_codes()
+    for code in codes_plain:
+        db.session.add(RecoveryCode(user_id=user_id, code_hash=hash_password(code)))
+    return codes_plain
+
+
 @mfa_bp.route("/setup", methods=["POST"])
 @jwt_required()
 @limiter.limit(lambda: current_app.config.get("MFA_SETUP_RATE_LIMIT", "3 per 10 minutes"))
@@ -157,20 +195,7 @@ def mfa_disable():
         if not validate_totp(secret, code):
             return _error_response("Invalid code", "invalid_mfa_code", 401)
     elif recovery:
-        max_days = int(current_app.config.get("RECOVERY_CODE_MAX_AGE_DAYS", 90))
-        cutoff = datetime.now(timezone.utc) - timedelta(days=max_days)
-        rc = (
-            RecoveryCode.query.filter_by(user_id=identity, used_at=None)
-            .filter(RecoveryCode.created_at >= cutoff)
-            .all()
-        )
-        ok = False
-        for item in rc:
-            if check_password(recovery, item.code_hash):
-                item.used_at = datetime.now(timezone.utc)
-                ok = True
-                break
-        if not ok:
+        if not _consume_recovery_code(identity, recovery):
             return _error_response("Invalid recovery code", "invalid_recovery_code", 401)
     else:
         return _error_response("Missing code or recovery_code", "missing_mfa_code", 400)
@@ -194,3 +219,96 @@ def mfa_disable():
     response = jsonify({"msg": "MFA disabled"})
     clear_auth_cookies(response)
     return response, 200
+
+
+@mfa_bp.route("/recovery-codes/status", methods=["GET"])
+@jwt_required()
+@limiter.limit(lambda: current_app.config.get("MFA_RECOVERY_STATUS_RATE_LIMIT", "20 per 10 minutes"))
+def recovery_codes_status():
+    identity = _parse_identity(get_jwt_identity())
+    if not identity:
+        return _error_response("Invalid user", "invalid_user", 401)
+    claims = get_jwt()
+    if claims.get("mfa_enrollment"):
+        return _error_response("Enrollment token not allowed", "mfa_enrollment_only", 403)
+
+    user = db.session.get(AppUser, identity)
+    if not user:
+        return _error_response("User not found", "user_not_found", 404)
+    if not user.is_active:
+        return _error_response("Account inactive", "inactive_account", 403)
+    if not user.mfa_enabled:
+        return _error_response("MFA not enabled", "mfa_not_enabled", 400)
+
+    cutoff = _recovery_cutoff()
+    all_codes = RecoveryCode.query.filter_by(user_id=identity).all()
+    valid_unused = [row for row in all_codes if row.used_at is None and (_as_utc(row.created_at) or cutoff) >= cutoff]
+    expired_unused = [row for row in all_codes if row.used_at is None and (_as_utc(row.created_at) or cutoff) < cutoff]
+    used_codes = [row for row in all_codes if row.used_at is not None]
+    return (
+        jsonify(
+            {
+                "mfa_enabled": True,
+                "recovery_codes_available": len(valid_unused),
+                "recovery_codes_used": len(used_codes),
+                "recovery_codes_expired_unused": len(expired_unused),
+                "rotation_recommended": len(valid_unused) < 3 or len(expired_unused) > 0,
+            }
+        ),
+        200,
+    )
+
+
+@mfa_bp.route("/recovery-codes/regenerate", methods=["POST"])
+@jwt_required()
+@limiter.limit(lambda: current_app.config.get("MFA_RECOVERY_REGENERATE_RATE_LIMIT", "5 per 30 minutes"))
+def regenerate_recovery_codes():
+    identity = _parse_identity(get_jwt_identity())
+    if not identity:
+        return _error_response("Invalid user", "invalid_user", 401)
+    claims = get_jwt()
+    if claims.get("mfa_enrollment"):
+        return _error_response("Enrollment token not allowed", "mfa_enrollment_only", 403)
+
+    data = request.get_json(silent=True) or {}
+    password = data.get("password")
+    code = data.get("code")
+    recovery_code = data.get("recovery_code")
+
+    if not password:
+        return _error_response("Missing password", "missing_password", 400)
+    if not code and not recovery_code:
+        return _error_response("Missing code or recovery_code", "missing_mfa_code", 400)
+
+    user = db.session.get(AppUser, identity)
+    if not user:
+        return _error_response("User not found", "user_not_found", 404)
+    if not user.is_active:
+        return _error_response("Account inactive", "inactive_account", 403)
+    if not user.mfa_enabled:
+        return _error_response("MFA not enabled", "mfa_not_enabled", 400)
+    if not check_password(password or "", user.password):
+        return _error_response("Invalid credentials", "invalid_credentials", 401)
+
+    user_mfa = UserMFA.query.filter_by(user_id=identity).first()
+    if not user_mfa:
+        return _error_response("MFA not enabled", "mfa_not_enabled", 400)
+
+    if code:
+        secret = decrypt_mfa_secret(user_mfa.secret_encrypted)
+        if not validate_totp(secret, code):
+            return _error_response("Invalid code", "invalid_mfa_code", 401)
+    elif recovery_code:
+        if not _consume_recovery_code(identity, recovery_code):
+            return _error_response("Invalid recovery code", "invalid_recovery_code", 401)
+
+    codes_plain = _replace_recovery_codes(identity)
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("Database error on recovery code regenerate for %s: %s", identity, e, exc_info=True)
+        return _error_response("Database error", "db_error", 500)
+
+    log_audit(identity, "MFA_RECOVERY_CODES_REGENERATED", "auth", "Recovery codes regenerated")
+    return jsonify({"recovery_codes": codes_plain}), 200
