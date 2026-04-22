@@ -77,7 +77,7 @@ def _primary_reporter_role(user: AppUser, roles: list[str]) -> str:
     if "GUARDIAN" in roles_set:
         return "GUARDIAN"
     if roles_set:
-        return sorted(roles_set)[0]
+        return min(roles_set)
     return (user.user_type or "UNKNOWN").upper()
 
 

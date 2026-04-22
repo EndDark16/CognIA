@@ -710,7 +710,7 @@ def _model_probability(model_version: ModelVersion, feature_map: dict[str, Any],
     if not artifact_path or not Path(artifact_path).exists():
         return _heuristic_domain_probability(domain, feature_map)
 
-    feature_columns, metadata = _load_feature_contract(model_version)
+    feature_columns, _ = _load_feature_contract(model_version)
     if not feature_columns:
         feature_columns = [key for key in feature_map.keys() if key != "_meta"]
 
@@ -1266,9 +1266,11 @@ def dashboard_user_growth(months: int = 12) -> dict[str, Any]:
 
 def dashboard_funnel(months: int = 12) -> dict[str, Any]:
     query = QuestionnaireSession.query
-    created = query.count()
-    submitted = query.filter(QuestionnaireSession.status.in_(["submitted", "processed"])).count()
-    processed = query.filter(QuestionnaireSession.status == "processed").count()
+    start_month = (pd.Timestamp(_utcnow().date().replace(day=1)) - pd.DateOffset(months=max(0, months - 1))).to_pydatetime()
+    created_query = query.filter(QuestionnaireSession.created_at >= start_month)
+    created = created_query.count()
+    submitted = created_query.filter(QuestionnaireSession.status.in_(["submitted", "processed"])).count()
+    processed = created_query.filter(QuestionnaireSession.status == "processed").count()
     return {
         "created": created,
         "submitted": submitted,

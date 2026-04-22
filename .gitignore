@@ -31,8 +31,12 @@ scripts/venv/
 .ruff_cache/
 .coverage
 .coverage.*
+coverage.xml
 htmlcov/
 .ipynb_checkpoints/
+.sonar/
+sonar_issues.csv
+sonar_issues.json
 
 # -----------------------------
 # Logs / temp

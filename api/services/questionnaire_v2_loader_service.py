@@ -327,7 +327,7 @@ def _set_question_modes(question: QuestionnaireQuestion, row: dict[str, Any]) ->
         )
 
 
-def _upsert_questions(version_id: uuid.UUID, master_df: pd.DataFrame, scales: dict[str, QuestionnaireScale]) -> dict[str, QuestionnaireQuestion]:
+def _upsert_questions(version_id: uuid.UUID, master_df: pd.DataFrame) -> dict[str, QuestionnaireQuestion]:
     sections_cache: dict[str, QuestionnaireSection] = {}
     question_by_code: dict[str, QuestionnaireQuestion] = {}
 
@@ -593,7 +593,7 @@ def sync_questionnaire_catalog(created_by: uuid.UUID | None = None, source_dir: 
     master_df = pd.read_csv(bundle.master_csv)
 
     scales = _upsert_scales(version.id, scales_df)
-    questions = _upsert_questions(version.id, master_df, scales)
+    questions = _upsert_questions(version.id, master_df)
 
     return {
         "definition_id": str(definition.id),

@@ -586,3 +586,16 @@ Validacion declarada en release actual:
 - Refuerzo de versionado profesional agregado:
   - `docs/backend_release_workflow.md` (flujo PR/merge release-driven)
   - `docs/backend_release_registry.csv` (indice tabular de releases backend)
+
+## Actualizacion de estado (2026-04-22) - sonarcloud_local_execution_and_security_hotspots_closure_v1
+- Se versiono ejecucion local de SonarCloud desde `.env` con:
+  - `sonar-project.properties`
+  - `scripts/run_sonar.ps1`
+  - variables Sonar en `.env.example`.
+- Se aplicaron hardenings backend vinculados a findings/hotspots:
+  - regex de email endurecida en `api/routes/auth.py`,
+  - generacion de identificadores/PIN con `secrets` en `api/services/questionnaire_runtime_service.py`,
+  - hash de `registration_number` migrado a `sha256` en `api/services/evaluation_service.py`,
+  - split de unsubscribe `GET/POST` en `api/routes/email.py`,
+  - `DEV_DEBUG=false` por defecto en `.env.example`.
+- Estado operativo declarado en esta ventana: Quality Gate Sonar `PASSED` y sin issues abiertas en new code period.

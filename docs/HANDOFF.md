@@ -728,3 +728,22 @@ Valor operativo:
 - Refuerzo de gobernanza de release agregado:
   - `docs/backend_release_workflow.md`
   - `docs/backend_release_registry.csv`
+
+## Actualizacion de sesion (2026-04-22) - sonarcloud_local_execution_and_security_hotspots_closure_v1
+Alcance:
+- Se incorporo ejecucion local de SonarCloud usando variables desde `.env`.
+- Se versionaron artefactos de soporte:
+  - `sonar-project.properties`
+  - `scripts/run_sonar.ps1`
+  - variables Sonar en `.env.example`.
+
+Correcciones/hardening aplicados:
+- `api/routes/auth.py`: regex de email endurecida.
+- `api/services/questionnaire_runtime_service.py`: PRNG migrado a `secrets` para identificadores/PIN.
+- `api/services/evaluation_service.py`: hash migrado de `md5` a `sha256` para `registration_number`.
+- `api/routes/email.py`: handlers separados para unsubscribe `GET` y `POST`.
+- `config/settings.py` + `.env.example`: `DEV_DEBUG=false` como default recomendado.
+
+Estado reportado:
+- Sonar Quality Gate en `PASSED`.
+- Open issues en new code period: `0`.
