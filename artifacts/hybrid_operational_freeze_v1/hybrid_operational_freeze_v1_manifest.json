@@ -1,0 +1,10 @@
+{
+  "run_id": "hybrid_operational_freeze_v1",
+  "champions": 30,
+  "overrides_from_boosted_v3": 4,
+  "artifacts": {
+    "candidate_registry": "data\\hybrid_operational_freeze_v1\\inventory\\hybrid_operational_candidate_registry.csv",
+    "final_champions": "data\\hybrid_operational_freeze_v1\\tables\\hybrid_operational_final_champions.csv",
+    "final_nonchampions": "data\\hybrid_operational_freeze_v1\\tables\\hybrid_operational_final_nonchampions.csv"
+  }
+}

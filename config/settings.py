@@ -28,7 +28,7 @@ class Config:
     
     # Database
     DB_USER = os.getenv("DB_USER", "postgres")
-    DB_PASSWORD = os.getenv("DB_PASSWORD", "password_placeholder")
+    DB_PASSWORD = os.getenv("DB_PASSWORD", "changeme")
     DB_HOST = os.getenv("DB_HOST", "localhost")
     DB_PORT = int(os.getenv("DB_PORT", "5432"))
     DB_NAME = os.getenv("DB_NAME", "cognia_db")
@@ -48,7 +48,7 @@ class Config:
     # CORS
     CORS_ORIGINS = os.getenv(
         "CORS_ORIGINS",
-        "http://localhost:3000,http://localhost:5000"
+        "https://localhost:3000,https://localhost:5000"
     ).split(",")
     CORS_ORIGINS = [origin.strip() for origin in CORS_ORIGINS if origin.strip()]
 
@@ -59,7 +59,7 @@ class Config:
     PASSWORD_MIN_LENGTH = int(os.getenv("PASSWORD_MIN_LENGTH", "8"))
     PASSWORD_INPUT_MAX = int(os.getenv("PASSWORD_INPUT_MAX", "200"))
     PASSWORD_RESET_TOKEN_TTL_MINUTES = int(os.getenv("PASSWORD_RESET_TOKEN_TTL_MINUTES", "30"))
-    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "https://localhost:3000")
     PASSWORD_RESET_PATH = os.getenv("PASSWORD_RESET_PATH", "/reset-password")
 
     # Auth hardening
@@ -203,7 +203,7 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-    DEBUG = True
+    DEBUG = _bool_env("DEV_DEBUG", False)
 
 class ProductionConfig(Config):
     DEBUG = False
@@ -222,7 +222,7 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    DEBUG = True
+    DEBUG = False
     # Usa SQLite en memoria para no tocar la base real durante pruebas
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     LOG_REQUESTS = False

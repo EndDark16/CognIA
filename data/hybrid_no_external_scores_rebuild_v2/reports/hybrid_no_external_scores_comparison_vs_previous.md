@@ -1,0 +1,34 @@
+# Hybrid No External Scores - Comparison vs Previous Frozen
+
+| domain | mode | prev_balanced_accuracy | balanced_accuracy | delta_balanced_accuracy | prev_pr_auc | pr_auc | delta_pr_auc | comparison_result | new_replaces_previous_as_primary |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| adhd | caregiver_1_3 | 0.920847 | 0.871403 | -0.049443 | 0.639851 | 0.631918 | -0.007933 | worse | no |
+| adhd | caregiver_2_3 | 0.938706 | 0.881490 | -0.057215 | 0.737523 | 0.704422 | -0.033101 | worse | no |
+| adhd | caregiver_full | 0.953230 | 0.874600 | -0.078630 | 0.769742 | 0.711879 | -0.057864 | worse | no |
+| adhd | psychologist_1_3 | 0.915528 | 0.874132 | -0.041396 | 0.623836 | 0.637545 | 0.013709 | worse | no |
+| adhd | psychologist_2_3 | 0.942730 | 0.877329 | -0.065401 | 0.729884 | 0.733739 | 0.003855 | worse | no |
+| adhd | psychologist_full | 0.982885 | 0.912441 | -0.070444 | 0.980874 | 0.927131 | -0.053743 | worse | yes |
+| anxiety | caregiver_1_3 | 0.824519 | 0.901369 | 0.076850 | 0.815098 | 0.926692 | 0.111593 | improves | yes |
+| anxiety | caregiver_2_3 | 0.942598 | 0.927901 | -0.014697 | 0.940175 | 0.952481 | 0.012306 | worse | yes |
+| anxiety | caregiver_full | 0.938791 | 0.938791 | 0.000000 | 0.936379 | 0.946538 | 0.010159 | tie_noise | yes |
+| anxiety | psychologist_1_3 | 0.901369 | 0.856658 | -0.044711 | 0.929537 | 0.916729 | -0.012808 | worse | yes_with_caveat |
+| anxiety | psychologist_2_3 | 0.956233 | 0.937522 | -0.018711 | 0.942496 | 0.930288 | -0.012208 | worse | yes |
+| anxiety | psychologist_full | 0.944605 | 0.932977 | -0.011628 | 0.941091 | 0.944218 | 0.003127 | worse | yes |
+| conduct | caregiver_1_3 | 0.923438 | 0.907813 | -0.015625 | 0.932896 | 0.950080 | 0.017184 | worse | yes |
+| conduct | caregiver_2_3 | 1.000000 | 1.000000 | 0.000000 | 1.000000 | 1.000000 | 0.000000 | tie_noise | yes |
+| conduct | caregiver_full | 1.000000 | 0.996875 | -0.003125 | 1.000000 | 1.000000 | 0.000000 | tie_noise | yes |
+| conduct | psychologist_1_3 | 0.923438 | 0.885938 | -0.037500 | 0.940778 | 0.954263 | 0.013484 | worse | yes_with_caveat |
+| conduct | psychologist_2_3 | 1.000000 | 1.000000 | 0.000000 | 1.000000 | 1.000000 | 0.000000 | tie_noise | yes |
+| conduct | psychologist_full | 1.000000 | 0.996875 | -0.003125 | 1.000000 | 1.000000 | 0.000000 | tie_noise | yes |
+| depression | caregiver_1_3 | 0.878754 | 0.812937 | -0.065817 | 0.796155 | 0.764765 | -0.031390 | worse | no |
+| depression | caregiver_2_3 | 0.916411 | 0.903144 | -0.013268 | 0.882349 | 0.843414 | -0.038934 | worse | no |
+| depression | caregiver_full | 0.928606 | 0.893461 | -0.035145 | 0.911586 | 0.866538 | -0.045048 | worse | yes_with_caveat |
+| depression | psychologist_1_3 | 0.877313 | 0.864046 | -0.013268 | 0.801131 | 0.768131 | -0.033000 | worse | no |
+| depression | psychologist_2_3 | 0.892389 | 0.890949 | -0.001440 | 0.879506 | 0.833041 | -0.046465 | tie_noise | no |
+| depression | psychologist_full | 0.914083 | 0.892205 | -0.021878 | 0.947749 | 0.940602 | -0.007147 | worse | yes_with_caveat |
+| elimination | caregiver_1_3 | 0.929457 | 0.805356 | -0.124101 | 0.943277 | 0.878649 | -0.064628 | worse | no |
+| elimination | caregiver_2_3 | 0.998832 | 0.976096 | -0.022735 | 1.000000 | 0.955948 | -0.044052 | worse | yes |
+| elimination | caregiver_full | 0.998832 | 0.978433 | -0.020399 | 1.000000 | 0.958261 | -0.041739 | worse | yes |
+| elimination | psychologist_1_3 | 0.881380 | 0.819914 | -0.061467 | 0.873756 | 0.882802 | 0.009046 | worse | no |
+| elimination | psychologist_2_3 | 0.998832 | 0.978433 | -0.020399 | 1.000000 | 0.957705 | -0.042295 | worse | yes |
+| elimination | psychologist_full | 0.998832 | 0.977265 | -0.021567 | 1.000000 | 0.973474 | -0.026526 | worse | yes |

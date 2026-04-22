@@ -183,9 +183,9 @@ def _is_valid_email(email: str) -> bool:
 
 def _login_rate_key() -> str:
     data = request.get_json(silent=True) or {}
-    username = data.get("username")
-    if username:
-        return f"login:{str(username).strip()}"
+    identifier = _normalize_username(data.get("identifier")) or _normalize_username(data.get("username")) or _normalize_email(data.get("email"))
+    if identifier:
+        return f"login:{str(identifier).strip().lower()}"
     return f"login_ip:{get_remote_address()}"
 
 
@@ -216,14 +216,6 @@ def _password_forgot_email_key() -> str:
     data = request.get_json(silent=True) or {}
     email = _normalize_email(data.get("email"))
     return f"pwd_forgot_email:{email}" if email else f"pwd_forgot_email:{get_remote_address()}"
-
-
-def _password_forgot_email_limit() -> str:
-    base_limit = current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes")
-    email_limit = current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT_EMAIL")
-    if not email_limit or email_limit == "5 per 10 minutes":
-        return base_limit
-    return email_limit
 
 
 def _password_reset_rate_key() -> str:
@@ -353,16 +345,22 @@ def register():
 @limiter.limit(lambda: current_app.config.get("LOGIN_RATE_LIMIT", "5 per 15 minutes"), key_func=_login_rate_key)
 def login():
     data = request.get_json(silent=True) or {}
-    username = _normalize_username(data.get("username"))
+    identifier = _normalize_username(data.get("identifier")) or _normalize_username(data.get("username")) or _normalize_email(data.get("email"))
     password = data.get("password") or ""
 
-    if not username or not password:
+    if not identifier or not password:
         return _error_response("Missing credentials", "missing_credentials", 400)
 
-    if not _is_valid_username(username):
-        return _error_response("Invalid username format", "invalid_username", 400)
+    identifier_lower = str(identifier).strip().lower()
+    by_email = "@" in identifier_lower
+    if by_email:
+        if not _is_valid_email(identifier_lower):
+            return _error_response("Invalid email format", "invalid_email", 400)
+    else:
+        if not _is_valid_username(str(identifier).strip()):
+            return _error_response("Invalid username format", "invalid_username", 400)
 
-    user = AppUser.query.filter_by(username=username).first()
+    user = AppUser.query.filter_by(email=identifier_lower).first() if by_email else AppUser.query.filter_by(username=str(identifier).strip()).first()
     if user:
         try:
             db.session.refresh(user)
@@ -390,7 +388,7 @@ def login():
             user.id if user else None,
             "login_failed",
             "auth",
-            f"Failed login for: {username}",
+            f"Failed login for: {identifier_lower}",
         )
         if user:
             try:
@@ -404,7 +402,7 @@ def login():
                 db.session.commit()
             except Exception as e:
                 db.session.rollback()
-                current_app.logger.error("Failed to update login attempts for %s: %s", username, e, exc_info=True)
+                current_app.logger.error("Failed to update login attempts for %s: %s", identifier_lower, e, exc_info=True)
         return _error_response("Invalid credentials", "invalid_credentials", 401)
 
     if user.user_type == "psychologist" and not getattr(user, "colpsic_verified", False):
@@ -823,15 +821,15 @@ def change_password():
 @limiter.limit(
     lambda: current_app.config.get(
         "PASSWORD_FORGOT_RATE_LIMIT",
-        current_app.config.get(
-            "PASSWORD_FORGOT_RATE_LIMIT_IP",
-            "20 per 10 minutes",
-        ),
+        current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT_IP", "20 per 10 minutes"),
     ),
     key_func=get_remote_address,
 )
 @limiter.limit(
-    lambda: _password_forgot_email_limit(),
+    lambda: current_app.config.get(
+        "PASSWORD_FORGOT_RATE_LIMIT_EMAIL",
+        current_app.config.get("PASSWORD_FORGOT_RATE_LIMIT", "5 per 10 minutes"),
+    ),
     key_func=_password_forgot_email_key,
 )
 def forgot_password():

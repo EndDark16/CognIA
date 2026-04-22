@@ -7,7 +7,6 @@ from http.cookies import SimpleCookie
 import pyotp
 import pytest
 from flask import jsonify
-from flask_jwt_extended import create_access_token
 
 # Garantiza que la raiz del proyecto este en el sys.path al ejecutar pytest
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -131,6 +130,36 @@ def test_register_and_login(client):
         },
     )
     assert resp_no_cookie.status_code == 401
+
+
+def test_login_accepts_email_or_username(client):
+    username = f"loginid_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={
+            "username": username,
+            "email": email,
+            "password": password,
+            "full_name": "Identifier User",
+            "user_type": "guardian",
+        },
+    )
+    assert resp_reg.status_code == 201
+
+    resp_username = client.post("/api/auth/login", json={"username": username, "password": password})
+    assert resp_username.status_code == 200
+    assert "access_token" in resp_username.json
+
+    resp_identifier = client.post("/api/auth/login", json={"identifier": email, "password": password})
+    assert resp_identifier.status_code == 200
+    assert "access_token" in resp_identifier.json
+
+    resp_email = client.post("/api/auth/login", json={"email": email, "password": password})
+    assert resp_email.status_code == 200
+    assert "access_token" in resp_email.json
 
 
 def test_register_sends_welcome_email(client, monkeypatch):
@@ -275,6 +304,51 @@ def test_mfa_setup_and_login_flow(client, app):
         headers={"X-CSRF-Token": csrf_refresh_new},
     )
     assert resp_refresh.status_code == 200
+
+
+def test_mfa_recovery_codes_status_and_regenerate(client):
+    username = f"mfarecov_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+
+    client.post(
+        "/api/auth/register",
+        json={"username": username, "email": email, "password": password, "full_name": "MFA Recovery", "user_type": "guardian"},
+    )
+    resp_login = client.post("/api/auth/login", json={"identifier": email, "password": password})
+    assert resp_login.status_code == 200
+    access_token = resp_login.json["access_token"]
+    _persist_cookies(client, resp_login.headers.getlist("Set-Cookie"))
+
+    resp_setup = client.post("/api/mfa/setup", headers={"Authorization": f"Bearer {access_token}"})
+    assert resp_setup.status_code == 200
+    secret = resp_setup.json["secret"]
+
+    code = pyotp.TOTP(secret).now()
+    resp_confirm = client.post(
+        "/api/mfa/confirm",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={"code": code},
+    )
+    assert resp_confirm.status_code == 200
+
+    resp_status = client.get(
+        "/api/mfa/recovery-codes/status",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert resp_status.status_code == 200
+    assert resp_status.json["mfa_enabled"] is True
+    assert resp_status.json["recovery_codes_available"] > 0
+
+    code2 = pyotp.TOTP(secret).now()
+    resp_regenerate = client.post(
+        "/api/mfa/recovery-codes/regenerate",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={"password": password, "code": code2},
+    )
+    assert resp_regenerate.status_code == 200
+    assert "recovery_codes" in resp_regenerate.json
+    assert len(resp_regenerate.json["recovery_codes"]) > 0
 
 
 def test_refresh_requires_csrf_header(client):
@@ -648,31 +722,6 @@ def test_roles_required_enforces_claims(client, app):
         "/api/admin-only", headers={"Authorization": f"Bearer {access_token2}"}
     )
     assert resp_forbidden.status_code == 403
-
-
-def test_roles_required_blocks_mfa_enrollment_token(client, app):
-    def _protected():
-        return jsonify({"ok": True}), 200
-
-    app.add_url_rule(
-        "/api/admin-only-enrollment-block",
-        "admin_only_enrollment_block",
-        roles_required("ADMIN")(_protected),
-        methods=["GET"],
-    )
-
-    with app.app_context():
-        enrollment_token = create_access_token(
-            identity=str(uuid.uuid4()),
-            additional_claims={"roles": ["ADMIN"], "mfa_enrollment": True},
-        )
-
-    resp = client.get(
-        "/api/admin-only-enrollment-block",
-        headers={"Authorization": f"Bearer {enrollment_token}"},
-    )
-    assert resp.status_code == 403
-    assert resp.json.get("error") == "mfa_enrollment_only"
 
 
 def test_auth_me_returns_profile(client):

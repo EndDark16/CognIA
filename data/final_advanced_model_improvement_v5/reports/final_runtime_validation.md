@@ -1,0 +1,33 @@
+# Final runtime validation
+
+        mode      domain                    check status                                                    details
+   caregiver        adhd   artifact_payload_ready   pass                                                  family=rf
+   caregiver        adhd input_contract_non_empty   pass                                              n_features=35
+   caregiver        adhd    output_contract_ready   pass probability/risk/confidence/uncertainty/explanation/caveat
+   caregiver     conduct   artifact_payload_ready   pass                                                  family=rf
+   caregiver     conduct input_contract_non_empty   pass                                              n_features=32
+   caregiver     conduct    output_contract_ready   pass probability/risk/confidence/uncertainty/explanation/caveat
+   caregiver elimination   artifact_payload_ready   pass                                             family=xgboost
+   caregiver elimination input_contract_non_empty   pass                                              n_features=27
+   caregiver elimination    output_contract_ready   pass probability/risk/confidence/uncertainty/explanation/caveat
+   caregiver     anxiety   artifact_payload_ready   pass                                            family=lightgbm
+   caregiver     anxiety input_contract_non_empty   pass                                              n_features=49
+   caregiver     anxiety    output_contract_ready   pass probability/risk/confidence/uncertainty/explanation/caveat
+   caregiver  depression   artifact_payload_ready   pass                                            family=catboost
+   caregiver  depression input_contract_non_empty   pass                                              n_features=28
+   caregiver  depression    output_contract_ready   pass probability/risk/confidence/uncertainty/explanation/caveat
+psychologist        adhd   artifact_payload_ready   pass                                                  family=rf
+psychologist        adhd input_contract_non_empty   pass                                              n_features=35
+psychologist        adhd    output_contract_ready   pass probability/risk/confidence/uncertainty/explanation/caveat
+psychologist     conduct   artifact_payload_ready   pass                                            family=catboost
+psychologist     conduct input_contract_non_empty   pass                                              n_features=34
+psychologist     conduct    output_contract_ready   pass probability/risk/confidence/uncertainty/explanation/caveat
+psychologist elimination   artifact_payload_ready   pass                                            family=lightgbm
+psychologist elimination input_contract_non_empty   pass                                              n_features=28
+psychologist elimination    output_contract_ready   pass probability/risk/confidence/uncertainty/explanation/caveat
+psychologist     anxiety   artifact_payload_ready   pass                                            family=lightgbm
+psychologist     anxiety input_contract_non_empty   pass                                             n_features=272
+psychologist     anxiety    output_contract_ready   pass probability/risk/confidence/uncertainty/explanation/caveat
+psychologist  depression   artifact_payload_ready   pass                                            family=catboost
+psychologist  depression input_contract_non_empty   pass                                              n_features=29
+psychologist  depression    output_contract_ready   pass probability/risk/confidence/uncertainty/explanation/caveat

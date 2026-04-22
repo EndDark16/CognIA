@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+from api.services.hybrid_classification_policy_v1 import PolicyInputs, build_normalized_table, policy_violations
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DATA_BASE = ROOT / "data" / "hybrid_classification_normalization_v1"
+SHORTCUT_INV = ROOT / "data" / "hybrid_secondary_honest_retrain_v1" / "tables" / "non_conduct_suspect_inventory.csv"
+
+LINES = [
+    (
+        "v2",
+        ROOT / "data" / "hybrid_operational_freeze_v2" / "tables" / "hybrid_operational_final_champions.csv",
+        ROOT / "data" / "hybrid_active_modes_freeze_v2" / "tables" / "hybrid_active_models_30_modes.csv",
+    ),
+    (
+        "v3",
+        ROOT / "data" / "hybrid_operational_freeze_v3" / "tables" / "hybrid_operational_final_champions.csv",
+        ROOT / "data" / "hybrid_active_modes_freeze_v3" / "tables" / "hybrid_active_models_30_modes.csv",
+    ),
+]
+
+
+def main() -> int:
+    output_dir = DATA_BASE / "validation"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    violations_total = 0
+    lines_checked = 0
+    details: dict[str, int] = {}
+
+    for label, op_csv, active_csv in LINES:
+        if not op_csv.exists() or not active_csv.exists():
+            continue
+        lines_checked += 1
+        normalized = build_normalized_table(
+            PolicyInputs(
+                operational_csv=op_csv,
+                active_csv=active_csv,
+                shortcut_inventory_csv=SHORTCUT_INV if SHORTCUT_INV.exists() else None,
+            )
+        )
+        violations = policy_violations(normalized)
+        details[label] = int(len(violations))
+        violations_total += int(len(violations))
+        violations.to_csv(output_dir / f"hybrid_classification_policy_violations_{label}.csv", index=False)
+
+    payload = {
+        "lines_checked": lines_checked,
+        "violation_count": violations_total,
+        "per_line": details,
+    }
+    print(json.dumps(payload, ensure_ascii=False))
+    if violations_total > 0:
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

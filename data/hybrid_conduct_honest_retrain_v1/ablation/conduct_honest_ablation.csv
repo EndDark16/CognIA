@@ -1,0 +1,9 @@
+domain,mode,ablation_case,k,delta_ba,delta_pr_auc,removed_features
+conduct,caregiver_2_3,baseline,0,0.0,0.0,
+conduct,caregiver_2_3,drop_top1,1,-0.043749999999999956,0.0036430375837319673,eng_externalizing_index
+conduct,caregiver_full,baseline,0,0.0,0.0,
+conduct,caregiver_full,drop_top1,1,0.012500000000000067,-0.009890773447010837,eng_externalizing_index
+conduct,psychologist_2_3,baseline,0,0.0,0.0,
+conduct,psychologist_2_3,drop_top1,1,0.010937500000000044,0.0002562052155000716,eng_externalizing_index
+conduct,psychologist_full,baseline,0,0.0,0.0,
+conduct,psychologist_full,drop_top1,1,0.0015624999999999112,-0.000736853545660221,eng_externalizing_index

@@ -1,0 +1,11 @@
+mode,domain,family,feature_variant,calibration,selected_threshold_policy,selected_threshold,selected_abstention_band,val_objective_score,test_precision,test_recall,test_balanced_accuracy,test_brier,uncertainty_rate,overconfident_wrong_rate
+caregiver,adhd,rf,engineered,isotonic,precision_guarded,0.605,0.05,,0.9370629370629372,0.8322981366459627,0.8801490683229813,0.0850838599179277,,
+caregiver,conduct,rf,engineered,isotonic,balanced,0.135,0.05,,0.9722222222222222,0.875,0.9326456310679612,0.0388767809485187,,
+caregiver,elimination,lightgbm,engineered,isotonic,precision_guarded,0.505,0.1,0.8156853475389303,0.9416666666666668,0.7018633540372671,0.8229316770186335,0.1356692469342928,0.7482517482517482,
+caregiver,anxiety,lightgbm,engineered,isotonic,precision_guarded,0.1,0.05,,0.8666666666666667,0.9848484848484848,0.9696969696969696,0.0222367257238079,,
+caregiver,depression,catboost,engineered,isotonic,recall_guarded,0.12,0.05,0.9512470229360706,0.8538461538461538,0.9652173913043478,0.9270531400966184,0.0569835347591006,1.0,
+psychologist,adhd,rf,base,isotonic,precision_guarded,0.605,0.05,,0.9568345323741008,0.8260869565217391,0.8890434782608696,0.0834336986759956,,
+psychologist,conduct,catboost,engineered,isotonic,balanced,0.335,0.05,,0.9722222222222222,0.875,0.9326456310679612,0.0383188790167749,,
+psychologist,elimination,lightgbm,engineered,isotonic,precision_guarded,0.505,0.05,,0.9416666666666668,0.7018633540372671,0.8229316770186335,0.1356692469342928,,
+psychologist,anxiety,lightgbm,engineered,isotonic,precision_guarded,0.1,0.05,,0.9850746268656716,1.0,0.9977272727272728,0.0022034291438283,,
+psychologist,depression,catboost,engineered,isotonic,recall_guarded,0.12,0.05,0.9512470229360706,0.8538461538461538,0.9652173913043478,0.9270531400966184,0.0569835347591006,1.0,

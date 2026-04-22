@@ -1,0 +1,11 @@
+family,available
+rf,yes
+extra_trees,yes
+hgb,yes
+logreg,yes
+balanced_rf,no
+balanced_bagging,no
+easy_ensemble,no
+xgboost,yes
+lightgbm,yes
+catboost,yes

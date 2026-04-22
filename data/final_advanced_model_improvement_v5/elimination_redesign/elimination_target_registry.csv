@@ -1,0 +1,5 @@
+target_variant,definition,positives,n,ambiguous_removed
+elimination_any_baseline,target_domain_elimination,1074,1905,0
+elimination_union_internal,target_enuresis_exact OR target_encopresis_exact,1074,1905,0
+elimination_overlap_strict,target_enuresis_exact AND target_encopresis_exact,732,1905,0
+elimination_clear_cases,baseline with ambiguous cases removed by direct/absent criteria support,1074,1905,0

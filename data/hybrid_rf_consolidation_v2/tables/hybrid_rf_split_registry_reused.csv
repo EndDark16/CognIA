@@ -1,0 +1,6 @@
+domain,source,train_n,val_n,holdout_n,train_ids_path,val_ids_path,holdout_ids_path
+adhd,hybrid_rf_ceiling_push_v1,1440,480,480,data/hybrid_rf_ceiling_push_v1/splits/domain_adhd/ids_train.csv,data/hybrid_rf_ceiling_push_v1/splits/domain_adhd/ids_val.csv,data/hybrid_rf_ceiling_push_v1/splits/domain_adhd/ids_holdout.csv
+conduct,hybrid_rf_ceiling_push_v1,1440,480,480,data/hybrid_rf_ceiling_push_v1/splits/domain_conduct/ids_train.csv,data/hybrid_rf_ceiling_push_v1/splits/domain_conduct/ids_val.csv,data/hybrid_rf_ceiling_push_v1/splits/domain_conduct/ids_holdout.csv
+elimination,hybrid_rf_ceiling_push_v1,1440,480,480,data/hybrid_rf_ceiling_push_v1/splits/domain_elimination/ids_train.csv,data/hybrid_rf_ceiling_push_v1/splits/domain_elimination/ids_val.csv,data/hybrid_rf_ceiling_push_v1/splits/domain_elimination/ids_holdout.csv
+anxiety,hybrid_rf_ceiling_push_v1,1440,480,480,data/hybrid_rf_ceiling_push_v1/splits/domain_anxiety/ids_train.csv,data/hybrid_rf_ceiling_push_v1/splits/domain_anxiety/ids_val.csv,data/hybrid_rf_ceiling_push_v1/splits/domain_anxiety/ids_holdout.csv
+depression,hybrid_rf_ceiling_push_v1,1440,480,480,data/hybrid_rf_ceiling_push_v1/splits/domain_depression/ids_train.csv,data/hybrid_rf_ceiling_push_v1/splits/domain_depression/ids_val.csv,data/hybrid_rf_ceiling_push_v1/splits/domain_depression/ids_holdout.csv

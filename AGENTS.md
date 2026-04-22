@@ -352,119 +352,250 @@ Contexto metodológico:
 - `por confirmar`:
   - resultado de suite completa `pytest -q` en esta misma ventana antes de cierre final.
 
-## Actualizacion de estado (2026-04-17) - openapi_runtime_alignment_hardening_v2
-- Se rehizo la alineacion contractual OpenAPI con inventario runtime real (117 operaciones).
-- Script nuevo: `scripts/openapi_professionalize.py` (normaliza paths, summaries/descriptions en espanol, estado contractual y matriz de ciclo de vida).
-- Contrato actualizado:
-  - `docs/openapi.yaml` ahora cubre `117/117` operaciones runtime.
-  - Sin `description: Success`, sin descripciones vacias, y con `x-contract-status` por operacion.
-  - Se incorporaron endpoints legacy runtime faltantes:
-    - `POST /api/v1/questionnaires/{template_id}/activate`
-    - `POST /api/v1/questionnaires/active/clone`
-- Matriz de reemplazo/deprecacion/cierre agregada en `docs/endpoint_lifecycle_matrix.md`.
-- Hardening de seguridad aplicado:
-  - `api/routes/predict.py`: validacion robusta, envelope uniforme, excepciones sanitizadas y rate limit configurable (`PREDICT_RATE_LIMIT`).
-  - `api/routes/questionnaire_v2.py`: metadata PDF ya no expone `file_path`; ahora devuelve `download_url`.
-  - Configuracion: `config/settings.py` y `.env.example` con `PREDICT_RATE_LIMIT`.
-- Guardrails nuevos:
-  - `tests/contracts/test_openapi_documentation_quality.py` (calidad documental integral).
-  - `tests/test_predict.py` (validacion, sanitizacion de errores y rate limit en `/api/predict`).
-- `por confirmar`: resultado de suite completa `pytest -q` en esta misma ventana tras integrar todos los cambios.
-
-## Actualizacion de estado (2026-04-17) - worktree_recovery_and_openapi_single_source
-- Se ejecuto auditoria integral de worktrees con baseline `origin/development` y clasificacion por riesgo/utilidad.
-- Hallazgo clave: no se detectaron commits por delante de `origin/development` en los worktrees auditados.
-- Cambios locales fuera de `cognia_app` quedaron clasificados como ruido de fin de linea (`REJECT_AS_NOISY`) sin delta funcional sustantivo.
-- Se aplico proteccion no destructiva previa:
-  - snapshots por worktree (status/diff/untracked) en backup local versionado.
-  - tags de seguridad `safety/worktree_20260417_190150_*`.
-- Se documento auditoria y clasificacion en `docs/worktree_recovery_20260417.md`.
-- Se removieron worktrees obsoletos/noisy tras respaldo, manteniendo solo el workspace principal y el worktree de consolidacion canonica.
-- Se reforzo gobernanza repo:
-  - `development` declarado canonico operativo en documentacion de mantenimiento.
-  - reglas de trabajo con worktrees y recuperacion conservadora documentadas.
-- OpenAPI/Swagger:
-  - se reafirma `docs/openapi.yaml` como fuente unica activa.
-  - se agrego guardrail de test para verificar que `/openapi.yaml` sirve exactamente `docs/openapi.yaml` y que `/docs` consume esa ruta.
-- `por confirmar`:
-  - promocion final del branch de recuperacion a `development` tras verificacion final de tests de regresion.
-
-## Actualizacion de estado (2026-04-17) - alembic_db_recovery_and_runtime_500_guard
-- Se audito cadena Alembic completa y estado real de BD en entorno operativo:
-  - `alembic current` = `20260415_01 (head)`.
-  - `alembic upgrade head` ejecutado sin pendientes.
-  - `alembic_version` verificado en BD = `20260415_01`.
-- Comparativa ORM vs esquema real (tablas/columnas/indices/FK por definicion):
-  - sin tablas faltantes;
-  - sin columnas faltantes;
-  - sin indices faltantes por definicion;
-  - sin constraints FK faltantes por definicion.
-- Causa reproducible de 500 en runtime detectada:
-  - `GET /api/v1/questionnaire-runtime/questionnaire/active` caia por `FileNotFoundError` de artefactos de modelo (`models/champions/rf_*`) durante bootstrap de preguntas por defecto.
-- Hardening aplicado sin romper contratos:
-  - `api/services/questionnaire_runtime_service.py` ahora hace fallback seguro por dominio al contrato de features cuando faltan artefactos de modelo (mantiene endpoint operativo para carga de cuestionario).
-  - `api/routes/questionnaire_v2.py` y `api/routes/problem_reports.py` normalizan manejo de excepciones de dependencias/DB para devolver `503 db_unavailable` o `503 runtime_assets_unavailable` en lugar de `500` ambiguo.
-- Verificacion post-fix:
-  - `GET /api/admin/problem-reports` => 200
-  - `GET /api/problem-reports/mine` => 200
-  - `GET /api/v2/questionnaires/active` => 200
-  - `GET /api/v1/questionnaire-runtime/questionnaire/active` => 200
-- OpenAPI/Swagger:
-  - se mantiene fuente unica `docs/openapi.yaml` (`/openapi.yaml` y `/docs` verificados).
-
-## Actualizacion de estado (2026-04-18) - openapi_swagger_sync_and_full_endpoint_smoke
-- Se tomo como fuente de verdad el `docs/openapi.yaml` actualizado en workspace local y se dejo como spec activa servida por Swagger.
-- Se reforzo alineacion runtime/openapi agregando rutas faltantes del runtime real:
-  - `POST /api/admin/impersonate/{user_id}`
-  - `POST /api/v1/questionnaires/active/clone`
-  - `POST /api/v1/questionnaires/{template_id}/activate`
-  - `POST /api/admin/roles`
-- Se ejecuto smoke test de endpoints registrados en runtime (`app.url_map`) sin dejar bypass persistente de autorizacion en codigo:
-  - cobertura: `118` reglas / `119` requests
-  - resultado final: `2xx=41`, `4xx=78`, `5xx/exceptions=0`
-  - reporte generado en `artifacts/api_smoke/endpoint_smoke_report.json`.
-- Se corrigio idempotencia de bootstrap v2 para evitar fallos 5xx en reejecuciones:
-  - `api/services/questionnaire_v2_loader_service.py`
-  - fix 1: upsert de `ModelArtifactRegistry` (`runtime_model`) por `(model_version_id, artifact_kind)`.
-  - fix 2: reemplazo de activaciones previas por tuple `(domain, mode_key, role)` para evitar colision de unique en `model_mode_domain_activation`.
-- Verificacion posterior:
-  - `POST /api/v2/questionnaires/admin/bootstrap` => `201` en reejecucion.
-  - `/openapi.yaml` y `/docs` siguen operativos con `docs/openapi.yaml` como fuente activa.
-  - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/api/test_questionnaire_v2_api.py tests/test_problem_reports.py -q` => `21 passed`.
-
-## Actualizacion de estado (2026-04-18) - openapi_request_body_examples_hardening
-- Se corrigieron los `requestBody` de OpenAPI que Swagger renderizaba con ejemplo generico `additionalProp1`.
-- Alcance aplicado en `docs/openapi.yaml`:
-  - 22 operaciones actualizadas en runtime v1 y cuestionarios/reportes v2.
-  - Endpoints sin body real ahora no exponen `requestBody` (p. ej. heartbeat, mark-read de notificacion, bootstrap admin v2, generacion PDF v2).
-  - Endpoints con body real ahora declaran `properties`, `required` y `example` alineados a los schemas runtime (`questionnaire_runtime_schema.py` y `questionnaire_v2_schema.py`).
-- Verificacion automatica:
-  - auditoria de spec: `problem_request_bodies=0` (sin request bodies genericos sin ejemplo).
-  - parseo YAML: `openapi_yaml_valid`.
-  - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py -q` => `5 passed`.
-- Fuente activa Swagger sin cambios:
-  - `/openapi.yaml` sigue sirviendo `docs/openapi.yaml`.
-  - `/docs` sigue consumiendo esa misma spec.
-
-## Actualizacion de estado (2026-04-18) - openapi_response_examples_endpoint_by_endpoint_v2
-- Se ejecuto una pasada integral endpoint-por-endpoint sobre `docs/openapi.yaml` para eliminar placeholders de respuesta tipo schema generico en Swagger.
-- Resultado de cobertura:
-  - `responses_without_example=0` en respuestas JSON/PDF documentadas.
-  - `required_requestbody_without_example=0`.
-  - `optional_requestbody_with_example=0` (los request body no obligatorios quedaron sin ejemplo de input).
-- Se agregaron ejemplos de respuesta concretos para 75 respuestas que aun no tenian example, incluyendo:
-  - health/readiness/metrics y `GET /api/auth/me`.
-  - legacy admin/questionnaire (`impersonate`, `roles`, activacion/clonado v1).
-  - problem reports (`POST /api/problem-reports`, listados y detalle admin).
-  - runtime v1 (draft/save/submit/status/results/export/admin bootstrap/versioning/notifications/professional).
-  - cuestionarios v2 (active, sessions, history, tags/share, submit, dashboards y reports jobs).
-- Se corrigio salida exacta de descarga PDF:
-  - `GET /api/v2/questionnaires/history/{session_id}/pdf/download` ahora documenta `application/pdf` (binario) en 200.
-- Se enriquecieron descripciones de operaciones con seccion profesional adicional por endpoint:
-  - seguridad operativa,
-  - codigos contractuales auditados,
-  - comportamiento condicional por HTTP,
-  - trazabilidad recomendada y criterio de uso.
+## Actualizacion de estado (2026-04-17) - openapi_descripciones_es_endpoint_complete
+- Se actualizaron las descripciones de endpoints en `docs/openapi.yaml` para cobertura completa en espanol.
+- Cobertura final: `115/115` operaciones documentadas con `description` (sin omisiones).
+- Cada descripcion ahora explicita, por endpoint:
+  - objetivo funcional
+  - ruta y metodo
+  - requisitos de seguridad declarados en OpenAPI
+  - parametros de entrada
+  - body request (si aplica)
+  - codigos de respuesta de exito/error documentados
 - Validacion ejecutada:
-  - parseo YAML: `openapi_yaml_valid`.
-  - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/api/test_questionnaire_v2_api.py tests/test_problem_reports.py -q` => `21 passed`.
+  - parseo OpenAPI exitoso (YAML valido)
+  - `pytest tests/contracts/test_openapi_runtime_alignment.py -q` => `1 passed`
+- Alcance de cambio: documentacion/contrato (`docs/openapi.yaml`) sin cambios de runtime.
+
+## Actualizacion de estado (2026-04-21) - hybrid_conduct_honest_retrain_v1 + freeze_v2
+- Se ejecuto auditoria y retraining focal de modelos activos perfectos/sospechosos en Conduct:
+  - `caregiver_2_3`
+  - `caregiver_full`
+  - `psychologist_2_3`
+  - `psychologist_full`
+- Linea nueva: `data/hybrid_conduct_honest_retrain_v1/` y `artifacts/hybrid_conduct_honest_retrain_v1/`.
+- Script principal: `scripts/run_hybrid_conduct_honest_retrain_v1.py`.
+- Manifest: `artifacts/hybrid_conduct_honest_retrain_v1/hybrid_conduct_honest_retrain_v1_manifest.json`.
+
+Auditoria metodologica Conduct (v1):
+- No se detectaron duplicados exactos ni overlap de vectores entre train/val/holdout.
+- No se detecto leakage explicito por columnas target/threshold ni reintroduccion de scores externos prohibidos.
+- Se confirmo patron de facilidad estructural del dataset (shortcut fuerte sobre `conduct_impairment_global`), con performance casi perfecta por regla simple.
+
+Decision de reemplazo:
+- Los 4 slots auditados fueron reemplazados por variantes honestas `engineered_compact_no_shortcuts_v1`.
+- Los modelos previos perfectos/sospechosos quedaron demovidos con trazabilidad explicita en:
+  - `data/hybrid_conduct_honest_retrain_v1/inventory/conduct_models_demoted.csv`
+  - `data/hybrid_conduct_honest_retrain_v1/reports/conduct_demotion_decision.md`
+- En los 4 reemplazos de Conduct se aplico techo duro de promocion (`headline <= 0.98` en holdout).
+
+Nuevas fuentes de verdad operativas:
+- `data/hybrid_operational_freeze_v2/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v2/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v2/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v2/tables/hybrid_questionnaire_inputs_master.csv`
+- Manifests:
+  - `artifacts/hybrid_operational_freeze_v2/hybrid_operational_freeze_v2_manifest.json`
+  - `artifacts/hybrid_active_modes_freeze_v2/hybrid_active_modes_freeze_v2_manifest.json`
+
+Integracion backend/runtime:
+- `api/services/questionnaire_v2_loader_service.py` actualizado para defaults `*_freeze_v2`.
+- `v1` se preserva como historico para trazabilidad (sin sobrescritura).
+
+Caveat de alcance:
+- Esta intervencion es focal sobre Conduct-perfect/suspect; otros pares de dominio no fueron reentrenados en esta ventana.
+- Claim permitido se mantiene: screening/apoyo profesional en entorno simulado, no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-21) - hybrid_secondary_honest_retrain_v1 + freeze_v3 (no-promote)
+- Se ejecuto una segunda auditoria/retraining honesto sobre sospechas fuera de Conduct.
+- Linea creada: `data/hybrid_secondary_honest_retrain_v1/` y `artifacts/hybrid_secondary_honest_retrain_v1/`.
+- Script principal: `scripts/run_hybrid_secondary_honest_retrain_v1.py`.
+- Manifest: `artifacts/hybrid_secondary_honest_retrain_v1/hybrid_secondary_honest_retrain_v1_manifest.json`.
+
+Alcance de auditoria:
+- Inventario completo de slots no-Conduct con `secondary_max_metric > 0.98` y/o `overfit_flag=yes`.
+- Prioridad explicita ejecutada:
+  - `depression/caregiver_1_3`
+  - `depression/psychologist_1_3`
+- Tercer caso retrain_required por dominancia de shortcut:
+  - `anxiety/psychologist_1_3` (dominancia de `eng_anxiety_core_mean`).
+
+Resultados de seleccion (v3):
+- `PROMOTE_NOW=0`, `HOLD_FOR_LIMITATION=3` sobre los objetivos reentrenados.
+- No hubo reemplazos promocionables en la linea operativa:
+  - `replaced_pairs=0` en `hybrid_operational_freeze_v3`.
+  - `replaced_pairs=0` en `hybrid_active_modes_freeze_v3`.
+
+Nuevas lineas versionadas:
+- `data/hybrid_operational_freeze_v3/` + `artifacts/hybrid_operational_freeze_v3/`.
+- `data/hybrid_active_modes_freeze_v3/` + `artifacts/hybrid_active_modes_freeze_v3/`.
+- Estas lineas quedan como evidencia de auditoria `no-promote`; la fuente operativa efectiva se mantiene en `*_freeze_v2` sin cambios de champions activos.
+
+Hallazgos metodologicos clave:
+- No se observaron duplicados exactos globales en el dataset auditado (`duplicate_audit_global.csv`).
+- Persisten casos con metricas secundarias altas (>0.98) fuera de Conduct, especialmente en Anxiety/Elimination.
+- En `anxiety/psychologist_1_3` se confirmo dominancia de feature unica (shortcut operativo), pero la mejor variante honestamente reentrenada mantuvo `secondary_max_metric > 0.98`, por lo que no se promovio.
+- En `depression` short modes se redujo overfit gap, pero la calidad final siguio en banda `malo` y no alcanzo gate de generalizacion/promocion.
+
+Claim permitido:
+- Se mantiene sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-21) - auth_mfa_recovery_flow_completion_v1
+- Login `POST /api/auth/login` actualizado para aceptar credenciales por `identifier` (username o email), manteniendo compatibilidad con `username` y `email` legacy.
+- Flujo de recovery codes MFA completado con endpoints nuevos:
+  - `GET /api/mfa/recovery-codes/status`
+  - `POST /api/mfa/recovery-codes/regenerate`
+- `POST /api/auth/login/mfa` y `POST /api/mfa/disable` mantienen soporte de `recovery_code` de un solo uso.
+- Regeneracion de recovery codes requiere verificacion fuerte (`password` + `code` TOTP o `recovery_code`).
+- `docs/openapi.yaml` actualizado con:
+  - contrato de login por username/email,
+  - paths/schemas de recovery status/regenerate,
+  - ejemplos de request/response.
+- Documentacion de versionado endpoint-por-endpoint agregada en:
+  - `docs/auth_mfa_recovery_flow_and_endpoint_versioning_20260421.md`
+- Validacion ejecutada (focal):
+  - `pytest tests/test_auth.py tests/contracts/test_openapi_runtime_alignment.py -q` => `21 passed`
+  - `pytest tests/api/test_questionnaire_v2_api.py tests/api/test_questionnaire_runtime_api.py tests/services/test_questionnaire_v2_loader.py tests/contracts/test_hybrid_classification_policy_v1.py -q` => `15 passed`
+
+## Actualizacion de estado (2026-04-22) - hybrid_final_honest_improvement_v1 + freeze_v4
+- Se ejecuto campana final de mejora honesta enfocada en modos `full` y `2_3` de `anxiety`, `depression` y `elimination`.
+- Linea creada: `data/hybrid_final_honest_improvement_v1/` y `artifacts/hybrid_final_honest_improvement_v1/`.
+- Script principal: `scripts/run_hybrid_final_honest_improvement_v1.py`.
+- Manifest: `artifacts/hybrid_final_honest_improvement_v1/hybrid_final_honest_improvement_v1_manifest.json`.
+
+Resultado de seleccion:
+- Slots revisados en foco: `12`.
+- Deep retrain ejecutado: `12` (todos los slots foco `full/2_3` en `anxiety`, `depression`, `elimination`).
+- Promociones honestas: `9`.
+  - Anxiety:
+    - `caregiver_2_3` -> `anxiety__caregiver_2_3__final_honest_improvement_v1__rf__engineered_pruned`
+    - `caregiver_full` -> `anxiety__caregiver_full__final_honest_improvement_v1__rf__engineered_compact`
+    - `psychologist_2_3` -> `anxiety__psychologist_2_3__final_honest_improvement_v1__rf__engineered_pruned`
+    - `psychologist_full` -> `anxiety__psychologist_full__final_honest_improvement_v1__rf__engineered_pruned`
+  - Depression:
+    - `psychologist_2_3` -> `depression__psychologist_2_3__final_honest_improvement_v1__rf__compact_subset`
+  - Elimination:
+    - `caregiver_2_3` -> `elimination__caregiver_2_3__final_honest_improvement_v1__rf__engineered_compact`
+    - `caregiver_full` -> `elimination__caregiver_full__final_honest_improvement_v1__rf__engineered_compact`
+    - `psychologist_2_3` -> `elimination__psychologist_2_3__final_honest_improvement_v1__rf__engineered_pruned`
+    - `psychologist_full` -> `elimination__psychologist_full__final_honest_improvement_v1__rf__engineered_compact`
+- No promovidos:
+  - `depression/caregiver_2_3` y `depression/caregiver_full` y `depression/psychologist_full` quedaron `HOLD_FOR_LIMITATION`.
+
+Ceiling/prudencia metodologica:
+- En los slots promovidos de `anxiety` y `elimination` persisten anomalias secundarias altas (`roc_auc`/`specificity` > 0.98), por lo que los reemplazos quedan con `PRIMARY_WITH_CAVEAT` (no `ROBUST_PRIMARY`).
+- Cambio de confianza calibrado por caveat/anomalia:
+  - mejora fuerte: `depression/psychologist_2_3` (`54.1 -> 74.3`, `limited -> moderate`)
+  - reduccion de sobreconfianza en reemplazos con anomalia secundaria (principalmente `anxiety`/`elimination`).
+
+Nuevas fuentes de verdad operativas:
+- `data/hybrid_operational_freeze_v4/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v4/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v4/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v4/tables/hybrid_questionnaire_inputs_master.csv`
+
+Integracion backend/runtime:
+- `api/services/questionnaire_v2_loader_service.py` actualizado para defaults `*_freeze_v4`.
+
+Claim permitido:
+- Se mantiene sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-22) - backend_documentation_gap_closure_v1
+- Se realizo auditoria documental backend (puntos 9-25) con evidencia de codigo y contratos publicados.
+- Nuevo documento versionado: `docs/backend_gap_matrix_20260422.md`.
+- Alcance del documento:
+  - estado por punto (`implementado`, `parcial`, `por confirmar`),
+  - evidencia backend concreta,
+  - separacion explicita de temas frontend/operacion externa.
+- Claim metodologico reforzado en contrato/documentacion:
+  - entorno simulado,
+  - screening/apoyo profesional,
+  - no diagnostico clinico automatico.
+
+Alineacion de endpoints solapados (punto 24):
+- Se confirmo que estos endpoints v1 siguen activos por compatibilidad en codigo:
+  - `POST /api/v1/questionnaires/{template_id}/activate`
+  - `POST /api/v1/questionnaires/active/clone`
+- Se marco deprecacion + reemplazo recomendado en `docs/openapi.yaml`:
+  - `.../activate` -> `POST /api/admin/questionnaires/{template_id}/publish`
+  - `.../active/clone` -> `POST /api/admin/questionnaires/{template_id}/clone`
+- Se corrigio inconsistencia documental en `docs/api_full_reference.md` (antes figuraban como retirados).
+- Se actualizo `docs/questionnaire_api_contract.md` con seccion de migracion v1 -> v2/admin.
+- Se actualizo `README.md` y `docs/traceability_map.md` para apuntar al nuevo mapa de brechas.
+
+Por confirmar:
+- archivo TXT adjunto con detalle de despliegue no localizado en el arbol versionado de esta rama; mantener estado `por confirmar` hasta versionarlo en repo.
+
+## Actualizacion de estado (2026-04-22) - admin_auth_regression_fix_and_full_test_pass_v1
+- Durante la pasada de validacion completa (`pytest -q`) aparecieron 3 regresiones backend y se corrigieron en la misma ventana.
+
+Regresiones corregidas:
+- `POST /api/admin/roles` devolvia `405` por ausencia de handler `POST` en `api/routes/admin.py`.
+  - Se agrego endpoint de creacion de rol.
+  - Se agrego schema `RoleCreateSchema` en `api/schemas/admin_schema.py`.
+- `POST /api/admin/impersonate/{user_id}` devolvia `404` por ausencia de handler en `api/routes/admin.py`.
+  - Se agrego endpoint operativo de impersonacion con token temporal.
+- Rate limit de `POST /api/auth/password/forgot` no aplicaba el limite esperado bajo `PASSWORD_FORGOT_RATE_LIMIT` en test de configuracion.
+  - Se ajusto prioridad de configuracion en `api/routes/auth.py` para respetar el limite general configurado.
+
+Alineacion de contrato:
+- `docs/openapi.yaml` actualizado para incluir `POST /api/admin/impersonate/{user_id}`.
+- `docs/openapi.yaml` actualizado para reflejar `POST /api/admin/roles` bajo `/api/admin/roles`.
+- Guardrail de contrato nuevamente en verde:
+  - `pytest tests/contracts/test_openapi_runtime_alignment.py -q` => `1 passed`.
+
+Validacion final completa:
+- `pytest -q` => `139 passed, 3 skipped`.
+
+## Actualizacion de estado (2026-04-22) - deployment_playbook_ingest_v1
+- Se recibio y analizo el archivo externo de despliegue:
+  - `C:\Users\andre\Downloads\readme_deployment_summary.txt`.
+- Se versiono la ingesta documental en:
+  - `docs/deployment_playbook_ingest_20260422.md`.
+
+Resultado de la ingesta:
+- Arquitectura de despliegue documentada (Ubuntu + Docker Compose + Postgres + backend Flask + gateway Nginx + Cloudflare Tunnel/Access + runners self-hosted).
+- Se mantuvo separacion de alcance:
+  - backend confirmado/documentado,
+  - frontend e integracion multi-repo como aclaracion externa (`por confirmar` en este repo).
+
+Ajuste de estado de brechas:
+- `docs/backend_gap_matrix_20260422.md` actualizado en punto 21 para incluir evidencia externa de despliegue recibida.
+- Estado de punto 21 se mantiene `parcial` (no cierre definitivo) por falta de versionado en esta rama de algunos artefactos del playbook (ej. `.deploy/`, `deploy_wsgi.py`, `gateway/default.conf`, workflows de deploy descritos en la guia externa).
+
+## Actualizacion de estado (2026-04-22) - backend_release_versioning_framework_v1
+- Se implemento framework formal de versionado backend con esquema CalVer (`YYYY.MM.DD-rN`).
+- Version backend inicial publicada en esta ventana: `2026.04.22-r1`.
+
+Artefactos de versionado creados:
+- `VERSION`
+- `CHANGELOG.md`
+- `docs/backend_versioning_policy.md`
+- `docs/releases/backend_release_2026-04-22_r1.md`
+- `artifacts/backend_release_registry/backend_release_2026-04-22_r1_manifest.json`
+
+Criterio profesional aplicado:
+- fuente de verdad unica de version (`VERSION`),
+- historial humano (`CHANGELOG.md`),
+- release note por entrega,
+- manifiesto JSON auditable con estado de validacion.
+
+Validacion declarada en release actual:
+- OpenAPI/runtime alignment: `passed`.
+- suite completa previa de esta ventana: `pytest -q` => `139 passed, 3 skipped`.
+- Refuerzo de versionado profesional agregado:
+  - `docs/backend_release_workflow.md` (flujo PR/merge release-driven)
+  - `docs/backend_release_registry.csv` (indice tabular de releases backend)
+
+## Actualizacion de estado (2026-04-22) - sonarcloud_local_execution_and_security_hotspots_closure_v1
+- Se versiono ejecucion local de SonarCloud desde `.env` con:
+  - `sonar-project.properties`
+  - `scripts/run_sonar.ps1`
+  - variables Sonar en `.env.example`.
+- Se aplicaron hardenings backend vinculados a findings/hotspots:
+  - regex de email endurecida en `api/routes/auth.py`,
+  - generacion de identificadores/PIN con `secrets` en `api/services/questionnaire_runtime_service.py`,
+  - hash de `registration_number` migrado a `sha256` en `api/services/evaluation_service.py`,
+  - split de unsubscribe `GET/POST` en `api/routes/email.py`,
+  - `DEV_DEBUG=false` por defecto en `.env.example`.
+- Estado operativo declarado en esta ventana: Quality Gate Sonar `PASSED` y sin issues abiertas en new code period.

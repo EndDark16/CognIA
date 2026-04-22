@@ -2,7 +2,7 @@ from marshmallow import EXCLUDE, Schema, ValidationError, fields, validate, vali
 
 
 MODES = ("short", "medium", "complete")
-ROLES = ("caregiver", "psychologist")
+ROLES = ("guardian", "psychologist")
 ALERT_LEVELS = ("low", "moderate", "elevated", "high", "critical_review")
 
 

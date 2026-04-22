@@ -21,6 +21,7 @@ Fuente: inventario runtime real (`api/app.py`) + contrato publicado (`docs/opena
 | `GET /api/auth/me` | `auth` | `N/A` | Contrato de autenticacion, seguridad y soporte vigente. | frontend auth | bajo | `KEEP_ACTIVE` | mantener visible |
 | `GET /api/auth/password/reset/verify` | `auth` | `N/A` | Contrato de autenticacion, seguridad y soporte vigente. | frontend auth | bajo | `KEEP_ACTIVE` | mantener visible |
 | `GET /api/email/unsubscribe` | `email` | `N/A` | Contrato de autenticacion, seguridad y soporte vigente. | soporte de correo | bajo | `KEEP_ACTIVE` | mantener visible |
+| `GET /api/mfa/recovery-codes/status` | `mfa` | `N/A` | Contrato de autenticacion, seguridad y soporte vigente. | usuarios autenticados | bajo | `KEEP_ACTIVE` | mantener visible |
 | `GET /api/problem-reports/mine` | `problem_reports` | `N/A` | Contrato vigente para trazabilidad operativa de incidentes y soporte. | usuarios + soporte | bajo | `KEEP_ACTIVE` | mantener visible |
 | `GET /api/v1/questionnaire-runtime/admin/templates/{template_id}/versions` | `questionnaire_runtime_v1` | `N/A` | Flujo runtime v1 mantenido por compatibilidad mientras se migra a cuestionarios v2. | admin runtime v1 | medio | `KEEP_ACTIVE_BUT_LEGACY` | mantener visible y marcar deprecated |
 | `GET /api/v1/questionnaire-runtime/admin/versions/{version_id}` | `questionnaire_runtime_v1` | `N/A` | Flujo runtime v1 mantenido por compatibilidad mientras se migra a cuestionarios v2. | admin runtime v1 | medio | `KEEP_ACTIVE_BUT_LEGACY` | mantener visible y marcar deprecated |
@@ -94,6 +95,7 @@ Fuente: inventario runtime real (`api/app.py`) + contrato publicado (`docs/opena
 | `POST /api/email/unsubscribe` | `email` | `N/A` | Contrato de autenticacion, seguridad y soporte vigente. | soporte de correo | bajo | `KEEP_ACTIVE` | mantener visible |
 | `POST /api/mfa/confirm` | `mfa` | `N/A` | Contrato de autenticacion, seguridad y soporte vigente. | usuarios autenticados | bajo | `KEEP_ACTIVE` | mantener visible |
 | `POST /api/mfa/disable` | `mfa` | `N/A` | Contrato de autenticacion, seguridad y soporte vigente. | usuarios autenticados | bajo | `KEEP_ACTIVE` | mantener visible |
+| `POST /api/mfa/recovery-codes/regenerate` | `mfa` | `N/A` | Contrato de autenticacion, seguridad y soporte vigente. | usuarios autenticados | bajo | `KEEP_ACTIVE` | mantener visible |
 | `POST /api/mfa/setup` | `mfa` | `N/A` | Contrato de autenticacion, seguridad y soporte vigente. | usuarios autenticados | bajo | `KEEP_ACTIVE` | mantener visible |
 | `POST /api/predict` | `predict_legacy` | `N/A` | Ruta experimental heredada sin contrato estable de producto. | integracion experimental | alto | `DEPRECATE_PUBLIC` | marcar deprecated |
 | `POST /api/problem-reports` | `problem_reports` | `N/A` | Contrato vigente para trazabilidad operativa de incidentes y soporte. | usuarios + soporte | bajo | `KEEP_ACTIVE` | mantener visible |

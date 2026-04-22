@@ -1,0 +1,8 @@
+{
+  "run_id": "hybrid_active_modes_freeze_v4",
+  "base_line": "hybrid_active_modes_freeze_v2",
+  "replacement_line": "hybrid_final_honest_improvement_v1",
+  "replaced_pairs": 9,
+  "path": "data/hybrid_active_modes_freeze_v4/tables/hybrid_active_models_30_modes.csv",
+  "generated_at_utc": "2026-04-21T23:00:45.405642+00:00"
+}

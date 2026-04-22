@@ -1,0 +1,50 @@
+question_id,feature_key,section,domain,question_text,response_type,response_scale,source_instrument_or_origin,modalidad,priority
+QB_001,age_years,contexto,adhd,Edad del niño o niña (años cumplidos),numeric_range,6.0|11.0,demographic_or_system,dato_demografico,high
+QB_002,sex_assigned_at_birth,contexto,adhd,Sexo asignado al nacer,single_choice,Female|Male|Unknown,demographic_or_system,dato_demografico,high
+QB_003,site,contexto,adhd,Sede de aplicación (autocompletado por sistema),single_choice,CBIC|CUNY|RUBIC|Staten Island,demographic_or_system,dato_demografico,medium
+QB_004,release,contexto,adhd,Versión de release de inferencia (autocompletado por sistema),numeric_range,11.0|11.0,demographic_or_system,dato_demografico,medium
+QB_005,cbcl_internalizing_proxy,dominio_adhd,adhd,Reporte cuidador: CBCL internalizing proxy,numeric_range,0.0|38.0,CBCL_caregiver,reporte_cuidador,medium
+QB_006,has_conners,dominio_adhd,adhd,Reporte cuidador: has conners,boolean,0|1,instrument_availability,disponibilidad_instrumental,medium
+QB_007,sdq_prosocial_behavior,dominio_adhd,adhd,Reporte cuidador: SDQ prosocial behavior,numeric_range,0.0|8.0,SDQ_caregiver,reporte_cuidador,medium
+QB_008,cbcl_externalizing_proxy,dominio_adhd,adhd,Reporte cuidador: CBCL externalizing proxy,numeric_range,2.0|40.0,CBCL_caregiver,reporte_cuidador,medium
+QB_009,cbcl_rule_breaking_proxy,dominio_conduct,conduct,Reporte cuidador: CBCL rule breaking proxy,numeric_range,0.0|22.0,CBCL_caregiver,reporte_cuidador,medium
+QB_010,has_icut,dominio_conduct,conduct,¿Se cuenta con escala ICU para este caso?,boolean,0|1,instrument_availability,disponibilidad_instrumental,medium
+QB_011,sdq_emotional_symptoms,dominio_adhd,adhd,Reporte cuidador: SDQ emotional symptoms,numeric_range,0.0|8.0,SDQ_caregiver,reporte_cuidador,medium
+QB_012,icut_total,dominio_conduct,conduct,Reporte cuidador: ICU total,numeric_range,6.0|60.0,ICU_parent,reporte_cuidador,medium
+QB_013,has_ari_p,dominio_conduct,conduct,¿Se cuenta con escala ARI-P para este caso?,boolean,0|1,instrument_availability,disponibilidad_instrumental,medium
+QB_014,has_ari_sr,dominio_conduct,conduct,Reporte cuidador: has ARI sr,boolean,0|1,instrument_availability,disponibilidad_instrumental,medium
+QB_015,has_cbcl,dominio_adhd,adhd,¿Se cuenta con datos CBCL para este caso?,boolean,0|1,instrument_availability,disponibilidad_instrumental,medium
+QB_016,cbcl_anxious_depressed_proxy,dominio_depression,depression,Reporte cuidador: CBCL anxious depressed proxy,numeric_range,0.0|20.0,CBCL_caregiver,reporte_cuidador,medium
+QB_017,sdq_impact,dominio_adhd,adhd,Reporte cuidador: SDQ impact,numeric_range,0.0|7.0,SDQ_caregiver,reporte_cuidador,medium
+QB_018,cbcl_attention_problems_proxy,dominio_adhd,adhd,Reporte cuidador: CBCL attention problems proxy,numeric_range,0.0|20.0,CBCL_caregiver,reporte_cuidador,medium
+QB_019,sdq_total_difficulties,dominio_adhd,adhd,Reporte cuidador: SDQ total difficulties,numeric_range,0.0|38.0,SDQ_caregiver,reporte_cuidador,medium
+QB_020,sdq_hyperactivity_inattention,dominio_adhd,adhd,Reporte cuidador: SDQ hyperactivity inattention,numeric_range,0.0|10.0,SDQ_caregiver,reporte_cuidador,medium
+QB_021,cbcl_aggressive_behavior_proxy,dominio_conduct,conduct,Reporte cuidador: CBCL aggressive behavior proxy,numeric_range,1.0|19.0,CBCL_caregiver,reporte_cuidador,medium
+QB_022,sdq_conduct_problems,dominio_conduct,conduct,Reporte cuidador: SDQ conduct problems,numeric_range,0.0|10.0,SDQ_caregiver,reporte_cuidador,medium
+QB_023,cbcl_025,dominio_anxiety,anxiety,Reporte cuidador: CBCL 025,numeric_range,0.0|2.0,CBCL_caregiver,reporte_cuidador,medium
+QB_024,cbcl_070,dominio_anxiety,anxiety,Reporte cuidador: CBCL 070,numeric_range,0.0|2.0,CBCL_caregiver,reporte_cuidador,medium
+QB_025,cbcl_057,dominio_anxiety,anxiety,Reporte cuidador: CBCL 057,numeric_range,0.0|2.0,CBCL_caregiver,reporte_cuidador,medium
+QB_026,cbcl_058,dominio_anxiety,anxiety,Reporte cuidador: CBCL 058,numeric_range,0.0|2.0,CBCL_caregiver,reporte_cuidador,medium
+QB_027,cbcl_060,dominio_anxiety,anxiety,Reporte cuidador: CBCL 060,numeric_range,0.0|2.0,CBCL_caregiver,reporte_cuidador,medium
+QB_028,cbcl_061,dominio_anxiety,anxiety,Reporte cuidador: CBCL 061,numeric_range,0.0|2.0,CBCL_caregiver,reporte_cuidador,medium
+QB_029,cbcl_062,dominio_anxiety,anxiety,Reporte cuidador: CBCL 062,numeric_range,0.0|2.0,CBCL_caregiver,reporte_cuidador,medium
+QB_030,cbcl_063,dominio_anxiety,anxiety,Reporte cuidador: CBCL 063,numeric_range,0.0|2.0,CBCL_caregiver,reporte_cuidador,medium
+QB_031,cbcl_064,dominio_anxiety,anxiety,Reporte cuidador: CBCL 064,numeric_range,0.0|2.0,CBCL_caregiver,reporte_cuidador,medium
+QB_032,cbcl_065,dominio_anxiety,anxiety,Reporte cuidador: CBCL 065,numeric_range,0.0|2.0,CBCL_caregiver,reporte_cuidador,medium
+QB_033,cbcl_066,dominio_anxiety,anxiety,Reporte cuidador: CBCL 066,numeric_range,0.0|2.0,CBCL_caregiver,reporte_cuidador,medium
+QB_034,mfq_p_total,dominio_depression,depression,Reporte cuidador: MFQ p total,numeric_range,0.0|60.0,MFQ_P_caregiver,reporte_cuidador,medium
+QB_035,sdq_peer_problems,dominio_adhd,adhd,Reporte cuidador: SDQ peer problems,numeric_range,0.0|10.0,SDQ_caregiver,reporte_cuidador,medium
+QB_036,has_swan,dominio_adhd,adhd,¿Se cuenta con escala SWAN para este caso?,boolean,0|1,instrument_availability,disponibilidad_instrumental,medium
+QB_037,swan_total,dominio_adhd,adhd,Reporte cuidador: SWAN total,numeric_range,-43.0|44.0,SWAN_caregiver,reporte_cuidador,medium
+QB_038,swan_inattention_total,dominio_adhd,adhd,Reporte cuidador: SWAN inattention total,numeric_range,-27.0|27.0,SWAN_caregiver,reporte_cuidador,medium
+QB_039,swan_hyperactive_impulsive_total,dominio_adhd,adhd,Reporte cuidador: SWAN hyperactive impulsive total,numeric_range,-17.0|18.0,SWAN_caregiver,reporte_cuidador,medium
+QB_040,has_scared_p,dominio_anxiety,anxiety,¿Se cuenta con escala SCARED-P para este caso?,boolean,0|1,instrument_availability,disponibilidad_instrumental,medium
+QB_041,scared_p_total,dominio_anxiety,anxiety,Reporte cuidador: SCARED p total,numeric_range,3.0|66.0,SCARED_P_caregiver,reporte_cuidador,medium
+QB_042,scared_p_generalized_anxiety,dominio_anxiety,anxiety,Reporte cuidador: SCARED p generalized anxiety,numeric_range,0.0|14.0,SCARED_P_caregiver,reporte_cuidador,medium
+QB_043,scared_p_panic_somatic,dominio_anxiety,anxiety,Reporte cuidador: SCARED p panic somatic,numeric_range,0.0|20.0,SCARED_P_caregiver,reporte_cuidador,medium
+QB_044,scared_p_social_anxiety,dominio_anxiety,anxiety,Reporte cuidador: SCARED p social anxiety,numeric_range,0.0|11.0,SCARED_P_caregiver,reporte_cuidador,medium
+QB_045,scared_p_separation_anxiety,dominio_anxiety,anxiety,Reporte cuidador: SCARED p separation anxiety,numeric_range,0.0|14.0,SCARED_P_caregiver,reporte_cuidador,medium
+QB_046,scared_p_school_avoidance,dominio_anxiety,anxiety,Reporte cuidador: SCARED p school avoidance,numeric_range,0.0|8.0,SCARED_P_caregiver,reporte_cuidador,medium
+QB_047,scared_p_possible_anxiety_disorder_cut25,dominio_anxiety,anxiety,Reporte cuidador: SCARED p possible anxiety disorder cut25,boolean,0|1,SCARED_P_caregiver,reporte_cuidador,medium
+QB_048,has_mfq_p,dominio_depression,depression,¿Se cuenta con escala MFQ-P para este caso?,boolean,0|1,instrument_availability,disponibilidad_instrumental,medium
+QB_049,ari_p_symptom_total,dominio_conduct,conduct,Reporte cuidador: ARI p symptom total,numeric_range,0.0|12.0,ARI_P_caregiver,reporte_cuidador,medium

@@ -1,0 +1,17 @@
+domain,mode,stress_type,scenario,delta_ba
+conduct,caregiver_2_3,threshold,shift_-0.10,0.014062500000000089
+conduct,caregiver_2_3,threshold,shift_-0.05,0.010937500000000044
+conduct,caregiver_2_3,threshold,shift_+0.05,-0.006249999999999978
+conduct,caregiver_2_3,threshold,shift_+0.10,-0.026562500000000044
+conduct,caregiver_full,threshold,shift_-0.10,0.0015625000000000222
+conduct,caregiver_full,threshold,shift_-0.05,0.006249999999999978
+conduct,caregiver_full,threshold,shift_+0.05,0.006249999999999978
+conduct,caregiver_full,threshold,shift_+0.10,0.007812500000000111
+conduct,psychologist_2_3,threshold,shift_-0.10,0.0015625000000001332
+conduct,psychologist_2_3,threshold,shift_-0.05,0.0015625000000001332
+conduct,psychologist_2_3,threshold,shift_+0.05,0.0
+conduct,psychologist_2_3,threshold,shift_+0.10,0.0
+conduct,psychologist_full,threshold,shift_-0.10,-0.0078125
+conduct,psychologist_full,threshold,shift_-0.05,-0.0078125
+conduct,psychologist_full,threshold,shift_+0.05,0.0
+conduct,psychologist_full,threshold,shift_+0.10,0.0
