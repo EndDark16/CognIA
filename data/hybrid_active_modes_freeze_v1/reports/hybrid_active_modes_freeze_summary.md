@@ -1,0 +1,7 @@
+# Hybrid Active Modes Freeze v1 - Summary
+
+- Active models defined: 30
+- ACTIVE_HIGH_CONFIDENCE: 15
+- ACTIVE_MODERATE_CONFIDENCE: 6
+- ACTIVE_LOW_CONFIDENCE: 0
+- ACTIVE_LIMITED_USE: 9

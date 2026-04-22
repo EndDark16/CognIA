@@ -1,0 +1,7 @@
+mode,role,mode_features_in_matrix,direct_usable,transparent_derived_usable,eligible_union
+caregiver_1_3,caregiver,49,49,0,49
+caregiver_2_3,caregiver,98,98,0,98
+caregiver_full,caregiver,147,147,0,147
+psychologist_1_3,psychologist,60,60,0,60
+psychologist_2_3,psychologist,120,120,0,120
+psychologist_full,psychologist,180,180,0,180

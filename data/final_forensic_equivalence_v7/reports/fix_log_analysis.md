@@ -1,0 +1,9 @@
+# Fix log analysis
+
+fix_id       component                                                what_was_wrong                                  correction_applied                  expected_impact
+   F01         derived heuristic derivation used even when exact legacy value exists                             legacy-first assignment    higher exact match on derived
+   F02       has_flags                   flags built inconsistently in partial cases deterministic has_* from related nonzero/nonmissing              lower flag mismatch
+   F03   system_fields                                site/release not canonicalized            canonical normalization for site/release            lower system mismatch
+   F04    vector_order                       potential non-explicit feature ordering              metadata.feature_columns ordering lock             prevent silent drift
+   F05  missing_policy                     self-report handling not explicit by mode                           mode-aware masking policy          honest coverage/outputs
+   F06 operating_point                       single threshold policy on weak domains                targeted threshold+abstention tuning better recall/BA on weak domains

@@ -1,0 +1,11 @@
+section_id,section_name,mode_supported,objective,main_source_type,expected_domains,estimated_minutes,required_for_mode,likely_branching_rule,notes
+ari,ARI,both,Capturar insumos estructurados de ARI para inferencia,disponibilidad_instrumental|score_derivado,conduct,3,yes,depende de flags has_* cuando aplique,Sin preguntas abiertas en core de modelo
+cbcl,CBCL,both,Capturar insumos estructurados de CBCL para inferencia,disponibilidad_instrumental|general|score_derivado,adhd|anxiety|conduct|depression|elimination,3,yes,depende de flags has_* cuando aplique,Sin preguntas abiertas en core de modelo
+conners,Conners,psychologist,Capturar insumos estructurados de Conners para inferencia,disponibilidad_instrumental|general|score_derivado,adhd,3,yes,depende de flags has_* cuando aplique,Sin preguntas abiertas en core de modelo
+demographics,Demographics,both,Capturar insumos estructurados de Demographics para inferencia,general,adhd|anxiety|conduct|depression|elimination,3,yes,depende de flags has_* cuando aplique,Sin preguntas abiertas en core de modelo
+icut,ICUT,both,Capturar insumos estructurados de ICUT para inferencia,disponibilidad_instrumental|score_derivado,conduct,3,yes,depende de flags has_* cuando aplique,Sin preguntas abiertas en core de modelo
+mfq,MFQ,both,Capturar insumos estructurados de MFQ para inferencia,score_derivado,depression,3,yes,depende de flags has_* cuando aplique,Sin preguntas abiertas en core de modelo
+scared,SCARED,both,Capturar insumos estructurados de SCARED para inferencia,disponibilidad_instrumental|general|score_derivado,anxiety,3,yes,depende de flags has_* cuando aplique,Sin preguntas abiertas en core de modelo
+sdq,SDQ,both,Capturar insumos estructurados de SDQ para inferencia,disponibilidad_instrumental|general,adhd|anxiety|conduct|depression|elimination,3,yes,depende de flags has_* cuando aplique,Sin preguntas abiertas en core de modelo
+swan,SWAN,both,Capturar insumos estructurados de SWAN para inferencia,disponibilidad_instrumental|score_derivado,adhd,3,yes,depende de flags has_* cuando aplique,Sin preguntas abiertas en core de modelo
+ysr,YSR,psychologist,Capturar insumos estructurados de YSR para inferencia,disponibilidad_instrumental|score_derivado,adhd,3,yes,depende de flags has_* cuando aplique,Sin preguntas abiertas en core de modelo

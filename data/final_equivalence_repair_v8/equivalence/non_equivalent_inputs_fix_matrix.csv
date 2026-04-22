@@ -1,0 +1,17 @@
+input_key,type,domains,severity,pre_fix_exact_match,post_fix_exact_match,correction_applied
+has_sdq,presence_flag,adhd;conduct;elimination;anxiety;depression,medium,0.9333333333333332,1.0,presence 1/NaN from instrument
+has_swan,presence_flag,adhd,low,0.9533333333333334,1.0,presence 1/NaN from instrument
+has_icut,presence_flag,conduct,low,0.9566666666666668,1.0,presence 1/NaN from instrument
+has_cbcl,presence_flag,adhd;conduct;elimination;anxiety;depression,low,0.9716666666666668,1.0,presence 1/NaN from instrument
+conners_total,derived,adhd,high,0.0258333333333333,1.0,sum(min_count=1)
+icut_total,derived,conduct,high,0.9566666666666668,1.0,sum(min_count=1)
+scared_p_total,derived,anxiety,high,0.725,1.0,sum(min_count=1)
+scared_sr_total,derived,anxiety,high,0.7308333333333333,1.0,sum(min_count=1)
+swan_total,derived,adhd,high,0.9533333333333334,1.0,sum(min_count=1)
+has_conners,presence_flag,adhd,high,0.0258333333333333,1.0,presence 1/NaN from instrument
+has_ysr,presence_flag,adhd,high,0.0266666666666666,1.0,presence 1/NaN from instrument
+has_ari_sr,presence_flag,conduct,high,0.9566666666666668,1.0,presence 1/NaN from instrument
+mfq_p_total,derived,depression,high,0.7241666666666666,1.0,sum(min_count=1)
+has_scared_p,presence_flag,anxiety,high,0.725,1.0,presence 1/NaN from instrument
+has_ari_p,presence_flag,conduct,high,0.9583333333333334,1.0,presence 1/NaN from instrument
+has_scared_sr,presence_flag,anxiety,high,0.7308333333333333,1.0,presence 1/NaN from instrument

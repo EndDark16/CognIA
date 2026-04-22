@@ -1,0 +1,3 @@
+| run_id | dataset | n_rows | n_features_base | n_features_engineered_v3 | priority_pairs | seed_base |
+|---|---|---|---|---|---|---|
+| hybrid_no_external_scores_boosted_v3 | data\hybrid_no_external_scores_rebuild_v2\tables\hybrid_no_external_scores_dataset_ready.csv | 2400 | 186 | 18 | 13 | 20270413 |

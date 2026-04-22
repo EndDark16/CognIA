@@ -1,0 +1,6 @@
+domain,recommended_route,recommended_variant,winner_hybrid_score,margin_vs_runner_up,use_hybrid_yes_no
+conduct,A,direct_basic,0.8607909775891397,0.0027348738218302415,yes
+anxiety,C,caregiver_clean_plus_optional_self,0.8389700977970325,0.0004287461353914557,yes
+depression,C,caregiver_clean_core,0.8378648916679249,0.004772594160318389,yes
+adhd,C,caregiver_clean_core,0.8280281216472756,0.001968439165905833,yes
+elimination,A,direct_basic,0.7532564656604162,0.0015376503130227759,yes
