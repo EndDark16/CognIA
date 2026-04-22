@@ -56,7 +56,6 @@ def _build_message(*, subject: str, to_email: str, html_body: str, text_body: st
 
 
 def _resolve_smtp_mode(
-    host: str,
     port: int | None,
     use_tls: bool,
     use_ssl: bool,
@@ -101,7 +100,7 @@ def _send_via_smtp(message: EmailMessage) -> None:
     if not host:
         raise RuntimeError("SMTP_HOST is not configured")
 
-    port, use_tls, use_ssl = _resolve_smtp_mode(host, port, use_tls, use_ssl, port_ssl, port_tls)
+    port, use_tls, use_ssl = _resolve_smtp_mode(port, use_tls, use_ssl, port_ssl, port_tls)
     current_app.logger.info(
         "SMTP attempt host=%s port=%s tls=%s ssl=%s user_configured=%s",
         host,

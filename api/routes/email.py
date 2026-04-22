@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, current_app
 from marshmallow import ValidationError
-from itsdangerous import BadSignature, SignatureExpired
+from itsdangerous import BadSignature
 
 from api.extensions import limiter
 from api.schemas.email_schema import EmailUnsubscribeSchema
@@ -24,9 +24,7 @@ def _collect_unsubscribe_payload() -> dict:
     return payload
 
 
-@email_bp.route("/unsubscribe", methods=["GET", "POST"])
-@limiter.limit(lambda: current_app.config.get("EMAIL_UNSUBSCRIBE_RATE_LIMIT", "10 per 10 minutes"))
-def email_unsubscribe():
+def _email_unsubscribe_impl():
     schema = EmailUnsubscribeSchema()
     try:
         data = schema.load(_collect_unsubscribe_payload())
@@ -40,7 +38,7 @@ def email_unsubscribe():
 
     try:
         email = verify_unsubscribe_token(token)
-    except (BadSignature, SignatureExpired):
+    except BadSignature:
         return jsonify({"msg": "Invalid or expired token", "error": "invalid_token"}), 400
     except Exception:
         current_app.logger.exception("Failed to verify unsubscribe token")
@@ -62,3 +60,15 @@ def email_unsubscribe():
         return jsonify({"msg": "Unable to process request", "error": "server_error"}), 500
 
     return jsonify({"message": "Unsubscribed"}), 200
+
+
+@email_bp.get("/unsubscribe")
+@limiter.limit(lambda: current_app.config.get("EMAIL_UNSUBSCRIBE_RATE_LIMIT", "10 per 10 minutes"))
+def email_unsubscribe_get():
+    return _email_unsubscribe_impl()
+
+
+@email_bp.post("/unsubscribe")
+@limiter.limit(lambda: current_app.config.get("EMAIL_UNSUBSCRIBE_RATE_LIMIT", "10 per 10 minutes"))
+def email_unsubscribe_post():
+    return _email_unsubscribe_impl()

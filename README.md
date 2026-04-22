@@ -191,6 +191,22 @@ Detalles: `docs/problem_reporting_backend.md`.
 - Guardrail de calidad documental OpenAPI: `pytest tests/contracts/test_openapi_documentation_quality.py -q`
 - Hardening de predict experimental: `pytest tests/test_predict.py -q`
 
+## SonarCloud (analisis local desde .env)
+- Variables requeridas en `.env`:
+  - `SONAR_HOST_URL`
+  - `SONAR_TOKEN`
+  - `SONAR_PROJECT_KEY`
+  - `SONAR_ORGANIZATION`
+- Ejecutar analisis:
+  - `.\scripts\run_sonar.ps1`
+- El script genera `coverage.xml` automaticamente con pruebas backend focalizadas antes del scan.
+- Esperar Quality Gate (opcional):
+  - `.\scripts\run_sonar.ps1 -WaitQualityGate -QualityGateTimeoutSec 300`
+- Omitir cobertura (si solo quieres validar scanner):
+  - `.\scripts\run_sonar.ps1 -SkipCoverage`
+- Scope actual versionado para Sonar:
+  - `api`, `app`, `config` (ver `sonar-project.properties`).
+
 ## Reporting y dashboards
 - Endpoints v2 en `/api/v2/dashboard/*` y `/api/v2/reports/jobs`.
 - Ver `docs/reporting_and_dashboards.md`.

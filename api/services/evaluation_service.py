@@ -35,7 +35,7 @@ def _hash_access_key(access_key: str) -> str:
 
 def _generate_registration_number(evaluation_id, created_at: datetime) -> str:
     date_part = created_at.strftime("%Y%m%d")
-    hash_part = hashlib.md5(str(evaluation_id).encode("utf-8")).hexdigest()[:8]
+    hash_part = hashlib.sha256(str(evaluation_id).encode("utf-8")).hexdigest()[:8]
     return f"EV-{date_part}-{hash_part}"
 
 
