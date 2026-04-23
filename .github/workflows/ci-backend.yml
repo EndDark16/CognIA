@@ -19,6 +19,9 @@ jobs:
     name: backend-ci
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      # Non-secret test key required by MFA encryption paths during pytest in CI.
+      MFA_ENCRYPTION_KEY: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
 
     steps:
       - name: Checkout
