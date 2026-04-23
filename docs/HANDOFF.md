@@ -747,3 +747,39 @@ Correcciones/hardening aplicados:
 Estado reportado:
 - Sonar Quality Gate en `PASSED`.
 - Open issues en new code period: `0`.
+
+## Actualizacion de sesion (2026-04-22) - hybrid_final_decisive_rescue_v5 + freeze_v5
+Objetivo:
+- cerrar incoherencias entre performance real, clase metodologica, confianza y activacion operativa en una sola pasada final.
+
+Ejecucion:
+- Script: `scripts/run_hybrid_final_decisive_rescue_v5.py`.
+- Linea de campana: `data/hybrid_final_decisive_rescue_v5/`.
+- Manifest: `artifacts/hybrid_final_decisive_rescue_v5/hybrid_final_decisive_rescue_v5_manifest.json`.
+
+Resultado de seleccion:
+- Slots foco auditados/reentrenados: `16`.
+- Promociones: `1` (`depression/caregiver_2_3`).
+- Resto de slots foco: `HOLD_FOR_LIMITATION` cuando no hubo mejora material defendible o persistio anomalia metodologica relevante.
+
+Coherencia global de confianza (30 slots):
+- Se recalculo `confidence_pct/confidence_band/final_operational_class` para los `30` slots.
+- Regla dura aplicada: slots con anomalia secundaria no quedan en `ACTIVE_HIGH_CONFIDENCE`.
+- Verificacion final: `0` slots `high` con anomalia secundaria.
+- Distribucion activa v5:
+  - `ACTIVE_MODERATE_CONFIDENCE=6`
+  - `ACTIVE_LOW_CONFIDENCE=11`
+  - `ACTIVE_LIMITED_USE=13`
+
+Normalizacion metodologica:
+- Nueva linea: `data/hybrid_classification_normalization_v2/`.
+- Tabla: `tables/hybrid_operational_classification_normalized_v5.csv`.
+- Violaciones de politica: `0` (`validation/hybrid_classification_policy_violations_v5.csv`).
+
+Nuevas fuentes operativas:
+- `data/hybrid_operational_freeze_v5/` + `artifacts/hybrid_operational_freeze_v5/`
+- `data/hybrid_active_modes_freeze_v5/` + `artifacts/hybrid_active_modes_freeze_v5/`
+- `replaced_pairs=1` en manifests de freeze v5.
+
+Integracion runtime:
+- `api/services/questionnaire_v2_loader_service.py` actualizado a defaults `*_freeze_v5`.

@@ -5,12 +5,15 @@ import json
 import sys
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from api.services.hybrid_classification_policy_v1 import PolicyInputs, build_normalized_table, policy_violations
 
-
-ROOT = Path(__file__).resolve().parents[1]
 DATA_BASE = ROOT / "data" / "hybrid_classification_normalization_v1"
 SHORTCUT_INV = ROOT / "data" / "hybrid_secondary_honest_retrain_v1" / "tables" / "non_conduct_suspect_inventory.csv"
+SHORTCUT_INV_V5 = ROOT / "data" / "hybrid_final_decisive_rescue_v5" / "tables" / "shortcut_inventory_v5.csv"
 
 LINES = [
     (
@@ -22,6 +25,16 @@ LINES = [
         "v3",
         ROOT / "data" / "hybrid_operational_freeze_v3" / "tables" / "hybrid_operational_final_champions.csv",
         ROOT / "data" / "hybrid_active_modes_freeze_v3" / "tables" / "hybrid_active_models_30_modes.csv",
+    ),
+    (
+        "v4",
+        ROOT / "data" / "hybrid_operational_freeze_v4" / "tables" / "hybrid_operational_final_champions.csv",
+        ROOT / "data" / "hybrid_active_modes_freeze_v4" / "tables" / "hybrid_active_models_30_modes.csv",
+    ),
+    (
+        "v5",
+        ROOT / "data" / "hybrid_operational_freeze_v5" / "tables" / "hybrid_operational_final_champions.csv",
+        ROOT / "data" / "hybrid_active_modes_freeze_v5" / "tables" / "hybrid_active_models_30_modes.csv",
     ),
 ]
 
@@ -42,7 +55,11 @@ def main() -> int:
             PolicyInputs(
                 operational_csv=op_csv,
                 active_csv=active_csv,
-                shortcut_inventory_csv=SHORTCUT_INV if SHORTCUT_INV.exists() else None,
+                shortcut_inventory_csv=(
+                    SHORTCUT_INV_V5
+                    if label == "v5" and SHORTCUT_INV_V5.exists()
+                    else (SHORTCUT_INV if SHORTCUT_INV.exists() else None)
+                ),
             )
         )
         violations = policy_violations(normalized)

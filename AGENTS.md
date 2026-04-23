@@ -599,3 +599,40 @@ Validacion declarada en release actual:
   - split de unsubscribe `GET/POST` en `api/routes/email.py`,
   - `DEV_DEBUG=false` por defecto en `.env.example`.
 - Estado operativo declarado en esta ventana: Quality Gate Sonar `PASSED` y sin issues abiertas en new code period.
+
+## Actualizacion de estado (2026-04-22) - hybrid_final_decisive_rescue_v5 + freeze_v5
+- Se ejecuto campana final decisiva de rescate y coherencia metodologica sobre la base operativa `freeze_v4`.
+- Script principal: `scripts/run_hybrid_final_decisive_rescue_v5.py`.
+- Linea creada: `data/hybrid_final_decisive_rescue_v5/` y `artifacts/hybrid_final_decisive_rescue_v5/`.
+- Manifest: `artifacts/hybrid_final_decisive_rescue_v5/hybrid_final_decisive_rescue_v5_manifest.json`.
+
+Resultados de seleccion:
+- Slots foco auditados/reentrenados: `16`.
+- Promociones honestas: `1` (`depression/caregiver_2_3`).
+- No-promocion explicita (`HOLD_FOR_LIMITATION`) en el resto de slots foco cuando no hubo mejora material defendible o persistio anomalia secundaria relevante.
+
+Coherencia confianza/clase (30 slots):
+- Recalculo completo de `confidence_pct`, `confidence_band` y `final_operational_class` para los `30` slots (no solo reemplazados).
+- Regla dura aplicada: `secondary_metric_anomaly_flag=yes` bloquea `ACTIVE_HIGH_CONFIDENCE`.
+- Resultado: `0` slots con `ACTIVE_HIGH_CONFIDENCE` y anomalia secundaria.
+- Distribucion activa v5:
+  - `ACTIVE_MODERATE_CONFIDENCE=6`
+  - `ACTIVE_LOW_CONFIDENCE=11`
+  - `ACTIVE_LIMITED_USE=13`
+
+Normalizacion metodologica v2:
+- Nueva salida: `data/hybrid_classification_normalization_v2/`.
+- Tabla normalizada v5: `tables/hybrid_operational_classification_normalized_v5.csv`.
+- Validacion de politica: `policy_violations=0` en `validation/hybrid_classification_policy_violations_v5.csv`.
+
+Nuevas fuentes de verdad operativas:
+- `data/hybrid_operational_freeze_v5/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v5/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v5/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v5/tables/hybrid_questionnaire_inputs_master.csv`
+
+Integracion backend/runtime:
+- `api/services/questionnaire_v2_loader_service.py` actualizado para defaults `*_freeze_v5`.
+
+Claim permitido sin cambios:
+- screening/apoyo profesional en entorno simulado; no diagnostico automatico.
