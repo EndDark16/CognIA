@@ -1,0 +1,59 @@
+name: Deploy backend
+
+on:
+  push:
+    branches:
+      - development
+  workflow_dispatch:
+
+concurrency:
+  group: cognia-backend-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-backend:
+    runs-on: [self-hosted, linux, x64, cognia-backend]
+
+    steps:
+      - name: Record current deployed backend commit
+        id: prev
+        run: |
+          cd /opt/cognia/backend
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Update deployed backend checkout
+        run: |
+          cd /opt/cognia/backend
+          git fetch origin development
+          git checkout development
+          git reset --hard origin/development
+
+      - name: Rebuild backend
+        run: |
+          cd /opt/cognia
+          docker compose up -d --build backend gateway
+
+      - name: Wait for backend readiness
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost/readyz >/dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1
+
+      - name: Roll back on failure
+        if: failure()
+        run: |
+          cd /opt/cognia/backend
+          git reset --hard "${{ steps.prev.outputs.sha }}"
+          cd /opt/cognia
+          docker compose up -d --build backend gateway
+
+      - name: Show backend status
+        if: always()
+        run: |
+          cd /opt/cognia
+          docker compose ps
+          docker compose logs --tail=80 backend
