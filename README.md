@@ -96,6 +96,9 @@ Este README esta pensado como fuente principal de onboarding tecnico y operacion
 - Guia operativa de referencia:
   - `docs/deployment_ubuntu_self_hosted.md`
   - `docs/deployment_playbook_ingest_20260422.md` (ingesta historica)
+- Branch protection recomendado:
+  - Required check: `CI Backend / backend-ci`
+  - No requerido (best effort): `Deploy Backend (Best Effort) / backend-deploy-best-effort`
 
 ## 4. Principios metodologicos y de producto
 - Screening/apoyo profesional, no diagnostico automatico.

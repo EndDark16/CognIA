@@ -19,8 +19,8 @@ Documentar el flujo operativo real de despliegue del backend CognIA hacia Ubuntu
 - Archivo: `.github/workflows/ci-backend.yml`
 - Runner: `ubuntu-latest`
 - Trigger:
-  - push a `development` y `main` (paths relevantes)
-  - pull request hacia `development` y `main` (paths relevantes)
+  - push a `development` y `main`
+  - pull request hacia `development` y `main`
   - `workflow_dispatch`
 - Validaciones ejecutadas:
   - instalacion reproducible desde `requirements.txt`
@@ -44,6 +44,10 @@ Regla de gobierno:
 - NO debe configurarse como required check en branch protection.
 - El check requerido para integrar cambios debe ser CI (`ci-backend`).
 - Si el runner self-hosted esta offline, CI continua funcionando y el equipo no queda bloqueado.
+
+Checks recomendados para branch protection:
+- Required check: `CI Backend / backend-ci`
+- No requerido (best effort): `Deploy Backend (Best Effort) / backend-deploy-best-effort`
 
 ## Comportamiento exacto del deploy workflow
 
@@ -126,7 +130,7 @@ curl -fsS http://localhost/readyz
 4. Instalar y registrar GitHub Actions self-hosted runner en ese host.
 5. Asignar labels al runner: `self-hosted`, `linux`, `x64`, `cognia-backend`.
 6. Levantar runner como servicio del sistema.
-7. En branch protection, dejar `ci-backend` como required y `deploy-backend` como no requerido.
+7. En branch protection, dejar `CI Backend / backend-ci` como required y `Deploy Backend (Best Effort) / backend-deploy-best-effort` como no requerido.
 
 ### Comandos base sugeridos (Ubuntu)
 ```bash

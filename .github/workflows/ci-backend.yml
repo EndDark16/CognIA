@@ -3,38 +3,8 @@ name: CI Backend
 on:
   push:
     branches: ["development", "main"]
-    paths:
-      - "api/**"
-      - "app/**"
-      - "config/**"
-      - "core/**"
-      - "migrations/**"
-      - "scripts/**"
-      - "tests/**"
-      - "Dockerfile"
-      - "docker/**"
-      - "requirements.txt"
-      - "run.py"
-      - "docs/openapi.yaml"
-      - ".github/workflows/ci-backend.yml"
-      - ".github/workflows/deploy-backend.yml"
   pull_request:
     branches: ["development", "main"]
-    paths:
-      - "api/**"
-      - "app/**"
-      - "config/**"
-      - "core/**"
-      - "migrations/**"
-      - "scripts/**"
-      - "tests/**"
-      - "Dockerfile"
-      - "docker/**"
-      - "requirements.txt"
-      - "run.py"
-      - "docs/openapi.yaml"
-      - ".github/workflows/ci-backend.yml"
-      - ".github/workflows/deploy-backend.yml"
   workflow_dispatch:
 
 permissions:
@@ -45,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
-    name: Validate backend
+  backend_ci:
+    name: backend-ci
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -76,16 +46,6 @@ jobs:
       - name: Test suite
         run: |
           pytest -q
-
-  docker-build:
-    name: Docker build sanity
-    runs-on: ubuntu-latest
-    needs: validate
-    timeout-minutes: 30
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
