@@ -1,0 +1,124 @@
+name: Deploy Backend (Best Effort)
+
+on:
+  push:
+    branches: ["development"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-backend-development
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy backend and gateway on Ubuntu
+    runs-on: [self-hosted, linux, x64, cognia-backend]
+    timeout-minutes: 45
+    env:
+      DEPLOY_BRANCH: development
+      BACKEND_REPO_DIR: /opt/cognia/backend
+      COMPOSE_DIR: /opt/cognia
+      READY_URL: http://localhost/readyz
+
+    steps:
+      - name: Validate server paths
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -d "$BACKEND_REPO_DIR/.git"
+          test -d "$COMPOSE_DIR"
+
+      - name: Deploy with automatic rollback
+        id: deploy
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          deploy_compose() {
+            cd "$COMPOSE_DIR"
+            docker compose up -d --build backend gateway
+          }
+
+          check_readyz() {
+            local attempts=24
+            local delay=5
+            local n=1
+
+            while [ "$n" -le "$attempts" ]; do
+              if curl -fsS "$READY_URL" >/tmp/cognia_readyz_response.txt; then
+                echo "readyz OK (attempt $n/$attempts)"
+                cat /tmp/cognia_readyz_response.txt
+                return 0
+              fi
+              echo "readyz not ready yet (attempt $n/$attempts), retrying in ${delay}s"
+              sleep "$delay"
+              n=$((n + 1))
+            done
+
+            return 1
+          }
+
+          cd "$BACKEND_REPO_DIR"
+          PREVIOUS_SHA="$(git rev-parse HEAD)"
+          echo "Previous deployed commit: $PREVIOUS_SHA"
+          echo "previous_sha=$PREVIOUS_SHA" >> "$GITHUB_OUTPUT"
+
+          git fetch origin "$DEPLOY_BRANCH"
+          git checkout "$DEPLOY_BRANCH"
+          git reset --hard "origin/$DEPLOY_BRANCH"
+
+          TARGET_SHA="$(git rev-parse HEAD)"
+          echo "Target commit after update: $TARGET_SHA"
+          echo "target_sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
+
+          deploy_compose
+
+          if check_readyz; then
+            echo "final_status=deployed" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "::warning::Post-deploy readyz check failed for $TARGET_SHA. Rolling back to $PREVIOUS_SHA"
+          cd "$BACKEND_REPO_DIR"
+          git reset --hard "$PREVIOUS_SHA"
+
+          ROLLBACK_SHA="$(git rev-parse HEAD)"
+          echo "Rollback commit: $ROLLBACK_SHA"
+          echo "rollback_sha=$ROLLBACK_SHA" >> "$GITHUB_OUTPUT"
+
+          deploy_compose
+
+          if check_readyz; then
+            echo "final_status=rolled_back" >> "$GITHUB_OUTPUT"
+            echo "::error::Deployment to $TARGET_SHA failed; rollback to $PREVIOUS_SHA succeeded."
+            exit 1
+          fi
+
+          echo "final_status=rollback_failed" >> "$GITHUB_OUTPUT"
+          echo "::error::Deployment and rollback both failed readiness verification."
+          exit 1
+
+      - name: Deployment summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### Backend deploy summary"
+            echo "- Previous SHA: ${{ steps.deploy.outputs.previous_sha || 'n/a' }}"
+            echo "- Target SHA: ${{ steps.deploy.outputs.target_sha || 'n/a' }}"
+            echo "- Rollback SHA: ${{ steps.deploy.outputs.rollback_sha || 'n/a' }}"
+            echo "- Final status: ${{ steps.deploy.outputs.final_status || 'unknown' }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Docker compose status and backend logs
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          cd "$COMPOSE_DIR"
+          docker compose ps
+          echo "----- backend logs (last 200 lines) -----"
+          docker compose logs --tail=200 backend
