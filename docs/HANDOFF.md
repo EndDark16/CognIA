@@ -783,3 +783,38 @@ Nuevas fuentes operativas:
 
 Integracion runtime:
 - `api/services/questionnaire_v2_loader_service.py` actualizado a defaults `*_freeze_v5`.
+
+## Actualizacion de estado (2026-04-22) - hybrid_final_aggressive_rescue_v6 + freeze_v6
+- Se ejecuto campana final agresiva con multipasadas internas A/B/C sobre 18 slots priorizados (Depression + anomalias secundarias + Conduct full opcional).
+- Linea nueva:
+  - `data/hybrid_final_aggressive_rescue_v6/`
+  - `artifacts/hybrid_final_aggressive_rescue_v6/`
+- Script principal:
+  - `scripts/run_hybrid_final_aggressive_rescue_v6.py`
+- Fuentes operativas versionadas:
+  - `data/hybrid_operational_freeze_v6/`
+  - `data/hybrid_active_modes_freeze_v6/`
+- Manifests:
+  - `artifacts/hybrid_final_aggressive_rescue_v6/hybrid_final_aggressive_rescue_v6_manifest.json`
+  - `artifacts/hybrid_operational_freeze_v6/hybrid_operational_freeze_v6_manifest.json`
+  - `artifacts/hybrid_active_modes_freeze_v6/hybrid_active_modes_freeze_v6_manifest.json`
+- Resultado de seleccion:
+  - `focus_slots=18`
+  - `PROMOTE_NOW=2`
+  - `HOLD_FOR_LIMITATION=16`
+  - `policy_violations=0`
+- Reemplazos promocionados:
+  - `conduct/caregiver_full` -> `extra_trees + dsm5_core_plus_context`
+  - `conduct/psychologist_full` -> `hgb + dsm5_core_plus_context`
+- Auditorias generadas:
+  - split/duplicates (`validation/split_registry.csv`, `validation/duplicate_audit_global.csv`)
+  - trials por pasada (`trials/focus_pass_a_trials.csv`, `focus_pass_b_trials.csv`, `focus_pass_c_trials.csv`, `final_aggressive_retrain_trials.csv`)
+  - evidencia global 30 slots (`validation/global_model_evidence_v6.csv`)
+  - bootstrap/stability/ablation/stress (`bootstrap/global_bootstrap_v6.csv`, `stability/global_seed_stability_v6.csv`, `ablation/global_ablation_v6.csv`, `stress/global_stress_v6.csv`)
+  - normalizacion/policy (`data/hybrid_classification_normalization_v2/tables/hybrid_operational_classification_normalized_v6.csv`, `validation/hybrid_classification_policy_violations_v6.csv`)
+- Loader/backend:
+  - `api/services/questionnaire_v2_loader_service.py` actualizado a defaults `*_freeze_v6`.
+- Contrato funcional:
+  - No hubo cambio de inputs funcionales expuestos ni outputs funcionales expuestos.
+  - Se mantuvieron `domain/mode/role` y semantica de inferencia; cambios solo en entrenamiento interno/seleccion/calibracion/threshold/weighting.
+
