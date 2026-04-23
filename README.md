@@ -88,9 +88,14 @@ Este README esta pensado como fuente principal de onboarding tecnico y operacion
 - Historico/trazabilidad:
   - `data/*`, `artifacts/*`, reportes de campanas, notas de release, matrices de gap.
 
-### Despliegue (estado conservador)
-- Versionado en repo: `Dockerfile`, `docker-compose.yml`, `docker/entrypoint.sh`.
-- Evidencia multi-repo/infra completa sigue **parcial / por confirmar** (ver `docs/deployment_playbook_ingest_20260422.md`).
+### Despliegue (Ubuntu self-hosted operativo)
+- Linea activa de deploy backend: GitHub Actions + runner self-hosted `cognia-backend` sobre rama `development`.
+- Workflows versionados en este repo:
+  - CI continuo (GitHub-hosted): `.github/workflows/ci-backend.yml`
+  - Deploy best effort (self-hosted): `.github/workflows/deploy-backend.yml`
+- Guia operativa de referencia:
+  - `docs/deployment_ubuntu_self_hosted.md`
+  - `docs/deployment_playbook_ingest_20260422.md` (ingesta historica)
 
 ## 4. Principios metodologicos y de producto
 - Screening/apoyo profesional, no diagnostico automatico.
@@ -181,7 +186,8 @@ cognia_app/
 |- models/
 |- .github/
 |  |- pull_request_template.md
-|  |- workflows/ci.yml
+|  |- workflows/ci-backend.yml
+|  |- workflows/deploy-backend.yml
 |- VERSION
 |- CHANGELOG.md
 |- CONTRIBUTING.md
@@ -221,7 +227,7 @@ cognia_app/
 | Seguridad MFA | pyotp + cryptography + bcrypt | `2.9.0` / `43.0.1` / `4.1.3` |
 | Servidor prod | gunicorn | `23.0.0` |
 | Testing | pytest + coverage | `8.2.2` / `7.8.0` |
-| Lint CI | ruff | instalado en workflow |
+| CI backend | compile/import sanity + pytest + docker build sanity | `.github/workflows/ci-backend.yml` |
 
 ## 8. Prerrequisitos
 - Python 3.12.
@@ -907,7 +913,7 @@ Si quieres entender X, lee Y:
 | Versionado y releases backend | `docs/backend_versioning_policy.md`, `docs/backend_release_workflow.md`, `docs/backend_release_registry.csv` |
 | Estado operativo/handoff | `AGENTS.md` + `docs/HANDOFF.md` |
 | Trazabilidad de lineas/campanas | `docs/traceability_map.md` |
-| Estado de despliegue documentado (conservador) | `docs/deployment_playbook_ingest_20260422.md` |
+| Estado de despliegue backend (Ubuntu self-hosted) | `docs/deployment_ubuntu_self_hosted.md`, `docs/deployment_playbook_ingest_20260422.md` |
 
 ## 30. Comandos utiles para mantenedores
 | Tarea | Comando |
@@ -929,7 +935,7 @@ Si quieres entender X, lee Y:
 | Tests API v2/runtime | `pytest tests/api/test_questionnaire_runtime_api.py tests/api/test_questionnaire_v2_api.py -q` |
 | Tests problem reports | `pytest tests/test_problem_reports.py -q` |
 | Smoke runtime | `pytest tests/smoke/test_questionnaire_runtime_smoke.py -q` |
-| Lint rapido (como CI) | `ruff check --select F api tests` |
+| Sanity compile (como CI) | `python -m compileall -q api app config core scripts run.py` |
 | Sonar local | `.\scripts\run_sonar.ps1` |
 
 ---

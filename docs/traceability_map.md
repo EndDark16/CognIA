@@ -30,6 +30,7 @@ Where:
   - `docs/questionnaire_backend_architecture.md`
   - `docs/auth_mfa_recovery_flow_and_endpoint_versioning_20260421.md`
   - `docs/backend_gap_matrix_20260422.md`
+  - `docs/deployment_ubuntu_self_hosted.md`
   - `docs/deployment_playbook_ingest_20260422.md`
 
 ### Backend release governance
