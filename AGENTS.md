@@ -636,3 +636,44 @@ Integracion backend/runtime:
 
 Claim permitido sin cambios:
 - screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-23) - github_actions_ci_and_self_hosted_deploy_v1
+- Se implemento separacion explicita entre CI normal (GitHub-hosted) y deploy backend (self-hosted) para evitar bloqueo de desarrollo cuando el runner Ubuntu este offline.
+- Workflows nuevos versionados:
+  - `.github/workflows/ci-backend.yml`
+  - `.github/workflows/deploy-backend.yml`
+- Workflow legacy removido:
+  - `.github/workflows/ci.yml`
+
+CI normal (`ci-backend`):
+- Trigger en push/PR para `development` y `main` (paths relevantes) + `workflow_dispatch`.
+- Runner: `ubuntu-latest`.
+- Validaciones aplicadas:
+  - instalacion de dependencias desde `requirements.txt`,
+  - compile sanity (`python -m compileall`),
+  - import sanity (`create_app()`),
+  - suite `pytest -q`,
+  - docker build sanity (sin push).
+
+Deploy backend (`deploy-backend`, best effort):
+- Trigger en push a `development` + `workflow_dispatch`.
+- Runner obligatorio: `[self-hosted, linux, x64, cognia-backend]`.
+- Flujo implementado:
+  - captura `previous_sha`,
+  - update repo en `/opt/cognia/backend` via `fetch/checkout/reset --hard origin/development`,
+  - rebuild/restart de `backend` + `gateway` en `/opt/cognia` via `docker compose up -d --build backend gateway`,
+  - verificacion real de readiness en `http://localhost/readyz`,
+  - rollback automatico basico al commit previo si falla post-deploy,
+  - salida obligatoria final de `docker compose ps` y logs recientes de `backend`.
+- `concurrency` agregado para serializar despliegues de `development`.
+
+Documentacion operativa agregada:
+- `docs/deployment_ubuntu_self_hosted.md` (bootstrap desde cero, flujo, verificacion, rollback manual y regla de checks).
+- `README.md` y `docs/backend_release_workflow.md` actualizados para reflejar CI/deploy separados.
+
+Regla operativa explicita:
+- `deploy-backend` NO debe marcarse como required check en branch protection.
+- La senal principal para integrar cambios es `ci-backend`.
+
+Claim metodologico sin cambios:
+- evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.

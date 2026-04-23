@@ -783,3 +783,46 @@ Nuevas fuentes operativas:
 
 Integracion runtime:
 - `api/services/questionnaire_v2_loader_service.py` actualizado a defaults `*_freeze_v5`.
+
+## Actualizacion de sesion (2026-04-23) - github_actions_ci_and_self_hosted_deploy_v1
+Objetivo:
+- dejar el repo backend listo para despliegue Ubuntu self-hosted sin bloquear el flujo normal de desarrollo.
+
+Cambios aplicados:
+- Se separo automatizacion en dos workflows:
+  - CI normal (GitHub-hosted): `.github/workflows/ci-backend.yml`
+  - Deploy best effort (self-hosted): `.github/workflows/deploy-backend.yml`
+- Se removio workflow legacy:
+  - `.github/workflows/ci.yml`
+
+CI normal (`ci-backend`):
+- Trigger: push/PR sobre `development` y `main` + `workflow_dispatch`.
+- Runner: `ubuntu-latest`.
+- Checks:
+  - install dependencias (`requirements.txt`),
+  - `python -m compileall` (sanity),
+  - import sanity (`create_app()`),
+  - `pytest -q`,
+  - docker build sanity (sin push).
+
+Deploy backend (`deploy-backend`):
+- Trigger: push a `development` + `workflow_dispatch`.
+- Runner requerido: `[self-hosted, linux, x64, cognia-backend]`.
+- Flujo:
+  - registra `previous_sha`,
+  - update en servidor backend (`/opt/cognia/backend`) con `git fetch/checkout/reset --hard origin/development`,
+  - rebuild/restart en `/opt/cognia` de `backend` + `gateway` con `docker compose up -d --build backend gateway`,
+  - readiness check real en `http://localhost/readyz`,
+  - rollback automatico basico al commit previo si falla post-deploy,
+  - salida final obligatoria de `docker compose ps` y logs recientes de `backend`.
+- `concurrency` agregado para serializar despliegues.
+
+Documentacion nueva/actualizada:
+- Nueva guia: `docs/deployment_ubuntu_self_hosted.md`.
+- `README.md` actualizado a flujo Ubuntu self-hosted operativo.
+- `docs/backend_release_workflow.md` actualizado con regla CI/deploy separada.
+- `docs/traceability_map.md` actualizado con nueva referencia de despliegue.
+
+Regla de gobierno operativa:
+- `deploy-backend` no debe ser required check en branch protection.
+- `ci-backend` es la senal principal para integrar cambios cuando runner self-hosted este offline.
