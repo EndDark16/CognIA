@@ -1,10 +1,10 @@
-# Model Registry and Inference (v4)
+# Model Registry and Inference (v5)
 
 ## Fuente de verdad
-- `data/hybrid_active_modes_freeze_v4/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_active_modes_freeze_v4/tables/hybrid_active_modes_summary.csv`
-- `data/hybrid_active_modes_freeze_v4/tables/hybrid_questionnaire_inputs_master.csv`
-- `data/hybrid_operational_freeze_v4/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v5/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v5/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v5/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v5/tables/hybrid_operational_final_champions.csv`
 
 Nota de continuidad (2026-04-22):
 - Se ejecuto la linea `hybrid_secondary_honest_retrain_v1` y se versionaron:
@@ -15,7 +15,13 @@ Nota de continuidad (2026-04-22):
 - Cambio estructural mas relevante:
   - `depression/psychologist_2_3` pasa de `HOLD_FOR_LIMITATION` a `PRIMARY_WITH_CAVEAT`.
 - En los reemplazos de `anxiety` y `elimination` se mantiene caveat por anomalia secundaria (>0.98), por lo que no se reclasifican como robustez limpia.
-- Por lo tanto, la fuente operativa efectiva pasa a `*_freeze_v4`.
+- Nota de continuidad (2026-04-22, campana final decisiva):
+  - Se ejecuto `hybrid_final_decisive_rescue_v5`.
+  - Se versionaron `data/hybrid_operational_freeze_v5/` y `data/hybrid_active_modes_freeze_v5/`.
+  - `replaced_pairs=1` (promocion focal en `depression/caregiver_2_3`).
+  - Se recalculo `confidence_pct/confidence_band/final_operational_class` para los 30 slots bajo politica normalizada.
+  - Se genero normalizacion v2 en `data/hybrid_classification_normalization_v2/` con `policy_violations=0`.
+  - La fuente operativa efectiva pasa a `*_freeze_v5`.
 
 ## Registro en DB
 - `model_registry`: identidad por `active_model_id`.
