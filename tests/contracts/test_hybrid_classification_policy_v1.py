@@ -14,20 +14,16 @@ SHORTCUT_INV = ROOT / "data" / "hybrid_secondary_honest_retrain_v1" / "tables" /
 
 
 def _line_inputs() -> list[PolicyInputs]:
-    lines = [
-        PolicyInputs(
-            operational_csv=ROOT / "data" / "hybrid_operational_freeze_v2" / "tables" / "hybrid_operational_final_champions.csv",
-            active_csv=ROOT / "data" / "hybrid_active_modes_freeze_v2" / "tables" / "hybrid_active_models_30_modes.csv",
-            shortcut_inventory_csv=SHORTCUT_INV if SHORTCUT_INV.exists() else None,
-        )
-    ]
-    v3_op = ROOT / "data" / "hybrid_operational_freeze_v3" / "tables" / "hybrid_operational_final_champions.csv"
-    v3_active = ROOT / "data" / "hybrid_active_modes_freeze_v3" / "tables" / "hybrid_active_models_30_modes.csv"
-    if v3_op.exists() and v3_active.exists():
+    lines: list[PolicyInputs] = []
+    for label in ["v2", "v3", "v4", "v5"]:
+        op = ROOT / "data" / f"hybrid_operational_freeze_{label}" / "tables" / "hybrid_operational_final_champions.csv"
+        active = ROOT / "data" / f"hybrid_active_modes_freeze_{label}" / "tables" / "hybrid_active_models_30_modes.csv"
+        if not op.exists() or not active.exists():
+            continue
         lines.append(
             PolicyInputs(
-                operational_csv=v3_op,
-                active_csv=v3_active,
+                operational_csv=op,
+                active_csv=active,
                 shortcut_inventory_csv=SHORTCUT_INV if SHORTCUT_INV.exists() else None,
             )
         )

@@ -460,8 +460,8 @@ python scripts/bootstrap_questionnaire_backend_v2.py regenerate-report-snapshot 
 
 ### Fuentes default usadas por loader v2
 - `data/cuestionario_v16.4/`
-- `data/hybrid_active_modes_freeze_v4/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_operational_freeze_v4/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v5/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_operational_freeze_v5/tables/hybrid_operational_final_champions.csv`
 
 ## 14. API y gobierno de contratos
 ### Donde vive OpenAPI
@@ -653,8 +653,8 @@ Referencia: `docs/security_hardening_20260416.md`.
 - Transformar respuestas a `feature_map`, aplicar derivaciones internas, inferir por dominio y comorbilidad.
 
 ### Fuentes de verdad operativas actuales
-- `data/hybrid_active_modes_freeze_v4/*`
-- `data/hybrid_operational_freeze_v4/*`
+- `data/hybrid_active_modes_freeze_v5/*`
+- `data/hybrid_operational_freeze_v5/*`
 
 ### Entrenamiento/pipeline en repo
 - Existen scripts versionados de entrenamiento/auditoria (`scripts/run_hybrid_*`, `scripts/run_*ceiling*`, etc.).
@@ -666,7 +666,7 @@ Referencia: `docs/security_hardening_20260416.md`.
 
 ### Caveats visibles
 - Para algunos modelos puede quedar `por_confirmar` de ruta exacta de artefacto y usar fallback controlado.
-- En `questionnaire_v2_service.py`, `model_bundle_version` esta fijo en `"hybrid_active_modes_freeze_v1"` (metadato historico que puede requerir alineacion con linea v4).
+- En `questionnaire_v2_service.py`, `model_bundle_version` esta fijo en `"hybrid_active_modes_freeze_v1"` (metadato historico que puede requerir alineacion con linea v5).
 
 ## 19. Questionnaires: legacy, runtime v1 y v2
 ### Convivencia de capas
@@ -875,7 +875,7 @@ Fuente de verdad: `docs/repository_artifact_policy.md`.
 ### Tecnicas
 - Coexisten capas legacy y actuales; aumenta superficie de mantenimiento.
 - `POST /api/predict` sigue presente por compatibilidad, pero deprecado.
-- Campo `model_bundle_version` en resultados v2 puede no reflejar linea v4 actual (metadato heredado).
+- Campo `model_bundle_version` en resultados v2 puede no reflejar linea v5 actual (metadato heredado).
 - No hay reporte global oficial de cobertura porcentual publicado en esta revision.
 
 ### Operativas
