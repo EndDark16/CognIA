@@ -13,12 +13,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    name: Deploy backend and gateway on Ubuntu
+  backend_deploy_best_effort:
+    name: backend-deploy-best-effort
     runs-on: [self-hosted, linux, x64, cognia-backend]
     timeout-minutes: 45
     env:
-      DEPLOY_BRANCH: development
       BACKEND_REPO_DIR: /opt/cognia/backend
       COMPOSE_DIR: /opt/cognia
       READY_URL: http://localhost/readyz
@@ -66,9 +65,9 @@ jobs:
           echo "Previous deployed commit: $PREVIOUS_SHA"
           echo "previous_sha=$PREVIOUS_SHA" >> "$GITHUB_OUTPUT"
 
-          git fetch origin "$DEPLOY_BRANCH"
-          git checkout "$DEPLOY_BRANCH"
-          git reset --hard "origin/$DEPLOY_BRANCH"
+          git fetch origin development
+          git checkout development
+          git reset --hard origin/development
 
           TARGET_SHA="$(git rev-parse HEAD)"
           echo "Target commit after update: $TARGET_SHA"

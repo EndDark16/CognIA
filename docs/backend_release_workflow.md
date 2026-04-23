@@ -30,7 +30,7 @@ Referencia base: `CONTRIBUTING.md`.
 ## Automatizacion CI/deploy en GitHub Actions
 - CI principal (siempre disponible): `.github/workflows/ci-backend.yml`
   - Runner: `ubuntu-latest` (GitHub-hosted)
-  - Trigger: pushes/PR sobre `development` y `main` (con filtros de paths)
+  - Trigger: pushes/PR sobre `development` y `main`
   - Validaciones: compile sanity, import sanity, `pytest -q`, docker build sanity
 - Deploy backend Ubuntu (best effort): `.github/workflows/deploy-backend.yml`
   - Runner: `[self-hosted, linux, x64, cognia-backend]`
@@ -41,6 +41,8 @@ Regla operativa obligatoria:
 - `deploy-backend` NO debe configurarse como required check en branch protection.
 - La senal de integracion para desarrollo continuo debe ser `ci-backend`.
 - Si el runner self-hosted esta offline, el flujo de desarrollo continua con CI normal en GitHub-hosted.
+- Check recomendado como required: `CI Backend / backend-ci`.
+- Check de deploy NO requerido: `Deploy Backend (Best Effort) / backend-deploy-best-effort`.
 
 ## Buenas practicas obligatorias
 - No subir secretos ni `.env`.
