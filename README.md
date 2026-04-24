@@ -145,6 +145,8 @@ Variables criticas:
 - Swagger UI: `GET /docs`
 - OpenAPI: `GET /openapi.yaml`
 - Fuente activa de contrato: `docs/openapi.yaml` (snapshots historicos en `docs/archive/openapi/`)
+- Manual tecnico consolidado backend: `docs/backend_technical_manual.md`
+- Matriz tecnica de endpoints (runtime real): `docs/backend_endpoint_matrix.csv`
 - Matriz de ciclo de vida de endpoints: `docs/endpoint_lifecycle_matrix.md`
 - Referencia mantenedor: `docs/api_full_reference.md`
 

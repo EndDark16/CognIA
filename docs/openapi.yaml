@@ -345,7 +345,7 @@ paths:
               edge:
                 summary: Edge of valid range
                 value:
-                  age: 3
+                  age: 6
                   sex: 0
                   conners_inattention_score: 0.0
                   conners_hyperactivity: 0.0
@@ -17772,8 +17772,8 @@ components:
       properties:
         age:
           type: integer
-          minimum: 3
-          maximum: 21
+          minimum: 6
+          maximum: 11
         sex:
           type: integer
           enum:

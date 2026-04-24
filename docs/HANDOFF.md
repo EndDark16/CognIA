@@ -633,3 +633,21 @@ Validacion:
 Swagger/OpenAPI:
 - Fuente activa unica confirmada: `docs/openapi.yaml`.
 - `/openapi.yaml` y `/docs` continúan consistentes con esa spec.
+
+## Actualizacion (2026-04-20) - backend_documentation_closure_v1
+Resumen de cierre:
+- Se consolido documentacion tecnica backend en `docs/backend_technical_manual.md` usando evidencia verificable del runtime/codigo del repositorio.
+- Se genero anexo de matriz tecnica de endpoints en `docs/backend_endpoint_matrix.csv` (119 pares endpoint-metodo; 112 paths unicos).
+- Se corrigio inconsistencia de edad en inferencia legacy:
+  - `api/schemas/predict_schema.py` ahora valida `age` en `6-11`.
+  - `docs/openapi.yaml` (`PredictRequest`) alineado al mismo rango.
+  - `tests/test_predict.py` actualizado con validacion de rango.
+
+Verificacion:
+- `pytest tests/test_predict.py tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/test_security_hardening.py -q` -> `13 passed`.
+
+Pendiente no cerrado en esta ventana:
+- `tests/contracts/test_openapi_documentation_quality.py` sigue fallando por deuda de formato documental transversal en descripciones OpenAPI.
+
+Criterio metodologico sin cambios:
+- uso para screening/apoyo profesional en entorno simulado; no diagnostico automatico.

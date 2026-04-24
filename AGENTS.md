@@ -468,3 +468,19 @@ Contexto metodológico:
 - Validacion ejecutada:
   - parseo YAML: `openapi_yaml_valid`.
   - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/api/test_questionnaire_v2_api.py tests/test_problem_reports.py -q` => `21 passed`.
+
+## Actualizacion de estado (2026-04-20) - backend_documentation_closure_v1
+- Se ejecuto cierre documental tecnico del backend en rama `development` con fuente principal en evidencia de codigo/runtime del repo.
+- Entregables nuevos:
+  - `docs/backend_technical_manual.md` (manual tecnico consolidado).
+  - `docs/backend_endpoint_matrix.csv` (matriz tecnica runtime real, 119 pares endpoint-metodo).
+- Se corrigio inconsistencia prioritaria de edad en flujo legacy `POST /api/predict`:
+  - `api/schemas/predict_schema.py`: `age` pasa de `3-21` a `6-11`.
+  - `docs/openapi.yaml`: `PredictRequest.age` alineado a `6-11` y ejemplo de borde actualizado.
+  - `tests/test_predict.py`: agregado test de rango fuera de limite para edad.
+- Verificacion ejecutada:
+  - `pytest tests/test_predict.py tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/test_security_hardening.py -q` => `13 passed`.
+- Discrepancia no cerrada en esta ventana (deuda documental amplia):
+  - `tests/contracts/test_openapi_documentation_quality.py` falla por formato de secciones requeridas en descripciones OpenAPI a escala global.
+- Nota metodologica mantenida sin cambios:
+  - evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
