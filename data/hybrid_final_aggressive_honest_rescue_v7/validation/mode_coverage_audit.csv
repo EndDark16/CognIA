@@ -1,0 +1,7 @@
+mode,role,mode_key,active_questions,total_rows,coverage_pct
+1_3,guardian,caregiver_1_3,76,203,37.4384236453202
+2_3,guardian,caregiver_2_3,107,203,52.70935960591133
+full,guardian,caregiver_full,136,203,66.99507389162561
+1_3,psychologist,psychologist_1_3,87,203,42.857142857142854
+2_3,psychologist,psychologist_2_3,111,203,54.679802955665025
+full,psychologist,psychologist_full,161,203,79.3103448275862

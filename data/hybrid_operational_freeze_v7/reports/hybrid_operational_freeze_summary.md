@@ -1,0 +1,31 @@
+# Hybrid Operational Freeze v7 - Summary
+
+## Final class counts
+final_class
+PRIMARY_WITH_CAVEAT    14
+HOLD_FOR_LIMITATION    12
+REJECT_AS_PRIMARY       3
+ROBUST_PRIMARY          1
+
+## Replacements
+| domain | mode | old_active_model_id | promotion_decision | new_model_family | new_feature_set_id | delta_balanced_accuracy | delta_f1 | delta_pr_auc | delta_brier | root_cause_hypothesis |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| adhd | psychologist_full | adhd__psychologist_full__rebuild_v2__rf__engineered_full | HOLD_FOR_LIMITATION | rf | engineered_full | 0.040100 | 0.024535 | 0.051632 | -0.005966 | secondary_metric_anomaly|anomaly_due_to_feature_dominance|insufficient_dsm5_core_signal|weighting_boundary_adjustment |
+| anxiety | caregiver_2_3 | anxiety__caregiver_2_3__final_honest_improvement_v1__rf__engineered_pruned | HOLD_FOR_LIMITATION | xgb | engineered_pruned_no_shortcut_v1 | 0.018711 | 0.023546 | 0.010667 | 0.001684 | secondary_metric_anomaly|anomaly_due_to_feature_dominance|weighting_boundary_adjustment |
+| anxiety | caregiver_full | anxiety__caregiver_full__final_honest_improvement_v1__rf__engineered_compact | HOLD_FOR_LIMITATION | extra_trees | balanced_subset | 0.008352 | 0.016378 | -0.011617 | 0.004618 | secondary_metric_anomaly|anomaly_due_to_feature_dominance |
+| anxiety | psychologist_2_3 | anxiety__psychologist_2_3__final_honest_improvement_v1__rf__engineered_pruned | HOLD_FOR_LIMITATION | xgb | engineered_pruned_no_eng_v1 | 0.030870 | 0.053860 | -0.002315 | -0.001709 | secondary_metric_anomaly|anomaly_due_to_feature_dominance|weighting_boundary_adjustment |
+| anxiety | psychologist_full | anxiety__psychologist_full__final_honest_improvement_v1__rf__engineered_pruned | HOLD_FOR_LIMITATION | xgb | engineered_pruned_no_eng_v1 | 0.012159 | 0.031276 | 0.007821 | -0.000442 | secondary_metric_anomaly|anomaly_due_to_feature_dominance|weighting_boundary_adjustment |
+| conduct | caregiver_full | conduct__caregiver_full__hybrid_final_aggressive_rescue_v6__extra_trees__dsm5_core_plus_context | HOLD_FOR_LIMITATION | extra_trees | dsm5_core_plus_context | -0.007812 | -0.006348 | 0.000000 | -0.000426 | secondary_metric_anomaly|dsm5_core_signal_strengthened|weighting_boundary_adjustment |
+| conduct | psychologist_full | conduct__psychologist_full__hybrid_final_aggressive_rescue_v6__hgb__dsm5_core_plus_context | HOLD_FOR_LIMITATION | extra_trees | dsm5_core_only | -0.010937 | -0.009543 | 0.000117 | 0.001514 | secondary_metric_anomaly|dsm5_core_signal_strengthened|weighting_boundary_adjustment |
+| depression | caregiver_1_3 | depression__caregiver_1_3__rebuild_v2__rf__precision_oriented_subset | HOLD_FOR_LIMITATION | rf | stability_pruned_subset | 0.039803 | 0.016344 | 0.053531 | 0.000559 | limited_separability_or_underfit|recall_tradeoff|precision_recall_tradeoff|weighting_boundary_adjustment |
+| depression | caregiver_2_3 | depression__caregiver_2_3__hybrid_final_decisive_rescue_v5__rf__precision_oriented_subset | HOLD_FOR_LIMITATION | extra_trees | precision_oriented_subset | -0.015780 | -0.010577 | -0.002997 | -0.000280 | insufficient_dsm5_core_signal|low_precision_due_to_boundary_noise|precision_recall_tradeoff |
+| depression | caregiver_full | depression__caregiver_full__boosted_v3__catboost__full_eligible | HOLD_FOR_LIMITATION | rf | compact_subset | -0.023314 | -0.020978 | -0.016195 | 0.010550 | secondary_metric_anomaly|insufficient_dsm5_core_signal |
+| depression | psychologist_1_3 | depression__psychologist_1_3__rebuild_v2__rf__stability_pruned_subset | HOLD_FOR_LIMITATION | hgb | stability_pruned_subset | -0.023502 | -0.056418 | 0.016147 | 0.012967 | insufficient_dsm5_core_signal|limited_separability_or_underfit|low_precision_due_to_boundary_noise|precision_recall_tradeoff |
+| depression | psychologist_2_3 | depression__psychologist_2_3__final_honest_improvement_v1__rf__compact_subset | HOLD_FOR_LIMITATION | hgb | engineered_compact | -0.037842 | -0.045587 | 0.031693 | 0.004935 | insufficient_dsm5_core_signal|low_precision_due_to_boundary_noise |
+| depression | psychologist_full | depression__psychologist_full__boosted_v3__hgb__full_eligible | HOLD_FOR_LIMITATION | xgb | full_eligible | -0.064391 | -0.065792 | -0.007749 | 0.008150 | secondary_metric_anomaly|insufficient_dsm5_core_signal|weighting_boundary_adjustment |
+| elimination | caregiver_1_3 | elimination__caregiver_1_3__boosted_v3__extra_trees__boosted_eng_full | HOLD_FOR_LIMITATION | xgb | engineered_pruned | -0.048322 | -0.061086 | -0.017324 | 0.000148 | secondary_metric_anomaly|insufficient_dsm5_core_signal |
+| elimination | caregiver_2_3 | elimination__caregiver_2_3__final_honest_improvement_v1__rf__engineered_compact | HOLD_FOR_LIMITATION | hgb | stability_pruned_subset | -0.008447 | -0.000534 | 0.056158 | -0.000906 | secondary_metric_anomaly|anomaly_due_to_feature_dominance|insufficient_dsm5_core_signal|weighting_boundary_adjustment |
+| elimination | caregiver_full | elimination__caregiver_full__final_honest_improvement_v1__rf__engineered_compact | HOLD_FOR_LIMITATION | hgb | engineered_compact_no_eng_v1 | -0.007279 | 0.008807 | 0.055538 | -0.002547 | secondary_metric_anomaly|anomaly_due_to_feature_dominance|insufficient_dsm5_core_signal|weighting_boundary_adjustment |
+| elimination | psychologist_1_3 | elimination__psychologist_1_3__boosted_v3__extra_trees__boosted_eng_full | HOLD_FOR_LIMITATION | hgb | stability_pruned_subset | -0.021806 | -0.044818 | -0.013865 | -0.001429 | secondary_metric_anomaly|insufficient_dsm5_core_signal |
+| elimination | psychologist_2_3 | elimination__psychologist_2_3__final_honest_improvement_v1__rf__engineered_pruned | HOLD_FOR_LIMITATION | hgb | stability_pruned_subset | 0.001168 | 0.009169 | 0.031425 | -0.001063 | secondary_metric_anomaly|anomaly_due_to_feature_dominance|insufficient_dsm5_core_signal|weighting_boundary_adjustment |
+| elimination | psychologist_full | elimination__psychologist_full__final_honest_improvement_v1__rf__engineered_compact | HOLD_FOR_LIMITATION | hgb | engineered_compact_no_eng_v1 | -0.007279 | 0.008807 | 0.007881 | -0.001008 | secondary_metric_anomaly|anomaly_due_to_feature_dominance|insufficient_dsm5_core_signal|weighting_boundary_adjustment |

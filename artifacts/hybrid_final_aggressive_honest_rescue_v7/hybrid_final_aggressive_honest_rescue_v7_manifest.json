@@ -1,0 +1,159 @@
+{
+  "line": "hybrid_final_aggressive_honest_rescue_v7",
+  "generated_at_utc": "2026-04-24T00:54:03.598271+00:00",
+  "source_truth_previous": {
+    "operational": "data\\hybrid_operational_freeze_v6\\tables\\hybrid_operational_final_champions.csv",
+    "active": "data\\hybrid_active_modes_freeze_v6\\tables\\hybrid_active_models_30_modes.csv"
+  },
+  "source_truth_new": {
+    "operational": "data\\hybrid_operational_freeze_v7\\tables\\hybrid_operational_final_champions.csv",
+    "active": "data\\hybrid_active_modes_freeze_v7\\tables\\hybrid_active_models_30_modes.csv"
+  },
+  "stats": {
+    "focus_slots": 19,
+    "promoted": 0,
+    "policy_violations": 0
+  },
+  "generated_files": [
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/ablation/global_ablation_v7.csv",
+      "sha256": "01942b2f4324d3293d36cdd165de7bce8899f9e3c22e6c71e7e48665f892dbb3",
+      "bytes": 4284
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/bootstrap/global_bootstrap_v7.csv",
+      "sha256": "2a9738633b7adc52e1126f91fdaa57027dc0feaa96e410e5a6585717b43ecfd1",
+      "bytes": 5413
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/inventory/models_demoted.csv",
+      "sha256": "73c2fe53f4f8ff689bf3579e6db98aeb76f537c90dfc14eae00b6b7d271ecaff",
+      "bytes": 999
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/reports/hybrid_final_aggressive_rescue_summary.md",
+      "sha256": "e93fe3357aea0ee4acf3eb51f484f29a0f4a7a3fb3eb79f67ead3e9d9fbf7d3a",
+      "bytes": 8617
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/stability/global_seed_stability_v7.csv",
+      "sha256": "f717741117d15d7daaa2b32fc19a68de80372adb08143bfb566456f1c3300de0",
+      "bytes": 10518
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/stress/global_stress_v7.csv",
+      "sha256": "79b3b80700ec9692de1f7f1a8a5f7800dcb0f72f577813f63bb5ff0c75aad44f",
+      "bytes": 13071
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/tables/dsm5_variant_effects_summary.csv",
+      "sha256": "474fcbd3eb4a11a665bfe0a746ae531a898cd22995894d3500cc1efbd2fabe73",
+      "bytes": 2068
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/tables/families_feature_sets_evaluated.csv",
+      "sha256": "b8399f584f6d98e730f570072a24590a03b58aa1710c8c6b8ba1f3925327065b",
+      "bytes": 258352
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/tables/final_aggressive_selected_models.csv",
+      "sha256": "0cfd7638803752149ee4fc0cc433291194b9bde34b4256c9a68e650f550f7638",
+      "bytes": 53817
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/tables/final_old_vs_new_comparison.csv",
+      "sha256": "fa06e8a7c52fe11df7d78649cde3b808f80aa9d6e804f76fb8b0c502a424d42d",
+      "bytes": 15165
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/tables/focus_margin_audit.csv",
+      "sha256": "7ca3e8f91a6e6d99ff55887ff5dc7e03dc572d24bb5ee11f0584714325ff1d6e",
+      "bytes": 4152
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/tables/focus_slots_inventory.csv",
+      "sha256": "e906fcaf6b92fc492823d31b7686817cf090c0849076a9bb4812a1a9900e78d9",
+      "bytes": 46626
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/tables/normalized_v4_snapshot.csv",
+      "sha256": "ecd24d3f20d002f89f0c9171c189d8bbf53e06a3d379af4c5264cc1f3d862f39",
+      "bytes": 23063
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/tables/root_cause_by_slot.csv",
+      "sha256": "e0bf02612635fc3d0fcc21a24cc5d2242c090b054cb4a609dfc71034968c13bc",
+      "bytes": 4180
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/tables/shortcut_inventory_v7.csv",
+      "sha256": "b7aebfb1767d4df468c243528be173f2c674bd1580317bc56d5d3116ec7da0fc",
+      "bytes": 920
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/tables/shortcut_inventory_v7_precheck.csv",
+      "sha256": "36f2a12b69eaeec10c718e2e9f933deed0b5961853c79b2f82c5da6edf4696fe",
+      "bytes": 3402
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/tables/weighting_effects_summary.csv",
+      "sha256": "744c8c86ed4c3bf958e0d17af97621cbc0d9cd1dd4d8a1fed79fae4c4b9f03f7",
+      "bytes": 10145
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/trials/final_aggressive_retrain_trials.csv",
+      "sha256": "588866a954c1fabdf73f124faf55c68010c9c3206053b2f24252157e531df60c",
+      "bytes": 7132927
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/trials/focus_pass_a_trials.csv",
+      "sha256": "6d4a5d605744ddbb8451dd9bcaeb6461e451c60ee401e02330259a6624c42fb8",
+      "bytes": 1869058
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/trials/focus_pass_b_trials.csv",
+      "sha256": "8477eb10d8e12906297ae6d2e718c6fdcf9c50bd0c171c6599088e5eea33f538",
+      "bytes": 3111849
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/trials/focus_pass_c_trials.csv",
+      "sha256": "dfe6679bf4519e77ccbe5ebebc40bf23083b43657d27bfa33786ae653b0dca93",
+      "bytes": 2152876
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/validation/duplicate_audit_global.csv",
+      "sha256": "5927efab2036e5cdb20b8725165e2bb06b595e82511c584c3019064dd00a0e8f",
+      "bytes": 54
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/validation/global_model_evidence_v7.csv",
+      "sha256": "fbb9a824cba01868db3d748abed9bee6233a96585c06dc21112e544ee7bfb270",
+      "bytes": 10151
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/validation/missingness_global.csv",
+      "sha256": "1ce898c0d6abcae297b89d8aa9bf63760dc966b43c3e844f580978c3447ea24c",
+      "bytes": 6466
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/validation/mode_coverage_audit.csv",
+      "sha256": "317f77ff1ca0665057b4b4e4a5ae9c803b6242d7f0d8da1155fbc0507081b574",
+      "bytes": 408
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/validation/near_duplicate_audit_global.csv",
+      "sha256": "675deeeb86e0eabef7d08876ba62d929cce74b4a95d5bfc7fd2def38bce40a3e",
+      "bytes": 57
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/validation/split_registry.csv",
+      "sha256": "87fbb4704c0b60429e60c732424c7358ae4a0140dc05bad1b776df4987791b00",
+      "bytes": 475
+    },
+    {
+      "path": "data/hybrid_final_aggressive_honest_rescue_v7/validation/split_shift_audit_global.csv",
+      "sha256": "44894be67fc13fa6eabb15f6dc6f5d44a02dab3dabe560b1d51cb95cba51ca70",
+      "bytes": 443
+    }
+  ]
+}
