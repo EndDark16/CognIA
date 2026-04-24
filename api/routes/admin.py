@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime, timezone
 
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import get_jwt, get_jwt_identity
@@ -21,7 +20,7 @@ from api.schemas.admin_schema import (
     UserPatchSchema,
 )
 from api.services import admin_service
-from app.models import AppUser, AuditLog, EmailUnsubscribe, Evaluation, QuestionnaireTemplate, Role, db
+from app.models import AppUser, EmailUnsubscribe, Evaluation, QuestionnaireTemplate, db
 
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/api/admin")
