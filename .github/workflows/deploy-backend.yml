@@ -31,7 +31,8 @@ jobs:
       - name: Rebuild backend
         run: |
           cd /opt/cognia
-          docker compose up -d --build backend gateway
+          docker compose up -d --build backend
+          docker compose up -d --force-recreate gateway
 
       - name: Wait for backend readiness
         run: |
@@ -49,7 +50,8 @@ jobs:
           cd /opt/cognia/backend
           git reset --hard "${{ steps.prev.outputs.sha }}"
           cd /opt/cognia
-          docker compose up -d --build backend gateway
+          docker compose up -d --build backend
+          docker compose up -d --force-recreate gateway
 
       - name: Show backend status
         if: always()
