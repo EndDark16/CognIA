@@ -840,3 +840,15 @@ Integracion runtime:
   - `policy_violations=0`
 - Integracion loader/runtime:
   - defaults de `api/services/questionnaire_v2_loader_service.py` migrados a `*_freeze_v6_hotfix_v1`.
+
+## Actualizacion de estado (2026-04-24) - cierre operativo guardia dura v6_hotfix_v1
+- Se verifico estado real de violaciones en lineas `v6` y `v6_hotfix_v1` antes de cierre:
+  - `v6`: `16` violadores.
+  - `v6_hotfix_v1`: `0` violadores.
+- Se confirma `v6_hotfix_v1` como fuente operativa efectiva de champions activos (no `v6`).
+- Se alineo validacion contractual para evaluar la linea activa `v6_hotfix_v1`:
+  - `scripts/validate_hybrid_classification_policy_v1.py`
+  - `tests/contracts/test_hybrid_classification_policy_v1.py`
+- Se mantiene framing metodologico:
+  - screening/apoyo profesional en entorno simulado.
+  - no diagnostico automatico.

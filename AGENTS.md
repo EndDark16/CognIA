@@ -391,3 +391,13 @@ Contexto metodológico:
   - `api/services/questionnaire_v2_loader_service.py` actualizado para defaults `*_freeze_v6_hotfix_v1`.
 - Claim permitido sin cambios:
   - evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-24) - cierre operativo guardia dura v6_hotfix_v1
+- Se realizo auditoria de cierre sobre `freeze_v6` y `freeze_v6_hotfix_v1` para confirmar estado real de violaciones.
+- Resultado de auditoria:
+  - `freeze_v6`: `16` slots violando guardia dura en al menos una metrica vigilada.
+  - `freeze_v6_hotfix_v1`: `0` slots violando guardia dura.
+- Fuente operativa confirmada para runtime/loader y contratos de inferencia:
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_operational_freeze_v6_hotfix_v1/tables/hybrid_operational_final_champions.csv`
+- Se actualizaron validaciones para tratar `v6_hotfix_v1` como linea activa en policy checks.
