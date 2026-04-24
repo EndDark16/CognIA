@@ -1,0 +1,7 @@
+{
+  "run_id": "hybrid_active_modes_freeze_v6_hotfix_v1",
+  "base_line": "hybrid_active_modes_freeze_v6",
+  "replacement_line": "hybrid_v6_quick_champion_guard_hotfix_v1",
+  "path": "data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_models_30_modes.csv",
+  "generated_at_utc": "2026-04-24T03:19:05.992230+00:00"
+}

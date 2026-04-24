@@ -671,3 +671,28 @@ Claim permitido sin cambios:
   - No hubo cambio de inputs funcionales expuestos ni outputs funcionales expuestos.
   - Se mantuvieron `domain/mode/role` y semantica de inferencia; cambios solo en entrenamiento interno/seleccion/calibracion/threshold/weighting.
 
+## Actualizacion de estado (2026-04-24) - hybrid_v6_quick_champion_guard_hotfix_v1
+- Se ejecuto hotfix rapido y focal sobre champions activos v6 para hacer cumplir regla dura de guardia:
+  - ningun champion activo con `recall|specificity|roc_auc|pr_auc > 0.98`.
+- Script principal:
+  - `scripts/run_hybrid_v6_quick_champion_guard_hotfix.py`
+- Lineas versionadas nuevas:
+  - `data/hybrid_v6_quick_champion_guard_hotfix_v1/`
+  - `data/hybrid_operational_freeze_v6_hotfix_v1/`
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/`
+  - `artifacts/hybrid_v6_quick_champion_guard_hotfix_v1/`
+  - `artifacts/hybrid_operational_freeze_v6_hotfix_v1/`
+  - `artifacts/hybrid_active_modes_freeze_v6_hotfix_v1/`
+- Resultado:
+  - `violating_slots_before=16`
+  - `corrected_slots_total=16`
+  - `remaining_guard_violations=0`
+  - `policy_violations=0`
+- Estrategia aplicada:
+  - reemplazo directo con modelos existentes cuando habia candidato valido guard-compliant.
+  - retrain ligero solo para slots sin reemplazo existente.
+  - fallback DSM-5 core de 1 feature para evitar colapso de precision/F1 cuando el fallback debil era insuficiente.
+- Integracion runtime:
+  - `api/services/questionnaire_v2_loader_service.py` actualizado para defaults `*_freeze_v6_hotfix_v1`.
+- Claim permitido sin cambios:
+  - evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
