@@ -1,4 +1,3 @@
-import io
 import json
 import secrets
 import uuid
@@ -13,7 +12,7 @@ import pandas as pd
 from flask import current_app
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-from sqlalchemy import and_, func, or_
+from sqlalchemy import or_
 
 from api.security import check_password, hash_password
 from api.services import questionnaire_v2_loader_service as loader
@@ -21,7 +20,6 @@ from app.models import (
     AppUser,
     GeneratedReport,
     ModelConfidenceRegistry,
-    ModelModeDomainActivation,
     ModelOperationalCaveat,
     ModelVersion,
     QuestionnaireAccessGrant,
