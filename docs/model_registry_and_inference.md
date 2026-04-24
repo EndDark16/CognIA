@@ -1,10 +1,10 @@
-# Model Registry and Inference (v6)
+# Model Registry and Inference (v7)
 
 ## Fuente de verdad
-- `data/hybrid_active_modes_freeze_v6/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_active_modes_freeze_v6/tables/hybrid_active_modes_summary.csv`
-- `data/hybrid_active_modes_freeze_v6/tables/hybrid_questionnaire_inputs_master.csv`
-- `data/hybrid_operational_freeze_v6/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v7/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v7/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v7/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v7/tables/hybrid_operational_final_champions.csv`
 
 Nota de continuidad (2026-04-22):
 - Se ejecuto la linea `hybrid_secondary_honest_retrain_v1` y se versionaron:
@@ -30,6 +30,12 @@ Nota de continuidad (2026-04-22):
   - Se recalculo `confidence_pct/confidence_band/final_operational_class` para los 30 slots bajo politica normalizada.
   - Se genero normalizacion v2 en `data/hybrid_classification_normalization_v2/` con `policy_violations=0`.
   - La fuente operativa efectiva pasa a `*_freeze_v6`.
+- Nota de continuidad (2026-04-23, campana final agresiva honesta):
+  - Se ejecuto `hybrid_final_aggressive_honest_rescue_v7`.
+  - Se versionaron `data/hybrid_operational_freeze_v7/` y `data/hybrid_active_modes_freeze_v7/`.
+  - `focus_slots=19`, `replaced_pairs=0`, `policy_violations=0`.
+  - Se aplico gate duro de promocion (`recall/specificity/roc_auc/pr_auc > 0.98` bloquea promotion) y bandas objetivo de recall por modo.
+  - Se recalculo `confidence_pct/confidence_band/final_operational_class` para 30 slots y la fuente operativa efectiva pasa a `*_freeze_v7`.
 
 ## Registro en DB
 - `model_registry`: identidad por `active_model_id`.
