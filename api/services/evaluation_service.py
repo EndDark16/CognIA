@@ -5,7 +5,6 @@ import secrets
 from datetime import datetime, timezone
 
 from app.models import Evaluation, EvaluationResponse, Question
-from app.models import db
 from api.security import hash_password
 
 _INTEGER_TYPES = {

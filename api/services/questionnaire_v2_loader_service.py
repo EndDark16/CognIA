@@ -24,7 +24,6 @@ from app.models import (
     QuestionnaireScale,
     QuestionnaireScaleOption,
     QuestionnaireSection,
-    QuestionnaireSession,
     QuestionnaireVersion,
     db,
 )
