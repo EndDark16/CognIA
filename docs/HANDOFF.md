@@ -818,24 +818,25 @@ Integracion runtime:
   - No hubo cambio de inputs funcionales expuestos ni outputs funcionales expuestos.
   - Se mantuvieron `domain/mode/role` y semantica de inferencia; cambios solo en entrenamiento interno/seleccion/calibracion/threshold/weighting.
 
-Swagger/OpenAPI:
-- Fuente activa unica confirmada: `docs/openapi.yaml`.
-- `/openapi.yaml` y `/docs` continúan consistentes con esa spec.
-
-## Actualizacion (2026-04-20) - backend_documentation_closure_v1
-Resumen de cierre:
-- Se consolido documentacion tecnica backend en `docs/backend_technical_manual.md` usando evidencia verificable del runtime/codigo del repositorio.
-- Se genero anexo de matriz tecnica de endpoints en `docs/backend_endpoint_matrix.csv` (119 pares endpoint-metodo; 112 paths unicos).
-- Se corrigio inconsistencia de edad en inferencia legacy:
-  - `api/schemas/predict_schema.py` ahora valida `age` en `6-11`.
-  - `docs/openapi.yaml` (`PredictRequest`) alineado al mismo rango.
-  - `tests/test_predict.py` actualizado con validacion de rango.
-
-Verificacion:
-- `pytest tests/test_predict.py tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/test_security_hardening.py -q` -> `13 passed`.
-
-Pendiente no cerrado en esta ventana:
-- `tests/contracts/test_openapi_documentation_quality.py` sigue fallando por deuda de formato documental transversal en descripciones OpenAPI.
-
-Criterio metodologico sin cambios:
-- uso para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+## Actualizacion de estado (2026-04-24) - hybrid_v6_quick_champion_guard_hotfix_v1
+- Objetivo:
+  - corregir de inmediato champions activos v6 que violaban guardia dura (`recall|specificity|roc_auc|pr_auc > 0.98`).
+- Script:
+  - `scripts/run_hybrid_v6_quick_champion_guard_hotfix.py`
+- Fuentes de verdad nuevas:
+  - `data/hybrid_operational_freeze_v6_hotfix_v1/tables/hybrid_operational_final_champions.csv`
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_modes_summary.csv`
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_questionnaire_inputs_master.csv`
+- Evidencia:
+  - `data/hybrid_v6_quick_champion_guard_hotfix_v1/tables/violating_slots_v6.csv`
+  - `data/hybrid_v6_quick_champion_guard_hotfix_v1/tables/final_old_vs_new_comparison.csv`
+  - `data/hybrid_v6_quick_champion_guard_hotfix_v1/tables/remaining_guard_violations_after_hotfix.csv`
+  - `data/hybrid_classification_normalization_v2/validation/hybrid_classification_policy_violations_v6_hotfix_v1.csv`
+- Resultado final:
+  - `violating_slots_before=16`
+  - `corrected_slots_total=16`
+  - `remaining_guard_violations=0`
+  - `policy_violations=0`
+- Integracion loader/runtime:
+  - defaults de `api/services/questionnaire_v2_loader_service.py` migrados a `*_freeze_v6_hotfix_v1`.

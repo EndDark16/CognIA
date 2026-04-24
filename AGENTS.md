@@ -366,18 +366,28 @@ Contexto metodológico:
   - parseo YAML: `openapi_yaml_valid`.
   - `pytest tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/api/test_questionnaire_v2_api.py tests/test_problem_reports.py -q` => `21 passed`.
 
-## Actualizacion de estado (2026-04-20) - backend_documentation_closure_v1
-- Se ejecuto cierre documental tecnico del backend en rama `development` con fuente principal en evidencia de codigo/runtime del repo.
-- Entregables nuevos:
-  - `docs/backend_technical_manual.md` (manual tecnico consolidado).
-  - `docs/backend_endpoint_matrix.csv` (matriz tecnica runtime real, 119 pares endpoint-metodo).
-- Se corrigio inconsistencia prioritaria de edad en flujo legacy `POST /api/predict`:
-  - `api/schemas/predict_schema.py`: `age` pasa de `3-21` a `6-11`.
-  - `docs/openapi.yaml`: `PredictRequest.age` alineado a `6-11` y ejemplo de borde actualizado.
-  - `tests/test_predict.py`: agregado test de rango fuera de limite para edad.
-- Verificacion ejecutada:
-  - `pytest tests/test_predict.py tests/contracts/test_openapi_runtime_alignment.py tests/test_docs_metrics.py tests/test_security_hardening.py -q` => `13 passed`.
-- Discrepancia no cerrada en esta ventana (deuda documental amplia):
-  - `tests/contracts/test_openapi_documentation_quality.py` falla por formato de secciones requeridas en descripciones OpenAPI a escala global.
-- Nota metodologica mantenida sin cambios:
+## Actualizacion de estado (2026-04-24) - hybrid_v6_quick_champion_guard_hotfix_v1
+- Se ejecuto hotfix rapido y focal sobre champions activos v6 para hacer cumplir regla dura de guardia:
+  - ningun champion activo con `recall|specificity|roc_auc|pr_auc > 0.98`.
+- Script principal:
+  - `scripts/run_hybrid_v6_quick_champion_guard_hotfix.py`
+- Lineas versionadas nuevas:
+  - `data/hybrid_v6_quick_champion_guard_hotfix_v1/`
+  - `data/hybrid_operational_freeze_v6_hotfix_v1/`
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/`
+  - `artifacts/hybrid_v6_quick_champion_guard_hotfix_v1/`
+  - `artifacts/hybrid_operational_freeze_v6_hotfix_v1/`
+  - `artifacts/hybrid_active_modes_freeze_v6_hotfix_v1/`
+- Resultado:
+  - `violating_slots_before=16`
+  - `corrected_slots_total=16`
+  - `remaining_guard_violations=0`
+  - `policy_violations=0`
+- Estrategia aplicada:
+  - reemplazo directo con modelos existentes cuando habia candidato valido guard-compliant.
+  - retrain ligero solo para slots sin reemplazo existente.
+  - fallback DSM-5 core de 1 feature para evitar colapso de precision/F1 cuando el fallback debil era insuficiente.
+- Integracion runtime:
+  - `api/services/questionnaire_v2_loader_service.py` actualizado para defaults `*_freeze_v6_hotfix_v1`.
+- Claim permitido sin cambios:
   - evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
