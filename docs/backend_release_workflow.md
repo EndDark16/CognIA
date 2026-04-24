@@ -27,6 +27,23 @@ Referencia base: `CONTRIBUTING.md`.
 8. Merge de promocion hacia `development`.
 9. Solo para cierre productivo aprobado: PR `development -> main`.
 
+## Automatizacion CI/deploy en GitHub Actions
+- CI principal (siempre disponible): `.github/workflows/ci-backend.yml`
+  - Runner: `ubuntu-latest` (GitHub-hosted)
+  - Trigger: pushes/PR sobre `development` y `main`
+  - Validaciones: compile sanity, import sanity, `pytest -q`, docker build sanity
+- Deploy backend Ubuntu (best effort): `.github/workflows/deploy-backend.yml`
+  - Runner: `[self-hosted, linux, x64, cognia-backend]`
+  - Trigger: push a `development` + `workflow_dispatch`
+  - Comportamiento: update repo en `/opt/cognia/backend`, `docker compose up -d --build backend gateway`, verificacion `http://localhost/readyz`, rollback automatico basico si falla el post-deploy healthcheck.
+
+Regla operativa obligatoria:
+- `deploy-backend` NO debe configurarse como required check en branch protection.
+- La senal de integracion para desarrollo continuo debe ser `ci-backend`.
+- Si el runner self-hosted esta offline, el flujo de desarrollo continua con CI normal en GitHub-hosted.
+- Check recomendado como required: `CI Backend / backend-ci`.
+- Check de deploy NO requerido: `Deploy Backend (Best Effort) / backend-deploy-best-effort`.
+
 ## Buenas practicas obligatorias
 - No subir secretos ni `.env`.
 - PR enfocado (un release coherente, no cambios mixtos sin trazabilidad).
