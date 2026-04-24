@@ -1,0 +1,18 @@
+mapping_id,target_feature,source_feature,method,evidence_strength,notes
+M01,ysr_aggressive_behavior_proxy,cbcl_aggressive_behavior_proxy,proxy_copy,moderate,self-report proxy from caregiver CBCL
+M02,ysr_anxious_depressed_proxy,cbcl_anxious_depressed_proxy,proxy_copy,moderate,self-report proxy from caregiver CBCL
+M03,ysr_attention_problems_proxy,cbcl_attention_problems_proxy,proxy_copy,moderate,self-report proxy from caregiver CBCL
+M04,ysr_externalizing_proxy,cbcl_externalizing_proxy,proxy_copy,moderate,self-report proxy from caregiver CBCL
+M05,ysr_internalizing_proxy,cbcl_internalizing_proxy,proxy_copy,moderate,self-report proxy from caregiver CBCL
+M06,ysr_rule_breaking_proxy,cbcl_rule_breaking_proxy,proxy_copy,moderate,self-report proxy from caregiver CBCL
+M07,has_ysr,has_cbcl,binary_proxy,moderate,availability proxy
+M08,ari_sr_symptom_total,ari_p_symptom_total,proxy_copy,moderate,self-report proxy from caregiver ARI-P
+M09,has_ari_sr,has_ari_p,binary_proxy,moderate,availability proxy
+M10,scared_sr_total,scared_p_total,proxy_copy,moderate,self-report total proxy from caregiver total
+M11,scared_sr_generalized_anxiety,scared_p_generalized_anxiety,proxy_copy,moderate,subscale proxy
+M12,scared_sr_panic_somatic,scared_p_panic_somatic,proxy_copy,moderate,subscale proxy
+M13,scared_sr_social_anxiety,scared_p_social_anxiety,proxy_copy,moderate,subscale proxy
+M14,scared_sr_separation_anxiety,scared_p_separation_anxiety,proxy_copy,moderate,subscale proxy
+M15,scared_sr_school_avoidance,scared_p_school_avoidance,proxy_copy,moderate,subscale proxy
+M16,scared_sr_possible_anxiety_disorder_cut25,scared_p_possible_anxiety_disorder_cut25,proxy_copy,moderate,cutoff proxy
+M17,scared_sr_01_to_41,scared_p_total,average_projection,weak,item-level approximation from caregiver total

@@ -1,0 +1,34 @@
+# Hybrid No External Scores - Ceiling Decision
+
+| domain | mode | quality_label | ceiling_status | should_keep_improving | overfit_warning |
+| --- | --- | --- | --- | --- | --- |
+| adhd | caregiver_1_3 | malo | marginal_room_left | only_if_new_signal | no |
+| adhd | caregiver_2_3 | malo | marginal_room_left | only_if_new_signal | yes |
+| adhd | caregiver_full | malo | marginal_room_left | only_if_new_signal | no |
+| adhd | psychologist_1_3 | malo | marginal_room_left | only_if_new_signal | no |
+| adhd | psychologist_2_3 | malo | marginal_room_left | only_if_new_signal | no |
+| adhd | psychologist_full | muy_bueno | marginal_room_left | yes | no |
+| anxiety | caregiver_1_3 | muy_bueno | marginal_room_left | yes | no |
+| anxiety | caregiver_2_3 | bueno | ceiling_confirmed | no_practical_ceiling_confirmed | no |
+| anxiety | caregiver_full | muy_bueno | marginal_room_left | yes | no |
+| anxiety | psychologist_1_3 | aceptable | near_ceiling | no | no |
+| anxiety | psychologist_2_3 | muy_bueno | ceiling_confirmed | no_practical_ceiling_confirmed | no |
+| anxiety | psychologist_full | muy_bueno | marginal_room_left | yes | no |
+| conduct | caregiver_1_3 | bueno | marginal_room_left | yes | no |
+| conduct | caregiver_2_3 | muy_bueno | marginal_room_left | yes | no |
+| conduct | caregiver_full | muy_bueno | marginal_room_left | yes | no |
+| conduct | psychologist_1_3 | aceptable | near_ceiling | no | yes |
+| conduct | psychologist_2_3 | muy_bueno | marginal_room_left | yes | no |
+| conduct | psychologist_full | muy_bueno | marginal_room_left | yes | no |
+| depression | caregiver_1_3 | malo | near_ceiling | only_if_new_signal | yes |
+| depression | caregiver_2_3 | malo | marginal_room_left | only_if_new_signal | no |
+| depression | caregiver_full | aceptable | marginal_room_left | yes | no |
+| depression | psychologist_1_3 | malo | marginal_room_left | only_if_new_signal | yes |
+| depression | psychologist_2_3 | malo | marginal_room_left | only_if_new_signal | yes |
+| depression | psychologist_full | aceptable | marginal_room_left | yes | no |
+| elimination | caregiver_1_3 | malo | marginal_room_left | only_if_new_signal | yes |
+| elimination | caregiver_2_3 | muy_bueno | ceiling_confirmed | no_practical_ceiling_confirmed | no |
+| elimination | caregiver_full | muy_bueno | marginal_room_left | yes | no |
+| elimination | psychologist_1_3 | malo | marginal_room_left | only_if_new_signal | yes |
+| elimination | psychologist_2_3 | muy_bueno | marginal_room_left | yes | no |
+| elimination | psychologist_full | muy_bueno | marginal_room_left | yes | no |

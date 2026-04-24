@@ -35,13 +35,7 @@ class RoleAssignSchema(Schema):
 
 
 class RoleCreateSchema(Schema):
-    name = fields.String(
-        required=True,
-        validate=[
-            validate.Length(min=2, max=50),
-            validate.Regexp(r"^[A-Z0-9_]+$", error="Role name must use A-Z, 0-9 and underscore."),
-        ],
-    )
+    name = fields.String(required=True, validate=validate.Length(min=2, max=64))
     description = fields.String(load_default=None, validate=validate.Length(max=255))
 
 

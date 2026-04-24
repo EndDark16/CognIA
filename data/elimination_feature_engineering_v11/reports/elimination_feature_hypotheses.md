@@ -1,0 +1,16 @@
+# Elimination feature hypotheses v11
+
+- Scope: elimination only, strict_no_leakage, no external data.
+- Stop policy: max 3 strong rounds + 1 confirm round.
+
+hypothesis_id                 feature_family                                                                  rationale expected_gain   risk                                      source_variables leakage_risk  priority
+           H1      symptom_burden_composites                 core+burden composites can improve ranking for elimination        medium    low cbcl_108,cbcl_112,sdq_impact,conners_total,swan_total          low         1
+           H2                   proxy_pruned       removing broad noisy proxies should improve recall-precision balance        medium    low     cbcl_108,cbcl_112,sdq_impact,sdq_conduct_problems          low         1
+           H3              impact_composites                impact-focused features improve clinically useful screening low_to_medium    low          sdq_impact,ari_p_impairment_item,mfq_p_total          low         2
+           H4       subtype_aware_composites               enuresis/encopresis proxy split can recover missed positives        medium medium                                     cbcl_108,cbcl_112          low         1
+           H5         missingness_indicators    coverage-aware features stabilize probabilities under partial responses        medium    low                      core missing flags,source counts          low         1
+           H6         source_semantics_aware           explicit source-mix semantics should reduce mode shift fragility        medium    low                 has_* flags,source mix,agreement gaps          low         1
+           H7 context_comorbidity_composites  cross-domain context from symptom burden may add discriminative structure low_to_medium medium          internalizing/externalizing/neurodev burdens          low         2
+           H8           interaction_features                  selected interactions can sharpen boundary near threshold           low medium                    core x impact,burden x missingness          low         3
+           H9   feature_compacting_denoising compact clinically-grounded sets can improve stability and maintainability        medium    low                    compact clinical engineered subset          low         1
+          H10  hybrid_engineered_best_effort          hybrid union may recover residual recall if overfit is controlled        medium medium                       mode base + engineered families          low         2

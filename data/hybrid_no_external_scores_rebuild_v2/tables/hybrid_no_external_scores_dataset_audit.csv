@@ -1,0 +1,8 @@
+item,value
+rows,2400
+columns_total_dataset_ready,191
+base_features_clean,176
+engineered_features,9
+removed_features,52
+retained_features,176
+explicit_external_score_columns_found_and_removed,28

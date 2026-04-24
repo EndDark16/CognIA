@@ -1,0 +1,109 @@
+{
+  "line": "hybrid_final_decisive_rescue_v5",
+  "generated_at_utc": "2026-04-23T01:28:00.572392+00:00",
+  "source_truth_previous": {
+    "operational": "data\\hybrid_operational_freeze_v4\\tables\\hybrid_operational_final_champions.csv",
+    "active": "data\\hybrid_active_modes_freeze_v4\\tables\\hybrid_active_models_30_modes.csv"
+  },
+  "source_truth_new": {
+    "operational": "data\\hybrid_operational_freeze_v5\\tables\\hybrid_operational_final_champions.csv",
+    "active": "data\\hybrid_active_modes_freeze_v5\\tables\\hybrid_active_models_30_modes.csv"
+  },
+  "stats": {
+    "focus_slots": 16,
+    "promoted": 1,
+    "policy_violations": 0
+  },
+  "generated_files": [
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/ablation/global_ablation_v5.csv",
+      "sha256": "fc860d2b4b721b37f8369d6ab3eb1573fb35cafe718efd1065e4527810c5bb50",
+      "bytes": 4537
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/bootstrap/global_bootstrap_v5.csv",
+      "sha256": "c4931c5a5ccb5b08809cec2746e372cadd47bd1a19af60786a505f1826a1a9f5",
+      "bytes": 5789
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/inventory/models_demoted.csv",
+      "sha256": "022f746d57414555de68641aead0b642b7840f15833b53b7fb2e02abbabdca58",
+      "bytes": 2981
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/reports/hybrid_final_decisive_rescue_summary.md",
+      "sha256": "2fb1b8a2b4ef351e775b6420c57863fe1f72e0b2195cad914c59b691c99e5dfe",
+      "bytes": 5677
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/stability/global_seed_stability_v5.csv",
+      "sha256": "e3aa0a665cbfb6193be9bb2f875c1983a89d425e23a829022a7faacb7d49d7ab",
+      "bytes": 7474
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/stress/global_stress_v5.csv",
+      "sha256": "af683e452da6bf8725685846a332865c58ae1ff87dada343142fa2da259256fa",
+      "bytes": 13788
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/tables/final_decisive_selected_models.csv",
+      "sha256": "8e6ff6bf02a2a3f6d36118664d78b3dbabca250c228a91b4795e38a8123a645e",
+      "bytes": 50179
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/tables/final_old_vs_new_comparison.csv",
+      "sha256": "ccfded7f71d2e236a91b0d7c14e81065e75389fdfe7798e83acd272f0fc7568d",
+      "bytes": 10465
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/tables/focus_margin_audit.csv",
+      "sha256": "2f6d4ff29e96a06bf7af0f89938019ce7d5a8fe36aab7247783a6a28024acc16",
+      "bytes": 2901
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/tables/focus_slots_inventory.csv",
+      "sha256": "e99cf9725bd3ed6c4dccf2894a8d2281c1cc70f38eed166d1fe1b35dbe85f8f7",
+      "bytes": 45055
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/tables/normalized_v4_snapshot.csv",
+      "sha256": "c76dc414d33b233ea06bb6aeffce9b5be16d4087c48fdba13c7f29cda4036c6b",
+      "bytes": 22473
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/tables/shortcut_inventory_v4_precheck.csv",
+      "sha256": "16e8a6bffde366a73f5b7e5744e87a6c198da9f8fde471ca7d931199694e4934",
+      "bytes": 3504
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/tables/shortcut_inventory_v5.csv",
+      "sha256": "330704fe7c5320d75940d0c0f32855b288306bc0f22e7d2acba305124b9991a7",
+      "bytes": 899
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/trials/final_decisive_retrain_trials.csv",
+      "sha256": "195b432464ac4f841e39eca0278b45c3a3246c8f6875cc5efdd37994c621cf61",
+      "bytes": 1799952
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/trials/focus_margin_trials.csv",
+      "sha256": "99ba191a8e895bc058cbc55a7761c11186ddebe7a99a42e870bd4cf2a810df98",
+      "bytes": 1080176
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/validation/duplicate_audit_global.csv",
+      "sha256": "5927efab2036e5cdb20b8725165e2bb06b595e82511c584c3019064dd00a0e8f",
+      "bytes": 54
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/validation/global_model_evidence_v5.csv",
+      "sha256": "7cbfbe99712e364a7c1806095e622d3846a15c8f16102cddd38c282d9f27937e",
+      "bytes": 10277
+    },
+    {
+      "path": "data/hybrid_final_decisive_rescue_v5/validation/split_registry.csv",
+      "sha256": "87fbb4704c0b60429e60c732424c7358ae4a0140dc05bad1b776df4987791b00",
+      "bytes": 475
+    }
+  ]
+}

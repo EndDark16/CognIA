@@ -49,10 +49,15 @@ from app.models import (
 
 
 DOMAIN_ORDER = ["adhd", "conduct", "elimination", "anxiety", "depression"]
+ROLE_ALIAS_TO_CANONICAL = {
+    "guardian": "guardian",
+    "caregiver": "guardian",
+    "psychologist": "psychologist",
+}
 MODE_TO_MODEL_KEY = {
-    ("caregiver", "short"): "caregiver_1_3",
-    ("caregiver", "medium"): "caregiver_2_3",
-    ("caregiver", "complete"): "caregiver_full",
+    ("guardian", "short"): "caregiver_1_3",
+    ("guardian", "medium"): "caregiver_2_3",
+    ("guardian", "complete"): "caregiver_full",
     ("psychologist", "short"): "psychologist_1_3",
     ("psychologist", "medium"): "psychologist_2_3",
     ("psychologist", "complete"): "psychologist_full",
@@ -133,8 +138,16 @@ def _alert_level(probability: float) -> str:
     return "low"
 
 
+def _normalize_role(role: str) -> str:
+    out = ROLE_ALIAS_TO_CANONICAL.get(str(role or "").strip().lower())
+    if not out:
+        raise ValueError("invalid_role")
+    return out
+
+
 def _get_mode_key(role: str, mode: str) -> str:
-    key = MODE_TO_MODEL_KEY.get((role, mode))
+    canonical_role = _normalize_role(role)
+    key = MODE_TO_MODEL_KEY.get((canonical_role, mode))
     if not key:
         raise ValueError("invalid_mode_role")
     return key
@@ -366,7 +379,8 @@ def _session_sections(session_id: uuid.UUID) -> list[dict[str, Any]]:
 
 def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = False, page: int = 1, page_size: int = 20) -> dict[str, Any]:
     version = _active_version()
-    mode_key = _get_mode_key(role, mode)
+    canonical_role = _normalize_role(role)
+    mode_key = _get_mode_key(canonical_role, mode)
 
     repeated_ids = {
         row.repeated_question_id
@@ -388,7 +402,7 @@ def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = 
 
     confidence_by_domain: dict[str, dict[str, Any]] = {}
     for domain in DOMAIN_ORDER:
-        activation = loader.get_active_activation(domain=domain, mode_key=mode_key, role=role)
+        activation = loader.get_active_activation(domain=domain, mode_key=mode_key, role=canonical_role)
         confidence_pct, band, operational_class = _confidence_for_activation(activation.id)
         confidence_by_domain[domain] = {
             "confidence_pct": confidence_pct,
@@ -431,7 +445,7 @@ def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = 
             "questionnaire_version_final": version.questionnaire_version_final,
             "scales_version_label": version.scales_version_label,
             "mode": mode,
-            "role": role,
+            "role": canonical_role,
             "mode_key": mode_key,
             "supported_domains": DOMAIN_ORDER,
             "confidence_by_domain": confidence_by_domain,
@@ -449,7 +463,7 @@ def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = 
 
 def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> QuestionnaireSession:
     mode = str(payload.get("mode") or "").strip().lower()
-    role = str(payload.get("role") or "").strip().lower()
+    role = _normalize_role(str(payload.get("role") or "").strip().lower())
     mode_key = _get_mode_key(role, mode)
     version = _active_version()
 
@@ -531,7 +545,7 @@ def get_session_payload(session: QuestionnaireSession) -> dict[str, Any]:
         "questionnaire_id": session.questionnaire_public_id,
         "status": session.status,
         "mode": session.mode,
-        "role": session.respondent_role,
+        "role": _normalize_role(session.respondent_role),
         "mode_key": session.mode_key,
         "progress_pct": float(session.progress_pct or 0),
         "version": session.questionnaire_version_label,
@@ -696,7 +710,7 @@ def _model_probability(model_version: ModelVersion, feature_map: dict[str, Any],
     if not artifact_path or not Path(artifact_path).exists():
         return _heuristic_domain_probability(domain, feature_map)
 
-    feature_columns, metadata = _load_feature_contract(model_version)
+    feature_columns, _ = _load_feature_contract(model_version)
     if not feature_columns:
         feature_columns = [key for key in feature_map.keys() if key != "_meta"]
 
@@ -801,9 +815,10 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
         result = QuestionnaireSessionResult(session_id=session.id)
 
     domain_rows: list[dict[str, Any]] = []
+    role_for_lookup = _normalize_role(session.respondent_role)
 
     for domain in DOMAIN_ORDER:
-        activation = loader.get_active_activation(domain=domain, mode_key=session.mode_key, role=session.respondent_role)
+        activation = loader.get_active_activation(domain=domain, mode_key=session.mode_key, role=role_for_lookup)
         model_version = db.session.get(ModelVersion, activation.model_version_id)
         if not model_version:
             raise LookupError(f"model_version_missing:{activation.model_version_id}")
@@ -850,7 +865,7 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
     result.metadata_json = {
         "mode": session.mode,
         "mode_key": session.mode_key,
-        "role": session.respondent_role,
+        "role": role_for_lookup,
     }
     result.processed_at = _utcnow()
     result.updated_at = _utcnow()
@@ -1189,7 +1204,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
             f"Session ID: {session.id}",
             f"Generated at: {_utcnow().isoformat()}",
             f"Mode: {session.mode} ({session.mode_key})",
-            f"Role: {session.respondent_role}",
+            f"Role: {_normalize_role(session.respondent_role)}",
             f"Questionnaire version: {session.questionnaire_version_label}",
             "",
             f"Executive summary: {result_payload['result'].get('summary') or 'N/A'}",
@@ -1251,9 +1266,11 @@ def dashboard_user_growth(months: int = 12) -> dict[str, Any]:
 
 def dashboard_funnel(months: int = 12) -> dict[str, Any]:
     query = QuestionnaireSession.query
-    created = query.count()
-    submitted = query.filter(QuestionnaireSession.status.in_(["submitted", "processed"])).count()
-    processed = query.filter(QuestionnaireSession.status == "processed").count()
+    start_month = (pd.Timestamp(_utcnow().date().replace(day=1)) - pd.DateOffset(months=max(0, months - 1))).to_pydatetime()
+    created_query = query.filter(QuestionnaireSession.created_at >= start_month)
+    created = created_query.count()
+    submitted = created_query.filter(QuestionnaireSession.status.in_(["submitted", "processed"])).count()
+    processed = created_query.filter(QuestionnaireSession.status == "processed").count()
     return {
         "created": created,
         "submitted": submitted,

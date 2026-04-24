@@ -1,0 +1,52 @@
+{
+  "campaign": "elimination_feature_engineering_v11",
+  "dataset": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\data\\processed_hybrid_dsm5_v2\\final\\model_ready\\strict_no_leakage_hybrid\\dataset_hybrid_model_ready_strict_no_leakage_hybrid.csv",
+  "split_dir": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\data\\processed_hybrid_dsm5_v2\\splits\\domain_elimination_strict_full",
+  "model_families": [
+    "rf",
+    "lightgbm",
+    "xgboost"
+  ],
+  "round_policy": {
+    "max_strong_rounds": 3,
+    "max_confirm_rounds": 1
+  },
+  "best_trials_by_mode": {
+    "caregiver": {
+      "feature_set": "proxy_pruned",
+      "family": "lightgbm",
+      "calibration": "isotonic",
+      "threshold": 0.2,
+      "n_features": 15,
+      "objective": 0.965729327571341
+    },
+    "psychologist": {
+      "feature_set": "compact_clinical_engineered",
+      "family": "lightgbm",
+      "calibration": "isotonic",
+      "threshold": 0.29000000000000004,
+      "n_features": 25,
+      "objective": 0.9660118129566065
+    }
+  },
+  "selected_operating_modes": {
+    "caregiver": {
+      "operating_mode": "balanced",
+      "approval_status": "ready_with_caveat",
+      "precision": 0.993421052631579,
+      "recall": 0.937888198757764,
+      "balanced_accuracy": 0.964944099378882,
+      "pr_auc": 0.9852344424620342,
+      "brier": 0.03506129166800665
+    },
+    "psychologist": {
+      "operating_mode": "balanced",
+      "approval_status": "ready_with_caveat",
+      "precision": 1.0,
+      "recall": 0.937888198757764,
+      "balanced_accuracy": 0.968944099378882,
+      "pr_auc": 0.9862807778140408,
+      "brier": 0.03422938188684162
+    }
+  }
+}

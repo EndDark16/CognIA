@@ -1,0 +1,30 @@
+feature_name,source_original,formula,used_in_caregiver_winner,used_in_psychologist_winner,conceptual_proximity_to_target,leakage_risk,pseudo_target_risk,single_feature_ba_test,single_feature_auc_test,severity,decision
+cbcl_112,cbcl_112,raw_feature,yes,yes,very_high,low,medium,0.8695652173913043,0.8695652173913043,high,keep_with_caveat
+cbcl_108,cbcl_108,raw_feature,yes,yes,very_high,low,medium,0.8322981366459627,0.8322981366459627,high,keep_with_caveat
+v11_core_balance_diff,"cbcl_108,cbcl_112",Difference between enuresis/encopresis-like core indicators.,no,yes,very_high,low,medium,0.8167701863354038,0.8167701863354038,high,keep_with_caveat
+v11_core_sum,"cbcl_108,cbcl_112,sdq_impact",Core elimination burden from parent-observable symptoms and impact.,yes,yes,very_high,low,medium,0.8082484472049689,0.9031304347826088,high,keep_with_caveat
+v11_core_mean,"cbcl_108,cbcl_112,sdq_impact",Stabilized core burden average.,yes,yes,very_high,low,medium,0.8064596273291926,0.8894658385093168,high,keep_with_caveat
+v11_core_missing_count,"cbcl_108,cbcl_112,sdq_impact",Core evidence missingness count.,yes,no,very_high,low,low,0.5,0.4637515527950311,high,keep_with_caveat
+sdq_total_difficulties,sdq_total_difficulties,raw_feature,yes,no,low,low,low,0.7975155279503106,0.8732919254658386,low,keep
+v11_context_cross_domain_parent,"v11_internalizing_burden_parent,v11_externalizing_burden_parent,v11_neurodev_overlap_parent",Cross-domain symptom context derived from parent signals.,no,yes,low,low,low,0.7890434782608695,0.8505590062111802,low,keep
+sdq_conduct_problems,sdq_conduct_problems,raw_feature,yes,yes,low,low,low,0.7887204968944099,0.8576149068322981,low,keep
+cbcl_internalizing_proxy,cbcl_internalizing_proxy,raw_feature,no,yes,low,low,low,0.7367701863354037,0.7890931677018633,low,keep
+ari_p_symptom_total,ari_p_symptom_total,raw_feature,no,yes,low,low,low,0.7278757763975154,0.8027080745341615,low,keep
+cbcl_externalizing_proxy,cbcl_externalizing_proxy,raw_feature,no,yes,low,low,low,0.7257142857142858,0.7379627329192546,low,keep
+v11_parent_impact_combo,"sdq_impact,ari_p_impairment_item",Parent impact burden composite.,no,yes,low,low,low,0.7128198757763975,0.7909316770186336,low,keep
+swan_total,swan_total,raw_feature,no,yes,low,low,low,0.7122981366459628,0.7742360248447205,low,keep
+sdq_impact,sdq_impact,raw_feature,yes,yes,low,low,low,0.7065590062111802,0.7612173913043478,low,keep
+scared_sr_total,scared_sr_total,raw_feature,no,yes,low,low,low,0.6681987577639752,0.7467577639751553,low,keep
+scared_p_total,scared_p_total,raw_feature,no,yes,low,low,low,0.664447204968944,0.7187329192546583,low,keep
+sex_assigned_at_birth,sex_assigned_at_birth,raw_feature,yes,yes,low,low,low,0.5445465838509317,0.5445465838509317,low,keep
+v11_parent_nonmissing_ratio,"cbcl_108,cbcl_112,sdq_impact,sdq_conduct_problems,sdq_total_difficulties,conners_total,swan_total,scared_p_total,ari_p_symptom_total,icut_total,mfq_p_total",Parent non-missing ratio over elimination-relevant sources.,yes,yes,low,low,low,0.5208944099378882,0.5256149068322981,low,keep
+v11_cross_source_agreement,"v11_parent_self_gap_scared,v11_parent_self_gap_ari,v11_parent_self_gap_internalizing",Cross-source agreement score (higher means more agreement).,no,yes,low,low,low,0.5168198757763975,0.45195031055900625,low,keep
+v11_missingness_regime,v11_parent_nonmissing_ratio,Discrete missingness regime indicator.,no,yes,low,low,low,0.5165217391304348,0.5165217391304348,low,keep
+conners_total,conners_total,raw_feature,no,yes,low,low,low,0.512,0.515031055900621,low,keep
+ysr_internalizing_proxy,ysr_internalizing_proxy,raw_feature,no,yes,low,low,low,0.504,0.49913043478260866,low,keep
+has_cbcl,has_cbcl,raw_feature,yes,no,low,low,low,0.5,0.5,low,keep
+has_sdq,has_sdq,raw_feature,yes,no,low,low,low,0.5,0.5,low,keep
+release,release,raw_feature,yes,yes,low,low,low,0.5,0.5,low,keep
+v11_parent_source_count,"has_cbcl,has_sdq,has_conners,has_swan,has_scared_p,has_ari_p,has_icut,has_mfq_p",Count of parent source instruments available.,no,yes,low,low,low,0.4991552795031056,0.5168944099378883,low,keep
+age_years,age_years,raw_feature,yes,yes,low,low,low,0.4689937888198758,0.4580869565217391,low,keep
+site,site,raw_feature,yes,yes,low,low,low,0.4681987577639752,0.4822608695652174,low,keep

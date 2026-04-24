@@ -1,0 +1,6 @@
+domain,target_column,n_pos,n_neg,positive_rate
+adhd,target_domain_adhd_final,470,1930,0.19583333333333333
+conduct,target_domain_conduct_final,798,1602,0.3325
+elimination,target_domain_elimination_final,259,2141,0.10791666666666666
+anxiety,target_domain_anxiety_final,430,1970,0.17916666666666667
+depression,target_domain_depression_final,409,1991,0.17041666666666666

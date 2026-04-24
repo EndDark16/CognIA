@@ -1,0 +1,24 @@
+# Runtime operational validation
+
+                        check_id                    scope status                details
+         output_contract_columns                   global   pass                       
+        input_contract_non_empty           caregiver:adhd   pass          n_features=35
+uncertainty_graceful_degradation           caregiver:adhd   pass uncertainty_rate=0.063
+        input_contract_non_empty        caregiver:conduct   pass          n_features=32
+uncertainty_graceful_degradation        caregiver:conduct   pass uncertainty_rate=0.071
+        input_contract_non_empty    caregiver:elimination   pass          n_features=27
+uncertainty_graceful_degradation    caregiver:elimination   pass uncertainty_rate=0.030
+        input_contract_non_empty        caregiver:anxiety   pass          n_features=49
+uncertainty_graceful_degradation        caregiver:anxiety   pass uncertainty_rate=0.044
+        input_contract_non_empty     caregiver:depression   pass          n_features=28
+uncertainty_graceful_degradation     caregiver:depression   pass uncertainty_rate=0.041
+        input_contract_non_empty        psychologist:adhd   pass          n_features=35
+uncertainty_graceful_degradation        psychologist:adhd   pass uncertainty_rate=0.184
+        input_contract_non_empty     psychologist:conduct   pass          n_features=34
+uncertainty_graceful_degradation     psychologist:conduct   warn uncertainty_rate=0.005
+        input_contract_non_empty psychologist:elimination   pass          n_features=28
+uncertainty_graceful_degradation psychologist:elimination   pass uncertainty_rate=0.033
+        input_contract_non_empty     psychologist:anxiety   pass         n_features=272
+uncertainty_graceful_degradation     psychologist:anxiety   pass uncertainty_rate=0.071
+        input_contract_non_empty  psychologist:depression   pass          n_features=29
+uncertainty_graceful_degradation  psychologist:depression   warn uncertainty_rate=0.016

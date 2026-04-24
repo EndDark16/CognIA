@@ -1,0 +1,235 @@
+file_path,purpose,line_count,heading_count,ambiguity_flags,placeholder_markers,final_state_consistency,classification,recommended_action,notes
+.github/ISSUE_TEMPLATE/bug_report.md,plantillas de colaboracion,29,6,none,none,aligned_or_historical,ok,mantener,none
+.github/ISSUE_TEMPLATE/feature_request.md,plantillas de colaboracion,19,4,none,none,aligned_or_historical,ok,mantener,none
+.github/pull_request_template.md,plantillas de colaboracion,56,9,none,none,aligned_or_historical,ok,mantener,none
+AGENTS_CONTEXT.md,documentacion general,43,7,none,none,aligned_or_historical,ok,mantener,none
+CONTRIBUTING.md,documentacion general,32,5,none,none,aligned_or_historical,ok,mantener,none
+README.md,documentacion principal del repositorio,610,59,none,none,aligned_or_historical,high_priority_fix,corregido_en_esta_fase,README recuperado y fusionado con estado final
+README_hybrid_dsm5_v2.md,documentacion general,14,3,none,none,historical_superseded,outdated,mantener_como_historial_versionado,no usar como fuente vigente
+REPO_CONTENT_POLICY.md,documentacion general,50,9,none,none,aligned_or_historical,ok,mantener,none
+artifacts/inference_v2/explanation_contract.md,contratos y especificaciones de inferencia/cuestionarios,5,1,none,none,historical_superseded,outdated,mantener_como_historial_versionado,no usar como fuente vigente
+artifacts/inference_v3/explanation_contract.md,contratos y especificaciones de inferencia/cuestionarios,1,0,muy_corto,none,historical_superseded,outdated,mantener_como_historial_versionado,no usar como fuente vigente
+artifacts/inference_v4/promotion_scope.md,contratos y especificaciones de inferencia/cuestionarios,16,4,none,none,aligned_or_historical,minor_revision_needed,ajuste_conservador_aplicado,claridad/coherencia ajustada en esta fase
+artifacts/inference_v5/elimination_scope_rationale.md,contratos y especificaciones de inferencia/cuestionarios,13,3,none,none,historical_superseded,outdated,mantener_como_historial_versionado,no usar como fuente vigente
+artifacts/questionnaire_dsm5_v1/questionnaire_api_contract.md,contratos y especificaciones de inferencia/cuestionarios,11,1,none,none,aligned_or_historical,ok,mantener,none
+artifacts/specs/random_forest_evaluation_spec.md,contratos y especificaciones de inferencia/cuestionarios,37,1,none,none,aligned_or_historical,ok,mantener,none
+artifacts/specs/threshold_selection_protocol.md,contratos y especificaciones de inferencia/cuestionarios,15,1,none,none,aligned_or_historical,ok,mantener,none
+artifacts/specs/training_strategy_recommendations.md,contratos y especificaciones de inferencia/cuestionarios,22,4,none,none,aligned_or_historical,ok,mantener,none
+data/README.md,evidencia y reportes versionados del pipeline ML,16,2,none,none,aligned_or_historical,minor_revision_needed,ajuste_conservador_aplicado,claridad/coherencia ajustada en esta fase
+data/elimination_feature_engineering_v5/reports/elimination_executive_summary_v5.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_feature_engineering_v5/reports/elimination_feature_engineering_audit.md,evidencia y reportes versionados del pipeline ML,6,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_feature_engineering_v5/reports/elimination_final_decision_v5.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_feature_engineering_v5/reports/elimination_generated_features_report.md,evidencia y reportes versionados del pipeline ML,7,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_feature_engineering_v5/reports/elimination_product_positioning_v5.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_feature_engineering_v5/reports/elimination_stop_rule_assessment_v5.md,evidencia y reportes versionados del pipeline ML,6,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_feature_engineering_v5/reports/elimination_thesis_positioning_v5.md,evidencia y reportes versionados del pipeline ML,6,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_feature_engineering_v5/reports/elimination_v2_v3_v4_v5_comparison.md,evidencia y reportes versionados del pipeline ML,9,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_feature_engineering_v5/reports/elimination_v5_abstention_analysis.md,evidencia y reportes versionados del pipeline ML,8,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_feature_engineering_v5/reports/elimination_v5_feature_set_design.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_feature_engineering_v5/reports/elimination_v5_two_stage_analysis.md,evidencia y reportes versionados del pipeline ML,8,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_feature_engineering_v5/reports/input_summary.md,evidencia y reportes versionados del pipeline ML,9,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_iterative_recovery_v2/reports/elimination_causal_hypotheses.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_iterative_recovery_v2/reports/elimination_correction_plan.md,evidencia y reportes versionados del pipeline ML,4,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_iterative_recovery_v2/reports/elimination_executive_summary.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_iterative_recovery_v2/reports/elimination_final_decision_v2.md,evidencia y reportes versionados del pipeline ML,13,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_iterative_recovery_v2/reports/elimination_initial_audit_report.md,evidencia y reportes versionados del pipeline ML,9,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_iterative_recovery_v2/reports/elimination_model_selection_rationale.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_iterative_recovery_v2/reports/elimination_product_positioning.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_iterative_recovery_v2/reports/elimination_thesis_positioning.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_iterative_recovery_v2/reports/input_summary.md,evidencia y reportes versionados del pipeline ML,7,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_refinement_v3/reports/elimination_abstention_operating_mode.md,evidencia y reportes versionados del pipeline ML,8,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_refinement_v3/reports/elimination_executive_summary_v3.md,evidencia y reportes versionados del pipeline ML,6,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_refinement_v3/reports/elimination_final_decision_v3.md,evidencia y reportes versionados del pipeline ML,10,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_refinement_v3/reports/elimination_incremental_hypotheses.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_refinement_v3/reports/elimination_product_positioning_v3.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_refinement_v3/reports/elimination_residual_error_report.md,evidencia y reportes versionados del pipeline ML,9,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_refinement_v3/reports/elimination_stop_rule_assessment.md,evidencia y reportes versionados del pipeline ML,8,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_refinement_v3/reports/elimination_thesis_positioning_v3.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_refinement_v3/reports/input_summary.md,evidencia y reportes versionados del pipeline ML,8,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_target_redesign_v4/reports/elimination_executive_summary_v4.md,evidencia y reportes versionados del pipeline ML,6,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_target_redesign_v4/reports/elimination_false_positive_reduction_analysis.md,evidencia y reportes versionados del pipeline ML,4,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_target_redesign_v4/reports/elimination_feature_space_redesign.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_target_redesign_v4/reports/elimination_final_decision_v4.md,evidencia y reportes versionados del pipeline ML,9,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_target_redesign_v4/reports/elimination_product_positioning_v4.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_target_redesign_v4/reports/elimination_stop_rule_assessment_v4.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_target_redesign_v4/reports/elimination_target_audit_report.md,evidencia y reportes versionados del pipeline ML,12,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_target_redesign_v4/reports/elimination_target_variant_design.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_target_redesign_v4/reports/elimination_thesis_positioning_v4.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_target_redesign_v4/reports/elimination_v2_v3_v4_comparison.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/elimination_target_redesign_v4/reports/elimination_v4_abstention_analysis.md,evidencia y reportes versionados del pipeline ML,8,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/final_closure_audit_v1/reports/final_closure_judgement.md,auditoria final metodologica de cierre,6,1,none,none,aligned_or_historical,ok,mantener,none
+data/final_closure_audit_v1/reports/final_executive_summary.md,auditoria final metodologica de cierre,8,1,none,none,aligned_or_historical,ok,mantener,none
+data/final_closure_audit_v1/reports/final_inventory_summary.md,auditoria final metodologica de cierre,6,1,none,none,aligned_or_historical,ok,mantener,none
+data/final_closure_audit_v1/reports/final_methodological_integrity_report.md,auditoria final metodologica de cierre,5,1,none,none,aligned_or_historical,ok,mantener,none
+data/final_closure_audit_v1/reports/final_methodological_positioning.md,auditoria final metodologica de cierre,5,1,none,none,aligned_or_historical,ok,mantener,none
+data/final_closure_audit_v1/reports/final_metrics_audit_notes.md,auditoria final metodologica de cierre,5,1,none,none,aligned_or_historical,ok,mantener,none
+data/final_closure_audit_v1/reports/inference_scope_final_audit.md,auditoria final metodologica de cierre,6,1,none,none,aligned_or_historical,ok,mantener,none
+data/final_closure_audit_v1/reports/per_domain_status_validation.md,auditoria final metodologica de cierre,9,1,none,none,aligned_or_historical,ok,mantener,none
+data/final_closure_audit_v1/reports/product_scope_validation.md,auditoria final metodologica de cierre,9,1,none,none,aligned_or_historical,ok,mantener,none
+data/final_closure_audit_v1/reports/reproducibility_and_consistency_report.md,auditoria final metodologica de cierre,6,1,none,none,aligned_or_historical,ok,mantener,none
+data/final_closure_audit_v1/reports/thesis_scope_validation.md,auditoria final metodologica de cierre,9,1,none,none,aligned_or_historical,ok,mantener,none
+data/finalization_and_recovery_v1/adhd_recovery/adhd_final_decision.md,evidencia y reportes versionados del pipeline ML,4,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/adhd_recovery/adhd_recovery_report.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/elimination_recovery/elimination_final_decision.md,evidencia y reportes versionados del pipeline ML,4,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/elimination_recovery/elimination_recovery_report.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/final_reports/anxiety_final_behavior_report.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/final_reports/conduct_final_behavior_report.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/final_reports/depression_final_behavior_report.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/reports/closure_justification_anxiety.md,evidencia y reportes versionados del pipeline ML,8,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/reports/closure_justification_conduct.md,evidencia y reportes versionados del pipeline ML,8,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/reports/closure_justification_depression.md,evidencia y reportes versionados del pipeline ML,8,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/reports/final_recommendations_next_iteration.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/reports/five_domain_final_decision_report.md,evidencia y reportes versionados del pipeline ML,7,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/reports/input_summary.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/reports/iteration_closure_summary.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/reports/product_scope_final_results.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/reports/thesis_ready_final_results.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/reports/why_continue_adhd_elimination.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/finalization_and_recovery_v1/reports/why_stop_anxiety_conduct_depression_here.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/domain_generalization_decisions.md,evidencia y reportes versionados del pipeline ML,7,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/final_model_classification.md,evidencia y reportes versionados del pipeline ML,7,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/final_recommendations_for_project.md,evidencia y reportes versionados del pipeline ML,9,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/generalization_criteria.md,evidencia y reportes versionados del pipeline ML,14,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/generalization_gate_summary.md,evidencia y reportes versionados del pipeline ML,7,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/input_summary.md,evidencia y reportes versionados del pipeline ML,13,2,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/leakage_gate_report.md,evidencia y reportes versionados del pipeline ML,10,2,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/learning_curve_interpretation.md,evidencia y reportes versionados del pipeline ML,8,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/noise_robustness_report.md,evidencia y reportes versionados del pipeline ML,4,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/overfit_audit_summary.md,evidencia y reportes versionados del pipeline ML,8,2,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/realism_shift_report.md,evidencia y reportes versionados del pipeline ML,4,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/retraining_summary.md,evidencia y reportes versionados del pipeline ML,3,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/generalization_gate_v1/reports/threshold_and_calibration_stability.md,evidencia y reportes versionados del pipeline ML,4,1,muy_corto,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/md_traceability_index.md,evidencia y reportes versionados del pipeline ML,115,1,none,none,aligned_or_historical,ok,mantener,none
+data/processed/dataset_dictionary.md,evidencia y reportes versionados del pipeline ML,40,3,none,none,aligned_or_historical,ok,mantener,none
+data/processed/model_readiness_report.md,evidencia y reportes versionados del pipeline ML,23,5,none,none,aligned_or_historical,ok,mantener,none
+data/processed/preprocessing_decisions.md,evidencia y reportes versionados del pipeline ML,9,1,none,none,aligned_or_historical,ok,mantener,none
+data/processed/random_forest_evaluation_spec.md,evidencia y reportes versionados del pipeline ML,37,1,none,none,aligned_or_historical,ok,mantener,none
+data/processed/reports/dataset_dictionary.md,evidencia y reportes versionados del pipeline ML,40,3,none,none,aligned_or_historical,ok,mantener,none
+data/processed/reports/model_readiness_report.md,evidencia y reportes versionados del pipeline ML,23,5,none,none,aligned_or_historical,ok,mantener,none
+data/processed/reports/preprocessing_decisions.md,evidencia y reportes versionados del pipeline ML,9,1,none,none,aligned_or_historical,ok,mantener,none
+data/processed/reports/random_forest_evaluation_spec.md,evidencia y reportes versionados del pipeline ML,37,1,none,none,aligned_or_historical,ok,mantener,none
+data/processed_dsm5_exact_v1/dataset_layering_guide.md,evidencia y reportes versionados del pipeline ML,10,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/domain_derivation_rules.md,evidencia y reportes versionados del pipeline ML,7,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/mandatory_parameter_completeness_report.md,evidencia y reportes versionados del pipeline ML,10,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/core_criteria_sufficiency_decision.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/feature_signal_risk_report.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/final_modelability_decisions.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/modelability_audit_summary.md,evidencia y reportes versionados del pipeline ML,19,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/modelability_input_summary.md,evidencia y reportes versionados del pipeline ML,12,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/modelability_scoring_method.md,evidencia y reportes versionados del pipeline ML,18,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/overclaiming_risk_report.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/rigor_vs_coverage_tradeoff_report.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/target_build_quality_report.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/training_readiness_recommendations.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/unit_coverage_summary.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/modelability_audit/reports/workflow_impact_summary.md,evidencia y reportes versionados del pipeline ML,7,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/reports/comparison_vs_previous_generation.md,evidencia y reportes versionados del pipeline ML,9,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/reports/coverage_and_gaps_report.md,evidencia y reportes versionados del pipeline ML,14,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/reports/dsm5_exact_dataset_dictionary.md,evidencia y reportes versionados del pipeline ML,19,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/reports/internal_exact_vs_external_domain_explanation.md,evidencia y reportes versionados del pipeline ML,7,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/reports/model_readiness_dsm5_exact.md,evidencia y reportes versionados del pipeline ML,6,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/reports/normative_rebuild_readiness.md,evidencia y reportes versionados del pipeline ML,9,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/reports/rebuild_summary.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/target_construction_rules.md,evidencia y reportes versionados del pipeline ML,6,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_dsm5_exact_v1/validation_summary_dsm5_exact.md,evidencia y reportes versionados del pipeline ML,5,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/core_criteria_sufficiency_decision.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/feature_signal_risk_report.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/final_modelability_decisions.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/modelability_audit_summary.md,evidencia y reportes versionados del pipeline ML,19,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/modelability_input_summary.md,evidencia y reportes versionados del pipeline ML,12,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/modelability_scoring_method.md,evidencia y reportes versionados del pipeline ML,18,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/overclaiming_risk_report.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/rigor_vs_coverage_tradeoff_report.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/target_build_quality_report.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/training_readiness_recommendations.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/unit_coverage_summary.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/modelability_audit/reports/workflow_impact_summary.md,evidencia y reportes versionados del pipeline ML,7,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/processed_hybrid_dsm5_v2/reports/hybrid_build_summary.md,evidencia y reportes versionados del pipeline ML,14,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/questionnaire_dsm5_v1/questionnaire_build_summary.md,evidencia y reportes versionados del pipeline ML,7,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+data/questionnaire_dsm5_v1/questionnaire_scoring_logic.md,evidencia y reportes versionados del pipeline ML,11,1,none,none,aligned_or_historical,ok,mantener,snapshot historico versionado; usar junto a reportes de cierre final
+docs/OPENAPI_GUIDE.md,documentacion de arquitectura/API/DB,73,11,none,none,aligned_or_historical,ok,mantener,none
+docs/database_schema.md,documentacion de arquitectura/API/DB,81,13,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/clinical_specificity_risks.md,reportes tecnicos y operativos,3,1,muy_corto,none,aligned_or_historical,minor_revision_needed,mejorar_estructura_en_iteracion_editorial,none
+reports/audit/dsm5_feature_gap_report.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/error_driver_summary.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/false_negative_audit.md,reportes tecnicos y operativos,15,1,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/false_positive_audit.md,reportes tecnicos y operativos,19,1,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/feature_pruning_opportunity_report.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/label_noise_hypotheses.md,reportes tecnicos y operativos,12,2,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/learning_curves_interpretation.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/per_disorder_precision_diagnosis.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/ppv_prevalence_analysis.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/precision_improvement_strategy.md,reportes tecnicos y operativos,12,4,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/product_ready_precision_recommendations.md,reportes tecnicos y operativos,10,3,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/ranking_vs_threshold_diagnosis.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/roadmaps/precision_improvement_strategy.md,reportes tecnicos y operativos,12,4,none,none,aligned_or_historical,merge_or_summarize,consolidar_en_fase_editorial_futura,duplicidad parcial con reportes base
+reports/audit/roadmaps/product_ready_precision_recommendations.md,reportes tecnicos y operativos,10,3,none,none,aligned_or_historical,merge_or_summarize,consolidar_en_fase_editorial_futura,duplicidad parcial con reportes base
+reports/audit/roadmaps/thesis_ready_precision_diagnosis.md,reportes tecnicos y operativos,9,1,none,none,aligned_or_historical,merge_or_summarize,consolidar_en_fase_editorial_futura,duplicidad parcial con reportes base
+reports/audit/target_confidence_recommendations.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/thesis_ready_precision_diagnosis.md,reportes tecnicos y operativos,9,1,none,none,aligned_or_historical,ok,mantener,none
+reports/audit/what_moves_precision.md,reportes tecnicos y operativos,5,1,none,none,aligned_or_historical,ok,mantener,none
+reports/comparisons/final_model_recommendations.md,reportes tecnicos y operativos,37,6,none,none,aligned_or_historical,ok,mantener,none
+reports/comparisons/hybrid_vs_previous_vs_exact.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_finalization/final_cleanup_actions_log.md,validacion/cierre de despliegue,17,4,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_finalization/final_deploy_smoke_test.md,validacion/cierre de despliegue,20,5,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_finalization/final_repo_and_deploy_closure.md,validacion/cierre de despliegue,28,7,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_finalization/final_repo_and_deploy_executive_summary.md,validacion/cierre de despliegue,17,4,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_finalization/final_repo_policy_addendum.md,validacion/cierre de despliegue,25,2,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_finalization/model_retention_decision_log.md,validacion/cierre de despliegue,18,4,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_finalization/runtime_alignment_changes.md,validacion/cierre de despliegue,23,3,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_finalization/runtime_model_resolution_report.md,validacion/cierre de despliegue,21,5,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_verification/deploy_runtime_summary.md,validacion/cierre de despliegue,6,1,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_verification/deploy_smoke_test_results.md,validacion/cierre de despliegue,4,1,muy_corto,none,aligned_or_historical,minor_revision_needed,mejorar_estructura_en_iteracion_editorial,none
+reports/deploy_verification/deploy_verification_executive_summary.md,validacion/cierre de despliegue,20,6,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_verification/env_and_secret_requirements.md,validacion/cierre de despliegue,4,1,muy_corto,none,aligned_or_historical,minor_revision_needed,mejorar_estructura_en_iteracion_editorial,none
+reports/deploy_verification/inference_runtime_audit.md,validacion/cierre de despliegue,12,4,none,none,aligned_or_historical,ok,mantener,none
+reports/deploy_verification/repo_policy_adjustments.md,validacion/cierre de despliegue,11,4,none,none,aligned_or_historical,ok,mantener,none
+reports/docs_recovery/readme_git_history_audit.md,auditoria y recuperacion documental,33,6,none,none,aligned_or_historical,ok,mantener,none
+reports/docs_recovery/readme_version_comparison.md,auditoria y recuperacion documental,44,6,none,none,aligned_or_historical,ok,mantener,none
+reports/experiments/experiment_plan.md,reportes tecnicos y operativos,20,3,none,none,aligned_or_historical,ok,mantener,none
+reports/experiments/precision_experiment_plan.md,reportes tecnicos y operativos,24,3,none,none,aligned_or_historical,ok,mantener,none
+reports/final_closure/elimination_positioning_final.md,cierre documental final de iteracion,30,5,none,none,aligned_or_historical,ok,mantener,none
+reports/final_closure/final_project_closure_report.md,cierre documental final de iteracion,81,11,none,none,aligned_or_historical,minor_revision_needed,ajuste_conservador_aplicado,claridad/coherencia ajustada en esta fase
+reports/final_closure/final_project_executive_summary.md,cierre documental final de iteracion,11,1,none,none,aligned_or_historical,ok,mantener,none
+reports/final_closure/inference_scope_final.md,cierre documental final de iteracion,19,5,none,none,aligned_or_historical,minor_revision_needed,ajuste_conservador_aplicado,claridad/coherencia ajustada en esta fase
+reports/final_closure/product_scope_final.md,cierre documental final de iteracion,26,5,none,none,aligned_or_historical,minor_revision_needed,ajuste_conservador_aplicado,claridad/coherencia ajustada en esta fase
+reports/final_closure/repository_documentation_update_log.md,cierre documental final de iteracion,18,3,none,none,aligned_or_historical,ok,mantener,none
+reports/final_closure/technical_evolution_summary.md,cierre documental final de iteracion,42,1,none,none,aligned_or_historical,ok,mantener,none
+reports/final_closure/thesis_scope_final.md,cierre documental final de iteracion,21,4,none,none,aligned_or_historical,ok,mantener,none
+reports/final_phase_summary.md,reportes tecnicos y operativos,22,1,none,none,aligned_or_historical,ok,mantener,none
+reports/limitations_and_risks_final.md,reportes tecnicos y operativos,6,1,none,none,aligned_or_historical,ok,mantener,none
+reports/md_traceability_index.md,reportes tecnicos y operativos,42,1,none,none,aligned_or_historical,ok,mantener,none
+reports/metrics_hybrid_v2/training_summary.md,reportes tecnicos y operativos,12,1,none,none,aligned_or_historical,ok,mantener,none
+reports/model_readiness_final.md,reportes tecnicos y operativos,19,3,none,none,aligned_or_historical,ok,mantener,none
+reports/next_steps_final.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/operating_modes/operating_modes_spec.md,reportes tecnicos y operativos,23,1,none,none,aligned_or_historical,ok,mantener,none
+reports/product_ready_results_summary.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/promotions/final_champion_recommendations.md,reportes tecnicos y operativos,8,1,none,none,aligned_or_historical,ok,mantener,none
+reports/promotions/precision_promotion_recommendations.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/questionnaire_real_design_discovery/current_placeholder_questionnaire_summary.md,levantamiento de contexto de cuestionario real,42,6,none,none,aligned_or_historical,needs_clarification,pendiente_respuestas_usuario_y_handoff_frontend,"discovery abierto, no especificacion final"
+reports/questionnaire_real_design_discovery/current_questionnaire_system_flow.md,levantamiento de contexto de cuestionario real,28,6,none,none,aligned_or_historical,needs_clarification,pendiente_respuestas_usuario_y_handoff_frontend,"discovery abierto, no especificacion final"
+reports/questionnaire_real_design_discovery/final_questionnaire_real_design_discovery_summary.md,levantamiento de contexto de cuestionario real,49,11,none,none,aligned_or_historical,needs_clarification,pendiente_respuestas_usuario_y_handoff_frontend,"discovery abierto, no especificacion final"
+reports/questionnaire_real_design_discovery/frontend_change_requests.md,levantamiento de contexto de cuestionario real,21,4,none,none,aligned_or_historical,needs_clarification,pendiente_respuestas_usuario_y_handoff_frontend,"discovery abierto, no especificacion final"
+reports/questionnaire_real_design_discovery/model_questionnaire_alignment.md,levantamiento de contexto de cuestionario real,20,5,none,none,aligned_or_historical,needs_clarification,pendiente_respuestas_usuario_y_handoff_frontend,"discovery abierto, no especificacion final"
+reports/questionnaire_real_design_discovery/next_step_recommendation.md,levantamiento de contexto de cuestionario real,13,3,none,none,aligned_or_historical,needs_clarification,pendiente_respuestas_usuario_y_handoff_frontend,"discovery abierto, no especificacion final"
+reports/questionnaire_real_design_discovery/questionnaire_api_gap_analysis.md,levantamiento de contexto de cuestionario real,29,5,none,none,aligned_or_historical,needs_clarification,pendiente_respuestas_usuario_y_handoff_frontend,"discovery abierto, no especificacion final"
+reports/questionnaire_real_design_discovery/questionnaire_information_requests.md,levantamiento de contexto de cuestionario real,60,10,none,none,aligned_or_historical,needs_clarification,pendiente_respuestas_usuario_y_handoff_frontend,"discovery abierto, no especificacion final"
+reports/questionnaire_real_design_discovery/questionnaire_migration_impact_assessment.md,levantamiento de contexto de cuestionario real,38,7,none,none,aligned_or_historical,needs_clarification,pendiente_respuestas_usuario_y_handoff_frontend,"discovery abierto, no especificacion final"
+reports/questionnaire_real_design_discovery/questionnaire_refactor_recommendation.md,levantamiento de contexto de cuestionario real,32,10,none,none,aligned_or_historical,needs_clarification,pendiente_respuestas_usuario_y_handoff_frontend,"discovery abierto, no especificacion final"
+reports/repo_hygiene_audit/cleanup_actions_log.md,higiene de repositorio y gobernanza,27,4,none,none,aligned_or_historical,ok,mantener,none
+reports/repo_hygiene_audit/deploy_and_secrets_recommendations.md,higiene de repositorio y gobernanza,30,6,none,none,aligned_or_historical,ok,mantener,none
+reports/repo_hygiene_audit/gitignore_rationale.md,higiene de repositorio y gobernanza,36,10,none,none,aligned_or_historical,ok,mantener,none
+reports/repo_hygiene_audit/recommended_repo_structure.md,higiene de repositorio y gobernanza,22,5,none,none,aligned_or_historical,ok,mantener,none
+reports/repo_hygiene_audit/redundancy_cleanup_recommendations.md,higiene de repositorio y gobernanza,12,3,none,none,aligned_or_historical,ok,mantener,none
+reports/repo_hygiene_audit/repo_hygiene_executive_summary.md,higiene de repositorio y gobernanza,21,5,none,none,aligned_or_historical,ok,mantener,none
+reports/repo_hygiene_audit/repo_inventory_summary.md,higiene de repositorio y gobernanza,56,8,none,none,aligned_or_historical,ok,mantener,none
+reports/repo_hygiene_audit/what_not_to_commit.md,higiene de repositorio y gobernanza,16,4,none,none,aligned_or_historical,ok,mantener,none
+reports/repo_hygiene_audit/what_to_commit.md,higiene de repositorio y gobernanza,15,4,none,none,aligned_or_historical,ok,mantener,none
+reports/repo_hygiene_audit/what_to_protect.md,higiene de repositorio y gobernanza,30,6,none,none,aligned_or_historical,ok,mantener,none
+reports/testing_modelos_audit/current_test_suite_inventory.md,auditoria de testing de modelos,38,6,none,none,aligned_or_historical,ok,mantener,none
+reports/testing_modelos_audit/model_testing_implementation_summary.md,auditoria de testing de modelos,85,13,none,none,aligned_or_historical,ok,mantener,none
+reports/testing_modelos_audit/model_testing_remaining_gaps.md,auditoria de testing de modelos,30,3,none,none,aligned_or_historical,ok,mantener,none
+reports/thesis_ready_results_summary.md,reportes tecnicos y operativos,7,1,none,none,aligned_or_historical,ok,mantener,none
+reports/training/training_log.md,reportes tecnicos y operativos,13,2,none,none,aligned_or_historical,ok,mantener,none
+reports/versioning/promotion_decisions.md,reportes tecnicos y operativos,13,2,none,none,aligned_or_historical,ok,mantener,none
+static/email/README.md,documentacion de assets de email,18,0,none,none,aligned_or_historical,ok,mantener,none

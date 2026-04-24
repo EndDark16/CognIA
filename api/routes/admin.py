@@ -14,9 +14,9 @@ from api.schemas.admin_schema import (
     EvaluationStatusSchema,
     PsychologistDecisionSchema,
     QuestionnaireCloneRequestSchema,
+    RoleCreateSchema,
     QuestionnaireListQuerySchema,
     RoleAssignSchema,
-    RoleCreateSchema,
     UserListQuerySchema,
     UserPatchSchema,
 )
@@ -532,17 +532,17 @@ def admin_create_role():
         data = schema.load(request.get_json(silent=True) or {})
     except ValidationError as exc:
         return _error_response("Validation error", "validation_error", 400, exc.messages)
-
     admin_id = _admin_id()
     if not admin_id:
         return _error_response("Invalid admin", "invalid_admin", 401)
 
+    name = (data["name"] or "").strip().upper()
+    description = (data.get("description") or "").strip() or None
+    if not name:
+        return _error_response("Invalid role name", "invalid_role_name", 400)
+
     try:
-        role = admin_service.create_role(
-            name=data["name"].strip().upper(),
-            description=(data.get("description") or None),
-            admin_id=admin_id,
-        )
+        role = admin_service.create_role(name=name, description=description, admin_id=admin_id)
     except ValueError as exc:
         if str(exc) == "role_exists":
             return _error_response("Role already exists", "role_exists", 409)
@@ -550,7 +550,6 @@ def admin_create_role():
     except Exception:
         current_app.logger.error("Create role failed", exc_info=True)
         return _error_response("Database error", "db_error", 500)
-
     return jsonify({"id": str(role.id), "name": role.name, "description": role.description}), 201
 
 
@@ -667,7 +666,7 @@ def admin_metrics():
 @admin_bp.post("/impersonate/<user_id>")
 @roles_required("ADMIN")
 @limiter.limit(lambda: current_app.config.get("ADMIN_SECURITY_RATE_LIMIT", "10 per minute"))
-def admin_impersonate_user(user_id):
+def admin_impersonate(user_id):
     guard = _ensure_admin_token()
     if guard:
         return guard
@@ -677,22 +676,22 @@ def admin_impersonate_user(user_id):
     user = db.session.get(AppUser, user_uuid)
     if not user:
         return _error_response("User not found", "user_not_found", 404)
+    if not user.is_active:
+        return _error_response("User inactive", "user_inactive", 409)
     admin_id = _admin_id()
     if not admin_id:
         return _error_response("Invalid admin", "invalid_admin", 401)
-
     try:
-        token, expires_in = admin_service.impersonate_user(admin_id=admin_id, user=user)
+        access_token, ttl = admin_service.impersonate_user(admin_id=admin_id, user=user)
     except Exception:
-        current_app.logger.error("Impersonation failed", exc_info=True)
+        current_app.logger.error("Admin impersonate failed", exc_info=True)
         return _error_response("Database error", "db_error", 500)
-
     return (
         jsonify(
             {
-                "access_token": token,
+                "access_token": access_token,
                 "token_type": "bearer",
-                "expires_in": expires_in,
+                "expires_in": ttl,
                 "impersonated_user_id": str(user.id),
             }
         ),

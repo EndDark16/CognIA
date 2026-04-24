@@ -1,0 +1,11 @@
+mode,domain,feature_variant,n_features,duplicates,missing_feature_columns,order_lock_hash,ordering_status,encoding_status,missing_policy_status,vector_payload_nonmissing_mean
+caregiver,adhd,engineered,23,0,0,1351847814467482779,pass,pass,pass,0.8341892046102933
+caregiver,conduct,engineered,21,0,0,3297130542054440338,pass,pass,pass,0.8686414198225221
+caregiver,elimination,engineered,16,0,0,361605317174299080,pass,pass,pass,0.8413385826771654
+caregiver,anxiety,engineered,37,0,0,3067779185573958270,pass,pass,pass,0.8572887848478399
+caregiver,depression,engineered,17,0,0,2697470868802434067,pass,pass,pass,0.8855951829550719
+psychologist,adhd,base,35,0,0,772201123250242468,pass,pass,pass,0.5820322459692538
+psychologist,conduct,engineered,23,0,0,8457598725801242096,pass,pass,pass,0.8755449047129976
+psychologist,elimination,engineered,17,0,0,5224006905107124334,pass,pass,pass,0.8470588235294119
+psychologist,anxiety,engineered,260,0,0,2105844391716188946,pass,pass,pass,0.862461134665859
+psychologist,depression,engineered,18,0,0,1611794015774599942,pass,pass,pass,0.888538932633421

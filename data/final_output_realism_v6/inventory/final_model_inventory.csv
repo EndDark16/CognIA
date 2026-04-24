@@ -1,0 +1,11 @@
+mode,domain,family,feature_variant,target_variant,threshold_policy,threshold,abstention_band,calibration,n_features,precision,recall,specificity,balanced_accuracy,f1,roc_auc,pr_auc,brier,open_weakness,caveat_level_expected
+caregiver,adhd,rf,engineered,baseline,precision_guarded,0.605,0.05,isotonic,35,0.9495,0.8178,0.944,0.8809,0.8788,0.9484,0.95,0.0842,adhd_recall,medium
+caregiver,conduct,rf,engineered,baseline,balanced,0.135,0.05,isotonic,32,0.9722,0.875,0.9903,0.9326,0.9211,0.9781,0.9506,0.0388,minor,medium
+caregiver,elimination,xgboost,engineered,elimination_any_baseline,precision_guarded,0.67,0.05,isotonic,27,0.9483,0.6832,0.952,0.8176,0.7942,0.8759,0.8907,0.1331,elimination_recall,high
+caregiver,anxiety,lightgbm,engineered,baseline,precision_guarded,0.1,0.05,isotonic,49,0.8912,0.9747,0.9636,0.9692,0.9304,0.9899,0.9765,0.0238,minor,medium
+caregiver,depression,catboost,engineered,baseline,precision_guarded,0.63,0.15,isotonic,28,0.989,0.7826,0.9942,0.8884,0.8738,0.9822,0.9688,0.0541,depression_caregiver_recall,medium
+psychologist,adhd,rf,base,baseline,precision_guarded,0.605,0.05,isotonic,35,0.9562,0.8137,0.952,0.8828,0.8792,0.9522,0.9544,0.0829,adhd_recall,low
+psychologist,conduct,catboost,engineered,baseline,balanced,0.335,0.05,isotonic,34,0.973,0.9,0.9903,0.9451,0.9351,0.9712,0.9381,0.0368,minor,low
+psychologist,elimination,lightgbm,engineered,elimination_any_baseline,precision_guarded,0.505,0.05,isotonic,28,0.9402,0.6832,0.944,0.8136,0.7914,0.877,0.8958,0.1371,elimination_recall,high
+psychologist,anxiety,lightgbm,engineered,baseline,precision_guarded,0.1,0.05,isotonic,272,0.9851,1.0,0.9955,0.9977,0.9925,1.0,0.9999,0.0021,minor,low
+psychologist,depression,catboost,engineered,baseline,balanced,0.29,0.05,isotonic,29,0.9023,0.8957,0.9337,0.9147,0.8981,0.9803,0.9633,0.0569,minor,low

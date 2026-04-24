@@ -1,0 +1,146 @@
+{
+  "line": "hybrid_no_external_scores_rebuild_v2",
+  "generated_at_utc": "2026-04-13T18:43:45.534222+00:00",
+  "fits_total_from_trial_registry": 3600,
+  "trees_total_estimated_from_trial_registry": 900000,
+  "removed_columns_count": 52,
+  "retained_columns_count": 176,
+  "engineered_features_count": 240,
+  "generated_files": [
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/ablation/hybrid_no_external_scores_ablation_results.csv",
+      "sha256": "e2d98fba9198d25f51a01714b76ec5bfb41e2c9f5b102efd49b51cca9e240885",
+      "bytes": 17090
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/bootstrap/hybrid_no_external_scores_bootstrap_intervals.csv",
+      "sha256": "83250ee50eef79b7733a0fc43fb362c20a5b4f1e0a48244218b3ae2317afc413",
+      "bytes": 11318
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/calibration/hybrid_no_external_scores_calibration_results.csv",
+      "sha256": "f20a008229558076b2ffd244a0c251684546a7dcff1644632d641fa0b38300a6",
+      "bytes": 42610
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/feature_engineering/hybrid_no_external_scores_feature_engineering_registry.csv",
+      "sha256": "87430b9864a5cd3dbbc2e0162adb33a27e8cf45164500c230dce7d55c282bce4",
+      "bytes": 476404
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/feature_engineering/hybrid_no_external_scores_feature_engineering_results.csv",
+      "sha256": "4c2abd921c7be2207a132e742515dfd8b5e70ac214f2f5b5fcb91c63d6bdf61f",
+      "bytes": 2769
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/inventory/no_external_scores_feature_governance.csv",
+      "sha256": "35f71a87b815c7472149f2b5c38b497013b73ad2ad0d8eed03b04d7a957ed72b",
+      "bytes": 15739
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/inventory/no_external_scores_removed_features.csv",
+      "sha256": "cee3386010249919e8e974ea67bfc20a568dd2f107caefdb18e19c3e6d355e2c",
+      "bytes": 4800
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/inventory/no_external_scores_retained_features.csv",
+      "sha256": "24a4c197a728124e87d916e8d35bb39b1fe27e4cc533f26783766efaf69d12f5",
+      "bytes": 11098
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/inventory/previous_models_status_demoted.csv",
+      "sha256": "41c90082f868fdfbf0abf3733cd144c42b0d972a231f33dbfb228a63f3b867cb",
+      "bytes": 633
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/modes/no_external_scores_mode_coverage.csv",
+      "sha256": "2ac8f7adc198e7f6d21fbaa07a552b63fbae5000aa48730f057083384fd87749",
+      "bytes": 455
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/modes/no_external_scores_mode_feature_counts.csv",
+      "sha256": "f92bc78dfc176e32c5f80aa33ac7d7f5106075d61f24a8ed26475cec9b7ab4ec",
+      "bytes": 1655
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/reports/hybrid_no_external_scores_ceiling_decision.md",
+      "sha256": "88896ff0b2743699c7e0db551b75ca45c758f142b33cb0b896872aa9abed04ef",
+      "bytes": 2617
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/reports/hybrid_no_external_scores_comparison_vs_previous.md",
+      "sha256": "da1d77ca0eaf999763cb86ebe170ff3913cf5becfa23af2d4cef8fa6e2e42b6f",
+      "bytes": 3763
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/reports/hybrid_no_external_scores_modeling_decision.md",
+      "sha256": "a0377742943fa0ceb712ee04d732ee17b1c6ec5b6d6a680bb85c56fe5a7cd4ff",
+      "bytes": 1570
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/reports/hybrid_no_external_scores_questionnaire_alignment.md",
+      "sha256": "e2a2c414b23a381bad63406b51b9a1d12bb1484cb61673828b3de09c636f8e9a",
+      "bytes": 735
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/reports/hybrid_no_external_scores_rebuild_summary.md",
+      "sha256": "100015bade35a55868d986763ea506c36c21f0c41db13d2c788f6e8f3d1c3935",
+      "bytes": 4624
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/stability/hybrid_no_external_scores_seed_stability.csv",
+      "sha256": "5929ce21b3ead41a2823b4e95e355a358ecffb560c8d7f67e2f5aa0f8979c5d1",
+      "bytes": 12389
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/stress/hybrid_no_external_scores_stress_results.csv",
+      "sha256": "cf0d3571416131d1a244ecf963dac43c55fc8daee383b802463ee9c9ba0f66ab",
+      "bytes": 28403
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/tables/hybrid_no_external_scores_dataset_audit.csv",
+      "sha256": "4aded3bc1ecafd4e83fbdfec618071124c60926881f4c4ba5909a73590d5cb7e",
+      "bytes": 202
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/tables/hybrid_no_external_scores_dataset_ready.csv",
+      "sha256": "8fa3b9a100bf54bc66a4f728c20a7859e0693f3db2528d14edf3dc48bda884d4",
+      "bytes": 1239194
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/tables/hybrid_no_external_scores_final_champions.csv",
+      "sha256": "330b2b45e75f8b965043d0769f919340f063c745ca83d4182057721baf23dc5a",
+      "bytes": 1257
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/tables/hybrid_no_external_scores_final_models.csv",
+      "sha256": "5e4f2c1a0059f0a55584f590230a9a667e522fa3b0ddb9b03072c949a8641134",
+      "bytes": 20648
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/tables/hybrid_no_external_scores_final_ranked_models.csv",
+      "sha256": "153e0affa382f2189a145a7c3c6a6959c8173284db4762738cba93e0191d6f7c",
+      "bytes": 21948
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/tables/hybrid_no_external_scores_vs_frozen_comparison.csv",
+      "sha256": "6d4ef803295b4eeb5071d7cd8d3518ac8ef261a450e69276404e7f4c31d1c5b0",
+      "bytes": 28805
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/thresholds/hybrid_no_external_scores_threshold_results.csv",
+      "sha256": "c2fb1d11dfb3de700e27baf64d0e9218179825cef3deafd15b7ae5fb3bfa7b11",
+      "bytes": 57623
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/trials/hybrid_no_external_scores_trial_metrics_full.csv",
+      "sha256": "bb4e9f9285a10d1c707c0bf5372ee3cf4aa42aee29dcca3e0a1dd622b96e2908",
+      "bytes": 2102758
+    },
+    {
+      "path": "data/hybrid_no_external_scores_rebuild_v2/trials/hybrid_no_external_scores_trial_registry.csv",
+      "sha256": "26e5b511d5436a41f8afb507911aaad831e8a34e86951d57a3a7dc50d44c1211",
+      "bytes": 611416
+    }
+  ]
+}

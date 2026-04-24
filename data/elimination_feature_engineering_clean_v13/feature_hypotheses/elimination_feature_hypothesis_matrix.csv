@@ -1,0 +1,11 @@
+hypothesis_id,feature_family,source_variables,rationale,expected_gain,risk,leakage_risk,priority
+H1,burden_composites,"cbcl_*_proxy,sdq_*,conners_total,swan_total",Capturar carga sintomatica compacta y estable.,Mejor BA y PR-AUC.,Perder especificidad si se sobrerresume.,low,high
+H2,impact_composites,"sdq_impact,ari_p_impairment_item",Incorporar impacto funcional para precision util.,Mejor precision con BA estable.,Recall puede bajar si threshold es alto.,low,high
+H3,symptom_balance,"v13_parent_behavior_burden,v13_parent_internalizing_burden",Separar perfiles mixtos y reducir falsos positivos.,Mejor precision/generalizacion.,Mayor complejidad interpretativa.,low,high
+H4,subtype_aware,"v13_subtype_context_proxy,v13_cbcl_sdq_external_gap",Refinar patrones de elimination sin items bloqueados.,Mejor recall sin shortcut.,Sensibilidad a cobertura CBCL.,low,high
+H5,context_comorbidity,"v13_cross_domain_burden,v13_regulation_load",Contexto transdiagnostico para robustez.,Mejor estabilidad en slices.,Ruido si se mezcla demasiado.,low,medium
+H6,agreement_disagreement,"v13_self_internalizing_burden,v13_parent_self_gap_internalizing",Modelar desacuerdo de fuente en modo profesional.,Mejor calibracion psychologist.,No aplica en caregiver.,low,medium
+H7,missingness_aware,"v13_parent_nonmissing_ratio,v13_parent_missing_count",Hacer el modelo robusto a cuestionarios incompletos.,Menor colapso en stress.,Puede penalizar casos completos.,low,high
+H8,coverage_aware,"has_*,v13_parent_source_count",Representar cobertura instrumental real.,Mejor generalizacion entre modos.,Dependencia de metadata.,low,medium
+H9,denoised_compact,v13_parent_signal_density,Reducir ruido mediante densidad de senal.,Mejor brier/calibracion.,Poca ganancia si cobertura alta.,low,medium
+H10,interaction_terms,"v13_behavior_x_impact,v13_internalizing_x_neurodev",Capturar no-linealidades clinicas utiles.,Mejor PR-AUC y F1.,Sobreajuste en sets pequenos.,low,medium
