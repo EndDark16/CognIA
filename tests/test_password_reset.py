@@ -10,7 +10,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from api.app import create_app
-from api.security import check_password, hash_password
+from api.security import check_password
 from app.models import db, AppUser, RefreshToken, PasswordResetToken
 from config.settings import TestingConfig
 
