@@ -1,0 +1,11 @@
+mode,domain,status,delta_balanced_accuracy,delta_pr_auc,delta_brier,family,feature_variant,target_variant
+caregiver,adhd,marginal_improvement,0.004871691511387111,-0.00761209619824299,-0.0005677545236591475,rf,engineered,baseline
+caregiver,conduct,marginal_improvement,0.00503663106796115,0.0023906895650496196,-0.0018411863646378285,rf,engineered,baseline
+caregiver,elimination,material_improvement,0.01999990683229813,0.017146661328683255,-0.014847619484901431,xgboost,engineered,elimination_any_baseline
+caregiver,anxiety,material_improvement,0.03169191919191927,0.03221054129258161,-0.016215183327715446,lightgbm,engineered,baseline
+caregiver,depression,marginal_improvement,-0.026061628782100166,0.009236226482224441,-0.0045926651768614934,catboost,engineered,baseline
+psychologist,adhd,near_ceiling,0.002789298136645857,-0.0018789588658786327,-0.0006607734785725322,rf,base,baseline
+psychologist,conduct,material_improvement,0.022041631067961087,-0.0035501759709929415,-0.0068020848937486375,catboost,engineered,baseline
+psychologist,elimination,material_improvement,0.024527906832298108,0.0212474547407705,-0.011476821411158022,lightgbm,engineered,elimination_any_baseline
+psychologist,anxiety,material_improvement,0.017803272727272668,0.028695619327604338,-0.011503836117106182,lightgbm,engineered,baseline
+psychologist,depression,marginal_improvement,-0.0018903146029325413,0.007969083031796997,-0.0014029570088320287,catboost,engineered,baseline

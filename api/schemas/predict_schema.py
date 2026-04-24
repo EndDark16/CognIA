@@ -1,6 +1,5 @@
-# api/schemas/predict_schema.py
-
 from marshmallow import Schema, fields, validate
+
 
 class PredictSchema(Schema):
     age = fields.Integer(required=True, validate=validate.Range(min=6, max=11))

@@ -1,0 +1,7 @@
+# elimination v14 subtype feasibility
+
+                subtype  trainval_positive  test_positive  trainval_total  test_total label_available
+  target_enuresis_exact                758            122            1619         286             yes
+target_encopresis_exact                793            133            1619         286             yes
+
+proceed_subtype_trials: yes

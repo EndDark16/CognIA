@@ -1,0 +1,11 @@
+mode,domain,probability_score_ready,risk_band_ready,confidence_percentage_ready,evidence_quality_ready,uncertainty_abstention_ready,short_explanation_ready,professional_detail_ready,caveat_message_ready,model_version_used_ready,questionnaire_version_used_ready,input_coverage_summary_ready,source_mix_summary_ready,readiness_score
+caregiver,adhd,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,1.0
+caregiver,conduct,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,1.0
+caregiver,elimination,no,no,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,0.8333333333333334
+caregiver,anxiety,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,1.0
+caregiver,depression,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,1.0
+psychologist,adhd,yes,yes,yes,no,yes,yes,yes,yes,yes,yes,yes,yes,0.9166666666666666
+psychologist,conduct,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,1.0
+psychologist,elimination,no,no,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,0.8333333333333334
+psychologist,anxiety,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,1.0
+psychologist,depression,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,1.0

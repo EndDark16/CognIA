@@ -1,0 +1,6 @@
+domain,role,mode_2_3,mode_full,decision_2_3,decision_full,delta_precision_full_minus_2_3,delta_recall_full_minus_2_3,delta_balanced_accuracy_full_minus_2_3,delta_pr_auc_full_minus_2_3,full_material_gain,prefer_2_3_practical
+adhd,psychologist,psychologist_2_3,psychologist_full,HOLD_FOR_TARGETED_FIX,PROMOTE_WITH_CAVEAT,0.17314189189189189,0.05319148936170215,0.05250248043214634,0.17577708335799513,yes,no
+anxiety,caregiver,caregiver_2_3,caregiver_full,PROMOTE_WITH_CAVEAT,PROMOTE_WITH_CAVEAT,0.05055611729019216,-0.011627906976744207,0.0005312241766024517,0.027438292439670775,yes,no
+conduct,psychologist,psychologist_2_3,psychologist_full,PROMOTE_WITH_CAVEAT,PROMOTE_WITH_CAVEAT,-0.006096158270071261,0.0,-0.0015576323987539498,0.0,no,yes
+depression,caregiver,caregiver_2_3,caregiver_full,HOLD_FOR_TARGETED_FIX,HOLD_FOR_TARGETED_FIX,-0.011605783866057817,0.0,-0.0012562814070352646,0.007020604537221531,no,yes
+elimination,caregiver,caregiver_2_3,caregiver_full,PROMOTE_WITH_CAVEAT,HOLD_FOR_TARGETED_FIX,-0.0007541478129713397,-0.019230769230769273,-0.009615384615384692,-0.014632476007629736,no,no

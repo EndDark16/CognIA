@@ -1,0 +1,255 @@
+{
+  "campaign": "hybrid_rf_final_ceiling_push_v3",
+  "generated_at_utc": "2026-04-13T02:50:13.745293+00:00",
+  "script": "scripts/run_hybrid_rf_final_ceiling_push_v3.py",
+  "dataset_source": "data/hybrid_dsm5_rebuild_v1/hybrid_dataset_synthetic_complete_final.csv",
+  "mode_count": 6,
+  "domain_count": 5,
+  "mode_domain_pairs": 30,
+  "trial_count": 2850,
+  "winner_count": 30,
+  "evidence_overfitting": "yes",
+  "evidence_good_generalization": "yes",
+  "hybrid_dataset_material_improvement_vs_previous": "yes",
+  "ceiling_status_counts": {
+    "marginal_room_left": 25,
+    "ceiling_reached": 5
+  },
+  "generated_files": [
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/ablation/hybrid_rf_ablation_results.csv",
+      "size_bytes": 26200,
+      "sha256": "d434fe76d2871a9bf13ef89d83b45382f501c0f89bf68457156faa068e886f7c"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/bootstrap/hybrid_rf_bootstrap_intervals.csv",
+      "size_bytes": 9928,
+      "sha256": "124f310b7f10f6935a91e768e18582c0eb4b3e46569276ea5c61f0c2a819179f"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/calibration/hybrid_rf_calibration_results.csv",
+      "size_bytes": 66446,
+      "sha256": "1e356297ed33854bf5c9dce01b4e9cbaa75f10bddaaaa725be1bffaa9e5f759d"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/feature_selection/hybrid_rf_feature_selection_summary.csv",
+      "size_bytes": 368,
+      "sha256": "172b52dcdb8f5dbb8dd293bf18b7a3d3211c1f8d5d0bf2da9488f4c4a13b62c7"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/inventory/hybrid_rf_final_ceiling_inventory.csv",
+      "size_bytes": 460,
+      "sha256": "1b4a277d90015c8e7ad02f17e1d977660c885b40069d20a29e604f2a79bdded4"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/inventory/hybrid_rf_final_ceiling_inventory.md",
+      "size_bytes": 897,
+      "sha256": "58afd2ee32bd0646a961e5fe6d1cac22b720701286899bccbe9640f39611a78e"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/reports/hybrid_rf_domain_mode_analysis.md",
+      "size_bytes": 4870,
+      "sha256": "101629a8931132a006cee8141cd61e1f31f1db50f064eeaee8fd1dd6ee1ba7ea"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/reports/hybrid_rf_executive_summary_v3.md",
+      "size_bytes": 1155,
+      "sha256": "0afea915e4db82ea17c60aa43d5e01f155dfb3c36618d961f3a491bb6f5631e3"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/reports/hybrid_rf_feature_strategy_report.md",
+      "size_bytes": 4895,
+      "sha256": "4339cada1fbc44adf6d9341cb848f5fac9e3e5c786a4147de68426b5ae5ead96"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/reports/hybrid_rf_final_ceiling_decision_v3.md",
+      "size_bytes": 2464,
+      "sha256": "232dab3b3623fc5c7af29708f641bdc8e4c1bf1beb44ad3c8215af162341de90"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/reports/hybrid_rf_generalization_audit_v3.md",
+      "size_bytes": 5736,
+      "sha256": "64b307b5f191fdf2640b31adca19c11a1b57c3f25aa93cc8188b875375d2277a"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/reports/hybrid_rf_overfitting_audit_v3.md",
+      "size_bytes": 2711,
+      "sha256": "73bee2176827b5988781c3c03bc1ab14289501cedeb9dc2f1602982b1eabd0ce"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_adhd/ids_holdout.csv",
+      "size_bytes": 7216,
+      "sha256": "d2248a28cdee2ec469193cd237be7549dd7c6a42752c58c6b538a963df884abe"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_adhd/ids_train.csv",
+      "size_bytes": 21616,
+      "sha256": "5e578c1723e0a9401a09a8643a78b5d21e985887a4c460775c5e7849a9e3cb3c"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_adhd/ids_val.csv",
+      "size_bytes": 7216,
+      "sha256": "0adb1b91a6774e072ffea3cccd8079906d67000a9e65a82932ca3181fe0a55d3"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_anxiety/ids_holdout.csv",
+      "size_bytes": 7216,
+      "sha256": "e3190c3684b1cfe00a58ec509a63a27098dbf30135933e01ce8141a9be917989"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_anxiety/ids_train.csv",
+      "size_bytes": 21616,
+      "sha256": "d3df26de2fb331d1905b5ac5c7447910b4436f5d84e973291c440b77a2cb142a"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_anxiety/ids_val.csv",
+      "size_bytes": 7216,
+      "sha256": "8c1a9fce9ced7004518ae14826de3262dfd2dff0ddc82bdb157acdce22b00846"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_conduct/ids_holdout.csv",
+      "size_bytes": 7216,
+      "sha256": "db10d832af14a6b01a35edb6191b5597f2ba583de71f2800b4b0f1bddc902a3d"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_conduct/ids_train.csv",
+      "size_bytes": 21616,
+      "sha256": "fcb90192d637c26c7991fede32234036dd0dc4d4cb70e805e3672e86ffedbe47"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_conduct/ids_val.csv",
+      "size_bytes": 7216,
+      "sha256": "b895316f5a4306929245b1de6b3202e460ffba10a662d9d8bd8b03f3989021e6"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_depression/ids_holdout.csv",
+      "size_bytes": 7216,
+      "sha256": "d453e28a0312cc0206584037d3129ff1ce318cf1a437a970516f11799a9d4d5f"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_depression/ids_train.csv",
+      "size_bytes": 21616,
+      "sha256": "968a2c25dfdb7314a010f4d75c2706ccf0a808cc1c17c5b080bc9adde6a35360"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_depression/ids_val.csv",
+      "size_bytes": 7216,
+      "sha256": "514f00c467b868711ad110487cfa456b2cb7d05b32844e564450b4df4b43c669"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_elimination/ids_holdout.csv",
+      "size_bytes": 7216,
+      "sha256": "4d6846a21086449c50c96dcec60091ef35c82ee2264278dfa864467e6125add7"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_elimination/ids_train.csv",
+      "size_bytes": 21616,
+      "sha256": "d7913b839e58a1924d8181a2047250076629ade2e293102879a1d830f3e0fb6c"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/splits/domain_elimination/ids_val.csv",
+      "size_bytes": 7216,
+      "sha256": "dfdbd0f461e3abcd98e2641e6751d0f22ab936d8a88fff54554b38c24bf067e0"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/stability/hybrid_rf_seed_stability.csv",
+      "size_bytes": 10993,
+      "sha256": "7d99d31d438ef1528ef37380064745f0b1a2a59cad115a9deb2d57ef6e1a5f31"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/stress/hybrid_rf_stress_results.csv",
+      "size_bytes": 45401,
+      "sha256": "8fcf2f1bdc169b9285bc8fc5af8162522b60c234a5794aa266e435bddc92c19b"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/domain_target_registry.csv",
+      "size_bytes": 1848,
+      "sha256": "93d013f68f1ea2e5ea0b45ace37e47f17c27c52608e46bc37980e444ec73b7ae"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/hybrid_rf_dsm5_vs_cleanbase_analysis.csv",
+      "size_bytes": 2669,
+      "sha256": "85e56c51e7e19514d42cfff1abd0cba313a9e699934f28b81501f3b48d600d61"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/hybrid_rf_final_champions.csv",
+      "size_bytes": 1087,
+      "sha256": "849c3d13b57de55df2ee4a8f289b6b66a2d9a33f850cf8958390795f2190573c"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/hybrid_rf_final_promotion_decisions.csv",
+      "size_bytes": 20567,
+      "sha256": "dab79d69ad60e5d95c44c316255d87396949b6608cd33f63caa77193443dfe81"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/hybrid_rf_final_ranked_models.csv",
+      "size_bytes": 19066,
+      "sha256": "793910264ac22cb47d40965d928e05c3379b87a0fdfee49250efd1da73a0895a"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/hybrid_rf_mode_domain_delta_vs_baseline.csv",
+      "size_bytes": 7424,
+      "sha256": "7da556708f40ba61c9653ccbe6fabc4fb34e1b73d017c73c983198818e284c5b"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/hybrid_rf_mode_domain_final_metrics.csv",
+      "size_bytes": 17326,
+      "sha256": "b0b8f287a151e836d2475dd6fb513d4c972225af6eb4526b1c4f22da218a2862"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/hybrid_rf_mode_domain_winners.csv",
+      "size_bytes": 9913,
+      "sha256": "421d7ae4116c5831f7560adec03de22cefc770db3f5d1801cdbdadf71c78f012"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/hybrid_rf_mode_step_losses.csv",
+      "size_bytes": 1023,
+      "sha256": "9b3949864ed9a7b637f4dd1e0ea592a8c34506e61cdd46e74e4f7b126f6bd5d6"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/hybrid_rf_operating_points.csv",
+      "size_bytes": 44579,
+      "sha256": "4c11d3dea9d96a8e0cd391cacdb1dbbd2f787adbece3097ad4700e4d80b28ab9"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/hybrid_rf_stability_matrix.csv",
+      "size_bytes": 10993,
+      "sha256": "7d99d31d438ef1528ef37380064745f0b1a2a59cad115a9deb2d57ef6e1a5f31"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/hybrid_rf_vs_previous_fullmode_delta.csv",
+      "size_bytes": 1398,
+      "sha256": "755f93b12d271ac7bf4c8472e193e71407a53179fa07179f6f9cd30a0d7f5760"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/mode_feature_coverage_matrix.csv",
+      "size_bytes": 387,
+      "sha256": "b4fb722d50614ae8bdff5596751b206ff06c0a42181cbbabe09daf70c3438123"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/tables/split_registry.csv",
+      "size_bytes": 2061,
+      "sha256": "639d2d15fdf125b6ea14273171d3e4d01d5c5ca28d0cc20c391b464eb7de6337"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/thresholds/hybrid_rf_threshold_results.csv",
+      "size_bytes": 44579,
+      "sha256": "4c11d3dea9d96a8e0cd391cacdb1dbbd2f787adbece3097ad4700e4d80b28ab9"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/trials/hybrid_rf_final_trial_feature_sets.csv",
+      "size_bytes": 409157,
+      "sha256": "1127321bd55d87b803a187963b344c8f3998389733c2ba1adbdf59c3488663e5"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/trials/hybrid_rf_final_trial_metrics_full.csv",
+      "size_bytes": 1228606,
+      "sha256": "ff6722daca588eaf87d9655846a6a9fe4f5de8cba545884bfaeee3a8098d944e"
+    },
+    {
+      "path": "data/hybrid_rf_final_ceiling_push_v3/trials/hybrid_rf_final_trial_registry.csv",
+      "size_bytes": 511803,
+      "sha256": "dcf6a1a83b237bf40f5bac93e39ad5f4b6bd1091be3ddf70abbd235da88ee820"
+    }
+  ]
+}

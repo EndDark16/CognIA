@@ -1,0 +1,5 @@
+{
+  "runtime_bundle": "questionnaire_runtime_v1",
+  "active_domains": ["adhd", "conduct", "elimination", "anxiety", "depression"],
+  "notes": "Backend questionnaire runtime scope; no reemplaza artifacts/inference_v4 historicos."
+}

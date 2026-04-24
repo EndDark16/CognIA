@@ -1,6 +1,6 @@
-# api/services/model_service.py
 import pandas as pd
 from core.models.predictor import load_model, predict_proba
+
 
 def predict_all_probabilities(data: dict) -> dict:
     feature_names = [
@@ -20,9 +20,6 @@ def predict_all_probabilities(data: dict) -> dict:
     # TDAH
     adhd_model = load_model("adhd")
     predictions["adhd"] = round(predict_proba(adhd_model, X), 2)
-
-    # Anxiety
-    # anxiety_model = load_model("anxiety")
 
     return predictions
 

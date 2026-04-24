@@ -1,0 +1,5 @@
+policy_id,rule_type,rule_definition,applies_to,enforcement_stage,rationale
+P1,exact_feature_block,feature in forbidden_signal_registry where decision=forbid,all_modes,feature_set_build,remove direct shortcuts
+P2,formula_token_block,source_formula contains cbcl_108 or cbcl_112,engineered_features,engineered_filter,remove equivalent derived shortcuts
+P3,winner_guard,assert winner feature list excludes forbidden tokens,winner_export,pre_export,prevent accidental reintroduction
+P4,extreme_performance_trigger,BA>=0.995 or P/R/Spec=1.0,all_modes,post_eval,force forensic re-audit

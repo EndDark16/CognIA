@@ -1,0 +1,3 @@
+mode,domain,selected_operating_mode,delta_balanced_accuracy,delta_recall,delta_pr_auc,delta_brier,improvement_level,stop_rule_result,structural_limit_signal,notes
+caregiver,elimination,balanced,0.15401242236024848,0.2360248447204969,0.09561823974365236,-0.11352118366802055,material_improvement,single_confirm_round_only,no,Improvement detected above noise thresholds.
+psychologist,elimination,balanced,0.15711801242236034,0.2422360248447205,0.0976697068299992,-0.11034698026199989,material_improvement,single_confirm_round_only,no,Improvement detected above noise thresholds.

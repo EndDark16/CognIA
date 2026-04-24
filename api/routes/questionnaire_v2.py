@@ -88,7 +88,7 @@ def bootstrap_questionnaire_v2():
 @jwt_required()
 def get_active_questionnaire():
     mode = (request.args.get("mode") or "short").strip().lower()
-    role = (request.args.get("role") or "caregiver").strip().lower()
+    role = (request.args.get("role") or "guardian").strip().lower()
     include_full = request.args.get("include_full", "false").lower() == "true"
 
     schema = SessionPageQuerySchema()

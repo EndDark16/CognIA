@@ -1,0 +1,9 @@
+# elimination v14 FN optimization
+
+        mode          strategy                 feature_set family  threshold  uncertainty_band  precision   recall  specificity  balanced_accuracy       f1   pr_auc    brier  uncertain_rate  uncertainty_usefulness  output_realism_score  fn_optimization_objective
+   caregiver          balanced r3_hybrid_clean_best_effort     rf      0.310              0.08   0.860759 0.844720        0.824           0.834360 0.852665 0.911523 0.132678        0.174825                0.115932              0.863287                   0.855885
+   caregiver      recall_first r3_hybrid_clean_best_effort     rf      0.320              0.10   0.860759 0.844720        0.824           0.834360 0.852665 0.911523 0.132678        0.237762                0.112385              0.821678                   0.855885
+   caregiver precision_guarded r3_hybrid_clean_best_effort     rf      0.760              0.06   0.914286 0.596273        0.928           0.762137 0.721805 0.911523 0.132678        0.000000               -0.258741              0.678322                   0.755159
+psychologist          balanced               r1_v12_replay     rf      0.375              0.08   0.847561 0.863354        0.800           0.831677 0.855385 0.912164 0.134631        0.125874                0.034444              0.851399                   0.859942
+psychologist      recall_first               r1_v12_replay     rf      0.285              0.10   0.734694 0.894410        0.584           0.739205 0.806723 0.912164 0.134631        0.209790                0.475074              0.869231                   0.827653
+psychologist precision_guarded               r1_v12_replay     rf      0.800              0.06   0.934783 0.534161        0.952           0.743081 0.679842 0.912164 0.134631        0.041958                0.487226              0.780070                   0.730609

@@ -30,10 +30,16 @@ from app.models import (
 )
 
 
+ROLE_ALIAS_TO_CANONICAL = {
+    "guardian": "guardian",
+    "caregiver": "guardian",
+    "psychologist": "psychologist",
+}
+
 MODE_KEYS = [
-    ("caregiver", "short", "caregiver_1_3"),
-    ("caregiver", "medium", "caregiver_2_3"),
-    ("caregiver", "complete", "caregiver_full"),
+    ("guardian", "short", "caregiver_1_3"),
+    ("guardian", "medium", "caregiver_2_3"),
+    ("guardian", "complete", "caregiver_full"),
     ("psychologist", "short", "psychologist_1_3"),
     ("psychologist", "medium", "psychologist_2_3"),
     ("psychologist", "complete", "psychologist_full"),
@@ -44,10 +50,10 @@ DEFAULT_DEFINITION_NAME = "Cuestionario operacional v16.4"
 DEFAULT_VERSION_LABEL = "v16.4"
 DEFAULT_SOURCE_DIR = Path("data") / "cuestionario_v16.4"
 
-DEFAULT_ACTIVE_MODELS = Path("data") / "hybrid_active_modes_freeze_v1" / "tables" / "hybrid_active_models_30_modes.csv"
-DEFAULT_ACTIVE_SUMMARY = Path("data") / "hybrid_active_modes_freeze_v1" / "tables" / "hybrid_active_modes_summary.csv"
-DEFAULT_INPUTS_MASTER = Path("data") / "hybrid_active_modes_freeze_v1" / "tables" / "hybrid_questionnaire_inputs_master.csv"
-DEFAULT_OPERATIONAL_CHAMPIONS = Path("data") / "hybrid_operational_freeze_v1" / "tables" / "hybrid_operational_final_champions.csv"
+DEFAULT_ACTIVE_MODELS = Path("data") / "hybrid_active_modes_freeze_v6" / "tables" / "hybrid_active_models_30_modes.csv"
+DEFAULT_ACTIVE_SUMMARY = Path("data") / "hybrid_active_modes_freeze_v6" / "tables" / "hybrid_active_modes_summary.csv"
+DEFAULT_INPUTS_MASTER = Path("data") / "hybrid_active_modes_freeze_v6" / "tables" / "hybrid_questionnaire_inputs_master.csv"
+DEFAULT_OPERATIONAL_CHAMPIONS = Path("data") / "hybrid_operational_freeze_v6" / "tables" / "hybrid_operational_final_champions.csv"
 
 
 def _utcnow() -> datetime:
@@ -78,6 +84,14 @@ def _normalize_text(value: Any) -> str:
         return ""
     text = str(value).strip()
     return text
+
+
+def _normalize_role(value: Any) -> str:
+    raw = _normalize_text(value).lower()
+    out = ROLE_ALIAS_TO_CANONICAL.get(raw)
+    if out:
+        return out
+    return raw
 
 
 def _slugify(value: str) -> str:
@@ -258,9 +272,9 @@ def _upsert_scales(version_id: uuid.UUID, scales_df: pd.DataFrame) -> dict[str, 
 def _mode_inclusion(row: dict[str, Any], mode_key: str) -> tuple[bool, float | None, str | None]:
     include_col = f"include_{mode_key}"
     include = _to_bool(row.get(include_col))
-    role = "caregiver" if mode_key.startswith("caregiver") else "psychologist"
-    rank_col = f"{role}_rank"
-    bucket_col = f"{role}_priority_bucket"
+    rank_role = "caregiver" if mode_key.startswith("caregiver") else "psychologist"
+    rank_col = f"{rank_role}_rank"
+    bucket_col = f"{rank_role}_priority_bucket"
     rank = _to_float(row.get(rank_col))
     bucket = _normalize_text(row.get(bucket_col)) or None
     return include, rank, bucket
@@ -313,7 +327,7 @@ def _set_question_modes(question: QuestionnaireQuestion, row: dict[str, Any]) ->
         )
 
 
-def _upsert_questions(version_id: uuid.UUID, master_df: pd.DataFrame, scales: dict[str, QuestionnaireScale]) -> dict[str, QuestionnaireQuestion]:
+def _upsert_questions(version_id: uuid.UUID, master_df: pd.DataFrame) -> dict[str, QuestionnaireQuestion]:
     sections_cache: dict[str, QuestionnaireSection] = {}
     question_by_code: dict[str, QuestionnaireQuestion] = {}
 
@@ -407,6 +421,7 @@ def _upsert_questions(version_id: uuid.UUID, master_df: pd.DataFrame, scales: di
 
 
 def _resolve_mode_key(role: str, mode: str) -> str:
+    role = _normalize_role(role)
     for row_role, row_mode, mode_key in MODE_KEYS:
         if row_role == role and row_mode == mode:
             return mode_key
@@ -445,7 +460,7 @@ def sync_active_models() -> dict[str, Any]:
             continue
         domain = _normalize_text(row.get("domain")).lower()
         mode_key = _normalize_text(row.get("mode"))
-        role = _normalize_text(row.get("role"))
+        role = _normalize_role(row.get("role"))
 
         registry = ModelRegistry.query.filter_by(model_key=model_key).first()
         if not registry:
@@ -584,7 +599,7 @@ def sync_questionnaire_catalog(created_by: uuid.UUID | None = None, source_dir: 
     master_df = pd.read_csv(bundle.master_csv)
 
     scales = _upsert_scales(version.id, scales_df)
-    questions = _upsert_questions(version.id, master_df, scales)
+    questions = _upsert_questions(version.id, master_df)
 
     return {
         "definition_id": str(definition.id),
@@ -631,23 +646,32 @@ def ensure_catalog_loaded() -> QuestionnaireVersion:
 
 
 def get_active_activation(domain: str, mode_key: str, role: str) -> ModelModeDomainActivation:
-    row = ModelModeDomainActivation.query.filter_by(
-        domain=domain,
-        mode_key=mode_key,
-        role=role,
-        active_flag=True,
-    ).order_by(ModelModeDomainActivation.valid_from.desc()).first()
-    if row:
-        return row
+    canonical_role = _normalize_role(role)
+    candidates = [canonical_role]
+    if canonical_role == "guardian":
+        candidates.append("caregiver")
+
+    for role_candidate in candidates:
+        row = ModelModeDomainActivation.query.filter_by(
+            domain=domain,
+            mode_key=mode_key,
+            role=role_candidate,
+            active_flag=True,
+        ).order_by(ModelModeDomainActivation.valid_from.desc()).first()
+        if row:
+            return row
 
     sync_active_models()
     db.session.commit()
-    row = ModelModeDomainActivation.query.filter_by(
-        domain=domain,
-        mode_key=mode_key,
-        role=role,
-        active_flag=True,
-    ).order_by(ModelModeDomainActivation.valid_from.desc()).first()
-    if not row:
-        raise LookupError(f"activation_not_found:{domain}:{mode_key}:{role}")
-    return row
+
+    for role_candidate in candidates:
+        row = ModelModeDomainActivation.query.filter_by(
+            domain=domain,
+            mode_key=mode_key,
+            role=role_candidate,
+            active_flag=True,
+        ).order_by(ModelModeDomainActivation.valid_from.desc()).first()
+        if row:
+            return row
+
+    raise LookupError(f"activation_not_found:{domain}:{mode_key}:{canonical_role}")

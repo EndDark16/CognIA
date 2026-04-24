@@ -1,0 +1,210 @@
+{
+  "campaign": "hybrid_rf_ceiling_push_v1",
+  "generated_at_utc": "2026-04-12T09:41:08.357184+00:00",
+  "script": "scripts/run_hybrid_rf_ceiling_push_v1.py",
+  "dataset_source": "data/hybrid_dsm5_rebuild_v1/hybrid_dataset_synthetic_complete_final.csv",
+  "mode_count": 6,
+  "domain_count": 5,
+  "mode_domain_pairs": 30,
+  "trial_count": 6264,
+  "winner_count": 30,
+  "evidence_overfitting": "yes",
+  "evidence_good_generalization": "yes",
+  "hybrid_dataset_material_improvement_vs_previous": "yes",
+  "ceiling_status_counts": {
+    "marginal_room_left": 22,
+    "ceiling_reached": 8
+  },
+  "generated_files": [
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/ablation/hybrid_rf_ablation_results.csv",
+      "size_bytes": 25903,
+      "sha256": "7027fffb7d040536b3c6ce659d1baa0861e0718d2d995e919e194f4eee778488"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/calibration/hybrid_rf_calibration_results.csv",
+      "size_bytes": 196961,
+      "sha256": "fefdd5cd6f7fe740005e10bf9ab4be38b926fc929ce8750ea4b05fe8dc235a06"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/inventory/hybrid_rf_modeling_inventory.csv",
+      "size_bytes": 463,
+      "sha256": "0fe47d70a396af6914ed3def6b654d6045c92e6df2a0ae1aff7f1b097d0ffc62"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/inventory/hybrid_rf_modeling_inventory.md",
+      "size_bytes": 895,
+      "sha256": "f9f1165bea6718b7d9f40551f94545eb61f3c56a3682e7dc54abc9839b0ab429"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/reports/hybrid_rf_ceiling_decision.md",
+      "size_bytes": 2452,
+      "sha256": "a87c71b72e9a0366c7026e9aeca8e65433c0e31f8de74950d4ed535b5222d20d"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/reports/hybrid_rf_domain_mode_analysis.md",
+      "size_bytes": 4860,
+      "sha256": "bdf92133da0772646780bfd865804ca524df9a86098b0096168002b05e817305"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/reports/hybrid_rf_executive_summary.md",
+      "size_bytes": 1150,
+      "sha256": "49d0269e1b2dcf2a73c0fe5f4c5578ac36c89c2a6e5ed4bc47478e9de0acb4ed"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/reports/hybrid_rf_generalization_audit.md",
+      "size_bytes": 5736,
+      "sha256": "3fcfd5a8c626cd1f6d18901c532467dc07b34e9148855cb50bfe67ed4cebf7c0"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/reports/hybrid_rf_overfitting_audit.md",
+      "size_bytes": 2701,
+      "sha256": "d24b74e7511a52bf1c8e36146dbefead7be18513ba47c66d240f0b7fae4f9531"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_adhd/ids_holdout.csv",
+      "size_bytes": 7216,
+      "sha256": "59474d1b021a898207a20dcc44b7ece8fbbcc48db036886e32994fcf35c39b4d"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_adhd/ids_train.csv",
+      "size_bytes": 21616,
+      "sha256": "1ca6922217e5a2cd9dd22c2f9a33ab4db403d1aa5e6fd74708539c7c3da4f628"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_adhd/ids_val.csv",
+      "size_bytes": 7216,
+      "sha256": "d2b5b643eb60a0ade6ad064249eb9ce217531e3f9b3ced805200356e26cb496d"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_anxiety/ids_holdout.csv",
+      "size_bytes": 7216,
+      "sha256": "0b46e43281bdec53f21f1a73c75b47941c0e5689abaf5d99ea4715ab0ce56391"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_anxiety/ids_train.csv",
+      "size_bytes": 21616,
+      "sha256": "9d71d2aea695cb4cf43ac93191f14a435a03abcd763c58c022f8787e2ccb36e4"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_anxiety/ids_val.csv",
+      "size_bytes": 7216,
+      "sha256": "b51de1719acdb91a596dcd6c16438b0b01c3493a72bd50b9f20a6377e19eccb9"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_conduct/ids_holdout.csv",
+      "size_bytes": 7216,
+      "sha256": "c78f68a36dd36a4b0a248af4afc719208bd20efd96237c95e244e01416e672cd"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_conduct/ids_train.csv",
+      "size_bytes": 21616,
+      "sha256": "fd0660a4f54d25cd96ebb6d4ac598e32198bd40703319b6868e14eb1ea4bacaf"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_conduct/ids_val.csv",
+      "size_bytes": 7216,
+      "sha256": "93cda68e76ff890027dd6b7f6795458937c462ead51819c0fd620734c0da1de5"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_depression/ids_holdout.csv",
+      "size_bytes": 7216,
+      "sha256": "16990ef60e7be7dac14a29ab8ce127814e8c6cfdd6ede1c7b5889861d9bfeaeb"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_depression/ids_train.csv",
+      "size_bytes": 21616,
+      "sha256": "9bd046bcf31c34ff87db199b517162cb8262245742ea7dcd43195e86a888f86c"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_depression/ids_val.csv",
+      "size_bytes": 7216,
+      "sha256": "6ab267570746f3bf9159a2239a431dc673a9fbc2fbf267c79a690e25e43c7bee"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_elimination/ids_holdout.csv",
+      "size_bytes": 7216,
+      "sha256": "ae685cec9bbf69eb440d66f072a333df56d05f5221ec797847f1b598bedeb55d"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_elimination/ids_train.csv",
+      "size_bytes": 21616,
+      "sha256": "06b344937cd97d40467de5602ccf18029b21c3000228f906f876fd7cecc435c9"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/splits/domain_elimination/ids_val.csv",
+      "size_bytes": 7216,
+      "sha256": "a2d72fac5d91dbc9944d8f0c5ecdab21bfd62aa5332dbc088fcbfcd7d0515534"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/stress/hybrid_rf_stress_results.csv",
+      "size_bytes": 48399,
+      "sha256": "640d22420fa1eadd4b815f978a7d30975610ca3ae405e3fa435c6cd0b7519574"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/tables/domain_target_registry.csv",
+      "size_bytes": 1848,
+      "sha256": "93d013f68f1ea2e5ea0b45ace37e47f17c27c52608e46bc37980e444ec73b7ae"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/tables/hybrid_rf_mode_domain_delta_vs_baseline.csv",
+      "size_bytes": 7529,
+      "sha256": "543e5d1c4db551c5a631f75ac6ce0dfb5eb91bb57271e37a9985db888eac0461"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/tables/hybrid_rf_mode_domain_final_metrics.csv",
+      "size_bytes": 18476,
+      "sha256": "403739a374f1b31a418f2a4efb0433b9025bf499f3b3fca9136b6a7fa09872ad"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/tables/hybrid_rf_mode_domain_winners.csv",
+      "size_bytes": 10050,
+      "sha256": "3d7bb9bde5c3b1751e12876489ff2372197294819b6f65cafe02e2b232f15c85"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/tables/hybrid_rf_mode_step_losses.csv",
+      "size_bytes": 1134,
+      "sha256": "24290ccb927d97b67324fa479da142c162635ae1fe3e8b4207d463dd50f323a1"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/tables/hybrid_rf_operating_points.csv",
+      "size_bytes": 38140,
+      "sha256": "72e26146249cbc726c1e3f50046ed49384d4f3bebca15d0600f6c04e84ffe46e"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/tables/hybrid_rf_stability_matrix.csv",
+      "size_bytes": 12044,
+      "sha256": "5d8c570055ba34f31e3870d953e58b300093a15ebd8810a9cdc99e9dc4fd8049"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/tables/hybrid_rf_vs_previous_fullmode_delta.csv",
+      "size_bytes": 1397,
+      "sha256": "8992a7c3a3a26ea9702bc858aa63b54989fa3007b5a76c88edac97001f18e4b5"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/tables/mode_feature_coverage_matrix.csv",
+      "size_bytes": 387,
+      "sha256": "b4fb722d50614ae8bdff5596751b206ff06c0a42181cbbabe09daf70c3438123"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/tables/split_registry.csv",
+      "size_bytes": 1941,
+      "sha256": "3bd66e0eaf013ef23d5cdaf5a151261d498e14d41e3cafb503e4643b08aee717"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/trials/hybrid_rf_trial_feature_sets.csv",
+      "size_bytes": 352644,
+      "sha256": "80dd7e767cbc1fa5afdec0b0084f38f6f1c3b53b9d3ece8acd3922086ecaaa7b"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/trials/hybrid_rf_trial_metrics_full.csv",
+      "size_bytes": 2729002,
+      "sha256": "3f8310bd187e90c2a7347cb6e53a5d2762a0f111557004e4eb13d6f313bf5c22"
+    },
+    {
+      "path": "data/hybrid_rf_ceiling_push_v1/trials/hybrid_rf_trial_registry.csv",
+      "size_bytes": 1138119,
+      "sha256": "6737f2bcfe9fa3d5124646015a027de8a465f4aa673a29d7ada972727c7bff47"
+    }
+  ]
+}

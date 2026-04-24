@@ -1,7 +1,7 @@
 import csv
 import json
-import random
 import re
+import secrets
 import string
 import uuid
 from concurrent.futures import ThreadPoolExecutor
@@ -121,7 +121,7 @@ def _notification_expiry() -> datetime:
 
 def _generate_reference_id() -> str:
     alphabet = string.ascii_uppercase + string.digits
-    return f"QRY-{''.join(random.choice(alphabet) for _ in range(8))}"
+    return f"QRY-{''.join(secrets.choice(alphabet) for _ in range(8))}"
 
 
 def _unique_reference_id(max_attempts: int = 10) -> str:
@@ -133,7 +133,7 @@ def _unique_reference_id(max_attempts: int = 10) -> str:
 
 
 def _generate_pin() -> str:
-    return f"{random.randint(0, 999999):06d}"
+    return f"{secrets.randbelow(1_000_000):06d}"
 
 
 def hash_pin(pin: str) -> str:
@@ -529,7 +529,7 @@ def _explanation(runtime: DomainRuntime, vector: dict[str, Any], threshold: floa
         if base and base in vector:
             extracted.append(base)
     if not extracted:
-        extracted = [c for c in runtime.feature_columns[:5]]
+        extracted = list(runtime.feature_columns[:5])
     contributors = []
     for key in extracted[:5]:
         contributors.append({"feature": key, "value": vector.get(key), "default_used": str(vector.get(key)) == str(_default_for_feature(key))})
@@ -718,7 +718,7 @@ def _visibility_rule_for_feature(feature: str, all_features: set[str]) -> dict[s
     return None
 
 
-def _build_default_questionnaire_version(version: QRQuestionnaireVersion, created_by: uuid.UUID | None) -> None:
+def _build_default_questionnaire_version(version: QRQuestionnaireVersion) -> None:
     features = _default_question_features()
     feature_set = set(features)
     section_defs = [
@@ -744,7 +744,7 @@ def _build_default_questionnaire_version(version: QRQuestionnaireVersion, create
         section_map[key] = section
     db.session.flush()
 
-    question_pos_by_section: dict[str, int] = {k: 0 for k in section_map}
+    question_pos_by_section: dict[str, int] = dict.fromkeys(section_map, 0)
     for feature in features:
         section_key = _domain_section_key(feature)
         if section_key not in section_map:
@@ -831,7 +831,7 @@ def ensure_runtime_bootstrap(created_by: uuid.UUID | None = None) -> QRQuestionn
     db.session.add(version)
     db.session.flush()
 
-    _build_default_questionnaire_version(version, created_by)
+    _build_default_questionnaire_version(version)
     _ensure_disclosures(version, created_by)
     db.session.commit()
     return version
@@ -1284,8 +1284,10 @@ def create_evaluation_draft(user_id: uuid.UUID, payload: dict[str, Any]) -> tupl
         current_app.config.get("EVALUATION_MAX_AGE", 11)
     ):
         raise ValueError("invalid_child_age")
-    respondent_type = (payload.get("respondent_type") or "caregiver").strip().lower()
-    if respondent_type not in {"caregiver", "psychologist"}:
+    respondent_type = (payload.get("respondent_type") or "guardian").strip().lower()
+    if respondent_type == "caregiver":
+        respondent_type = "guardian"
+    if respondent_type not in {"guardian", "psychologist"}:
         raise ValueError("invalid_respondent_type")
 
     disclosures = _disclosures_for_new_evaluation(version.id)
