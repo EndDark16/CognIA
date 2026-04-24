@@ -21,7 +21,6 @@ from app.models import (
     QuestionnaireTemplate,
     Question,
     RecoveryCode,
-    RefreshToken,
     Role,
     UserMFA,
     UserRole,

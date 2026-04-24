@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 
 from flask import current_app
-from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+from itsdangerous import URLSafeTimedSerializer, BadSignature
 
 from sqlalchemy.exc import IntegrityError
 
