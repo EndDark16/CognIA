@@ -241,12 +241,14 @@ git clone https://github.com/EndDark16/CognIA.git
 cd CognIA
 ```
 
-### 9.2 Entorno virtual e instalacion
-```bash
-python -m venv .venv
-source .venv/bin/activate  # Linux/macOS
-pip install -r requirements.txt
-```
+## API y contratos
+- Swagger UI: `GET /docs`
+- OpenAPI: `GET /openapi.yaml`
+- Fuente activa de contrato: `docs/openapi.yaml` (snapshots historicos en `docs/archive/openapi/`)
+- Manual tecnico consolidado backend: `docs/backend_technical_manual.md`
+- Matriz tecnica de endpoints (runtime real): `docs/backend_endpoint_matrix.csv`
+- Matriz de ciclo de vida de endpoints: `docs/endpoint_lifecycle_matrix.md`
+- Referencia mantenedor: `docs/api_full_reference.md`
 
 PowerShell:
 ```powershell

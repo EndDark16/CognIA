@@ -46,6 +46,24 @@ def test_predict_validation_error_for_missing_fields():
     assert "age" in body["details"]
 
 
+def test_predict_validation_error_for_age_out_of_range():
+    client = _client()
+    payload = dict(VALID_PAYLOAD)
+    payload["age"] = 5
+    resp = client.post("/api/predict", json=payload)
+    assert resp.status_code == 400
+    body = resp.get_json()
+    assert body["error"] == "validation_error"
+    assert "age" in body["details"]
+
+    payload["age"] = 12
+    resp = client.post("/api/predict", json=payload)
+    assert resp.status_code == 400
+    body = resp.get_json()
+    assert body["error"] == "validation_error"
+    assert "age" in body["details"]
+
+
 def test_predict_internal_error_is_sanitized(monkeypatch):
     client = _client()
 
@@ -81,4 +99,3 @@ def test_predict_rate_limit_applies(monkeypatch):
     assert first.status_code == 200
     assert second.status_code == 429
     assert second.get_json()["error"] == "rate_limited"
-
