@@ -6,7 +6,7 @@ Eliminar ambigüedad en `final_class` y separar explícitamente:
 1. clase operativa principal
 2. flags de riesgo metodológico
 
-Esta política aplica sobre la línea operativa vigente (`freeze_v2`) y la línea de auditoría secundaria (`freeze_v3`) como evidencia no promocional.
+Esta política aplica sobre la línea operativa vigente declarada por el loader v2. A 2026-04-24, esa línea es `hybrid_active_modes_freeze_v6_hotfix_v1` / `hybrid_operational_freeze_v6_hotfix_v1`; `freeze_v2` y `freeze_v3` quedan como históricos auditables.
 
 ## Capa 1: clase operativa principal
 Valores permitidos:
@@ -71,6 +71,8 @@ Bloqueador metodológico fuerte:
 - `shortcut_risk_flag=yes` nunca puede coexistir con `ROBUST_PRIMARY`.
 - `secondary_metric_anomaly_flag=yes` solo puede coexistir con `ROBUST_PRIMARY` si `secondary_anomaly_resolution=documented_strong`.
 - si no hay evidencia documental fuerte de resolución de anomalía secundaria, marcar `secondary_anomaly_resolution=por_confirmar`.
+- Ningún champion activo puede permanecer si `recall`, `specificity`, `roc_auc` o `pr_auc` queda `> 0.98`.
+- La comunicación de confianza debe quedar alineada: `ACTIVE_MODERATE_CONFIDENCE` usa `confidence_band=moderate`; `ACTIVE_LIMITED_USE` usa `confidence_band=limited`; `ACTIVE_HIGH_CONFIDENCE` requiere `confidence_band=high` y sin caveat metodológico fuerte.
 
 ## Política de anomalía secundaria
 Se marca `secondary_metric_anomaly_flag=yes` cuando existe al menos una de estas señales:
@@ -88,6 +90,6 @@ No se usa solo umbral bruto: la evaluación agrega combinaciones `secondary_peak
 - Módulo reusable de política: `api/services/hybrid_classification_policy_v1.py`
 
 ## Compatibilidad y trazabilidad
-- No sobrescribe tablas históricas (`freeze_v1/v2/v3`).
-- Produce tablas derivadas versionadas en `data/hybrid_classification_normalization_v1/`.
+- No sobrescribe tablas históricas (`freeze_v1` a `freeze_v6`).
+- Produce tablas derivadas versionadas en `data/hybrid_classification_normalization_v2/` para la línea activa reciente.
 - Mantiene el framing metodológico: screening/apoyo profesional, no diagnóstico automático.
