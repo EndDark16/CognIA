@@ -18,8 +18,10 @@ jobs:
     runs-on: [self-hosted, linux, x64, cognia-backend]
     timeout-minutes: 45
     env:
+      DEPLOY_BRANCH: development
       BACKEND_REPO_DIR: /opt/cognia/backend
       COMPOSE_DIR: /opt/cognia
+      EXPECTED_SHA: ${{ github.sha }}
       READY_URL: http://localhost/readyz
 
     steps:
@@ -38,7 +40,8 @@ jobs:
 
           deploy_compose() {
             cd "$COMPOSE_DIR"
-            docker compose up -d --build backend gateway
+            docker compose up -d --build backend
+            docker compose up -d --force-recreate gateway
           }
 
           check_readyz() {
@@ -65,9 +68,18 @@ jobs:
           echo "Previous deployed commit: $PREVIOUS_SHA"
           echo "previous_sha=$PREVIOUS_SHA" >> "$GITHUB_OUTPUT"
 
-          git fetch origin development
-          git checkout development
-          git reset --hard origin/development
+          git fetch --prune origin "$DEPLOY_BRANCH"
+          REMOTE_SHA="$(git rev-parse "origin/$DEPLOY_BRANCH")"
+          echo "Remote $DEPLOY_BRANCH commit: $REMOTE_SHA"
+
+          if [ "$REMOTE_SHA" != "$EXPECTED_SHA" ]; then
+            echo "::error::Expected workflow SHA $EXPECTED_SHA but origin/$DEPLOY_BRANCH resolved $REMOTE_SHA."
+            echo "final_status=sha_mismatch" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+          git checkout -B "$DEPLOY_BRANCH" "$EXPECTED_SHA"
+          git reset --hard "$EXPECTED_SHA"
 
           TARGET_SHA="$(git rev-parse HEAD)"
           echo "Target commit after update: $TARGET_SHA"
@@ -107,6 +119,7 @@ jobs:
           {
             echo "### Backend deploy summary"
             echo "- Previous SHA: ${{ steps.deploy.outputs.previous_sha || 'n/a' }}"
+            echo "- Expected SHA: ${{ github.sha }}"
             echo "- Target SHA: ${{ steps.deploy.outputs.target_sha || 'n/a' }}"
             echo "- Rollback SHA: ${{ steps.deploy.outputs.rollback_sha || 'n/a' }}"
             echo "- Final status: ${{ steps.deploy.outputs.final_status || 'unknown' }}"
@@ -121,3 +134,5 @@ jobs:
           docker compose ps
           echo "----- backend logs (last 200 lines) -----"
           docker compose logs --tail=200 backend
+          echo "----- gateway logs (last 200 lines) -----"
+          docker compose logs --tail=200 gateway

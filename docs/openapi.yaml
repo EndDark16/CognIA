@@ -104,7 +104,7 @@ paths:
         La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
 
         Estado contractual:
-        `ACTIVE`
+        `KEEP_ACTIVE`
 
         Marco de cumplimiento profesional:
         - Punto de control contractual: `GET /healthz`.
@@ -123,7 +123,7 @@ paths:
                 $ref: '#/components/schemas/HealthResponse'
               example:
                 status: ok
-      x-contract-status: ACTIVE
+      x-contract-status: KEEP_ACTIVE
   /readyz:
     get:
       tags:
@@ -158,7 +158,7 @@ paths:
         La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
 
         Estado contractual:
-        `ACTIVE`
+        `KEEP_ACTIVE`
 
         Marco de cumplimiento profesional:
         - Punto de control contractual: `GET /readyz`.
@@ -189,7 +189,7 @@ paths:
                   value:
                     msg: service unavailable while processing readyz
                     error: service_unavailable
-      x-contract-status: ACTIVE
+      x-contract-status: KEEP_ACTIVE
   /metrics:
     get:
       tags:
@@ -224,7 +224,7 @@ paths:
         La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
 
         Estado contractual:
-        `ACTIVE`
+        `KEEP_ACTIVE`
 
         Marco de cumplimiento profesional:
         - Punto de control contractual: `GET /metrics`.
@@ -287,7 +287,7 @@ paths:
                     msg: internal failure while processing metrics
                     error: server_error
           description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
-      x-contract-status: ACTIVE
+      x-contract-status: KEEP_ACTIVE
   /api/predict:
     post:
       tags:
@@ -3978,35 +3978,35 @@ paths:
       - Admin
       summary: Actualizar atributos administrativos de un usuario existente
       description: |
-        Qué hace:
+        **Objetivo funcional**
         Actualizar atributos administrativos de un usuario existente.
 
-        Cuándo usarlo:
+        **Cuando debe usarse**
         Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `PATCH /api/admin/users/{id}`.
 
-        Quién lo usa:
+        **Actor que lo consume**
         Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
 
-        Seguridad:
+        **Seguridad aplicable**
         Requiere: JWT bearer.
 
-        Entrada esperada:
+        **Entrada esperada**
         Request body obligatorio. Formatos admitidos: application/json. Schema principal: AdminUserPatchRequest.
 
         Reglas obligatorias:
         Debe respetar los parámetros declarados en ruta o query: id. El body debe cumplir el schema `AdminUserPatchRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos. La cuenta autenticada debe tener privilegios administrativos suficientes para operar el recurso.
 
-        Resultado exitoso:
+        **Resultado exitoso**
         Actualiza el recurso solicitado y devuelve confirmación o la representación actualizada del estado.
 
-        Errores posibles:
+        **Errores posibles y causa funcional**
         Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 409, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
 
         Limitaciones actuales:
         La operación puede dejar trazabilidad administrativa o de auditoría según la implementación de servicios y modelos.
 
-        Estado contractual:
-        `ACTIVE`
+        **Estado contractual**
+        `KEEP_ACTIVE`
 
         Marco de cumplimiento profesional:
         - Punto de control contractual: `PATCH /api/admin/users/{id}`.
@@ -4144,42 +4144,42 @@ paths:
                     msg: internal failure while processing api_admin_users_id
                     error: server_error
           description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
-      x-contract-status: ACTIVE
+      x-contract-status: KEEP_ACTIVE
   /api/admin/users/{id}/password-reset:
     post:
       tags:
       - Admin
       summary: Forzar un flujo administrativo de restablecimiento de contraseña
       description: |
-        Qué hace:
+        **Objetivo funcional**
         Forzar un flujo administrativo de restablecimiento de contraseña.
 
-        Cuándo usarlo:
+        **Cuando debe usarse**
         Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/admin/users/{id}/password-reset`.
 
-        Quién lo usa:
+        **Actor que lo consume**
         Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
 
-        Seguridad:
+        **Seguridad aplicable**
         Requiere: JWT bearer.
 
-        Entrada esperada:
+        **Entrada esperada**
         No usa requestBody en el contrato auditado.
 
         Reglas obligatorias:
         Debe respetar los parámetros declarados en ruta o query: id. La cuenta autenticada debe tener privilegios administrativos suficientes para operar el recurso.
 
-        Resultado exitoso:
+        **Resultado exitoso**
         Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
 
-        Errores posibles:
+        **Errores posibles y causa funcional**
         Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
 
         Limitaciones actuales:
         La operación puede dejar trazabilidad administrativa o de auditoría según la implementación de servicios y modelos.
 
-        Estado contractual:
-        `ACTIVE`
+        **Estado contractual**
+        `KEEP_ACTIVE`
 
         Marco de cumplimiento profesional:
         - Punto de control contractual: `POST /api/admin/users/{id}/password-reset`.
@@ -4279,42 +4279,42 @@ paths:
                     msg: internal failure while processing api_admin_users_id_password_reset
                     error: server_error
           description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
-      x-contract-status: ACTIVE
+      x-contract-status: KEEP_ACTIVE
   /api/admin/users/{id}/mfa/reset:
     post:
       tags:
       - Admin
       summary: Reiniciar MFA de una cuenta desde administración
       description: |
-        Qué hace:
+        **Objetivo funcional**
         Reiniciar MFA de una cuenta desde administración.
 
-        Cuándo usarlo:
+        **Cuando debe usarse**
         Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/admin/users/{id}/mfa/reset`.
 
-        Quién lo usa:
+        **Actor que lo consume**
         Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
 
-        Seguridad:
+        **Seguridad aplicable**
         Requiere: JWT bearer.
 
-        Entrada esperada:
+        **Entrada esperada**
         No usa requestBody en el contrato auditado.
 
         Reglas obligatorias:
         Debe respetar los parámetros declarados en ruta o query: id. La cuenta autenticada debe tener privilegios administrativos suficientes para operar el recurso.
 
-        Resultado exitoso:
+        **Resultado exitoso**
         Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
 
-        Errores posibles:
+        **Errores posibles y causa funcional**
         Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
 
         Limitaciones actuales:
         La operación puede dejar trazabilidad administrativa o de auditoría según la implementación de servicios y modelos.
 
-        Estado contractual:
-        `ACTIVE`
+        **Estado contractual**
+        `KEEP_ACTIVE`
 
         Marco de cumplimiento profesional:
         - Punto de control contractual: `POST /api/admin/users/{id}/mfa/reset`.
@@ -4414,7 +4414,7 @@ paths:
                     msg: internal failure while processing api_admin_users_id_mfa_reset
                     error: server_error
           description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
-      x-contract-status: ACTIVE
+      x-contract-status: KEEP_ACTIVE
   /api/admin/audit-logs:
     get:
       tags:
