@@ -230,7 +230,7 @@ cognia_app/
 | Seguridad MFA | pyotp + cryptography + bcrypt | `2.9.0` / `43.0.1` / `4.1.3` |
 | Servidor prod | gunicorn | `23.0.0` |
 | Testing | pytest + coverage | `8.2.2` / `7.8.0` |
-| CI backend | compile/import sanity + pytest + docker build sanity | `.github/workflows/ci-backend.yml` |
+| CI backend | Ruff F-check + compile/import sanity + pytest + docker build sanity | `.github/workflows/ci-backend.yml` |
 
 ## 8. Prerrequisitos
 - Python 3.12.

@@ -391,3 +391,21 @@ Contexto metodológico:
   - `api/services/questionnaire_v2_loader_service.py` actualizado para defaults `*_freeze_v6_hotfix_v1`.
 - Claim permitido sin cambios:
   - evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-25) - development_branch_reconciliation_ops_v1
+- Se ejecuto auditoria completa de ramas remotas contra `origin/development` despues de `git fetch --all --prune`.
+- Rama base auditada antes de cambios: `origin/development` en `136a683`.
+- Reporte versionado: `docs/ops/development-branch-reconciliation-audit.md`.
+- Decision CI/CD:
+  - `ci-backend.yml` queda como unico CI backend autoritativo.
+  - `.github/workflows/ci.yml` se elimina como workflow legado/redundante.
+  - `ci-backend.yml` conserva compile/import sanity, `pytest -q`, docker build sanity y agrega Ruff F-check.
+- Decision deploy:
+  - `deploy-backend.yml` conserva rollback y `readyz`.
+  - Se agrega verificacion de `github.sha` contra `origin/development` antes de mutar checkout.
+  - Se reemplaza `docker compose up -d --build backend gateway` por rebuild de `backend` y recreacion forzada de `gateway`.
+  - Se agregan logs de `gateway` al cierre del job.
+- Validacion local detecto y corrigio una falla documental preexistente en `docs/openapi.yaml`, alineando tres operaciones admin y estados residuales health/readiness/metrics con el guardrail de contrato.
+- Verificacion final local: `pytest -q` => `149 passed, 3 skipped`.
+- No se promovieron ramas v6/v7 de modelado ni cambios amplios de startup/docs por estar fuera del alcance operativo seguro de esta reconciliacion.
+- Pendiente operativo: reactivar workflows en GitHub solo despues de revisar el diff final y, preferiblemente, ejecutar una corrida controlada del CI backend.

@@ -840,3 +840,31 @@ Integracion runtime:
   - `policy_violations=0`
 - Integracion loader/runtime:
   - defaults de `api/services/questionnaire_v2_loader_service.py` migrados a `*_freeze_v6_hotfix_v1`.
+
+## Actualizacion de sesion (2026-04-25) - development branch reconciliation ops v1
+Objetivo:
+- Auditar todas las ramas remotas del backend y sanear `development` en automatizacion CI/CD y operacion.
+
+Resultado:
+- Se auditaron ramas remotas contra `origin/development` con `git fetch --all --prune`.
+- Reporte versionado: `docs/ops/development-branch-reconciliation-audit.md`.
+
+Decisiones aplicadas:
+- `.github/workflows/ci.yml` eliminado como CI legado duplicado.
+- `.github/workflows/ci-backend.yml` queda como CI backend unico y autoritativo.
+- `ci-backend.yml` suma Ruff F-check manteniendo compile/import sanity, `pytest -q` y docker build sanity.
+- `.github/workflows/deploy-backend.yml` queda robustecido:
+  - verifica `github.sha` contra `origin/development`,
+  - reconstruye `backend`,
+  - recrea `gateway` con `--force-recreate`,
+  - mantiene `readyz` y rollback,
+  - publica logs de `backend` y `gateway`.
+- `docs/openapi.yaml` corregido para que tres operaciones admin cumplan secciones obligatorias y para normalizar estados residuales health/readiness/metrics a `x-contract-status=KEEP_ACTIVE`.
+- Verificacion final local: `pytest -q` => `149 passed, 3 skipped`.
+
+No aplicado:
+- No se consolidaron ramas v6/v7 de modelado en esta ventana; requieren decision metodologica separada.
+- No se agrego `.deploy/` porque no existe version auditada en ramas remotas.
+
+Pendiente:
+- Rehabilitar workflows en GitHub con una corrida controlada tras revisar el commit final.
