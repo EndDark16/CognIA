@@ -35,6 +35,10 @@ Nota de continuidad (2026-04-22):
   - Se versionaron `data/hybrid_operational_freeze_v6_hotfix_v1/` y `data/hybrid_active_modes_freeze_v6_hotfix_v1/`.
   - Resultado de auditoria guardia: `remaining_guard_violations=0` en las metricas vigiladas (`recall`, `specificity`, `roc_auc`, `pr_auc`).
   - La fuente operativa efectiva pasa a `*_freeze_v6_hotfix_v1`; `*_freeze_v6` queda historico para trazabilidad.
+- Nota de continuidad (2026-04-24, coherencia de confianza):
+  - Se normalizo la comunicacion de `confidence_band/confidence_pct` en `hybrid_active_modes_freeze_v6_hotfix_v1`.
+  - Resultado: `ACTIVE_HIGH_CONFIDENCE/high=1`, `ACTIVE_MODERATE_CONFIDENCE/moderate=14`, `ACTIVE_LIMITED_USE/limited=15`.
+  - No se cambiaron champions, metricas de modelo, inputs funcionales ni outputs funcionales.
 
 ## Registro en DB
 - `model_registry`: identidad por `active_model_id`.

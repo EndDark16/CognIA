@@ -401,3 +401,17 @@ Contexto metodológico:
   - `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_models_30_modes.csv`
   - `data/hybrid_operational_freeze_v6_hotfix_v1/tables/hybrid_operational_final_champions.csv`
 - Se actualizaron validaciones para tratar `v6_hotfix_v1` como linea activa en policy checks.
+
+## Actualizacion de estado (2026-04-24) - coherencia confidence/clase v6_hotfix_v1
+- Se auditaron los 30 champions activos reales cargados por `api/services/questionnaire_v2_loader_service.py`.
+- Resultado de guardrails en la linea activa real:
+  - `recall|specificity|roc_auc|pr_auc > 0.98`: `0` violadores.
+- Incoherencias encontradas:
+  - `12` filas con `ACTIVE_MODERATE_CONFIDENCE` y `confidence_band=high`.
+  - varias de esas filas tenian caveat metodologico (`secondary metric anomaly`, `mode fragility` o `stress sensitivity`), por lo que `high` era comunicacionalmente excesivo.
+- Correccion aplicada:
+  - `ACTIVE_MODERATE_CONFIDENCE` queda con `confidence_band=moderate` y `confidence_pct<=84.9`.
+  - `ACTIVE_LIMITED_USE` queda con `confidence_band=limited`.
+  - `ACTIVE_HIGH_CONFIDENCE` queda reservado para `confidence_band=high` sin caveat metodologico fuerte.
+- No se cambiaron `active_model_id`, metricas de modelo, inputs funcionales, outputs funcionales, `domain/mode/role` ni semantica operativa.
+- Summary final activa: `ACTIVE_HIGH_CONFIDENCE/high=1`, `ACTIVE_MODERATE_CONFIDENCE/moderate=14`, `ACTIVE_LIMITED_USE/limited=15`.

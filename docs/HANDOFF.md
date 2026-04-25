@@ -852,3 +852,18 @@ Integracion runtime:
 - Se mantiene framing metodologico:
   - screening/apoyo profesional en entorno simulado.
   - no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-24) - coherencia confidence/clase v6_hotfix_v1
+- Auditoria inicial de linea activa real (segun loader v2):
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_operational_freeze_v6_hotfix_v1/tables/hybrid_operational_final_champions.csv`
+- Guardrails duros:
+  - `0` champions activos con `recall|specificity|roc_auc|pr_auc > 0.98`.
+- Incoherencias corregidas:
+  - `12` filas `ACTIVE_MODERATE_CONFIDENCE` con `confidence_band=high`.
+- Politica comunicacional aplicada:
+  - `ACTIVE_MODERATE_CONFIDENCE -> confidence_band=moderate`.
+  - `ACTIVE_LIMITED_USE -> confidence_band=limited`.
+  - `ACTIVE_HIGH_CONFIDENCE -> confidence_band=high` solo sin caveat metodologico fuerte.
+- No hubo reemplazo de champions ni reentrenamiento en esta ventana porque la hotfix real ya no tenia violadores.
+- Se actualizaron `README.md`, `docs/traceability_map.md`, `docs/model_registry_and_inference.md` y `docs/hybrid_operational_classification_policy_v1.md` para alinear fuente activa y confianza.

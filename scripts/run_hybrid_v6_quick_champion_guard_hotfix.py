@@ -897,6 +897,21 @@ def main() -> None:
             op_class = "ACTIVE_MODERATE_CONFIDENCE"
         else:
             op_class = "ACTIVE_LOW_CONFIDENCE"
+
+        # Communication bands must not overstate the operational class.
+        if op_class == "ACTIVE_LIMITED_USE":
+            score = min(score, 59.0)
+            band = "limited"
+        elif op_class == "ACTIVE_LOW_CONFIDENCE":
+            score = min(max(score, 60.0), 69.9)
+            band = "low"
+        elif op_class == "ACTIVE_MODERATE_CONFIDENCE":
+            score = min(max(score, 70.0), 84.9)
+            band = "moderate"
+        elif op_class == "ACTIVE_HIGH_CONFIDENCE":
+            score = max(85.0, min(score, 98.0))
+            band = "high"
+
         active_new.loc[i, "confidence_pct"] = round(score, 1)
         active_new.loc[i, "confidence_band"] = band
         active_new.loc[i, "final_operational_class"] = op_class
