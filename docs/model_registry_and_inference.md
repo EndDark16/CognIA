@@ -1,10 +1,10 @@
-# Model Registry and Inference (v6)
+# Model Registry and Inference (v6_hotfix_v1)
 
 ## Fuente de verdad
-- `data/hybrid_active_modes_freeze_v6/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_active_modes_freeze_v6/tables/hybrid_active_modes_summary.csv`
-- `data/hybrid_active_modes_freeze_v6/tables/hybrid_questionnaire_inputs_master.csv`
-- `data/hybrid_operational_freeze_v6/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v6_hotfix_v1/tables/hybrid_operational_final_champions.csv`
 
 Nota de continuidad (2026-04-22):
 - Se ejecuto la linea `hybrid_secondary_honest_retrain_v1` y se versionaron:
@@ -30,6 +30,15 @@ Nota de continuidad (2026-04-22):
   - Se recalculo `confidence_pct/confidence_band/final_operational_class` para los 30 slots bajo politica normalizada.
   - Se genero normalizacion v2 en `data/hybrid_classification_normalization_v2/` con `policy_violations=0`.
   - La fuente operativa efectiva pasa a `*_freeze_v6`.
+- Nota de continuidad (2026-04-24, cierre guardia dura):
+  - Se aplico `hybrid_v6_quick_champion_guard_hotfix_v1` sobre `v6`.
+  - Se versionaron `data/hybrid_operational_freeze_v6_hotfix_v1/` y `data/hybrid_active_modes_freeze_v6_hotfix_v1/`.
+  - Resultado de auditoria guardia: `remaining_guard_violations=0` en las metricas vigiladas (`recall`, `specificity`, `roc_auc`, `pr_auc`).
+  - La fuente operativa efectiva pasa a `*_freeze_v6_hotfix_v1`; `*_freeze_v6` queda historico para trazabilidad.
+- Nota de continuidad (2026-04-24, coherencia de confianza):
+  - Se normalizo la comunicacion de `confidence_band/confidence_pct` en `hybrid_active_modes_freeze_v6_hotfix_v1`.
+  - Resultado: `ACTIVE_HIGH_CONFIDENCE/high=1`, `ACTIVE_MODERATE_CONFIDENCE/moderate=14`, `ACTIVE_LIMITED_USE/limited=15`.
+  - No se cambiaron champions, metricas de modelo, inputs funcionales ni outputs funcionales.
 
 ## Registro en DB
 - `model_registry`: identidad por `active_model_id`.
