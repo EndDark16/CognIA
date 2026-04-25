@@ -58,15 +58,16 @@ Checks recomendados para branch protection:
 ```bash
 cd /opt/cognia/backend
 git fetch origin development
-git checkout development
-git reset --hard origin/development
+git checkout -B development <github.sha>
+git reset --hard <github.sha>
 ```
 
 4. Reconstruye y levanta stack de servicios requeridos:
 
 ```bash
 cd /opt/cognia
-docker compose up -d --build backend gateway
+docker compose up -d --build backend
+docker compose up -d --force-recreate gateway
 ```
 
 5. Verifica readiness real contra:
@@ -77,12 +78,13 @@ curl -fsS http://localhost/readyz
 
 6. Si el readyz falla, ejecuta rollback automatico basico:
 - `git reset --hard <previous_sha>` en `/opt/cognia/backend`.
-- vuelve a correr `docker compose up -d --build backend gateway`.
+- vuelve a correr `docker compose up -d --build backend` y `docker compose up -d --force-recreate gateway`.
 - reintenta `http://localhost/readyz`.
 
 7. Siempre publica evidencia operativa al final:
 - `docker compose ps`
 - logs recientes de `backend`.
+- logs recientes de `gateway`.
 
 Nota:
 - Si el rollback logra recuperar servicio, el job igual queda en fallo para dejar evidencia explicita de que el commit nuevo no quedo activo.
@@ -116,7 +118,8 @@ cd /opt/cognia/backend
 git log --oneline -n 20
 git reset --hard <commit_anterior_estable>
 cd /opt/cognia
-docker compose up -d --build backend gateway
+docker compose up -d --build backend
+docker compose up -d --force-recreate gateway
 curl -fsS http://localhost/readyz
 ```
 

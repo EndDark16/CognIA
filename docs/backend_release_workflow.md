@@ -31,11 +31,11 @@ Referencia base: `CONTRIBUTING.md`.
 - CI principal (siempre disponible): `.github/workflows/ci-backend.yml`
   - Runner: `ubuntu-latest` (GitHub-hosted)
   - Trigger: pushes/PR sobre `development` y `main`
-  - Validaciones: compile sanity, import sanity, `pytest -q`, docker build sanity
+  - Validaciones: Ruff F-check, compile sanity, import sanity, `pytest -q`, docker build sanity
 - Deploy backend Ubuntu (best effort): `.github/workflows/deploy-backend.yml`
   - Runner: `[self-hosted, linux, x64, cognia-backend]`
   - Trigger: push a `development` + `workflow_dispatch`
-  - Comportamiento: update repo en `/opt/cognia/backend`, `docker compose up -d --build backend gateway`, verificacion `http://localhost/readyz`, rollback automatico basico si falla el post-deploy healthcheck.
+  - Comportamiento: update verificado de repo en `/opt/cognia/backend` contra `github.sha`, `docker compose up -d --build backend`, recreacion forzada de `gateway`, verificacion `http://localhost/readyz`, rollback automatico basico si falla el post-deploy healthcheck.
 
 Regla operativa obligatoria:
 - `deploy-backend` NO debe configurarse como required check en branch protection.
