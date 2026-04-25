@@ -15,6 +15,7 @@ DATA_BASE = ROOT / "data" / "hybrid_classification_normalization_v2"
 SHORTCUT_INV = ROOT / "data" / "hybrid_secondary_honest_retrain_v1" / "tables" / "non_conduct_suspect_inventory.csv"
 SHORTCUT_INV_V5 = ROOT / "data" / "hybrid_final_decisive_rescue_v5" / "tables" / "shortcut_inventory_v5.csv"
 SHORTCUT_INV_V6 = ROOT / "data" / "hybrid_final_aggressive_rescue_v6" / "tables" / "shortcut_inventory_v6.csv"
+SHORTCUT_INV_V6_HOTFIX = ROOT / "data" / "hybrid_v6_quick_champion_guard_hotfix_v1" / "tables" / "shortcut_inventory_v6_hotfix_v1.csv"
 
 LINES = [
     (
@@ -38,9 +39,9 @@ LINES = [
         ROOT / "data" / "hybrid_active_modes_freeze_v5" / "tables" / "hybrid_active_models_30_modes.csv",
     ),
     (
-        "v6",
-        ROOT / "data" / "hybrid_operational_freeze_v6" / "tables" / "hybrid_operational_final_champions.csv",
-        ROOT / "data" / "hybrid_active_modes_freeze_v6" / "tables" / "hybrid_active_models_30_modes.csv",
+        "v6_hotfix_v1",
+        ROOT / "data" / "hybrid_operational_freeze_v6_hotfix_v1" / "tables" / "hybrid_operational_final_champions.csv",
+        ROOT / "data" / "hybrid_active_modes_freeze_v6_hotfix_v1" / "tables" / "hybrid_active_models_30_modes.csv",
     ),
 ]
 
@@ -62,12 +63,16 @@ def main() -> int:
                 operational_csv=op_csv,
                 active_csv=active_csv,
                 shortcut_inventory_csv=(
-                    SHORTCUT_INV_V6
-                    if label == "v6" and SHORTCUT_INV_V6.exists()
+                    SHORTCUT_INV_V6_HOTFIX
+                    if label == "v6_hotfix_v1" and SHORTCUT_INV_V6_HOTFIX.exists()
                     else (
-                        SHORTCUT_INV_V5
-                        if label == "v5" and SHORTCUT_INV_V5.exists()
-                        else (SHORTCUT_INV if SHORTCUT_INV.exists() else None)
+                        SHORTCUT_INV_V6
+                        if label == "v6" and SHORTCUT_INV_V6.exists()
+                        else (
+                            SHORTCUT_INV_V5
+                            if label == "v5" and SHORTCUT_INV_V5.exists()
+                            else (SHORTCUT_INV if SHORTCUT_INV.exists() else None)
+                        )
                     )
                 ),
             )

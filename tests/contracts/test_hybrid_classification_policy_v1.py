@@ -11,20 +11,22 @@ from api.services.hybrid_classification_policy_v1 import PolicyInputs, build_nor
 
 ROOT = Path(PROJECT_ROOT)
 SHORTCUT_INV = ROOT / "data" / "hybrid_secondary_honest_retrain_v1" / "tables" / "non_conduct_suspect_inventory.csv"
+SHORTCUT_INV_V6_HOTFIX = ROOT / "data" / "hybrid_v6_quick_champion_guard_hotfix_v1" / "tables" / "shortcut_inventory_v6_hotfix_v1.csv"
 
 
 def _line_inputs() -> list[PolicyInputs]:
     lines: list[PolicyInputs] = []
-    for label in ["v2", "v3", "v4", "v5"]:
+    for label in ["v2", "v3", "v4", "v5", "v6_hotfix_v1"]:
         op = ROOT / "data" / f"hybrid_operational_freeze_{label}" / "tables" / "hybrid_operational_final_champions.csv"
         active = ROOT / "data" / f"hybrid_active_modes_freeze_{label}" / "tables" / "hybrid_active_models_30_modes.csv"
         if not op.exists() or not active.exists():
             continue
+        shortcut_inv = SHORTCUT_INV_V6_HOTFIX if label == "v6_hotfix_v1" else SHORTCUT_INV
         lines.append(
             PolicyInputs(
                 operational_csv=op,
                 active_csv=active,
-                shortcut_inventory_csv=SHORTCUT_INV if SHORTCUT_INV.exists() else None,
+                shortcut_inventory_csv=shortcut_inv if shortcut_inv.exists() else None,
             )
         )
     return lines

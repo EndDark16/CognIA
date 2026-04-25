@@ -841,6 +841,34 @@ Integracion runtime:
 - Integracion loader/runtime:
   - defaults de `api/services/questionnaire_v2_loader_service.py` migrados a `*_freeze_v6_hotfix_v1`.
 
+
+## Actualizacion de estado (2026-04-24) - cierre operativo guardia dura v6_hotfix_v1
+- Se verifico estado real de violaciones en lineas `v6` y `v6_hotfix_v1` antes de cierre:
+  - `v6`: `16` violadores.
+  - `v6_hotfix_v1`: `0` violadores.
+- Se confirma `v6_hotfix_v1` como fuente operativa efectiva de champions activos (no `v6`).
+- Se alineo validacion contractual para evaluar la linea activa `v6_hotfix_v1`:
+  - `scripts/validate_hybrid_classification_policy_v1.py`
+  - `tests/contracts/test_hybrid_classification_policy_v1.py`
+- Se mantiene framing metodologico:
+  - screening/apoyo profesional en entorno simulado.
+  - no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-24) - coherencia confidence/clase v6_hotfix_v1
+- Auditoria inicial de linea activa real (segun loader v2):
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_operational_freeze_v6_hotfix_v1/tables/hybrid_operational_final_champions.csv`
+- Guardrails duros:
+  - `0` champions activos con `recall|specificity|roc_auc|pr_auc > 0.98`.
+- Incoherencias corregidas:
+  - `12` filas `ACTIVE_MODERATE_CONFIDENCE` con `confidence_band=high`.
+- Politica comunicacional aplicada:
+  - `ACTIVE_MODERATE_CONFIDENCE -> confidence_band=moderate`.
+  - `ACTIVE_LIMITED_USE -> confidence_band=limited`.
+  - `ACTIVE_HIGH_CONFIDENCE -> confidence_band=high` solo sin caveat metodologico fuerte.
+- No hubo reemplazo de champions ni reentrenamiento en esta ventana porque la hotfix real ya no tenia violadores.
+- Se actualizaron `README.md`, `docs/traceability_map.md`, `docs/model_registry_and_inference.md` y `docs/hybrid_operational_classification_policy_v1.md` para alinear fuente activa y confianza.
+
 ## Actualizacion de sesion (2026-04-25) - development branch reconciliation ops v1
 Objetivo:
 - Auditar todas las ramas remotas del backend y sanear `development` en automatizacion CI/CD y operacion.
