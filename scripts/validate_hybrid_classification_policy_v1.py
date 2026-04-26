@@ -16,6 +16,7 @@ SHORTCUT_INV = ROOT / "data" / "hybrid_secondary_honest_retrain_v1" / "tables" /
 SHORTCUT_INV_V5 = ROOT / "data" / "hybrid_final_decisive_rescue_v5" / "tables" / "shortcut_inventory_v5.csv"
 SHORTCUT_INV_V6 = ROOT / "data" / "hybrid_final_aggressive_rescue_v6" / "tables" / "shortcut_inventory_v6.csv"
 SHORTCUT_INV_V6_HOTFIX = ROOT / "data" / "hybrid_v6_quick_champion_guard_hotfix_v1" / "tables" / "shortcut_inventory_v6_hotfix_v1.csv"
+SHORTCUT_INV_V8 = ROOT / "data" / "hybrid_structural_mode_rescue_v1" / "tables" / "shortcut_inventory_structural_mode_rescue_v1.csv"
 
 LINES = [
     (
@@ -43,7 +44,24 @@ LINES = [
         ROOT / "data" / "hybrid_operational_freeze_v6_hotfix_v1" / "tables" / "hybrid_operational_final_champions.csv",
         ROOT / "data" / "hybrid_active_modes_freeze_v6_hotfix_v1" / "tables" / "hybrid_active_models_30_modes.csv",
     ),
+    (
+        "v8",
+        ROOT / "data" / "hybrid_operational_freeze_v8" / "tables" / "hybrid_operational_final_champions.csv",
+        ROOT / "data" / "hybrid_active_modes_freeze_v8" / "tables" / "hybrid_active_models_30_modes.csv",
+    ),
 ]
+
+
+def _shortcut_inventory_for(label: str) -> Path | None:
+    if label == "v8" and SHORTCUT_INV_V8.exists():
+        return SHORTCUT_INV_V8
+    if label == "v6_hotfix_v1" and SHORTCUT_INV_V6_HOTFIX.exists():
+        return SHORTCUT_INV_V6_HOTFIX
+    if label == "v6" and SHORTCUT_INV_V6.exists():
+        return SHORTCUT_INV_V6
+    if label == "v5" and SHORTCUT_INV_V5.exists():
+        return SHORTCUT_INV_V5
+    return SHORTCUT_INV if SHORTCUT_INV.exists() else None
 
 
 def main() -> int:
@@ -62,25 +80,13 @@ def main() -> int:
             PolicyInputs(
                 operational_csv=op_csv,
                 active_csv=active_csv,
-                shortcut_inventory_csv=(
-                    SHORTCUT_INV_V6_HOTFIX
-                    if label == "v6_hotfix_v1" and SHORTCUT_INV_V6_HOTFIX.exists()
-                    else (
-                        SHORTCUT_INV_V6
-                        if label == "v6" and SHORTCUT_INV_V6.exists()
-                        else (
-                            SHORTCUT_INV_V5
-                            if label == "v5" and SHORTCUT_INV_V5.exists()
-                            else (SHORTCUT_INV if SHORTCUT_INV.exists() else None)
-                        )
-                    )
-                ),
+                shortcut_inventory_csv=_shortcut_inventory_for(label),
             )
         )
         violations = policy_violations(normalized)
         details[label] = int(len(violations))
         violations_total += int(len(violations))
-        violations.to_csv(output_dir / f"hybrid_classification_policy_violations_{label}.csv", index=False)
+        violations.to_csv(output_dir / f"hybrid_classification_policy_violations_{label}.csv", index=False, lineterminator="\n")
 
     payload = {
         "lines_checked": lines_checked,

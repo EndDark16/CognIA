@@ -1,10 +1,10 @@
-# Model Registry and Inference (v6_hotfix_v1)
+# Model Registry and Inference (v8)
 
 ## Fuente de verdad
-- `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_modes_summary.csv`
-- `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_questionnaire_inputs_master.csv`
-- `data/hybrid_operational_freeze_v6_hotfix_v1/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v8/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v8/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v8/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v8/tables/hybrid_operational_final_champions.csv`
 
 Nota de continuidad (2026-04-22):
 - Se ejecuto la linea `hybrid_secondary_honest_retrain_v1` y se versionaron:
@@ -39,6 +39,14 @@ Nota de continuidad (2026-04-22):
   - Se normalizo la comunicacion de `confidence_band/confidence_pct` en `hybrid_active_modes_freeze_v6_hotfix_v1`.
   - Resultado: `ACTIVE_HIGH_CONFIDENCE/high=1`, `ACTIVE_MODERATE_CONFIDENCE/moderate=14`, `ACTIVE_LIMITED_USE/limited=15`.
   - No se cambiaron champions, metricas de modelo, inputs funcionales ni outputs funcionales.
+
+- Nota de continuidad (2026-04-26, structural mode rescue v1):
+  - Se ejecuto `hybrid_structural_mode_rescue_v1` sobre la linea activa real `v6_hotfix_v1`.
+  - Se versionaron `data/hybrid_operational_freeze_v8/` y `data/hybrid_active_modes_freeze_v8/`.
+  - Se reemplazaron los 14 champions 1_3/2_3 prohibidos por modelos estructurales reentrenados; `accepted_existing_fallbacks=0`.
+  - Se aplicaron 3 rescates extra por degeneracion estructural de una sola variable: `anxiety/psychologist_full`, `elimination/caregiver_full` y `elimination/psychologist_full`.
+  - Elimination queda en subsets estructurales `structural_ranked` para sus 6 modos (42/84/126 features en caregiver y 50/101/151 en psychologist). Resultado de cierre: `blacklisted_active_final=0`, `structural_extra_rescue_final=0`, `single_feature_active_final=0`, `guardrail_violations_final=0`, `policy_violations_final=0`.
+  - La fuente operativa efectiva pasa a `*_freeze_v8`; `*_freeze_v6_hotfix_v1` queda historico para trazabilidad. Summary final activa: `ACTIVE_HIGH_CONFIDENCE/high=1`, `ACTIVE_MODERATE_CONFIDENCE/moderate=9`, `ACTIVE_LIMITED_USE/limited=20`.
 
 ## Registro en DB
 - `model_registry`: identidad por `active_model_id`.
