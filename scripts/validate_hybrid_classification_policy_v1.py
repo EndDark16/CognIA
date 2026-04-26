@@ -18,47 +18,14 @@ SHORTCUT_INV_V6 = ROOT / "data" / "hybrid_final_aggressive_rescue_v6" / "tables"
 SHORTCUT_INV_V6_HOTFIX = ROOT / "data" / "hybrid_v6_quick_champion_guard_hotfix_v1" / "tables" / "shortcut_inventory_v6_hotfix_v1.csv"
 SHORTCUT_INV_V8 = ROOT / "data" / "hybrid_structural_mode_rescue_v1" / "tables" / "shortcut_inventory_structural_mode_rescue_v1.csv"
 SHORTCUT_INV_V9 = ROOT / "data" / "hybrid_elimination_structural_audit_rescue_v1" / "tables" / "shortcut_inventory_elimination_structural_audit_rescue_v1.csv"
+SHORTCUT_INV_V10 = ROOT / "data" / "hybrid_final_model_structural_compliance_v1" / "tables" / "shortcut_inventory_final_model_structural_compliance_v1.csv"
 
-LINES = [
-    (
-        "v2",
-        ROOT / "data" / "hybrid_operational_freeze_v2" / "tables" / "hybrid_operational_final_champions.csv",
-        ROOT / "data" / "hybrid_active_modes_freeze_v2" / "tables" / "hybrid_active_models_30_modes.csv",
-    ),
-    (
-        "v3",
-        ROOT / "data" / "hybrid_operational_freeze_v3" / "tables" / "hybrid_operational_final_champions.csv",
-        ROOT / "data" / "hybrid_active_modes_freeze_v3" / "tables" / "hybrid_active_models_30_modes.csv",
-    ),
-    (
-        "v4",
-        ROOT / "data" / "hybrid_operational_freeze_v4" / "tables" / "hybrid_operational_final_champions.csv",
-        ROOT / "data" / "hybrid_active_modes_freeze_v4" / "tables" / "hybrid_active_models_30_modes.csv",
-    ),
-    (
-        "v5",
-        ROOT / "data" / "hybrid_operational_freeze_v5" / "tables" / "hybrid_operational_final_champions.csv",
-        ROOT / "data" / "hybrid_active_modes_freeze_v5" / "tables" / "hybrid_active_models_30_modes.csv",
-    ),
-    (
-        "v6_hotfix_v1",
-        ROOT / "data" / "hybrid_operational_freeze_v6_hotfix_v1" / "tables" / "hybrid_operational_final_champions.csv",
-        ROOT / "data" / "hybrid_active_modes_freeze_v6_hotfix_v1" / "tables" / "hybrid_active_models_30_modes.csv",
-    ),
-    (
-        "v8",
-        ROOT / "data" / "hybrid_operational_freeze_v8" / "tables" / "hybrid_operational_final_champions.csv",
-        ROOT / "data" / "hybrid_active_modes_freeze_v8" / "tables" / "hybrid_active_models_30_modes.csv",
-    ),
-    (
-        "v9",
-        ROOT / "data" / "hybrid_operational_freeze_v9" / "tables" / "hybrid_operational_final_champions.csv",
-        ROOT / "data" / "hybrid_active_modes_freeze_v9" / "tables" / "hybrid_active_models_30_modes.csv",
-    ),
-]
+LABELS = ["v2", "v3", "v4", "v5", "v6_hotfix_v1", "v8", "v9", "v10"]
 
 
 def _shortcut_inventory_for(label: str) -> Path | None:
+    if label == "v10" and SHORTCUT_INV_V10.exists():
+        return SHORTCUT_INV_V10
     if label == "v9" and SHORTCUT_INV_V9.exists():
         return SHORTCUT_INV_V9
     if label == "v8" and SHORTCUT_INV_V8.exists():
@@ -72,15 +39,22 @@ def _shortcut_inventory_for(label: str) -> Path | None:
     return SHORTCUT_INV if SHORTCUT_INV.exists() else None
 
 
+def _line_paths(label: str) -> tuple[Path, Path]:
+    return (
+        ROOT / "data" / f"hybrid_operational_freeze_{label}" / "tables" / "hybrid_operational_final_champions.csv",
+        ROOT / "data" / f"hybrid_active_modes_freeze_{label}" / "tables" / "hybrid_active_models_30_modes.csv",
+    )
+
+
 def main() -> int:
     output_dir = DATA_BASE / "validation"
     output_dir.mkdir(parents=True, exist_ok=True)
-
     violations_total = 0
     lines_checked = 0
     details: dict[str, int] = {}
 
-    for label, op_csv, active_csv in LINES:
+    for label in LABELS:
+        op_csv, active_csv = _line_paths(label)
         if not op_csv.exists() or not active_csv.exists():
             continue
         lines_checked += 1
@@ -96,15 +70,9 @@ def main() -> int:
         violations_total += int(len(violations))
         violations.to_csv(output_dir / f"hybrid_classification_policy_violations_{label}.csv", index=False, lineterminator="\n")
 
-    payload = {
-        "lines_checked": lines_checked,
-        "violation_count": violations_total,
-        "per_line": details,
-    }
+    payload = {"lines_checked": lines_checked, "violation_count": violations_total, "per_line": details}
     print(json.dumps(payload, ensure_ascii=False))
-    if violations_total > 0:
-        return 1
-    return 0
+    return 1 if violations_total > 0 else 0
 
 
 if __name__ == "__main__":

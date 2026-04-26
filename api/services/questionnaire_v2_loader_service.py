@@ -49,10 +49,10 @@ DEFAULT_DEFINITION_NAME = "Cuestionario operacional v16.4"
 DEFAULT_VERSION_LABEL = "v16.4"
 DEFAULT_SOURCE_DIR = Path("data") / "cuestionario_v16.4"
 
-DEFAULT_ACTIVE_MODELS = Path("data") / "hybrid_active_modes_freeze_v9" / "tables" / "hybrid_active_models_30_modes.csv"
-DEFAULT_ACTIVE_SUMMARY = Path("data") / "hybrid_active_modes_freeze_v9" / "tables" / "hybrid_active_modes_summary.csv"
-DEFAULT_INPUTS_MASTER = Path("data") / "hybrid_active_modes_freeze_v9" / "tables" / "hybrid_questionnaire_inputs_master.csv"
-DEFAULT_OPERATIONAL_CHAMPIONS = Path("data") / "hybrid_operational_freeze_v9" / "tables" / "hybrid_operational_final_champions.csv"
+DEFAULT_ACTIVE_MODELS = Path("data") / "hybrid_active_modes_freeze_v10" / "tables" / "hybrid_active_models_30_modes.csv"
+DEFAULT_ACTIVE_SUMMARY = Path("data") / "hybrid_active_modes_freeze_v10" / "tables" / "hybrid_active_modes_summary.csv"
+DEFAULT_INPUTS_MASTER = Path("data") / "hybrid_active_modes_freeze_v10" / "tables" / "hybrid_questionnaire_inputs_master.csv"
+DEFAULT_OPERATIONAL_CHAMPIONS = Path("data") / "hybrid_operational_freeze_v10" / "tables" / "hybrid_operational_final_champions.csv"
 
 
 def _utcnow() -> datetime:
@@ -461,6 +461,24 @@ def sync_active_models() -> dict[str, Any]:
         mode_key = _normalize_text(row.get("mode"))
         role = _normalize_role(row.get("role"))
 
+        # A mode already encodes the respondent side (`caregiver_*` or
+        # `psychologist_*`). Clear the whole domain/mode slot so historical
+        # rows that used the pre-normalized `caregiver` role cannot remain
+        # active next to the current canonical `guardian` row.
+        stale_registries = ModelRegistry.query.filter_by(domain=domain, mode_key=mode_key).all()
+        for stale_registry in stale_registries:
+            stale_registry.is_active = False
+            stale_registry.updated_at = _utcnow()
+            db.session.add(stale_registry)
+            ModelVersion.query.filter_by(model_registry_id=stale_registry.id).update(
+                {"is_active": False, "updated_at": _utcnow()},
+                synchronize_session=False,
+            )
+        ModelModeDomainActivation.query.filter_by(
+            domain=domain,
+            mode_key=mode_key,
+        ).delete(synchronize_session=False)
+
         registry = ModelRegistry.query.filter_by(model_key=model_key).first()
         if not registry:
             registry = ModelRegistry(model_key=model_key)
@@ -491,8 +509,14 @@ def sync_active_models() -> dict[str, Any]:
         version.threshold = _to_float(row.get("threshold"))
         version.seed = _normalize_text(row.get("seed")) or None
         version.n_features = int(_to_float(row.get("n_features")) or 0) or None
+        feature_columns = [
+            item.strip()
+            for item in str(row.get("feature_list_pipe") or "").split("|")
+            if item.strip() and item.strip().lower() != "nan"
+        ]
         version.metadata_json = {
             "source_csv": str(DEFAULT_ACTIVE_MODELS),
+            "feature_columns": feature_columns,
             "notes": _normalize_text(row.get("notes")) or None,
             "por_confirmar": artifact_path is None,
         }
@@ -500,15 +524,6 @@ def sync_active_models() -> dict[str, Any]:
         version.updated_at = _utcnow()
         db.session.add(version)
         db.session.flush()
-
-        # Keep sync idempotent: replace prior rows for this domain/mode/role tuple
-        # instead of toggling to false, because the table has unique constraints on
-        # (domain, mode_key, role, active_flag) and can otherwise collide on reruns.
-        ModelModeDomainActivation.query.filter_by(
-            domain=domain,
-            mode_key=mode_key,
-            role=role,
-        ).delete(synchronize_session=False)
 
         activation = ModelModeDomainActivation(
             domain=domain,

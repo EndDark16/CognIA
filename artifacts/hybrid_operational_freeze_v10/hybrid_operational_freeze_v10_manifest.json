@@ -1,0 +1,27 @@
+{
+  "line": "hybrid_final_model_structural_compliance_v1",
+  "freeze_label": "v10",
+  "generated_at_utc": "2026-04-26T20:45:01.754565+00:00",
+  "source_truth_previous": {
+    "active": "data\\hybrid_active_modes_freeze_v9\\tables\\hybrid_active_models_30_modes.csv",
+    "operational": "data\\hybrid_operational_freeze_v9\\tables\\hybrid_operational_final_champions.csv"
+  },
+  "source_truth_new": {
+    "active": "data\\hybrid_active_modes_freeze_v10\\tables\\hybrid_active_models_30_modes.csv",
+    "operational": "data\\hybrid_operational_freeze_v10\\tables\\hybrid_operational_final_champions.csv",
+    "questionnaire_visible": "data\\cuestionario_v16.4\\questionnaire_v16_4_visible_questions_excel_utf8.csv"
+  },
+  "stats": {
+    "initial_guardrail_violations": 0,
+    "target_slots_for_retrain": 20,
+    "trials": 640,
+    "selected_promotions": 5,
+    "retained_after_retrain_attempt": 15,
+    "remaining_guardrail_violations": 0,
+    "policy_violations": 0,
+    "question_text_changes": 0,
+    "questionnaire_mode_flag_changes": 100,
+    "anti_clone_reverted_promotions": 3
+  },
+  "artifact": "hybrid_operational_freeze_v10"
+}
