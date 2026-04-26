@@ -1,4 +1,4 @@
-# Traceability Map
+﻿# Traceability Map
 
 ## Objective
 Provide a single map for campaign/versioned artifacts so teams can find source-of-truth without guessing folder intent.
@@ -44,11 +44,11 @@ Where:
 
 ### Model activation and champions
 - Active 30-mode activation:
-  - `data/hybrid_active_modes_freeze_v9/`
-  - `artifacts/hybrid_active_modes_freeze_v9/`
+  - `data/hybrid_active_modes_freeze_v10/`
+  - `artifacts/hybrid_active_modes_freeze_v10/`
 - Operational champions:
-  - `data/hybrid_operational_freeze_v9/`
-  - `artifacts/hybrid_operational_freeze_v9/`
+  - `data/hybrid_operational_freeze_v10/`
+  - `artifacts/hybrid_operational_freeze_v10/`
 
 Audit lines:
 - `data/hybrid_secondary_honest_retrain_v1/`
@@ -58,6 +58,7 @@ Audit lines:
 - `data/hybrid_v6_quick_champion_guard_hotfix_v1/`
 - `data/hybrid_structural_mode_rescue_v1/`
 - `data/hybrid_elimination_structural_audit_rescue_v1/`
+- `data/hybrid_final_model_structural_compliance_v1/`
 - `data/hybrid_operational_freeze_v3/`
 - `data/hybrid_operational_freeze_v4/`
 - `data/hybrid_operational_freeze_v5/`
@@ -65,6 +66,7 @@ Audit lines:
 - `data/hybrid_operational_freeze_v6_hotfix_v1/`
 - `data/hybrid_operational_freeze_v8/`
 - `data/hybrid_operational_freeze_v9/`
+- `data/hybrid_operational_freeze_v10/`
 - `data/hybrid_active_modes_freeze_v3/`
 - `data/hybrid_active_modes_freeze_v4/`
 - `data/hybrid_active_modes_freeze_v5/`
@@ -72,6 +74,7 @@ Audit lines:
 - `data/hybrid_active_modes_freeze_v6_hotfix_v1/`
 - `data/hybrid_active_modes_freeze_v8/`
 - `data/hybrid_active_modes_freeze_v9/`
+- `data/hybrid_active_modes_freeze_v10/`
 - `artifacts/hybrid_secondary_honest_retrain_v1/`
 - `artifacts/hybrid_final_honest_improvement_v1/`
 - `artifacts/hybrid_final_decisive_rescue_v5/`
@@ -79,6 +82,7 @@ Audit lines:
 - `artifacts/hybrid_v6_quick_champion_guard_hotfix_v1/`
 - `artifacts/hybrid_structural_mode_rescue_v1/`
 - `artifacts/hybrid_elimination_structural_audit_rescue_v1/`
+- `artifacts/hybrid_final_model_structural_compliance_v1/`
 - `artifacts/hybrid_operational_freeze_v3/`
 - `artifacts/hybrid_operational_freeze_v4/`
 - `artifacts/hybrid_operational_freeze_v5/`
@@ -86,6 +90,7 @@ Audit lines:
 - `artifacts/hybrid_operational_freeze_v6_hotfix_v1/`
 - `artifacts/hybrid_operational_freeze_v8/`
 - `artifacts/hybrid_operational_freeze_v9/`
+- `artifacts/hybrid_operational_freeze_v10/`
 - `artifacts/hybrid_active_modes_freeze_v3/`
 - `artifacts/hybrid_active_modes_freeze_v4/`
 - `artifacts/hybrid_active_modes_freeze_v5/`
@@ -93,6 +98,7 @@ Audit lines:
 - `artifacts/hybrid_active_modes_freeze_v6_hotfix_v1/`
 - `artifacts/hybrid_active_modes_freeze_v8/`
 - `artifacts/hybrid_active_modes_freeze_v9/`
+- `artifacts/hybrid_active_modes_freeze_v10/`
 - Estado (2026-04-21): evidencia versionada de auditoria secundaria con `replaced_pairs=0`.
 - Estado (2026-04-22): campana `hybrid_final_honest_improvement_v1` con `replaced_pairs=9` desplaza la fuente operativa a `*_freeze_v4`.
 - Estado (2026-04-22): campana final decisiva `hybrid_final_decisive_rescue_v5` con `replaced_pairs=1` desplaza la fuente operativa a `*_freeze_v5`.
@@ -100,6 +106,7 @@ Audit lines:
 - Estado (2026-04-24): hotfix `hybrid_v6_quick_champion_guard_hotfix_v1` deja `remaining_guard_violations=0` y desplaza la fuente operativa a `*_freeze_v6_hotfix_v1`.
 - Estado (2026-04-26): `hybrid_structural_mode_rescue_v1` reemplaza los 14 champions 1_3/2_3 prohibidos y 3 champions extra degenerados de una sola variable, deja `blacklisted_active_final=0`, `structural_extra_rescue_final=0`, `single_feature_active_final=0`, `guardrail_violations_final=0`, `policy_violations_final=0` y desplaza la fuente operativa a `*_freeze_v8`.
 - Estado (2026-04-26): `hybrid_elimination_structural_audit_rescue_v1` reentrena los 6 slots Elimination, elimina el clonado (`old_prediction_pairs_identical=15/15` a `new_prediction_pairs_identical=0/15`), deja `guardrail_violations_final=0`, `policy_violations_final=0` y desplaza la fuente operativa a `*_freeze_v9`.
+- Estado (2026-04-26): `hybrid_final_model_structural_compliance_v1` ejecuta retrain focal de 20 slots sobre v9, promueve 5 champions, revierte 3 challengers Elimination por anti-clonado, deja `guardrail_violations_final=0`, `policy_violations_final=0` y desplaza la fuente operativa a `*_freeze_v10`.
 
 Historical lines retained for traceability:
 - `data/hybrid_active_modes_freeze_v1/`
