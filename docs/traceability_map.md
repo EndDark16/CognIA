@@ -30,6 +30,7 @@ Where:
   - `docs/questionnaire_backend_architecture.md`
   - `docs/auth_mfa_recovery_flow_and_endpoint_versioning_20260421.md`
   - `docs/backend_gap_matrix_20260422.md`
+  - `docs/deployment_ubuntu_self_hosted.md`
   - `docs/deployment_playbook_ingest_20260422.md`
 
 ### Backend release governance
@@ -43,27 +44,55 @@ Where:
 
 ### Model activation and champions
 - Active 30-mode activation:
-  - `data/hybrid_active_modes_freeze_v4/`
-  - `artifacts/hybrid_active_modes_freeze_v4/`
+  - `data/hybrid_active_modes_freeze_v8/`
+  - `artifacts/hybrid_active_modes_freeze_v8/`
 - Operational champions:
-  - `data/hybrid_operational_freeze_v4/`
-  - `artifacts/hybrid_operational_freeze_v4/`
+  - `data/hybrid_operational_freeze_v8/`
+  - `artifacts/hybrid_operational_freeze_v8/`
 
 Audit lines:
 - `data/hybrid_secondary_honest_retrain_v1/`
 - `data/hybrid_final_honest_improvement_v1/`
+- `data/hybrid_final_decisive_rescue_v5/`
+- `data/hybrid_final_aggressive_rescue_v6/`
+- `data/hybrid_v6_quick_champion_guard_hotfix_v1/`
+- `data/hybrid_structural_mode_rescue_v1/`
 - `data/hybrid_operational_freeze_v3/`
 - `data/hybrid_operational_freeze_v4/`
+- `data/hybrid_operational_freeze_v5/`
+- `data/hybrid_operational_freeze_v6/`
+- `data/hybrid_operational_freeze_v6_hotfix_v1/`
+- `data/hybrid_operational_freeze_v8/`
 - `data/hybrid_active_modes_freeze_v3/`
 - `data/hybrid_active_modes_freeze_v4/`
+- `data/hybrid_active_modes_freeze_v5/`
+- `data/hybrid_active_modes_freeze_v6/`
+- `data/hybrid_active_modes_freeze_v6_hotfix_v1/`
+- `data/hybrid_active_modes_freeze_v8/`
 - `artifacts/hybrid_secondary_honest_retrain_v1/`
 - `artifacts/hybrid_final_honest_improvement_v1/`
+- `artifacts/hybrid_final_decisive_rescue_v5/`
+- `artifacts/hybrid_final_aggressive_rescue_v6/`
+- `artifacts/hybrid_v6_quick_champion_guard_hotfix_v1/`
+- `artifacts/hybrid_structural_mode_rescue_v1/`
 - `artifacts/hybrid_operational_freeze_v3/`
 - `artifacts/hybrid_operational_freeze_v4/`
+- `artifacts/hybrid_operational_freeze_v5/`
+- `artifacts/hybrid_operational_freeze_v6/`
+- `artifacts/hybrid_operational_freeze_v6_hotfix_v1/`
+- `artifacts/hybrid_operational_freeze_v8/`
 - `artifacts/hybrid_active_modes_freeze_v3/`
 - `artifacts/hybrid_active_modes_freeze_v4/`
+- `artifacts/hybrid_active_modes_freeze_v5/`
+- `artifacts/hybrid_active_modes_freeze_v6/`
+- `artifacts/hybrid_active_modes_freeze_v6_hotfix_v1/`
+- `artifacts/hybrid_active_modes_freeze_v8/`
 - Estado (2026-04-21): evidencia versionada de auditoria secundaria con `replaced_pairs=0`.
-- Estado (2026-04-22): campana final `hybrid_final_honest_improvement_v1` con `replaced_pairs=1` desplaza la fuente operativa a `*_freeze_v4`.
+- Estado (2026-04-22): campana `hybrid_final_honest_improvement_v1` con `replaced_pairs=9` desplaza la fuente operativa a `*_freeze_v4`.
+- Estado (2026-04-22): campana final decisiva `hybrid_final_decisive_rescue_v5` con `replaced_pairs=1` desplaza la fuente operativa a `*_freeze_v5`.
+- Estado (2026-04-22): campana final agresiva `hybrid_final_aggressive_rescue_v6` con `replaced_pairs=2` desplaza la fuente operativa a `*_freeze_v6`.
+- Estado (2026-04-24): hotfix `hybrid_v6_quick_champion_guard_hotfix_v1` deja `remaining_guard_violations=0` y desplaza la fuente operativa a `*_freeze_v6_hotfix_v1`.
+- Estado (2026-04-26): `hybrid_structural_mode_rescue_v1` reemplaza los 14 champions 1_3/2_3 prohibidos y 3 champions extra degenerados de una sola variable, deja `blacklisted_active_final=0`, `structural_extra_rescue_final=0`, `single_feature_active_final=0`, `guardrail_violations_final=0`, `policy_violations_final=0` y desplaza la fuente operativa a `*_freeze_v8`.
 
 Historical lines retained for traceability:
 - `data/hybrid_active_modes_freeze_v1/`

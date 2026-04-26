@@ -70,6 +70,4351 @@ tags:
 - name: Misc
   description: Endpoints no clasificados explicitamente.
 paths:
+  /healthz:
+    get:
+      tags:
+      - Health
+      summary: Verificar que el proceso HTTP de la API sigue vivo
+      description: |
+        Qué hace:
+        Verificar que el proceso HTTP de la API sigue vivo.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `GET /healthz`.
+
+        Quién lo usa:
+        Lo consume típicamente infraestructura, monitoreo, QA o desarrolladores.
+
+        Seguridad:
+        Público. No requiere JWT ni cookies.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        No recibe request body y se consume tal como está publicado por el backend.
+
+        Resultado exitoso:
+        Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `KEEP_ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `GET /healthz`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: getLiveness
+      responses:
+        '200':
+          description: Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+      x-contract-status: KEEP_ACTIVE
+  /readyz:
+    get:
+      tags:
+      - Health
+      summary: Verificar si la API está lista para operar con base de datos
+      description: |
+        Qué hace:
+        Verificar si la API está lista para operar con base de datos.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `GET /readyz`.
+
+        Quién lo usa:
+        Lo consume típicamente infraestructura, monitoreo, QA o desarrolladores.
+
+        Seguridad:
+        Público. No requiere JWT ni cookies.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        No recibe request body y se consume tal como está publicado por el backend.
+
+        Resultado exitoso:
+        Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 503. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `KEEP_ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `GET /readyz`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 503.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: getReadiness
+      responses:
+        '200':
+          description: Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadyResponse'
+              example:
+                status: ready
+                latency_ms: 3.21
+        '503':
+          description: La aplicación está viva, pero una dependencia crítica no está disponible para completar la operación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotReadyResponse'
+              examples:
+                error_503:
+                  value:
+                    msg: service unavailable while processing readyz
+                    error: service_unavailable
+      x-contract-status: KEEP_ACTIVE
+  /metrics:
+    get:
+      tags:
+      - Health
+      summary: Obtener un snapshot de métricas en memoria del proceso actual
+      description: |
+        Qué hace:
+        Obtener un snapshot de métricas en memoria del proceso actual.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `GET /metrics`.
+
+        Quién lo usa:
+        Lo consume típicamente infraestructura, monitoreo, QA o desarrolladores.
+
+        Seguridad:
+        Puede ser público o exigir token de métricas según configuración del entorno.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        No recibe request body y se consume tal como está publicado por el backend.
+
+        Resultado exitoso:
+        Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 401, 404, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `KEEP_ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `GET /metrics`.
+        - Seguridad operacional: metricsToken. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 401, 404, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: getMetrics
+      security:
+      - metricsToken: []
+      - {}
+      responses:
+        '200':
+          description: Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsResponse'
+              example:
+                uptime_seconds: 14320
+                requests_total: 987
+                latency_ms_avg: 24.17
+                latency_ms_max: 210.4
+                status_counts:
+                  '200': 900
+                  '400': 52
+                  '401': 28
+                  '500': 7
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '404':
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponseMsg'
+              examples:
+                disabled:
+                  summary: Disabled
+                  value:
+                    msg: Metrics disabled
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing metrics
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: KEEP_ACTIVE
+  /api/predict:
+    post:
+      tags:
+      - Predict
+      summary: Ejecutar la inferencia experimental o legado del payload clásico de predicción
+      description: |
+        Qué hace:
+        Ejecutar la inferencia experimental o legado del payload clásico de predicción.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/predict`.
+
+        Quién lo usa:
+        Lo consume típicamente infraestructura, monitoreo, QA o desarrolladores.
+
+        Seguridad:
+        No requiere autenticación explícita en el contrato actual.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: PredictRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `PredictRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos. El payload debe incluir exactamente las features requeridas por el modelo clásico cargado en el entorno.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        Este endpoint está mantenido por compatibilidad o pruebas. El flujo recomendado de producto vive en questionnaire-v2.
+
+        Estado contractual:
+        `DEPRECATED`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/predict`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 400, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: createPrediction
+      deprecated: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PredictRequest'
+            examples:
+              typical:
+                summary: Typical input
+                value:
+                  age: 10
+                  sex: 1
+                  conners_inattention_score: 12.5
+                  conners_hyperactivity: 8.1
+                  cbcl_attention_score: 14.0
+                  sleep_problems: 0
+              edge:
+                summary: Edge of valid range
+                value:
+                  age: 6
+                  sex: 0
+                  conners_inattention_score: 0.0
+                  conners_hyperactivity: 0.0
+                  cbcl_attention_score: 0.0
+                  sleep_problems: 1
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PredictResponse'
+              examples:
+                typical:
+                  summary: Typical prediction
+                  value:
+                    predictions:
+                      adhd: 0.42
+                      anxiety: 0.18
+        '400':
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_payload:
+                  summary: Missing required fields
+                  value:
+                    msg: Validation error
+                    error: validation_error
+                    errors:
+                      age:
+                      - Missing data for required field.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_predict
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: DEPRECATED
+  /api/auth/register:
+    post:
+      tags:
+      - Auth
+      summary: Registrar una nueva cuenta de tutor o psicólogo
+      description: |
+        Qué hace:
+        Registrar una nueva cuenta de tutor o psicólogo.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/auth/register`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        No requiere autenticación explícita en el contrato actual.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: RegisterRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `RegisterRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos. Username y email deben ser únicos; para cuentas de psicólogo la tarjeta profesional debe ser coherente con el alta.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 201, 400, 409, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/auth/register`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 201, 400, 409, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            examples:
+              guardian:
+                summary: Guardian registration
+                value:
+                  username: guardian_01
+                  email: guardian@example.com
+                  password: P4ssw0rd!
+                  full_name: Maria Perez
+                  user_type: guardian
+              psychologist:
+                summary: Psychologist registration
+                value:
+                  username: dr_gomez
+                  email: dr.gomez@example.com
+                  password: P4ssw0rd!
+                  full_name: Oscar Gomez
+                  user_type: psychologist
+                  professional_card_number: COLPSIC-12345
+      responses:
+        '201':
+          description: La operación de creación o bootstrap se completó correctamente y el backend devuelve el recurso creado o su metadata operativa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+              examples:
+                created:
+                  summary: Registered
+                  value:
+                    msg: user created
+                    user_id: b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_auth_register
+                    error: invalid_api_auth_register
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_409:
+                  value:
+                    msg: conflict while processing api_auth_register
+                    error: api_auth_register_conflict
+          description: La operación entra en conflicto con el estado actual del recurso o con una restricción de unicidad, transición o concurrencia.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_auth_register
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_auth_register
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Iniciar sesión con credenciales y resolver si el flujo requiere MFA
+      description: |
+        Qué hace:
+        Iniciar sesión con credenciales y resolver si el flujo requiere MFA.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/auth/login`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        No requiere autenticación explícita en el contrato actual.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: LoginRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `LoginRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos. La cuenta debe existir, estar habilitada y cumplir las reglas de MFA o revisión profesional que apliquen.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 423, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/auth/login`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 423, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              typical:
+                summary: Username/password
+                value:
+                  username: guardian_01
+                  password: P4ssw0rd!
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: refresh_token (HttpOnly) + csrf_refresh_token
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/AuthTokenResponse'
+                - $ref: '#/components/schemas/MFAChallengeResponse'
+                - $ref: '#/components/schemas/MFAEnrollmentResponse'
+              examples:
+                token:
+                  summary: Access token response
+                  value:
+                    access_token: <jwt>
+                    token_type: bearer
+                    expires_in: 900
+                mfa_challenge:
+                  summary: MFA challenge response
+                  value:
+                    mfa_required: true
+                    challenge_id: <uuid>
+                    expires_in: 300
+                    error: mfa_required
+                mfa_enrollment:
+                  summary: MFA enrollment response
+                  value:
+                    mfa_enrollment_required: true
+                    enrollment_token: <jwt>
+                    token_type: bearer
+                    expires_in: 600
+                    msg: MFA enrollment required
+                    error: mfa_enrollment_required
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_auth_login
+                    error: invalid_api_auth_login
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_auth_login
+                    error: forbidden_api_auth_login
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '423':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_423:
+                  value:
+                    msg: resource temporarily locked for api_auth_login
+                    error: api_auth_login_locked
+          description: La cuenta o recurso se encuentra temporalmente bloqueado.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_auth_login
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_auth_login
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/auth/login/mfa:
+    post:
+      tags:
+      - Auth
+      summary: Completar el segundo paso del login MFA
+      description: |
+        Qué hace:
+        Completar el segundo paso del login MFA.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/auth/login/mfa`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        No requiere autenticación explícita en el contrato actual.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: LoginMFARequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `LoginMFARequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos. La cuenta debe existir, estar habilitada y cumplir las reglas de MFA o revisión profesional que apliquen.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/auth/login/mfa`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: completeMfaLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginMFARequest'
+            examples:
+              totp:
+                summary: TOTP code
+                value:
+                  challenge_id: 5f6c5f8f-2f7f-4c57-97f2-9f9e38c8d1d1
+                  code: '123456'
+              recovery:
+                summary: Recovery code
+                value:
+                  challenge_id: 5f6c5f8f-2f7f-4c57-97f2-9f9e38c8d1d1
+                  recovery_code: a1b2c3d4
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: refresh_token (HttpOnly) + csrf_refresh_token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+              examples:
+                token:
+                  summary: Access token
+                  value:
+                    access_token: <jwt>
+                    token_type: bearer
+                    expires_in: 900
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_auth_login_mfa
+                    error: invalid_api_auth_login_mfa
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_auth_login_mfa
+                    error: forbidden_api_auth_login_mfa
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_auth_login_mfa
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_auth_login_mfa
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/auth/refresh:
+    post:
+      tags:
+      - Auth
+      summary: Renovar el access token usando el refresh token en cookie
+      description: |
+        Qué hace:
+        Renovar el access token usando el refresh token en cookie.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/auth/refresh`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        Requiere: cookie refresh_token, csrfCookie, header X-CSRF-Token.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: CsrfHeader. La cookie de refresh y el control CSRF deben ser válidos al mismo tiempo.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 401, 403, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/auth/refresh`.
+        - Seguridad operacional: cookieAuth, csrfCookie, csrfHeader. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 401, 403, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: refreshSession
+      security:
+      - cookieAuth: []
+        csrfCookie: []
+        csrfHeader: []
+      parameters:
+      - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: refresh_token rotated + csrf_refresh_token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+              examples:
+                token:
+                  summary: Refreshed token
+                  value:
+                    access_token: <jwt>
+                    token_type: bearer
+                    expires_in: 900
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_auth_refresh
+                    error: forbidden_api_auth_refresh
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_auth_refresh
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/auth/logout:
+    post:
+      tags:
+      - Auth
+      summary: Cerrar la sesión actual y revocar refresh tokens activos
+      description: |
+        Qué hace:
+        Cerrar la sesión actual y revocar refresh tokens activos.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/auth/logout`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        Requiere: JWT bearer, csrfCookie, header X-CSRF-Token.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: CsrfHeader.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 401, 403, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/auth/logout`.
+        - Seguridad operacional: bearerAuth, csrfCookie, csrfHeader. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 401, 403, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: logoutUser
+      security:
+      - bearerAuth: []
+        csrfCookie: []
+        csrfHeader: []
+      parameters:
+      - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: auth cookies cleared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+              examples:
+                logged_out:
+                  summary: Logged out
+                  value:
+                    message: logged out
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_auth_logout
+                    error: forbidden_api_auth_logout
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_auth_logout
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/auth/me:
+    get:
+      tags:
+      - Auth
+      summary: Obtener el perfil del usuario autenticado
+      description: |
+        Qué hace:
+        Obtener el perfil del usuario autenticado.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `GET /api/auth/me`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        La operación debe respetar el contrato de parámetros, seguridad y estado del recurso declarado por el backend.
+
+        Resultado exitoso:
+        Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 401, 403, 404, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `GET /api/auth/me`.
+        - Seguridad operacional: bearerAuth. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 401, 403, 404, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: getCurrentUser
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+              example:
+                id: 11111111-1111-1111-1111-111111111111
+                username: admin_user
+                email: admin@example.com
+                full_name: Admin Operativo
+                user_type: psychologist
+                professional_card_number: COL-998877
+                colpsic_verified: true
+                is_active: true
+                roles:
+                - ADMIN
+                - PSYCHOLOGIST
+                mfa_enabled: true
+                mfa_confirmed_at: '2026-04-18T06:40:00Z'
+                mfa_method: totp
+                created_at: '2026-04-18T06:40:00Z'
+                updated_at: '2026-04-18T06:40:00Z'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_auth_me
+                    error: forbidden_api_auth_me
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_auth_me
+                    error: api_auth_me_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_auth_me
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/auth/password/change:
+    post:
+      tags:
+      - Auth
+      summary: Cambiar la contraseña del usuario autenticado
+      description: |
+        Qué hace:
+        Cambiar la contraseña del usuario autenticado.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/auth/password/change`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: PasswordChangeRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `PasswordChangeRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/auth/password/change`.
+        - Seguridad operacional: bearerAuth. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: changePassword
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+            examples:
+              typical:
+                summary: Change password
+                value:
+                  currentPassword: P4ssw0rd!
+                  newPassword: N3wP4ssw0rd!
+                  confirmNewPassword: N3wP4ssw0rd!
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponseMessage'
+              examples:
+                updated:
+                  summary: Updated
+                  value:
+                    message: Password updated
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_auth_password_change
+                    error: invalid_api_auth_password_change
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_auth_password_change
+                    error: forbidden_api_auth_password_change
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_auth_password_change
+                    error: api_auth_password_change_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_auth_password_change
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_auth_password_change
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/auth/password/forgot:
+    post:
+      tags:
+      - Auth
+      summary: Solicitar un enlace de restablecimiento de contraseña
+      description: |
+        Qué hace:
+        Solicitar un enlace de restablecimiento de contraseña.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/auth/password/forgot`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        No requiere autenticación explícita en el contrato actual.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: PasswordForgotRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `PasswordForgotRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/auth/password/forgot`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: requestPasswordReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordForgotRequest'
+            examples:
+              typical:
+                summary: Password reset request
+                value:
+                  email: guardian@example.com
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponseMessage'
+              examples:
+                accepted:
+                  summary: Accepted
+                  value:
+                    message: If the email exists, a reset link has been sent
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_auth_password_forgot
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_auth_password_forgot
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/auth/password/reset:
+    post:
+      tags:
+      - Auth
+      summary: Restablecer la contraseña usando un token de recuperación
+      description: |
+        Qué hace:
+        Restablecer la contraseña usando un token de recuperación.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/auth/password/reset`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        No requiere autenticación explícita en el contrato actual.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: PasswordResetRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `PasswordResetRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/auth/password/reset`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 400, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+            examples:
+              typical:
+                summary: Reset with token
+                value:
+                  token: reset-token-123
+                  newPassword: N3wP4ssw0rd!
+                  confirmNewPassword: N3wP4ssw0rd!
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponseMessage'
+              examples:
+                updated:
+                  summary: Updated
+                  value:
+                    message: Password updated
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_auth_password_reset
+                    error: invalid_api_auth_password_reset
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_auth_password_reset
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_auth_password_reset
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/auth/password/reset/verify:
+    get:
+      tags:
+      - Auth
+      summary: Verificar si un token de recuperación sigue siendo utilizable
+      description: |
+        Qué hace:
+        Verificar si un token de recuperación sigue siendo utilizable.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `GET /api/auth/password/reset/verify`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        No requiere autenticación explícita en el contrato actual.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: token.
+
+        Resultado exitoso:
+        Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `GET /api/auth/password/reset/verify`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 400, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: verifyResetToken
+      parameters:
+      - in: query
+        name: token
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetVerifyResponse'
+              examples:
+                valid:
+                  summary: Valid token
+                  value:
+                    valid: true
+        '400':
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetVerifyResponse'
+              examples:
+                invalid:
+                  summary: Invalid token
+                  value:
+                    valid: false
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_auth_password_reset_verify
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_auth_password_reset_verify
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/email/unsubscribe:
+    get:
+      tags:
+      - Email
+      summary: Dar de baja un correo usando el token del enlace recibido
+      description: |
+        Qué hace:
+        Dar de baja un correo usando el token del enlace recibido.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `GET /api/email/unsubscribe`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        No requiere autenticación explícita en el contrato actual.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: token, reason.
+
+        Resultado exitoso:
+        Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `GET /api/email/unsubscribe`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 400, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: unsubscribeEmail
+      parameters:
+      - in: query
+        name: token
+        required: true
+        schema:
+          type: string
+          minLength: 10
+          maxLength: 512
+      - in: query
+        name: reason
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+      responses:
+        '200':
+          description: Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponseMessage'
+              examples:
+                success:
+                  summary: Unsubscribed
+                  value:
+                    message: Unsubscribed
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_email_unsubscribe
+                    error: invalid_api_email_unsubscribe
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_email_unsubscribe
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_email_unsubscribe
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+    post:
+      tags:
+      - Email
+      summary: Dar de baja un correo enviando el token por JSON o formulario
+      description: |
+        Qué hace:
+        Dar de baja un correo enviando el token por JSON o formulario.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/email/unsubscribe`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        No requiere autenticación explícita en el contrato actual.
+
+        Entrada esperada:
+        Request body opcional. Formatos admitidos: application/json. Schema principal: EmailUnsubscribeRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `EmailUnsubscribeRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/email/unsubscribe`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 400, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: unsubscribeEmailPost
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailUnsubscribeRequest'
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponseMessage'
+              examples:
+                success:
+                  summary: Unsubscribed
+                  value:
+                    message: Unsubscribed
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_email_unsubscribe
+                    error: invalid_api_email_unsubscribe
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_email_unsubscribe
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_email_unsubscribe
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/mfa/setup:
+    post:
+      tags:
+      - MFA
+      summary: Iniciar la configuración de MFA TOTP para la cuenta actual
+      description: |
+        Qué hace:
+        Iniciar la configuración de MFA TOTP para la cuenta actual.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/mfa/setup`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        Requiere: JWT bearer, token temporal de enrolamiento MFA.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        El flujo MFA depende del estado actual de la cuenta; setup, confirmación y desactivación no son intercambiables.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 401, 403, 404, 409, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/mfa/setup`.
+        - Seguridad operacional: bearerAuth, mfaEnrollmentToken. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 401, 403, 404, 409, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: setupMfa
+      security:
+      - bearerAuth: []
+      - mfaEnrollmentToken: []
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MFASetupResponse'
+              examples:
+                setup:
+                  summary: Setup response
+                  value:
+                    otpauth_uri: otpauth://totp/CogniaApp:demo?secret=BASE32&issuer=CogniaApp
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_mfa_setup
+                    error: forbidden_api_mfa_setup
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_mfa_setup
+                    error: api_mfa_setup_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_409:
+                  value:
+                    msg: conflict while processing api_mfa_setup
+                    error: api_mfa_setup_conflict
+          description: La operación entra en conflicto con el estado actual del recurso o con una restricción de unicidad, transición o concurrencia.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_mfa_setup
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_mfa_setup
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/mfa/confirm:
+    post:
+      tags:
+      - MFA
+      summary: Confirmar la activación de MFA con un código TOTP válido
+      description: |
+        Qué hace:
+        Confirmar la activación de MFA con un código TOTP válido.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/mfa/confirm`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        Requiere: JWT bearer, token temporal de enrolamiento MFA.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: MFAConfirmRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `MFAConfirmRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos. El flujo MFA depende del estado actual de la cuenta; setup, confirmación y desactivación no son intercambiables.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/mfa/confirm`.
+        - Seguridad operacional: bearerAuth, mfaEnrollmentToken. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: confirmMfa
+      security:
+      - bearerAuth: []
+      - mfaEnrollmentToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MFAConfirmRequest'
+            examples:
+              totp:
+                summary: Confirm with TOTP
+                value:
+                  code: '123456'
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MFAConfirmResponse'
+              examples:
+                recovery:
+                  summary: Recovery codes
+                  value:
+                    recovery_codes:
+                    - a1b2c3d4
+                    - e5f6g7h8
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_mfa_confirm
+                    error: invalid_api_mfa_confirm
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_mfa_confirm
+                    error: forbidden_api_mfa_confirm
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_mfa_confirm
+                    error: api_mfa_confirm_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_mfa_confirm
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_mfa_confirm
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/mfa/disable:
+    post:
+      tags:
+      - MFA
+      summary: Desactivar MFA validando contraseña y un segundo factor válido
+      description: |
+        Qué hace:
+        Desactivar MFA validando contraseña y un segundo factor válido.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/mfa/disable`.
+
+        Quién lo usa:
+        Lo consume típicamente frontend público o frontend autenticado, según la operación.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: MFADisableRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `MFADisableRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos. El flujo MFA depende del estado actual de la cuenta; setup, confirmación y desactivación no son intercambiables.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La documentación se alinea con el comportamiento observable del backend y evita prometer capacidades no confirmadas por el contrato auditado.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/mfa/disable`.
+        - Seguridad operacional: bearerAuth. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: disableMfa
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MFADisableRequest'
+            examples:
+              totp:
+                summary: Disable with TOTP
+                value:
+                  password: P4ssw0rd!
+                  code: '123456'
+              recovery:
+                summary: Disable with recovery code
+                value:
+                  password: P4ssw0rd!
+                  recovery_code: a1b2c3d4
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponseMsg'
+              examples:
+                disabled:
+                  summary: Disabled
+                  value:
+                    msg: MFA disabled
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_mfa_disable
+                    error: invalid_api_mfa_disable
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_mfa_disable
+                    error: forbidden_api_mfa_disable
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_mfa_disable
+                    error: api_mfa_disable_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_mfa_disable
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_mfa_disable
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/v1/questionnaires/active:
+    get:
+      tags:
+      - Questionnaires
+      summary: Obtener la plantilla activa del flujo clásico v1
+      description: |
+        Qué hace:
+        Obtener la plantilla activa del flujo clásico v1.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `GET /api/v1/questionnaires/active`.
+
+        Quién lo usa:
+        Lo consume típicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        No requiere autenticación explícita en el contrato actual.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        La operación debe respetar el contrato de parámetros, seguridad y estado del recurso declarado por el backend.
+
+        Resultado exitoso:
+        Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 404, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clásico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `GET /api/v1/questionnaires/active`.
+        - Seguridad operacional: acceso publico. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 200, 404, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: getActiveQuestionnaire
+      responses:
+        '200':
+          description: Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActiveQuestionnaireResponse'
+              examples:
+                active:
+                  summary: Active questionnaire
+                  value:
+                    questionnaire_template:
+                      id: 2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6
+                      name: Conners Short
+                      version: v1
+                      description: Instrumento base
+                      is_active: true
+                    questions:
+                    - id: bd875d7f-6f1a-4c2c-9905-1ce14f74c0d1
+                      code: Q1
+                      text: Dificultad para concentrarse
+                      response_type: likert_0_4
+                      disorder_id:
+                      disorder_ids: []
+                      position: 1
+                      response_min: 0
+                      response_max: 4
+                      response_step: 1
+                      response_options:
+        '404':
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_v1_questionnaires_active
+                    error: api_v1_questionnaires_active_not_found
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_v1_questionnaires_active
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+  /api/v1/questionnaires/active/clone:
+    post:
+      tags:
+      - Questionnaires
+      summary: Clonar plantilla activa en flujo legacy v1
+      description: |
+        Que hace:
+        Clona la plantilla activa del contrato v1 para compatibilidad con clientes legacy.
+
+        Estado contractual:
+        ACTIVE_BUT_LEGACY. Flujo recomendado: /api/admin/questionnaires/{template_id}/clone.
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/v1/questionnaires/active/clone`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 201, 400, 401, 403, 409, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: cloneActiveQuestionnaireV1Legacy
+      deprecated: true
+      x-contract-status: ACTIVE_BUT_LEGACY
+      x-replaced-by: /api/admin/questionnaires/{template_id}/clone
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionnaireCloneRequest'
+            example:
+              version: v2.1.0
+              name: Cuestionario operacional v2.1
+              description: Clon controlado del template activo para evolucion contractual sin afectar produccion.
+      responses:
+        '201':
+          description: La operacion de clonacion se completo correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionnaireCloneResponse'
+              example:
+                template_id: 11111111-1111-1111-1111-111111111111
+                name: Cuestionario operacional v2.1
+                version: v2.1.0
+                is_active: false
+                question_count: 203
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /api/v1/questionnaires/{template_id}/activate:
+    post:
+      tags:
+      - Questionnaires
+      summary: Activar plantilla en flujo legacy v1
+      description: |
+        Que hace:
+        Activa una plantilla del contrato v1 para compatibilidad con clientes legacy.
+
+        Estado contractual:
+        ACTIVE_BUT_LEGACY. Flujo recomendado: /api/admin/questionnaires/{template_id}/publish.
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/v1/questionnaires/{template_id}/activate`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: activateQuestionnaireV1Legacy
+      deprecated: true
+      x-contract-status: ACTIVE_BUT_LEGACY
+      x-replaced-by: /api/admin/questionnaires/{template_id}/publish
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: template_id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Plantilla activada correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionnaireTemplate'
+              example:
+                msg: template activated
+                template_id: 11111111-1111-1111-1111-111111111111
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /api/v1/questionnaires:
+    post:
+      tags:
+      - Questionnaires
+      summary: Crear una nueva plantilla de cuestionario clásico
+      description: |
+        Qué hace:
+        Crear una nueva plantilla de cuestionario clásico.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/v1/questionnaires`.
+
+        Quién lo usa:
+        Lo consume típicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: QuestionnaireCreateRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `QuestionnaireCreateRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 201, 400, 401, 403, 409, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clásico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/v1/questionnaires`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 201, 400, 401, 403, 409, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: createQuestionnaire
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionnaireCreateRequest'
+            examples:
+              typical:
+                summary: Create template
+                value:
+                  name: Conners Short
+                  version: v1
+                  description: Instrumento base
+      responses:
+        '201':
+          description: La operación de creación o bootstrap se completó correctamente y el backend devuelve el recurso creado o su metadata operativa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionnaireCreateResponse'
+              examples:
+                created:
+                  summary: Created
+                  value:
+                    id: 2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6
+                    name: Conners Short
+                    version: v1
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_v1_questionnaires
+                    error: invalid_api_v1_questionnaires
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_questionnaires
+                    error: forbidden_api_v1_questionnaires
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_409:
+                  value:
+                    msg: conflict while processing api_v1_questionnaires
+                    error: api_v1_questionnaires_conflict
+          description: La operación entra en conflicto con el estado actual del recurso o con una restricción de unicidad, transición o concurrencia.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_v1_questionnaires
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+  /api/v1/questionnaires/{template_id}/questions:
+    post:
+      tags:
+      - Questionnaires
+      summary: Agregar una o varias preguntas a una plantilla clásica existente
+      description: |
+        Qué hace:
+        Agregar una o varias preguntas a una plantilla clásica existente.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/v1/questionnaires/{template_id}/questions`.
+
+        Quién lo usa:
+        Lo consume típicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: inline object.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: template_id.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 201, 400, 401, 403, 404, 409, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clásico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/v1/questionnaires/{template_id}/questions`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 201, 400, 401, 403, 404, 409, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: createQuestionnaireQuestions
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: template_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/QuestionCreateRequest'
+              - $ref: '#/components/schemas/QuestionCreateListRequest'
+            examples:
+              single:
+                summary: Single question
+                value:
+                  code: Q1
+                  text: Dificultad para concentrarse
+                  response_type: likert_0_4
+                  position: 1
+              batch:
+                summary: Batch questions
+                value:
+                - code: Q1
+                  text: Dificultad para concentrarse
+                  response_type: likert_0_4
+                  position: 1
+                - code: Q2
+                  text: Inquietud o hiperactividad
+                  response_type: likert_0_4
+                  position: 2
+      responses:
+        '201':
+          description: La operación de creación o bootstrap se completó correctamente y el backend devuelve el recurso creado o su metadata operativa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionsCreatedResponse'
+              examples:
+                created:
+                  summary: Created
+                  value:
+                    template_id: 2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6
+                    created: 2
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_v1_questionnaires_template_id_questions
+                    error: invalid_api_v1_questionnaires_template_id_questions
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_questionnaires_template_id_questions
+                    error: forbidden_api_v1_questionnaires_template_id_questions
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_v1_questionnaires_template_id_questions
+                    error: api_v1_questionnaires_template_id_questions_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_409:
+                  value:
+                    msg: conflict while processing api_v1_questionnaires_template_id_questions
+                    error: api_v1_questionnaires_template_id_questions_conflict
+          description: La operación entra en conflicto con el estado actual del recurso o con una restricción de unicidad, transición o concurrencia.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_v1_questionnaires_template_id_questions
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+  /api/v1/questionnaires/{template_id}/activate:
+    post:
+      tags:
+      - Questionnaires
+      summary: Activar una plantilla clasica de cuestionario
+      description: |-
+        Que hace:
+        Activa una plantilla clasica existente para que quede como plantilla activa.
+
+        Cuando usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/v1/questionnaires/{template_id}/activate`.
+
+        Quien lo usa:
+        Lo consume tipicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Reglas obligatorias:
+        Debe respetar los parametros declarados en ruta o query: template_id.
+
+        Resultado exitoso:
+        Activa correctamente la plantilla solicitada y devuelve su identificador.
+
+        Errores posibles:
+        Este endpoint documenta explicitamente los codigos 200, 400, 401, 403, 404, 409, 500. Cada codigo debe interpretarse con la causa funcional descrita en la seccion de respuestas, no como un fallo generico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clasico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+      operationId: activateQuestionnaire
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: template_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: La accion se ejecuto correctamente y el backend devuelve el estado activado del recurso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  template_id:
+                    type: string
+                    format: uuid
+                required:
+                - msg
+                - template_id
+              examples:
+                activated:
+                  summary: Activated
+                  value:
+                    msg: template activated
+                    template_id: 2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: invalid template_id
+                    error: invalid_template_id
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticacion valida, el token expiro o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_questionnaires_template_id_activate
+                    error: forbidden_api_v1_questionnaires_template_id_activate
+          description: La cuenta esta autenticada pero no tiene permiso suficiente, o fallo una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: template not found
+                    error: template_not_found
+          description: El recurso objetivo no existe, no esta habilitado en este entorno o no es visible para el actor actual.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                template_archived:
+                  value:
+                    msg: template archived
+                    error: template_archived
+                template_empty:
+                  value:
+                    msg: template has no questions
+                    error: template_empty
+          description: La operacion entra en conflicto con el estado actual del recurso o con una restriccion de unicidad, transicion o concurrencia.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: database error
+                    error: db_error
+          description: El backend encontro una falla interna durante consulta, persistencia, generacion, inferencia o coordinacion del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+  /api/v1/questionnaires/active/clone:
+    post:
+      tags:
+      - Questionnaires
+      summary: Clonar la plantilla clasica activa
+      description: |-
+        Que hace:
+        Clona la plantilla clasica activa y crea una nueva plantilla en estado no activo.
+
+        Cuando usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/v1/questionnaires/active/clone`.
+
+        Quien lo usa:
+        Lo consume tipicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: QuestionnaireCloneRequest.
+
+        Resultado exitoso:
+        Crea correctamente una plantilla clonada y devuelve su metadata operativa.
+
+        Errores posibles:
+        Este endpoint documenta explicitamente los codigos 201, 400, 401, 403, 404, 409, 500. Cada codigo debe interpretarse con la causa funcional descrita en la seccion de respuestas, no como un fallo generico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clasico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+      operationId: cloneActiveQuestionnaire
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionnaireCloneRequest'
+            examples:
+              clone:
+                summary: Clone active template
+                value:
+                  version: v2
+                  name: Cuestionario Inicial
+                  description: Copia para ajustes internos
+      responses:
+        '201':
+          description: La operacion de creacion o bootstrap se completo correctamente y el backend devuelve el recurso creado o su metadata operativa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionnaireCloneResponse'
+              examples:
+                cloned:
+                  summary: Cloned
+                  value:
+                    template_id: 8a8dd2c1-4c8c-4c48-baa6-1b1e9bf6fa0d
+                    name: Cuestionario Inicial
+                    version: v2
+                    is_active: false
+                    question_count: 42
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: validation error
+                    error: validation_error
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticacion valida, el token expiro o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_questionnaires_active_clone
+                    error: forbidden_api_v1_questionnaires_active_clone
+          description: La cuenta esta autenticada pero no tiene permiso suficiente, o fallo una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: no active questionnaire template
+                    error: no_active_template
+          description: El recurso objetivo no existe, no esta habilitado en este entorno o no es visible para el actor actual.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_409:
+                  value:
+                    msg: template already exists
+                    error: template_exists
+          description: La operacion entra en conflicto con el estado actual del recurso o con una restriccion de unicidad, transicion o concurrencia.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: database error
+                    error: db_error
+          description: El backend encontro una falla interna durante consulta, persistencia, generacion, inferencia o coordinacion del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+  /api/v1/evaluations:
+    post:
+      tags:
+      - Evaluations
+      summary: Crear una evaluación sobre la plantilla activa del flujo clásico
+      description: |
+        Qué hace:
+        Crear una evaluación sobre la plantilla activa del flujo clásico.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/v1/evaluations`.
+
+        Quién lo usa:
+        Lo consume típicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: EvaluationCreateRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `EvaluationCreateRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 201, 400, 401, 403, 404, 409, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clásico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/v1/evaluations`.
+        - Seguridad operacional: bearerAuth. Roles declarados: no aplica.
+        - Respuestas contractuales auditadas: 201, 400, 401, 403, 404, 409, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: createEvaluation
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationCreateRequest'
+            examples:
+              typical:
+                summary: Create evaluation
+                value:
+                  age_at_evaluation: 9
+                  evaluation_date: '2026-02-01'
+                  status: submitted
+                  is_anonymous: true
+                  responses:
+                  - question_id: bd875d7f-6f1a-4c2c-9905-1ce14f74c0d1
+                    value: 2
+                  - question_id: bd875d7f-6f1a-4c2c-9905-1ce14f74c0d2
+                    value: 1
+      responses:
+        '201':
+          description: La operación de creación o bootstrap se completó correctamente y el backend devuelve el recurso creado o su metadata operativa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationCreateResponse'
+              examples:
+                created:
+                  summary: Created
+                  value:
+                    evaluation_id: 3a086b0c-2e4e-4a2f-9f24-7b61ac4a76f0
+                    registration_number: EVAL-2026-0001
+                    questionnaire_template_id: 2e2d89a7-2f5b-4a9d-a62e-0af36e3db9d6
+                    access_key: ABCD12
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_v1_evaluations
+                    error: invalid_api_v1_evaluations
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_evaluations
+                    error: forbidden_api_v1_evaluations
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_v1_evaluations
+                    error: api_v1_evaluations_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_409:
+                  value:
+                    msg: conflict while processing api_v1_evaluations
+                    error: api_v1_evaluations_conflict
+          description: La operación entra en conflicto con el estado actual del recurso o con una restricción de unicidad, transición o concurrencia.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_v1_evaluations
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+  /api/v1/users:
+    get:
+      tags:
+      - Users
+      summary: Listar usuarios en el flujo administrativo legacy v1
+      description: |
+        Qué hace:
+        Listar usuarios en el flujo administrativo legacy v1.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `GET /api/v1/users`.
+
+        Quién lo usa:
+        Lo consume típicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: PageParam, PageSizeParam.
+
+        Resultado exitoso:
+        Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clásico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `GET /api/v1/users`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: listUsers
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/PageParam'
+      - $ref: '#/components/parameters/PageSizeParam'
+      responses:
+        '200':
+          description: Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+              examples:
+                typical:
+                  summary: First page
+                  value:
+                    data:
+                    - id: b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a
+                      username: guardian_01
+                      email: guardian@example.com
+                      full_name: Maria Perez
+                      user_type: guardian
+                      professional_card_number:
+                      colpsic_verified: false
+                      is_active: true
+                      roles:
+                      - GUARDIAN
+                      created_at: '2026-02-01T10:05:12Z'
+                      updated_at: '2026-02-01T10:05:12Z'
+                    pagination:
+                      page: 1
+                      page_size: 20
+                      total: 1
+                      pages: 1
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_v1_users
+                    error: invalid_api_v1_users
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_users
+                    error: forbidden_api_v1_users
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_v1_users
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+    post:
+      tags:
+      - Users
+      summary: Crear un usuario en el flujo legacy v1
+      description: |
+        Qué hace:
+        Crear un usuario en el flujo legacy v1.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/v1/users`.
+
+        Quién lo usa:
+        Lo consume típicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: UserCreateRequest.
+
+        Reglas obligatorias:
+        El body debe cumplir el schema `UserCreateRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos.
+
+        Resultado exitoso:
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 201, 400, 401, 403, 409, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clásico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/v1/users`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 201, 400, 401, 403, 409, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: createUser
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+            examples:
+              guardian:
+                summary: Create guardian
+                value:
+                  username: guardian_02
+                  email: guardian2@example.com
+                  password: P4ssw0rd!
+                  full_name: Juan Perez
+                  user_type: guardian
+                  is_active: true
+              psychologist:
+                summary: Create psychologist
+                value:
+                  username: dr_sanchez
+                  email: dr.sanchez@example.com
+                  password: P4ssw0rd!
+                  full_name: Laura Sanchez
+                  user_type: psychologist
+                  professional_card_number: COLPSIC-98765
+                  roles:
+                  - PSYCHOLOGIST
+      responses:
+        '201':
+          description: La operación de creación o bootstrap se completó correctamente y el backend devuelve el recurso creado o su metadata operativa.
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URL of the created user resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserItem'
+              examples:
+                created:
+                  summary: Created
+                  value:
+                    id: b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a
+                    username: guardian_02
+                    email: guardian2@example.com
+                    full_name: Juan Perez
+                    user_type: guardian
+                    professional_card_number:
+                    colpsic_verified: false
+                    is_active: true
+                    roles:
+                    - GUARDIAN
+                    created_at: '2026-02-01T10:05:12Z'
+                    updated_at: '2026-02-01T10:05:12Z'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_v1_users
+                    error: invalid_api_v1_users
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_users
+                    error: forbidden_api_v1_users
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_409:
+                  value:
+                    msg: conflict while processing api_v1_users
+                    error: api_v1_users_conflict
+          description: La operación entra en conflicto con el estado actual del recurso o con una restricción de unicidad, transición o concurrencia.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_v1_users
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+  /api/v1/users/{user_id}:
+    get:
+      tags:
+      - Users
+      summary: Obtener el detalle de un usuario por el contrato legacy v1
+      description: |
+        Qué hace:
+        Obtener el detalle de un usuario por el contrato legacy v1.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `GET /api/v1/users/{user_id}`.
+
+        Quién lo usa:
+        Lo consume típicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: user_id.
+
+        Resultado exitoso:
+        Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clásico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `GET /api/v1/users/{user_id}`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: getUserById
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserItem'
+              examples:
+                user:
+                  summary: User detail
+                  value:
+                    id: b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a
+                    username: guardian_01
+                    email: guardian@example.com
+                    full_name: Maria Perez
+                    user_type: guardian
+                    professional_card_number:
+                    colpsic_verified: false
+                    is_active: true
+                    roles:
+                    - GUARDIAN
+                    created_at: '2026-02-01T10:05:12Z'
+                    updated_at: '2026-02-01T10:05:12Z'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_v1_users_user_id
+                    error: invalid_api_v1_users_user_id
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_users_user_id
+                    error: forbidden_api_v1_users_user_id
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_v1_users_user_id
+                    error: api_v1_users_user_id_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_v1_users_user_id
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+    patch:
+      tags:
+      - Users
+      summary: Actualizar un usuario usando el contrato legacy v1
+      description: |
+        Qué hace:
+        Actualizar un usuario usando el contrato legacy v1.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `PATCH /api/v1/users/{user_id}`.
+
+        Quién lo usa:
+        Lo consume típicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: UserUpdateRequest.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: user_id. El body debe cumplir el schema `UserUpdateRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos.
+
+        Resultado exitoso:
+        Actualiza el recurso solicitado y devuelve confirmación o la representación actualizada del estado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 409, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clásico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `PATCH /api/v1/users/{user_id}`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 409, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: updateUserById
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+            examples:
+              update_email:
+                summary: Update email
+                value:
+                  email: new-email@example.com
+              update_roles:
+                summary: Update roles
+                value:
+                  roles:
+                  - ADMIN
+                  - ANALYST
+      responses:
+        '200':
+          description: Actualiza el recurso solicitado y devuelve confirmación o la representación actualizada del estado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserItem'
+              examples:
+                updated:
+                  summary: Updated
+                  value:
+                    id: b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a
+                    username: guardian_01
+                    email: new-email@example.com
+                    full_name: Maria Perez
+                    user_type: guardian
+                    professional_card_number:
+                    colpsic_verified: false
+                    is_active: true
+                    roles:
+                    - GUARDIAN
+                    - ANALYST
+                    created_at: '2026-02-01T10:05:12Z'
+                    updated_at: '2026-02-02T11:11:11Z'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_v1_users_user_id
+                    error: invalid_api_v1_users_user_id
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_users_user_id
+                    error: forbidden_api_v1_users_user_id
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_v1_users_user_id
+                    error: api_v1_users_user_id_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_409:
+                  value:
+                    msg: conflict while processing api_v1_users_user_id
+                    error: api_v1_users_user_id_conflict
+          description: La operación entra en conflicto con el estado actual del recurso o con una restricción de unicidad, transición o concurrencia.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_v1_users_user_id
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+    delete:
+      tags:
+      - Users
+      summary: Desactivar un usuario a través del contrato legacy v1
+      description: |
+        Qué hace:
+        Desactivar un usuario a través del contrato legacy v1.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `DELETE /api/v1/users/{user_id}`.
+
+        Quién lo usa:
+        Lo consume típicamente clientes legacy, backoffice o flujos de compatibilidad.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: user_id.
+
+        Resultado exitoso:
+        Elimina, revoca o desactiva correctamente el recurso o vínculo solicitado.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        Este bloque pertenece al contrato clásico v1 y se mantiene por compatibilidad con clientes o flujos legacy.
+
+        Estado contractual:
+        `ACTIVE_BUT_LEGACY`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `DELETE /api/v1/users/{user_id}`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: deactivateUserById
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Elimina, revoca o desactiva correctamente el recurso o vínculo solicitado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDeactivateResponse'
+              examples:
+                deactivated:
+                  summary: Deactivated
+                  value:
+                    msg: user deactivated
+                    user_id: b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_v1_users_user_id
+                    error: invalid_api_v1_users_user_id
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_v1_users_user_id
+                    error: forbidden_api_v1_users_user_id
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_v1_users_user_id
+                    error: api_v1_users_user_id_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_v1_users_user_id
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE_BUT_LEGACY
+  /api/admin/users:
+    get:
+      tags:
+      - Admin
+      summary: Listar usuarios para administración y gobierno de acceso
+      description: |
+        Qué hace:
+        Listar usuarios para administración y gobierno de acceso.
+
+        Cuándo usarlo:
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `GET /api/admin/users`.
+
+        Quién lo usa:
+        Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
+
+        Seguridad:
+        Requiere: JWT bearer.
+
+        Entrada esperada:
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: PageParam, PageSizeParam, q, email, username, role, user_type, is_active, colpsic_verified, sort, OrderParam. La cuenta autenticada debe tener privilegios administrativos suficientes para operar el recurso.
+
+        Resultado exitoso:
+        Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+
+        Errores posibles:
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La operación puede dejar trazabilidad administrativa o de auditoría según la implementación de servicios y modelos.
+
+        Estado contractual:
+        `ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `GET /api/admin/users`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: listAdminUsers
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/PageParam'
+      - $ref: '#/components/parameters/PageSizeParam'
+      - in: query
+        name: q
+        description: Search by username/email (substring).
+        schema:
+          type: string
+      - in: query
+        name: email
+        schema:
+          type: string
+          format: email
+      - in: query
+        name: username
+        schema:
+          type: string
+      - in: query
+        name: role
+        description: Exact role name (case-insensitive).
+        schema:
+          type: string
+      - in: query
+        name: user_type
+        schema:
+          type: string
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: colpsic_verified
+        schema:
+          type: boolean
+      - in: query
+        name: sort
+        description: Sort field.
+        schema:
+          type: string
+          enum:
+          - created_at
+          - email
+          - username
+      - $ref: '#/components/parameters/OrderParam'
+      responses:
+        '200':
+          description: Devuelve el recurso o agregado solicitado con la estructura que el frontend o backoffice espera consumir.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserListResponse'
+              examples:
+                typical:
+                  summary: First page
+                  value:
+                    data:
+                    - id: b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a
+                      username: guardian_01
+                      email: guardian@example.com
+                      full_name: Maria Perez
+                      user_type: guardian
+                      professional_card_number:
+                      colpsic_verified: false
+                      is_active: true
+                      roles:
+                      - GUARDIAN
+                      created_at: '2026-02-01T10:05:12Z'
+                      updated_at: '2026-02-01T10:05:12Z'
+                    pagination:
+                      page: 1
+                      page_size: 20
+                      total: 1
+                      pages: 1
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_admin_users
+                    error: invalid_api_admin_users
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_admin_users
+                    error: forbidden_api_admin_users
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_admin_users
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_admin_users
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: ACTIVE
+  /api/admin/users/{id}:
+    patch:
+      tags:
+      - Admin
+      summary: Actualizar atributos administrativos de un usuario existente
+      description: |
+        **Objetivo funcional**
+        Actualizar atributos administrativos de un usuario existente.
+
+        **Cuando debe usarse**
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `PATCH /api/admin/users/{id}`.
+
+        **Actor que lo consume**
+        Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
+
+        **Seguridad aplicable**
+        Requiere: JWT bearer.
+
+        **Entrada esperada**
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: AdminUserPatchRequest.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: id. El body debe cumplir el schema `AdminUserPatchRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos. La cuenta autenticada debe tener privilegios administrativos suficientes para operar el recurso.
+
+        **Resultado exitoso**
+        Actualiza el recurso solicitado y devuelve confirmación o la representación actualizada del estado.
+
+        **Errores posibles y causa funcional**
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 409, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La operación puede dejar trazabilidad administrativa o de auditoría según la implementación de servicios y modelos.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `PATCH /api/admin/users/{id}`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 409, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: updateAdminUser
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUserPatchRequest'
+            examples:
+              deactivate:
+                summary: Deactivate user
+                value:
+                  is_active: false
+              roles:
+                summary: Update roles
+                value:
+                  roles:
+                  - ADMIN
+                  - ANALYST
+      responses:
+        '200':
+          description: Actualiza el recurso solicitado y devuelve confirmación o la representación actualizada del estado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserItem'
+              examples:
+                updated:
+                  summary: Updated
+                  value:
+                    id: b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a
+                    username: guardian_01
+                    email: guardian@example.com
+                    full_name: Maria Perez
+                    user_type: guardian
+                    professional_card_number:
+                    colpsic_verified: false
+                    is_active: false
+                    roles:
+                    - GUARDIAN
+                    - ANALYST
+                    updated_at: '2026-02-02T11:11:11Z'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_admin_users_id
+                    error: invalid_api_admin_users_id
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_admin_users_id
+                    error: forbidden_api_admin_users_id
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_admin_users_id
+                    error: api_admin_users_id_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_409:
+                  value:
+                    msg: conflict while processing api_admin_users_id
+                    error: api_admin_users_id_conflict
+          description: La operación entra en conflicto con el estado actual del recurso o con una restricción de unicidad, transición o concurrencia.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_admin_users_id
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_admin_users_id
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: KEEP_ACTIVE
+  /api/admin/users/{id}/password-reset:
+    post:
+      tags:
+      - Admin
+      summary: Forzar un flujo administrativo de restablecimiento de contraseña
+      description: |
+        **Objetivo funcional**
+        Forzar un flujo administrativo de restablecimiento de contraseña.
+
+        **Cuando debe usarse**
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/admin/users/{id}/password-reset`.
+
+        **Actor que lo consume**
+        Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
+
+        **Seguridad aplicable**
+        Requiere: JWT bearer.
+
+        **Entrada esperada**
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: id. La cuenta autenticada debe tener privilegios administrativos suficientes para operar el recurso.
+
+        **Resultado exitoso**
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        **Errores posibles y causa funcional**
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La operación puede dejar trazabilidad administrativa o de auditoría según la implementación de servicios y modelos.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/admin/users/{id}/password-reset`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: resetUserPasswordAdmin
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminPasswordResetResponse'
+              example:
+                endpoint: /api/admin/users/{id}/password-reset
+                method: POST
+                status: 200
+                msg: operacion ejecutada correctamente
+                timestamp: '2026-04-18T06:40:00Z'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_admin_users_id_password_reset
+                    error: invalid_api_admin_users_id_password_reset
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_admin_users_id_password_reset
+                    error: forbidden_api_admin_users_id_password_reset
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_admin_users_id_password_reset
+                    error: api_admin_users_id_password_reset_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_admin_users_id_password_reset
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_admin_users_id_password_reset
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: KEEP_ACTIVE
+  /api/admin/users/{id}/mfa/reset:
+    post:
+      tags:
+      - Admin
+      summary: Reiniciar MFA de una cuenta desde administración
+      description: |
+        **Objetivo funcional**
+        Reiniciar MFA de una cuenta desde administración.
+
+        **Cuando debe usarse**
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/admin/users/{id}/mfa/reset`.
+
+        **Actor que lo consume**
+        Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
+
+        **Seguridad aplicable**
+        Requiere: JWT bearer.
+
+        **Entrada esperada**
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: id. La cuenta autenticada debe tener privilegios administrativos suficientes para operar el recurso.
+
+        **Resultado exitoso**
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        **Errores posibles y causa funcional**
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La operación puede dejar trazabilidad administrativa o de auditoría según la implementación de servicios y modelos.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/admin/users/{id}/mfa/reset`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: resetUserMfaAdmin
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMfaResetResponse'
+              example:
+                endpoint: /api/admin/users/{id}/mfa/reset
+                method: POST
+                status: 200
+                msg: operacion ejecutada correctamente
+                timestamp: '2026-04-18T06:40:00Z'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_admin_users_id_mfa_reset
+                    error: invalid_api_admin_users_id_mfa_reset
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_admin_users_id_mfa_reset
+                    error: forbidden_api_admin_users_id_mfa_reset
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_admin_users_id_mfa_reset
+                    error: api_admin_users_id_mfa_reset_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_admin_users_id_mfa_reset
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_admin_users_id_mfa_reset
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: KEEP_ACTIVE
   /api/admin/audit-logs:
     get:
       tags:
@@ -20799,8 +25144,8 @@ components:
       properties:
         age:
           type: integer
-          minimum: 3
-          maximum: 21
+          minimum: 6
+          maximum: 11
         sex:
           type: integer
           enum:
