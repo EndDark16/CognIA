@@ -896,3 +896,18 @@ No aplicado:
 
 Pendiente:
 - Rehabilitar workflows en GitHub con una corrida controlada tras revisar el commit final.
+
+## Actualizacion de estado (2026-04-26) - hybrid_structural_mode_rescue_v1
+- Se ejecuto una intervencion focal estructural sobre la linea activa real `v6_hotfix_v1` en la rama `fix/structural-mode-model-rescue-v1`, sin commits directos sobre `development` ni `dev.enddark`.
+- Lineas versionadas nuevas:
+  - `data/hybrid_structural_mode_rescue_v1/`
+  - `artifacts/hybrid_structural_mode_rescue_v1/`
+  - `data/hybrid_active_modes_freeze_v8/`
+  - `artifacts/hybrid_active_modes_freeze_v8/`
+  - `data/hybrid_operational_freeze_v8/`
+  - `artifacts/hybrid_operational_freeze_v8/`
+- Script principal: `scripts/run_hybrid_structural_mode_rescue_v1.py`.
+- Resultado de cierre: `blacklisted_active_initial=14`, `accepted_existing_fallbacks=0`, `structural_extra_rescue_initial=3`, `retrained_structural_replacements=17`, `blacklisted_active_final=0`, `structural_extra_rescue_final=0`, `single_feature_active_final=0`, `guardrail_violations_final=0`, `policy_violations_final=0`.
+- Los 14 champions 1/3 y 2/3 prohibidos fueron removidos de la linea activa; ademas se rescataron 3 champions extra de una sola variable (`anxiety/psychologist_full` y los dos `elimination/*_full`). Elimination queda en subsets estructurales `structural_ranked` para sus 6 modos.
+- `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v8` y `hybrid_operational_freeze_v8`.
+- Caveat metodologico vigente: persiste sensibilidad `drop_top1`/stress en Elimination y parte de Depression; la linea final queda sin champions de una sola feature y la evidencia sigue siendo para screening/apoyo profesional en entorno simulado, no diagnostico automatico.

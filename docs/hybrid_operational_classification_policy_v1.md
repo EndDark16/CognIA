@@ -6,7 +6,7 @@ Eliminar ambigüedad en `final_class` y separar explícitamente:
 1. clase operativa principal
 2. flags de riesgo metodológico
 
-Esta política aplica sobre la línea operativa vigente declarada por el loader v2. A 2026-04-24, esa línea es `hybrid_active_modes_freeze_v6_hotfix_v1` / `hybrid_operational_freeze_v6_hotfix_v1`; `freeze_v2` y `freeze_v3` quedan como históricos auditables.
+Esta política aplica sobre la línea operativa vigente declarada por el loader v2. A 2026-04-26, esa línea es `hybrid_active_modes_freeze_v8` / `hybrid_operational_freeze_v8`; `freeze_v2` a `freeze_v6_hotfix_v1` quedan como históricos auditables.
 
 ## Capa 1: clase operativa principal
 Valores permitidos:
