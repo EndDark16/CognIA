@@ -1,0 +1,613 @@
+mode,order,feature,questionnaire_item_id,domain,domains_final,question_text_primary
+caregiver_1_3,1,adhd_context_home,Q003,adhd,adhd|conduct|depression,"Pensando en dificultades frecuentes de atención, inquietud o impulsividad, ¿estas conductas se observan claramente en casa?"
+caregiver_1_3,2,adhd_context_other,Q004,adhd,adhd|depression,"¿Estos síntomas también se observan en otros contextos, por ejemplo con familiares, amistades o actividades?"
+caregiver_1_3,3,adhd_context_school,Q005,adhd,adhd|depression,¿Estos síntomas se observan en el colegio o en otras actividades de aprendizaje?
+caregiver_1_3,4,adhd_hypimp_01_fidgets,Q006,adhd,adhd|conduct|elimination|anxiety|depression,"¿Con qué frecuencia mueve mucho las manos o los pies, o se mueve inquieto mientras está sentado?"
+caregiver_1_3,5,adhd_hypimp_02_leaves_seat,Q007,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se levanta cuando debería permanecer sentado?
+caregiver_1_3,6,adhd_hypimp_03_runs_or_climbs_inappropriately,Q008,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia corre, trepa o se mueve excesivamente cuando no corresponde?"
+caregiver_1_3,7,adhd_hypimp_04_cannot_play_quietly,Q009,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia tiene dificultad para jugar o participar tranquilamente en actividades calmadas?
+caregiver_1_3,8,adhd_hypimp_05_driven_by_motor,Q010,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece estar acelerado o no puede quedarse quieto?
+caregiver_1_3,9,adhd_hypimp_06_talks_excessively,Q011,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia habla en exceso?
+caregiver_1_3,10,adhd_hypimp_07_blurts_out,Q012,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia responde antes de que terminen de hablarle o interrumpe la secuencia normal de la conversación?
+caregiver_1_3,11,adhd_hypimp_08_difficulty_waiting_turn,Q013,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta esperar su turno?
+caregiver_1_3,12,adhd_hypimp_09_interrupts_intrudes,Q014,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia interrumpe actividades o conversaciones de otras personas?
+caregiver_1_3,13,adhd_inatt_01_attention_to_detail_errors,Q015,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia comete errores por descuido o no presta suficiente atención a los detalles?
+caregiver_1_3,14,adhd_inatt_02_sustained_attention_difficulty,Q016,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta mantener la atención en tareas o actividades?
+caregiver_1_3,15,adhd_inatt_03_seems_not_listening,Q017,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece que no escucha cuando se le habla directamente?
+caregiver_1_3,16,adhd_inatt_04_fails_to_finish_tasks,Q018,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia empieza tareas, deberes o actividades, pero no las termina o no sigue las instrucciones hasta el final?"
+caregiver_1_3,17,adhd_inatt_05_organization_difficulty,Q019,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia tiene dificultades para organizar tareas, materiales o actividades?"
+caregiver_1_3,18,adhd_inatt_06_avoids_sustained_effort,Q020,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia evita o rechaza tareas que exigen esfuerzo mental sostenido?
+caregiver_1_3,19,adhd_inatt_07_loses_things,Q021,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia pierde objetos necesarios para sus actividades?
+caregiver_1_3,20,adhd_inatt_08_easily_distracted,Q022,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se distrae fácilmente con estímulos externos o pensamientos irrelevantes?
+caregiver_1_3,21,adhd_inatt_09_forgetful_daily_activities,Q023,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia es olvidadizo en actividades diarias?
+caregiver_1_3,22,adhd_impairment_home,Q024,adhd,adhd|conduct|elimination|anxiety|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan la convivencia o el funcionamiento en casa?"
+caregiver_1_3,23,adhd_impairment_school,Q025,adhd,adhd|conduct|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan el funcionamiento escolar o de aprendizaje?"
+caregiver_1_3,24,adhd_impairment_social,Q026,adhd,adhd|conduct|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan las amistades, el juego o la relación con otras personas?"
+caregiver_1_3,25,conduct_impairment_global,Q027,adhd,adhd|conduct|elimination|depression,"En conjunto, ¿cuánto afectan estas conductas la vida diaria?"
+caregiver_1_3,26,adhd_onset_before_12,Q028,adhd,adhd|depression,"Pensando en la historia del niño o la niña hasta hoy, ¿estas dificultades ya se observaban claramente desde años anteriores y no comenzaron solo recientemente?"
+caregiver_1_3,27,conduct_01_bullies_threatens_intimidates,Q036,adhd,adhd|conduct|elimination|anxiety|depression,"¿Ha intimidado, amenazado o acosado repetidamente a otras personas?"
+caregiver_1_3,28,conduct_02_initiates_fights,Q037,adhd,adhd|conduct|anxiety|depression,¿Ha iniciado peleas físicas?
+caregiver_1_3,29,conduct_03_weapon_use,Q038,adhd,adhd|conduct|anxiety|depression,¿Ha usado un objeto o arma que pudiera causar daño grave?
+caregiver_1_3,30,conduct_04_physical_cruelty_people,Q039,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con otras personas?
+caregiver_1_3,31,conduct_05_physical_cruelty_animals,Q040,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con animales?
+caregiver_1_3,32,conduct_06_steals_confronting_victim,Q041,adhd,adhd|conduct|anxiety|depression,"¿Ha robado algo usando amenaza, fuerza o intimidación contra otra persona?"
+caregiver_1_3,33,conduct_07_forced_sex,Q042,adhd,adhd|conduct|anxiety|depression,¿Ha forzado a otra persona a una actividad sexual?
+caregiver_1_3,34,conduct_08_fire_setting,Q043,adhd,adhd|conduct|elimination|anxiety|depression,¿Ha provocado incendios deliberadamente con intención de causar daño o problemas serios?
+caregiver_1_3,35,conduct_09_property_destruction,Q044,adhd,adhd|conduct|anxiety|depression,¿Ha destruido deliberadamente propiedad ajena?
+caregiver_1_3,36,conduct_10_breaks_into_house_building_car,Q045,adhd,adhd|conduct|anxiety|depression,"¿Ha entrado por la fuerza a una casa, edificio o vehículo que no le pertenecía?"
+caregiver_1_3,37,conduct_11_lies_to_obtain_or_avoid,Q046,adhd,adhd|conduct|anxiety|depression,"¿Miente con frecuencia para obtener beneficios, evitar consecuencias o librarse de obligaciones?"
+caregiver_1_3,38,conduct_12_steals_without_confrontation,Q047,adhd,adhd|conduct|anxiety|depression,"¿Ha robado objetos sin usar amenaza, fuerza ni contacto directo con la persona afectada?"
+caregiver_1_3,39,conduct_13_stays_out_at_night_before_13,Q048,adhd,adhd|conduct|anxiety|depression,¿Se ha quedado fuera de casa durante la noche sin permiso?
+caregiver_1_3,40,conduct_14_runs_away_overnight,Q049,adhd,adhd|conduct|anxiety|depression,¿Se ha escapado de casa pasando la noche fuera?
+caregiver_1_3,41,conduct_15_truancy_before_13,Q050,adhd,adhd|conduct|anxiety|depression,¿Ha faltado al colegio sin permiso?
+caregiver_1_3,42,agor_impairment,Q061,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta este miedo la vida diaria?
+caregiver_1_3,43,gad_difficulty_controlling_worry,Q070,adhd,adhd|elimination|anxiety|depression,¿Le cuesta controlar o detener la preocupación una vez que empieza?
+caregiver_1_3,44,gad_excessive_worry_multiple_areas,Q072,adhd,adhd|anxiety|depression,"¿Se preocupa en exceso por varios aspectos de la vida cotidiana, incluso cuando no parece necesario?"
+caregiver_1_3,45,gad_impairment,Q073,adhd,adhd|elimination|anxiety|depression,¿Cuánto afectan estas preocupaciones a la vida diaria?
+caregiver_1_3,46,sep_anx_01_distress_on_separation,Q076,adhd,adhd|elimination|anxiety|depression,¿Se angustia mucho cuando se separa de sus figuras de apego principales?
+caregiver_1_3,47,sep_anx_impairment,Q085,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta a la vida diaria este miedo a separarse de sus figuras de cuidado principales?
+caregiver_1_3,48,social_anxiety_impairment,Q096,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta esta ansiedad social la vida diaria?
+caregiver_1_3,49,pdd_depressed_or_irritable_mood,Q105,adhd,adhd|elimination|anxiety|depression,"¿Se ha mostrado triste, decaído o irritable la mayor parte del tiempo?"
+caregiver_1_3,50,pdd_duration_months_child,Q106,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente este estado de ánimo triste o irritable persistente?
+caregiver_1_3,51,pdd_impairment,Q107,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta este estado de ánimo persistente la vida diaria?
+caregiver_1_3,52,mdd_02_loss_of_interest_or_pleasure,Q113,adhd,adhd|anxiety|depression,¿Ha perdido interés o disfrute en actividades que antes le gustaban?
+caregiver_1_3,53,mdd_03_weight_or_appetite_change,Q114,adhd,adhd|elimination|anxiety|depression,¿Ha habido un cambio importante de apetito o peso?
+caregiver_1_3,54,mdd_05_psychomotor_change,Q116,adhd,adhd|conduct|elimination|anxiety|depression,¿Se nota mucho más lento o mucho más inquieto de lo habitual?
+caregiver_1_3,55,mdd_06_fatigue_or_low_energy,Q117,adhd,adhd|conduct|elimination|anxiety|depression,¿Se muestra cansado o con muy poca energía?
+caregiver_1_3,56,mdd_07_worthlessness_or_excessive_guilt,Q118,adhd,adhd|elimination|anxiety|depression,¿Expresa sentirse inútil o tener culpa excesiva?
+caregiver_1_3,57,mdd_08_concentration_or_decision_difficulty,Q119,adhd,adhd|anxiety|depression,¿Tiene mucha dificultad para concentrarse o decidir?
+caregiver_1_3,58,mdd_09_death_or_suicidal_thoughts,Q120,adhd,adhd|elimination|anxiety|depression,"¿Ha expresado ideas frecuentes sobre muerte, querer desaparecer o hacerse daño?"
+caregiver_1_3,59,mdd_duration_weeks,Q121,adhd,adhd|conduct|elimination|anxiety|depression,"¿Desde hace cuántas semanas viene presentando este estado de ánimo triste, decaído o irritable?"
+caregiver_1_3,60,mdd_impairment,Q122,adhd,adhd|conduct|elimination|anxiety|depression,¿Cuánto afecta este problema del estado de ánimo la vida diaria?
+caregiver_1_3,61,dmdd_duration_months,Q130,adhd,adhd|conduct|elimination|depression,¿Cuántos meses lleva presente este patrón de irritabilidad y estallidos?
+caregiver_1_3,62,dmdd_irritable_between_outbursts,Q131,adhd,adhd|conduct|elimination|anxiety|depression,¿Entre estallidos se mantiene irritable o de mal genio la mayor parte del tiempo?
+caregiver_1_3,63,dmdd_outbursts_frequency_per_week,Q136,adhd,adhd|conduct|elimination|anxiety|depression,"¿Cuántos estallidos graves ocurren, en promedio, por semana?"
+caregiver_1_3,64,encopresis_event_frequency_per_month,Q140,adhd,adhd|elimination|anxiety|depression,"Pensando en los escapes de heces o en ensuciarse, ¿cuántas veces por mes ocurre este problema?"
+caregiver_1_3,65,enuresis_distress_impairment,Q144,adhd,adhd|elimination|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuánto malestar o impacto genera este problema?"
+caregiver_1_3,66,enuresis_duration_months_consecutive,Q146,adhd,adhd|elimination|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuántos meses seguidos lleva ocurriendo este problema?"
+caregiver_1_3,67,enuresis_event_frequency_per_week,Q147,adhd,adhd|elimination|anxiety|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuántas veces por semana ocurre este problema?"
+caregiver_2_3,1,age_years,Q001,adhd,adhd|conduct|elimination|anxiety|depression,"¿Qué edad tiene el niño o la niña, en años cumplidos?"
+caregiver_2_3,2,sex_assigned_at_birth,Q002,adhd,adhd|depression,¿Qué sexo se registró al nacer para el niño o la niña?
+caregiver_2_3,3,adhd_context_home,Q003,adhd,adhd|conduct|depression,"Pensando en dificultades frecuentes de atención, inquietud o impulsividad, ¿estas conductas se observan claramente en casa?"
+caregiver_2_3,4,adhd_context_other,Q004,adhd,adhd|depression,"¿Estos síntomas también se observan en otros contextos, por ejemplo con familiares, amistades o actividades?"
+caregiver_2_3,5,adhd_context_school,Q005,adhd,adhd|depression,¿Estos síntomas se observan en el colegio o en otras actividades de aprendizaje?
+caregiver_2_3,6,adhd_hypimp_01_fidgets,Q006,adhd,adhd|conduct|elimination|anxiety|depression,"¿Con qué frecuencia mueve mucho las manos o los pies, o se mueve inquieto mientras está sentado?"
+caregiver_2_3,7,adhd_hypimp_02_leaves_seat,Q007,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se levanta cuando debería permanecer sentado?
+caregiver_2_3,8,adhd_hypimp_03_runs_or_climbs_inappropriately,Q008,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia corre, trepa o se mueve excesivamente cuando no corresponde?"
+caregiver_2_3,9,adhd_hypimp_04_cannot_play_quietly,Q009,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia tiene dificultad para jugar o participar tranquilamente en actividades calmadas?
+caregiver_2_3,10,adhd_hypimp_05_driven_by_motor,Q010,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece estar acelerado o no puede quedarse quieto?
+caregiver_2_3,11,adhd_hypimp_06_talks_excessively,Q011,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia habla en exceso?
+caregiver_2_3,12,adhd_hypimp_07_blurts_out,Q012,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia responde antes de que terminen de hablarle o interrumpe la secuencia normal de la conversación?
+caregiver_2_3,13,adhd_hypimp_08_difficulty_waiting_turn,Q013,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta esperar su turno?
+caregiver_2_3,14,adhd_hypimp_09_interrupts_intrudes,Q014,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia interrumpe actividades o conversaciones de otras personas?
+caregiver_2_3,15,adhd_inatt_01_attention_to_detail_errors,Q015,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia comete errores por descuido o no presta suficiente atención a los detalles?
+caregiver_2_3,16,adhd_inatt_02_sustained_attention_difficulty,Q016,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta mantener la atención en tareas o actividades?
+caregiver_2_3,17,adhd_inatt_03_seems_not_listening,Q017,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece que no escucha cuando se le habla directamente?
+caregiver_2_3,18,adhd_inatt_04_fails_to_finish_tasks,Q018,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia empieza tareas, deberes o actividades, pero no las termina o no sigue las instrucciones hasta el final?"
+caregiver_2_3,19,adhd_inatt_05_organization_difficulty,Q019,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia tiene dificultades para organizar tareas, materiales o actividades?"
+caregiver_2_3,20,adhd_inatt_06_avoids_sustained_effort,Q020,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia evita o rechaza tareas que exigen esfuerzo mental sostenido?
+caregiver_2_3,21,adhd_inatt_07_loses_things,Q021,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia pierde objetos necesarios para sus actividades?
+caregiver_2_3,22,adhd_inatt_08_easily_distracted,Q022,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se distrae fácilmente con estímulos externos o pensamientos irrelevantes?
+caregiver_2_3,23,adhd_inatt_09_forgetful_daily_activities,Q023,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia es olvidadizo en actividades diarias?
+caregiver_2_3,24,adhd_impairment_home,Q024,adhd,adhd|conduct|elimination|anxiety|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan la convivencia o el funcionamiento en casa?"
+caregiver_2_3,25,adhd_impairment_school,Q025,adhd,adhd|conduct|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan el funcionamiento escolar o de aprendizaje?"
+caregiver_2_3,26,adhd_impairment_social,Q026,adhd,adhd|conduct|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan las amistades, el juego o la relación con otras personas?"
+caregiver_2_3,27,conduct_impairment_global,Q027,adhd,adhd|conduct|elimination|depression,"En conjunto, ¿cuánto afectan estas conductas la vida diaria?"
+caregiver_2_3,28,adhd_onset_before_12,Q028,adhd,adhd|depression,"Pensando en la historia del niño o la niña hasta hoy, ¿estas dificultades ya se observaban claramente desde años anteriores y no comenzaron solo recientemente?"
+caregiver_2_3,29,conduct_01_bullies_threatens_intimidates,Q036,adhd,adhd|conduct|elimination|anxiety|depression,"¿Ha intimidado, amenazado o acosado repetidamente a otras personas?"
+caregiver_2_3,30,conduct_02_initiates_fights,Q037,adhd,adhd|conduct|anxiety|depression,¿Ha iniciado peleas físicas?
+caregiver_2_3,31,conduct_03_weapon_use,Q038,adhd,adhd|conduct|anxiety|depression,¿Ha usado un objeto o arma que pudiera causar daño grave?
+caregiver_2_3,32,conduct_04_physical_cruelty_people,Q039,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con otras personas?
+caregiver_2_3,33,conduct_05_physical_cruelty_animals,Q040,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con animales?
+caregiver_2_3,34,conduct_06_steals_confronting_victim,Q041,adhd,adhd|conduct|anxiety|depression,"¿Ha robado algo usando amenaza, fuerza o intimidación contra otra persona?"
+caregiver_2_3,35,conduct_07_forced_sex,Q042,adhd,adhd|conduct|anxiety|depression,¿Ha forzado a otra persona a una actividad sexual?
+caregiver_2_3,36,conduct_08_fire_setting,Q043,adhd,adhd|conduct|elimination|anxiety|depression,¿Ha provocado incendios deliberadamente con intención de causar daño o problemas serios?
+caregiver_2_3,37,conduct_09_property_destruction,Q044,adhd,adhd|conduct|anxiety|depression,¿Ha destruido deliberadamente propiedad ajena?
+caregiver_2_3,38,conduct_10_breaks_into_house_building_car,Q045,adhd,adhd|conduct|anxiety|depression,"¿Ha entrado por la fuerza a una casa, edificio o vehículo que no le pertenecía?"
+caregiver_2_3,39,conduct_11_lies_to_obtain_or_avoid,Q046,adhd,adhd|conduct|anxiety|depression,"¿Miente con frecuencia para obtener beneficios, evitar consecuencias o librarse de obligaciones?"
+caregiver_2_3,40,conduct_12_steals_without_confrontation,Q047,adhd,adhd|conduct|anxiety|depression,"¿Ha robado objetos sin usar amenaza, fuerza ni contacto directo con la persona afectada?"
+caregiver_2_3,41,conduct_13_stays_out_at_night_before_13,Q048,adhd,adhd|conduct|anxiety|depression,¿Se ha quedado fuera de casa durante la noche sin permiso?
+caregiver_2_3,42,conduct_14_runs_away_overnight,Q049,adhd,adhd|conduct|anxiety|depression,¿Se ha escapado de casa pasando la noche fuera?
+caregiver_2_3,43,conduct_15_truancy_before_13,Q050,adhd,adhd|conduct|anxiety|depression,¿Ha faltado al colegio sin permiso?
+caregiver_2_3,44,agor_avoid_or_need_companion,Q052,adhd,adhd|elimination|anxiety|depression,¿Evita estas situaciones o necesita compañía para tolerarlas?
+caregiver_2_3,45,agor_duration_months,Q054,adhd,adhd|conduct|elimination|anxiety|depression,¿Cuántos meses lleva presente este patrón de miedo o evitación?
+caregiver_2_3,46,agor_escape_help_cognition,Q055,adhd,adhd|elimination|anxiety|depression,¿El miedo aparece porque piensa que escapar sería difícil o que no recibiría ayuda si algo sale mal?
+caregiver_2_3,47,agor_fear_01_public_transport,Q056,adhd,adhd|anxiety|depression,¿Tiene mucho miedo a usar transporte público?
+caregiver_2_3,48,agor_fear_02_open_spaces,Q057,adhd,adhd|anxiety|depression,¿Tiene mucho miedo a estar en espacios abiertos?
+caregiver_2_3,49,agor_fear_03_enclosed_spaces,Q058,adhd,adhd|elimination|anxiety|depression,¿Tiene mucho miedo a estar en lugares cerrados?
+caregiver_2_3,50,agor_impairment,Q061,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta este miedo la vida diaria?
+caregiver_2_3,51,gad_assoc_01_restlessness,Q064,adhd,adhd|elimination|anxiety|depression,"¿Se muestra inquieto, nervioso o incapaz de relajarse?"
+caregiver_2_3,52,gad_assoc_02_fatigue,Q065,adhd,adhd|elimination|anxiety|depression,¿Se cansa con facilidad o muestra baja energía asociada a la preocupación?
+caregiver_2_3,53,gad_assoc_03_concentration_difficulty,Q066,adhd,adhd|elimination|anxiety|depression,¿La preocupación le dificulta concentrarse o pensar con claridad?
+caregiver_2_3,54,gad_assoc_04_irritability,Q067,adhd,adhd|elimination|anxiety|depression,¿Se muestra irritable o fácilmente molesto cuando está preocupado?
+caregiver_2_3,55,gad_assoc_05_muscle_tension,Q068,adhd,adhd|elimination|anxiety|depression,¿Presenta tensión muscular asociada a preocupación o ansiedad?
+caregiver_2_3,56,gad_assoc_06_sleep_problems,Q069,adhd,adhd|elimination|anxiety|depression,¿Tiene problemas de sueño asociados a preocupación o ansiedad?
+caregiver_2_3,57,gad_difficulty_controlling_worry,Q070,adhd,adhd|elimination|anxiety|depression,¿Le cuesta controlar o detener la preocupación una vez que empieza?
+caregiver_2_3,58,gad_duration_months,Q071,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente esta preocupación excesiva?
+caregiver_2_3,59,gad_excessive_worry_multiple_areas,Q072,adhd,adhd|anxiety|depression,"¿Se preocupa en exceso por varios aspectos de la vida cotidiana, incluso cuando no parece necesario?"
+caregiver_2_3,60,gad_impairment,Q073,adhd,adhd|elimination|anxiety|depression,¿Cuánto afectan estas preocupaciones a la vida diaria?
+caregiver_2_3,61,sep_anx_01_distress_on_separation,Q076,adhd,adhd|elimination|anxiety|depression,¿Se angustia mucho cuando se separa de sus figuras de apego principales?
+caregiver_2_3,62,sep_anx_02_worry_losing_attachment_figures,Q077,adhd,adhd|elimination|anxiety|depression,¿Le preocupa perder a sus figuras de apego o que les pase algo grave?
+caregiver_2_3,63,sep_anx_03_worry_event_causing_separation,Q078,adhd,adhd|elimination|anxiety|depression,¿Le preocupa que ocurra algo que lo separe de sus figuras de apego?
+caregiver_2_3,64,sep_anx_04_refuses_leaving_home_school,Q079,adhd,adhd|elimination|anxiety|depression,"¿Evita o se niega a salir de casa, ir al colegio o quedarse en otros lugares por miedo a separarse?"
+caregiver_2_3,65,sep_anx_05_fear_being_alone_without_attachment,Q080,adhd,adhd|elimination|anxiety|depression,¿Le da miedo estar solo o sin una figura de apego cerca?
+caregiver_2_3,66,sep_anx_06_refuses_sleep_away_or_alone,Q081,adhd,adhd|elimination|anxiety|depression,¿Se niega a dormir fuera de casa o a dormir solo por miedo a la separación?
+caregiver_2_3,67,sep_anx_07_separation_nightmares,Q082,adhd,adhd|elimination|anxiety|depression,¿Tiene pesadillas relacionadas con la separación?
+caregiver_2_3,68,sep_anx_08_physical_complaints_on_separation,Q083,adhd,adhd|elimination|anxiety|depression,"¿Presenta molestias físicas, como dolor de cabeza, dolor de estómago o náuseas, cuando anticipa o vive una separación?"
+caregiver_2_3,69,sep_anx_duration_weeks,Q084,adhd,adhd|elimination|anxiety|depression,¿Desde hace cuántas semanas viene ocurriendo este miedo intenso a separarse de sus figuras de cuidado principales?
+caregiver_2_3,70,sep_anx_impairment,Q085,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta a la vida diaria este miedo a separarse de sus figuras de cuidado principales?
+caregiver_2_3,71,social_anxiety_almost_always_triggered,Q087,adhd,adhd|elimination|anxiety|depression,¿Ese miedo aparece casi siempre cuando enfrenta esas situaciones?
+caregiver_2_3,72,social_anxiety_avoid_or_endure_intense,Q088,adhd,adhd|elimination|anxiety|depression,¿Evita esas situaciones o las soporta con mucha ansiedad?
+caregiver_2_3,73,social_anxiety_duration_months,Q091,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente este patrón de ansiedad social?
+caregiver_2_3,74,social_anxiety_fear_being_observed,Q092,adhd,adhd|elimination|anxiety|depression,¿Le da mucho miedo hacer algo mientras otras personas lo observan?
+caregiver_2_3,75,social_anxiety_fear_interactions,Q093,adhd,adhd|anxiety|depression,¿Le da mucho miedo interactuar con otras personas?
+caregiver_2_3,76,social_anxiety_fear_negative_evaluation,Q094,adhd,adhd|elimination|anxiety|depression,"¿Le preocupa intensamente hacer el ridículo, quedar mal o ser juzgado negativamente?"
+caregiver_2_3,77,social_anxiety_fear_performance,Q095,adhd,adhd|elimination|anxiety|depression,"¿Le da mucho miedo actuar, exponer o hablar frente a otras personas?"
+caregiver_2_3,78,social_anxiety_impairment,Q096,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta esta ansiedad social la vida diaria?
+caregiver_2_3,79,pdd_01_appetite_change,Q099,adhd,adhd|elimination|anxiety|depression,¿Ha habido cambios persistentes en el apetito?
+caregiver_2_3,80,pdd_05_concentration_difficulty,Q103,adhd,adhd|conduct|anxiety|depression,¿Tiene dificultad persistente para concentrarse o pensar con claridad?
+caregiver_2_3,81,pdd_depressed_or_irritable_mood,Q105,adhd,adhd|elimination|anxiety|depression,"¿Se ha mostrado triste, decaído o irritable la mayor parte del tiempo?"
+caregiver_2_3,82,pdd_duration_months_child,Q106,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente este estado de ánimo triste o irritable persistente?
+caregiver_2_3,83,pdd_impairment,Q107,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta este estado de ánimo persistente la vida diaria?
+caregiver_2_3,84,mdd_02_loss_of_interest_or_pleasure,Q113,adhd,adhd|anxiety|depression,¿Ha perdido interés o disfrute en actividades que antes le gustaban?
+caregiver_2_3,85,mdd_03_weight_or_appetite_change,Q114,adhd,adhd|elimination|anxiety|depression,¿Ha habido un cambio importante de apetito o peso?
+caregiver_2_3,86,mdd_05_psychomotor_change,Q116,adhd,adhd|conduct|elimination|anxiety|depression,¿Se nota mucho más lento o mucho más inquieto de lo habitual?
+caregiver_2_3,87,mdd_06_fatigue_or_low_energy,Q117,adhd,adhd|conduct|elimination|anxiety|depression,¿Se muestra cansado o con muy poca energía?
+caregiver_2_3,88,mdd_07_worthlessness_or_excessive_guilt,Q118,adhd,adhd|elimination|anxiety|depression,¿Expresa sentirse inútil o tener culpa excesiva?
+caregiver_2_3,89,mdd_08_concentration_or_decision_difficulty,Q119,adhd,adhd|anxiety|depression,¿Tiene mucha dificultad para concentrarse o decidir?
+caregiver_2_3,90,mdd_09_death_or_suicidal_thoughts,Q120,adhd,adhd|elimination|anxiety|depression,"¿Ha expresado ideas frecuentes sobre muerte, querer desaparecer o hacerse daño?"
+caregiver_2_3,91,mdd_duration_weeks,Q121,adhd,adhd|conduct|elimination|anxiety|depression,"¿Desde hace cuántas semanas viene presentando este estado de ánimo triste, decaído o irritable?"
+caregiver_2_3,92,mdd_impairment,Q122,adhd,adhd|conduct|elimination|anxiety|depression,¿Cuánto afecta este problema del estado de ánimo la vida diaria?
+caregiver_2_3,93,dmdd_duration_months,Q130,adhd,adhd|conduct|elimination|depression,¿Cuántos meses lleva presente este patrón de irritabilidad y estallidos?
+caregiver_2_3,94,dmdd_irritable_between_outbursts,Q131,adhd,adhd|conduct|elimination|anxiety|depression,¿Entre estallidos se mantiene irritable o de mal genio la mayor parte del tiempo?
+caregiver_2_3,95,dmdd_outbursts_frequency_per_week,Q136,adhd,adhd|conduct|elimination|anxiety|depression,"¿Cuántos estallidos graves ocurren, en promedio, por semana?"
+caregiver_2_3,96,dmdd_outbursts_severity,Q137,adhd,adhd|conduct|elimination|anxiety|depression,¿Qué tan graves son los estallidos?
+caregiver_2_3,97,encopresis_constipation_present,Q138,adhd,adhd|elimination|depression,"Pensando en los problemas para evacuar o en los escapes de heces, ¿también hay estreñimiento?"
+caregiver_2_3,98,encopresis_duration_months_consecutive,Q139,adhd,adhd|elimination|depression,"Pensando en los escapes de heces o en ensuciarse, ¿cuántos meses seguidos lleva ocurriendo este problema?"
+caregiver_2_3,99,encopresis_event_frequency_per_month,Q140,adhd,adhd|elimination|anxiety|depression,"Pensando en los escapes de heces o en ensuciarse, ¿cuántas veces por mes ocurre este problema?"
+caregiver_2_3,100,enuresis_distress_impairment,Q144,adhd,adhd|elimination|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuánto malestar o impacto genera este problema?"
+caregiver_2_3,101,enuresis_duration_months_consecutive,Q146,adhd,adhd|elimination|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuántos meses seguidos lleva ocurriendo este problema?"
+caregiver_2_3,102,enuresis_event_frequency_per_week,Q147,adhd,adhd|elimination|anxiety|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuántas veces por semana ocurre este problema?"
+caregiver_2_3,103,enuresis_nocturnal,Q148,adhd,adhd|elimination|depression,¿Los escapes de orina ocurren principalmente durante el sueño o en la noche?
+caregiver_2_3,104,enuresis_primary_course,Q150,adhd,adhd|elimination|depression,¿Nunca llegó a mantener un periodo claro de continencia antes de que apareciera este problema?
+caregiver_full,1,age_years,Q001,adhd,adhd|conduct|elimination|anxiety|depression,"¿Qué edad tiene el niño o la niña, en años cumplidos?"
+caregiver_full,2,sex_assigned_at_birth,Q002,adhd,adhd|depression,¿Qué sexo se registró al nacer para el niño o la niña?
+caregiver_full,3,adhd_context_home,Q003,adhd,adhd|conduct|depression,"Pensando en dificultades frecuentes de atención, inquietud o impulsividad, ¿estas conductas se observan claramente en casa?"
+caregiver_full,4,adhd_context_other,Q004,adhd,adhd|depression,"¿Estos síntomas también se observan en otros contextos, por ejemplo con familiares, amistades o actividades?"
+caregiver_full,5,adhd_context_school,Q005,adhd,adhd|depression,¿Estos síntomas se observan en el colegio o en otras actividades de aprendizaje?
+caregiver_full,6,adhd_hypimp_01_fidgets,Q006,adhd,adhd|conduct|elimination|anxiety|depression,"¿Con qué frecuencia mueve mucho las manos o los pies, o se mueve inquieto mientras está sentado?"
+caregiver_full,7,adhd_hypimp_02_leaves_seat,Q007,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se levanta cuando debería permanecer sentado?
+caregiver_full,8,adhd_hypimp_03_runs_or_climbs_inappropriately,Q008,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia corre, trepa o se mueve excesivamente cuando no corresponde?"
+caregiver_full,9,adhd_hypimp_04_cannot_play_quietly,Q009,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia tiene dificultad para jugar o participar tranquilamente en actividades calmadas?
+caregiver_full,10,adhd_hypimp_05_driven_by_motor,Q010,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece estar acelerado o no puede quedarse quieto?
+caregiver_full,11,adhd_hypimp_06_talks_excessively,Q011,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia habla en exceso?
+caregiver_full,12,adhd_hypimp_07_blurts_out,Q012,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia responde antes de que terminen de hablarle o interrumpe la secuencia normal de la conversación?
+caregiver_full,13,adhd_hypimp_08_difficulty_waiting_turn,Q013,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta esperar su turno?
+caregiver_full,14,adhd_hypimp_09_interrupts_intrudes,Q014,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia interrumpe actividades o conversaciones de otras personas?
+caregiver_full,15,adhd_inatt_01_attention_to_detail_errors,Q015,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia comete errores por descuido o no presta suficiente atención a los detalles?
+caregiver_full,16,adhd_inatt_02_sustained_attention_difficulty,Q016,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta mantener la atención en tareas o actividades?
+caregiver_full,17,adhd_inatt_03_seems_not_listening,Q017,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece que no escucha cuando se le habla directamente?
+caregiver_full,18,adhd_inatt_04_fails_to_finish_tasks,Q018,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia empieza tareas, deberes o actividades, pero no las termina o no sigue las instrucciones hasta el final?"
+caregiver_full,19,adhd_inatt_05_organization_difficulty,Q019,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia tiene dificultades para organizar tareas, materiales o actividades?"
+caregiver_full,20,adhd_inatt_06_avoids_sustained_effort,Q020,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia evita o rechaza tareas que exigen esfuerzo mental sostenido?
+caregiver_full,21,adhd_inatt_07_loses_things,Q021,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia pierde objetos necesarios para sus actividades?
+caregiver_full,22,adhd_inatt_08_easily_distracted,Q022,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se distrae fácilmente con estímulos externos o pensamientos irrelevantes?
+caregiver_full,23,adhd_inatt_09_forgetful_daily_activities,Q023,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia es olvidadizo en actividades diarias?
+caregiver_full,24,adhd_impairment_home,Q024,adhd,adhd|conduct|elimination|anxiety|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan la convivencia o el funcionamiento en casa?"
+caregiver_full,25,adhd_impairment_school,Q025,adhd,adhd|conduct|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan el funcionamiento escolar o de aprendizaje?"
+caregiver_full,26,adhd_impairment_social,Q026,adhd,adhd|conduct|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan las amistades, el juego o la relación con otras personas?"
+caregiver_full,27,conduct_impairment_global,Q027,adhd,adhd|conduct|elimination|depression,"En conjunto, ¿cuánto afectan estas conductas la vida diaria?"
+caregiver_full,28,adhd_onset_before_12,Q028,adhd,adhd|depression,"Pensando en la historia del niño o la niña hasta hoy, ¿estas dificultades ya se observaban claramente desde años anteriores y no comenzaron solo recientemente?"
+caregiver_full,29,conduct_onset_before_10,Q029,adhd,adhd|depression,¿Las primeras conductas problemáticas relevantes empezaron antes de los 10 años?
+caregiver_full,30,conduct_lpe_01_lack_remorse_guilt,Q032,adhd,adhd|conduct|depression,¿Suele mostrar poca culpa o poco remordimiento después de hacer daño o de comportarse mal?
+caregiver_full,31,conduct_lpe_02_callous_lack_empathy,Q033,adhd,adhd|conduct|depression,¿Suele mostrar poca empatía o poca preocupación por los sentimientos de otras personas?
+caregiver_full,32,conduct_lpe_03_unconcerned_performance,Q034,adhd,adhd|conduct|depression,"¿Parece poco preocupado por cómo le va en el colegio, con otras personas o con su comportamiento?"
+caregiver_full,33,conduct_lpe_04_shallow_deficient_affect,Q035,adhd,adhd|conduct|depression,"¿La forma en que expresa sus emociones parece poco sincera, superficial o muy limitada?"
+caregiver_full,34,conduct_01_bullies_threatens_intimidates,Q036,adhd,adhd|conduct|elimination|anxiety|depression,"¿Ha intimidado, amenazado o acosado repetidamente a otras personas?"
+caregiver_full,35,conduct_02_initiates_fights,Q037,adhd,adhd|conduct|anxiety|depression,¿Ha iniciado peleas físicas?
+caregiver_full,36,conduct_03_weapon_use,Q038,adhd,adhd|conduct|anxiety|depression,¿Ha usado un objeto o arma que pudiera causar daño grave?
+caregiver_full,37,conduct_04_physical_cruelty_people,Q039,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con otras personas?
+caregiver_full,38,conduct_05_physical_cruelty_animals,Q040,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con animales?
+caregiver_full,39,conduct_06_steals_confronting_victim,Q041,adhd,adhd|conduct|anxiety|depression,"¿Ha robado algo usando amenaza, fuerza o intimidación contra otra persona?"
+caregiver_full,40,conduct_07_forced_sex,Q042,adhd,adhd|conduct|anxiety|depression,¿Ha forzado a otra persona a una actividad sexual?
+caregiver_full,41,conduct_08_fire_setting,Q043,adhd,adhd|conduct|elimination|anxiety|depression,¿Ha provocado incendios deliberadamente con intención de causar daño o problemas serios?
+caregiver_full,42,conduct_09_property_destruction,Q044,adhd,adhd|conduct|anxiety|depression,¿Ha destruido deliberadamente propiedad ajena?
+caregiver_full,43,conduct_10_breaks_into_house_building_car,Q045,adhd,adhd|conduct|anxiety|depression,"¿Ha entrado por la fuerza a una casa, edificio o vehículo que no le pertenecía?"
+caregiver_full,44,conduct_11_lies_to_obtain_or_avoid,Q046,adhd,adhd|conduct|anxiety|depression,"¿Miente con frecuencia para obtener beneficios, evitar consecuencias o librarse de obligaciones?"
+caregiver_full,45,conduct_12_steals_without_confrontation,Q047,adhd,adhd|conduct|anxiety|depression,"¿Ha robado objetos sin usar amenaza, fuerza ni contacto directo con la persona afectada?"
+caregiver_full,46,conduct_13_stays_out_at_night_before_13,Q048,adhd,adhd|conduct|anxiety|depression,¿Se ha quedado fuera de casa durante la noche sin permiso?
+caregiver_full,47,conduct_14_runs_away_overnight,Q049,adhd,adhd|conduct|anxiety|depression,¿Se ha escapado de casa pasando la noche fuera?
+caregiver_full,48,conduct_15_truancy_before_13,Q050,adhd,adhd|conduct|anxiety|depression,¿Ha faltado al colegio sin permiso?
+caregiver_full,49,agor_almost_always_triggered,Q051,adhd,adhd|anxiety|depression,"Pensando en lugares o situaciones donde siente que sería difícil salir o recibir ayuda, ¿ese miedo aparece casi siempre cuando está allí?"
+caregiver_full,50,agor_avoid_or_need_companion,Q052,adhd,adhd|elimination|anxiety|depression,¿Evita estas situaciones o necesita compañía para tolerarlas?
+caregiver_full,51,agor_duration_months,Q054,adhd,adhd|conduct|elimination|anxiety|depression,¿Cuántos meses lleva presente este patrón de miedo o evitación?
+caregiver_full,52,agor_escape_help_cognition,Q055,adhd,adhd|elimination|anxiety|depression,¿El miedo aparece porque piensa que escapar sería difícil o que no recibiría ayuda si algo sale mal?
+caregiver_full,53,agor_fear_01_public_transport,Q056,adhd,adhd|anxiety|depression,¿Tiene mucho miedo a usar transporte público?
+caregiver_full,54,agor_fear_02_open_spaces,Q057,adhd,adhd|anxiety|depression,¿Tiene mucho miedo a estar en espacios abiertos?
+caregiver_full,55,agor_fear_03_enclosed_spaces,Q058,adhd,adhd|elimination|anxiety|depression,¿Tiene mucho miedo a estar en lugares cerrados?
+caregiver_full,56,agor_fear_04_crowds_queues,Q059,adhd,adhd|elimination|anxiety|depression,¿Tiene mucho miedo a estar en filas o multitudes?
+caregiver_full,57,agor_fear_05_outside_home_alone,Q060,adhd,adhd|elimination|anxiety|depression,¿Tiene mucho miedo a estar fuera de casa solo o sola?
+caregiver_full,58,agor_impairment,Q061,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta este miedo la vida diaria?
+caregiver_full,59,gad_assoc_01_restlessness,Q064,adhd,adhd|elimination|anxiety|depression,"¿Se muestra inquieto, nervioso o incapaz de relajarse?"
+caregiver_full,60,gad_assoc_02_fatigue,Q065,adhd,adhd|elimination|anxiety|depression,¿Se cansa con facilidad o muestra baja energía asociada a la preocupación?
+caregiver_full,61,gad_assoc_03_concentration_difficulty,Q066,adhd,adhd|elimination|anxiety|depression,¿La preocupación le dificulta concentrarse o pensar con claridad?
+caregiver_full,62,gad_assoc_04_irritability,Q067,adhd,adhd|elimination|anxiety|depression,¿Se muestra irritable o fácilmente molesto cuando está preocupado?
+caregiver_full,63,gad_assoc_05_muscle_tension,Q068,adhd,adhd|elimination|anxiety|depression,¿Presenta tensión muscular asociada a preocupación o ansiedad?
+caregiver_full,64,gad_assoc_06_sleep_problems,Q069,adhd,adhd|elimination|anxiety|depression,¿Tiene problemas de sueño asociados a preocupación o ansiedad?
+caregiver_full,65,gad_difficulty_controlling_worry,Q070,adhd,adhd|elimination|anxiety|depression,¿Le cuesta controlar o detener la preocupación una vez que empieza?
+caregiver_full,66,gad_duration_months,Q071,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente esta preocupación excesiva?
+caregiver_full,67,gad_excessive_worry_multiple_areas,Q072,adhd,adhd|anxiety|depression,"¿Se preocupa en exceso por varios aspectos de la vida cotidiana, incluso cuando no parece necesario?"
+caregiver_full,68,gad_impairment,Q073,adhd,adhd|elimination|anxiety|depression,¿Cuánto afectan estas preocupaciones a la vida diaria?
+caregiver_full,69,sep_anx_01_distress_on_separation,Q076,adhd,adhd|elimination|anxiety|depression,¿Se angustia mucho cuando se separa de sus figuras de apego principales?
+caregiver_full,70,sep_anx_02_worry_losing_attachment_figures,Q077,adhd,adhd|elimination|anxiety|depression,¿Le preocupa perder a sus figuras de apego o que les pase algo grave?
+caregiver_full,71,sep_anx_03_worry_event_causing_separation,Q078,adhd,adhd|elimination|anxiety|depression,¿Le preocupa que ocurra algo que lo separe de sus figuras de apego?
+caregiver_full,72,sep_anx_04_refuses_leaving_home_school,Q079,adhd,adhd|elimination|anxiety|depression,"¿Evita o se niega a salir de casa, ir al colegio o quedarse en otros lugares por miedo a separarse?"
+caregiver_full,73,sep_anx_05_fear_being_alone_without_attachment,Q080,adhd,adhd|elimination|anxiety|depression,¿Le da miedo estar solo o sin una figura de apego cerca?
+caregiver_full,74,sep_anx_06_refuses_sleep_away_or_alone,Q081,adhd,adhd|elimination|anxiety|depression,¿Se niega a dormir fuera de casa o a dormir solo por miedo a la separación?
+caregiver_full,75,sep_anx_07_separation_nightmares,Q082,adhd,adhd|elimination|anxiety|depression,¿Tiene pesadillas relacionadas con la separación?
+caregiver_full,76,sep_anx_08_physical_complaints_on_separation,Q083,adhd,adhd|elimination|anxiety|depression,"¿Presenta molestias físicas, como dolor de cabeza, dolor de estómago o náuseas, cuando anticipa o vive una separación?"
+caregiver_full,77,sep_anx_duration_weeks,Q084,adhd,adhd|elimination|anxiety|depression,¿Desde hace cuántas semanas viene ocurriendo este miedo intenso a separarse de sus figuras de cuidado principales?
+caregiver_full,78,sep_anx_impairment,Q085,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta a la vida diaria este miedo a separarse de sus figuras de cuidado principales?
+caregiver_full,79,social_anxiety_almost_always_triggered,Q087,adhd,adhd|elimination|anxiety|depression,¿Ese miedo aparece casi siempre cuando enfrenta esas situaciones?
+caregiver_full,80,social_anxiety_avoid_or_endure_intense,Q088,adhd,adhd|elimination|anxiety|depression,¿Evita esas situaciones o las soporta con mucha ansiedad?
+caregiver_full,81,social_anxiety_children_peer_only_flag,Q089,adhd,adhd|depression,"¿Este miedo también aparece con personas de su misma edad, y no solo con adultos?"
+caregiver_full,82,social_anxiety_duration_months,Q091,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente este patrón de ansiedad social?
+caregiver_full,83,social_anxiety_fear_being_observed,Q092,adhd,adhd|elimination|anxiety|depression,¿Le da mucho miedo hacer algo mientras otras personas lo observan?
+caregiver_full,84,social_anxiety_fear_interactions,Q093,adhd,adhd|anxiety|depression,¿Le da mucho miedo interactuar con otras personas?
+caregiver_full,85,social_anxiety_fear_negative_evaluation,Q094,adhd,adhd|elimination|anxiety|depression,"¿Le preocupa intensamente hacer el ridículo, quedar mal o ser juzgado negativamente?"
+caregiver_full,86,social_anxiety_fear_performance,Q095,adhd,adhd|elimination|anxiety|depression,"¿Le da mucho miedo actuar, exponer o hablar frente a otras personas?"
+caregiver_full,87,social_anxiety_impairment,Q096,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta esta ansiedad social la vida diaria?
+caregiver_full,88,pdd_01_appetite_change,Q099,adhd,adhd|elimination|anxiety|depression,¿Ha habido cambios persistentes en el apetito?
+caregiver_full,89,pdd_02_sleep_change,Q100,adhd,adhd|elimination|anxiety|depression,"Durante este periodo, ¿ha dormido mucho menos o mucho más de lo habitual?"
+caregiver_full,90,pdd_03_low_energy,Q101,adhd,adhd|elimination|anxiety|depression,¿Se ha mostrado con poca energía durante mucho tiempo?
+caregiver_full,91,pdd_04_low_self_esteem,Q102,adhd,adhd|elimination|anxiety|depression,¿Suele sentirse mal consigo mismo o con baja autoestima?
+caregiver_full,92,pdd_05_concentration_difficulty,Q103,adhd,adhd|conduct|anxiety|depression,¿Tiene dificultad persistente para concentrarse o pensar con claridad?
+caregiver_full,93,pdd_06_hopelessness,Q104,adhd,adhd|anxiety|depression,¿Se muestra sin esperanza o cree que las cosas no van a mejorar?
+caregiver_full,94,pdd_depressed_or_irritable_mood,Q105,adhd,adhd|elimination|anxiety|depression,"¿Se ha mostrado triste, decaído o irritable la mayor parte del tiempo?"
+caregiver_full,95,pdd_duration_months_child,Q106,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente este estado de ánimo triste o irritable persistente?
+caregiver_full,96,pdd_impairment,Q107,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta este estado de ánimo persistente la vida diaria?
+caregiver_full,97,pdd_no_gap_gt_2_months,Q108,adhd,adhd|depression,"Durante este periodo, ¿pasó menos de dos meses seguidos completamente sin estos síntomas?"
+caregiver_full,98,mdd_02_loss_of_interest_or_pleasure,Q113,adhd,adhd|anxiety|depression,¿Ha perdido interés o disfrute en actividades que antes le gustaban?
+caregiver_full,99,mdd_03_weight_or_appetite_change,Q114,adhd,adhd|elimination|anxiety|depression,¿Ha habido un cambio importante de apetito o peso?
+caregiver_full,100,mdd_05_psychomotor_change,Q116,adhd,adhd|conduct|elimination|anxiety|depression,¿Se nota mucho más lento o mucho más inquieto de lo habitual?
+caregiver_full,101,mdd_06_fatigue_or_low_energy,Q117,adhd,adhd|conduct|elimination|anxiety|depression,¿Se muestra cansado o con muy poca energía?
+caregiver_full,102,mdd_07_worthlessness_or_excessive_guilt,Q118,adhd,adhd|elimination|anxiety|depression,¿Expresa sentirse inútil o tener culpa excesiva?
+caregiver_full,103,mdd_08_concentration_or_decision_difficulty,Q119,adhd,adhd|anxiety|depression,¿Tiene mucha dificultad para concentrarse o decidir?
+caregiver_full,104,mdd_09_death_or_suicidal_thoughts,Q120,adhd,adhd|elimination|anxiety|depression,"¿Ha expresado ideas frecuentes sobre muerte, querer desaparecer o hacerse daño?"
+caregiver_full,105,mdd_duration_weeks,Q121,adhd,adhd|conduct|elimination|anxiety|depression,"¿Desde hace cuántas semanas viene presentando este estado de ánimo triste, decaído o irritable?"
+caregiver_full,106,mdd_impairment,Q122,adhd,adhd|conduct|elimination|anxiety|depression,¿Cuánto afecta este problema del estado de ánimo la vida diaria?
+caregiver_full,107,dmdd_context_home,Q126,adhd,adhd|depression,¿Los estallidos o la irritabilidad intensa aparecen en casa?
+caregiver_full,108,dmdd_context_peers,Q127,adhd,adhd|depression,¿Los estallidos o la irritabilidad intensa aparecen con otras personas de su edad o con amistades?
+caregiver_full,109,dmdd_context_school,Q128,adhd,adhd|depression,¿Los estallidos o la irritabilidad intensa aparecen en el colegio?
+caregiver_full,110,dmdd_duration_months,Q130,adhd,adhd|conduct|elimination|depression,¿Cuántos meses lleva presente este patrón de irritabilidad y estallidos?
+caregiver_full,111,dmdd_irritable_between_outbursts,Q131,adhd,adhd|conduct|elimination|anxiety|depression,¿Entre estallidos se mantiene irritable o de mal genio la mayor parte del tiempo?
+caregiver_full,112,dmdd_onset_before_10,Q135,adhd,adhd|depression,¿Este patrón empezó antes de los 10 años?
+caregiver_full,113,dmdd_outbursts_frequency_per_week,Q136,adhd,adhd|conduct|elimination|anxiety|depression,"¿Cuántos estallidos graves ocurren, en promedio, por semana?"
+caregiver_full,114,dmdd_outbursts_severity,Q137,adhd,adhd|conduct|elimination|anxiety|depression,¿Qué tan graves son los estallidos?
+caregiver_full,115,encopresis_constipation_present,Q138,adhd,adhd|elimination|depression,"Pensando en los problemas para evacuar o en los escapes de heces, ¿también hay estreñimiento?"
+caregiver_full,116,encopresis_duration_months_consecutive,Q139,adhd,adhd|elimination|depression,"Pensando en los escapes de heces o en ensuciarse, ¿cuántos meses seguidos lleva ocurriendo este problema?"
+caregiver_full,117,encopresis_event_frequency_per_month,Q140,adhd,adhd|elimination|anxiety|depression,"Pensando en los escapes de heces o en ensuciarse, ¿cuántas veces por mes ocurre este problema?"
+caregiver_full,118,encopresis_visible_deposition_pattern,Q143,adhd,adhd|elimination|depression,¿Qué tan evidente es el patrón de ensuciar o evacuar en lugares inadecuados?
+caregiver_full,119,enuresis_distress_impairment,Q144,adhd,adhd|elimination|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuánto malestar o impacto genera este problema?"
+caregiver_full,120,enuresis_diurnal,Q145,adhd,adhd|elimination|depression,¿Los escapes de orina ocurren principalmente de día?
+caregiver_full,121,enuresis_duration_months_consecutive,Q146,adhd,adhd|elimination|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuántos meses seguidos lleva ocurriendo este problema?"
+caregiver_full,122,enuresis_event_frequency_per_week,Q147,adhd,adhd|elimination|anxiety|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuántas veces por semana ocurre este problema?"
+caregiver_full,123,enuresis_nocturnal,Q148,adhd,adhd|elimination|depression,¿Los escapes de orina ocurren principalmente durante el sueño o en la noche?
+caregiver_full,124,enuresis_primary_course,Q150,adhd,adhd|elimination|depression,¿Nunca llegó a mantener un periodo claro de continencia antes de que apareciera este problema?
+caregiver_full,125,enuresis_secondary_course,Q151,adhd,adhd|elimination|depression,¿Este problema apareció después de haber tenido un periodo claro de continencia?
+psychologist_1_3,1,adhd_hypimp_02_leaves_seat,Q007,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se levanta cuando debería permanecer sentado?
+psychologist_1_3,2,adhd_hypimp_04_cannot_play_quietly,Q009,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia tiene dificultad para jugar o participar tranquilamente en actividades calmadas?
+psychologist_1_3,3,adhd_hypimp_05_driven_by_motor,Q010,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece estar acelerado o no puede quedarse quieto?
+psychologist_1_3,4,adhd_hypimp_07_blurts_out,Q012,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia responde antes de que terminen de hablarle o interrumpe la secuencia normal de la conversación?
+psychologist_1_3,5,adhd_hypimp_08_difficulty_waiting_turn,Q013,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta esperar su turno?
+psychologist_1_3,6,adhd_inatt_01_attention_to_detail_errors,Q015,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia comete errores por descuido o no presta suficiente atención a los detalles?
+psychologist_1_3,7,adhd_inatt_02_sustained_attention_difficulty,Q016,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta mantener la atención en tareas o actividades?
+psychologist_1_3,8,adhd_inatt_03_seems_not_listening,Q017,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece que no escucha cuando se le habla directamente?
+psychologist_1_3,9,adhd_inatt_04_fails_to_finish_tasks,Q018,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia empieza tareas, deberes o actividades, pero no las termina o no sigue las instrucciones hasta el final?"
+psychologist_1_3,10,adhd_inatt_05_organization_difficulty,Q019,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia tiene dificultades para organizar tareas, materiales o actividades?"
+psychologist_1_3,11,adhd_inatt_06_avoids_sustained_effort,Q020,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia evita o rechaza tareas que exigen esfuerzo mental sostenido?
+psychologist_1_3,12,adhd_inatt_07_loses_things,Q021,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia pierde objetos necesarios para sus actividades?
+psychologist_1_3,13,adhd_inatt_08_easily_distracted,Q022,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se distrae fácilmente con estímulos externos o pensamientos irrelevantes?
+psychologist_1_3,14,adhd_inatt_09_forgetful_daily_activities,Q023,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia es olvidadizo en actividades diarias?
+psychologist_1_3,15,adhd_onset_before_12,Q028,adhd,adhd|depression,"Pensando en la historia del niño o la niña hasta hoy, ¿estas dificultades ya se observaban claramente desde años anteriores y no comenzaron solo recientemente?"
+psychologist_1_3,16,conduct_01_bullies_threatens_intimidates,Q036,adhd,adhd|conduct|elimination|anxiety|depression,"¿Ha intimidado, amenazado o acosado repetidamente a otras personas?"
+psychologist_1_3,17,conduct_02_initiates_fights,Q037,adhd,adhd|conduct|anxiety|depression,¿Ha iniciado peleas físicas?
+psychologist_1_3,18,conduct_03_weapon_use,Q038,adhd,adhd|conduct|anxiety|depression,¿Ha usado un objeto o arma que pudiera causar daño grave?
+psychologist_1_3,19,conduct_04_physical_cruelty_people,Q039,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con otras personas?
+psychologist_1_3,20,conduct_05_physical_cruelty_animals,Q040,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con animales?
+psychologist_1_3,21,conduct_06_steals_confronting_victim,Q041,adhd,adhd|conduct|anxiety|depression,"¿Ha robado algo usando amenaza, fuerza o intimidación contra otra persona?"
+psychologist_1_3,22,conduct_07_forced_sex,Q042,adhd,adhd|conduct|anxiety|depression,¿Ha forzado a otra persona a una actividad sexual?
+psychologist_1_3,23,conduct_08_fire_setting,Q043,adhd,adhd|conduct|elimination|anxiety|depression,¿Ha provocado incendios deliberadamente con intención de causar daño o problemas serios?
+psychologist_1_3,24,conduct_09_property_destruction,Q044,adhd,adhd|conduct|anxiety|depression,¿Ha destruido deliberadamente propiedad ajena?
+psychologist_1_3,25,conduct_10_breaks_into_house_building_car,Q045,adhd,adhd|conduct|anxiety|depression,"¿Ha entrado por la fuerza a una casa, edificio o vehículo que no le pertenecía?"
+psychologist_1_3,26,conduct_11_lies_to_obtain_or_avoid,Q046,adhd,adhd|conduct|anxiety|depression,"¿Miente con frecuencia para obtener beneficios, evitar consecuencias o librarse de obligaciones?"
+psychologist_1_3,27,conduct_12_steals_without_confrontation,Q047,adhd,adhd|conduct|anxiety|depression,"¿Ha robado objetos sin usar amenaza, fuerza ni contacto directo con la persona afectada?"
+psychologist_1_3,28,conduct_13_stays_out_at_night_before_13,Q048,adhd,adhd|conduct|anxiety|depression,¿Se ha quedado fuera de casa durante la noche sin permiso?
+psychologist_1_3,29,conduct_14_runs_away_overnight,Q049,adhd,adhd|conduct|anxiety|depression,¿Se ha escapado de casa pasando la noche fuera?
+psychologist_1_3,30,conduct_15_truancy_before_13,Q050,adhd,adhd|conduct|anxiety|depression,¿Ha faltado al colegio sin permiso?
+psychologist_1_3,31,gad_difficulty_controlling_worry,Q070,adhd,adhd|elimination|anxiety|depression,¿Le cuesta controlar o detener la preocupación una vez que empieza?
+psychologist_1_3,32,gad_excessive_worry_multiple_areas,Q072,adhd,adhd|anxiety|depression,"¿Se preocupa en exceso por varios aspectos de la vida cotidiana, incluso cuando no parece necesario?"
+psychologist_1_3,33,sep_anx_01_distress_on_separation,Q076,adhd,adhd|elimination|anxiety|depression,¿Se angustia mucho cuando se separa de sus figuras de apego principales?
+psychologist_1_3,34,sep_anx_02_worry_losing_attachment_figures,Q077,adhd,adhd|elimination|anxiety|depression,¿Le preocupa perder a sus figuras de apego o que les pase algo grave?
+psychologist_1_3,35,sep_anx_03_worry_event_causing_separation,Q078,adhd,adhd|elimination|anxiety|depression,¿Le preocupa que ocurra algo que lo separe de sus figuras de apego?
+psychologist_1_3,36,sep_anx_04_refuses_leaving_home_school,Q079,adhd,adhd|elimination|anxiety|depression,"¿Evita o se niega a salir de casa, ir al colegio o quedarse en otros lugares por miedo a separarse?"
+psychologist_1_3,37,sep_anx_05_fear_being_alone_without_attachment,Q080,adhd,adhd|elimination|anxiety|depression,¿Le da miedo estar solo o sin una figura de apego cerca?
+psychologist_1_3,38,sep_anx_06_refuses_sleep_away_or_alone,Q081,adhd,adhd|elimination|anxiety|depression,¿Se niega a dormir fuera de casa o a dormir solo por miedo a la separación?
+psychologist_1_3,39,sep_anx_07_separation_nightmares,Q082,adhd,adhd|elimination|anxiety|depression,¿Tiene pesadillas relacionadas con la separación?
+psychologist_1_3,40,sep_anx_08_physical_complaints_on_separation,Q083,adhd,adhd|elimination|anxiety|depression,"¿Presenta molestias físicas, como dolor de cabeza, dolor de estómago o náuseas, cuando anticipa o vive una separación?"
+psychologist_1_3,41,social_anxiety_almost_always_triggered,Q087,adhd,adhd|elimination|anxiety|depression,¿Ese miedo aparece casi siempre cuando enfrenta esas situaciones?
+psychologist_1_3,42,social_anxiety_avoid_or_endure_intense,Q088,adhd,adhd|elimination|anxiety|depression,¿Evita esas situaciones o las soporta con mucha ansiedad?
+psychologist_1_3,43,social_anxiety_fear_being_observed,Q092,adhd,adhd|elimination|anxiety|depression,¿Le da mucho miedo hacer algo mientras otras personas lo observan?
+psychologist_1_3,44,social_anxiety_fear_interactions,Q093,adhd,adhd|anxiety|depression,¿Le da mucho miedo interactuar con otras personas?
+psychologist_1_3,45,pdd_depressed_or_irritable_mood,Q105,adhd,adhd|elimination|anxiety|depression,"¿Se ha mostrado triste, decaído o irritable la mayor parte del tiempo?"
+psychologist_1_3,46,pdd_duration_months_child,Q106,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente este estado de ánimo triste o irritable persistente?
+psychologist_1_3,47,pdd_impairment,Q107,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta este estado de ánimo persistente la vida diaria?
+psychologist_1_3,48,mdd_duration_weeks,Q121,adhd,adhd|conduct|elimination|anxiety|depression,"¿Desde hace cuántas semanas viene presentando este estado de ánimo triste, decaído o irritable?"
+psychologist_1_3,49,mdd_impairment,Q122,adhd,adhd|conduct|elimination|anxiety|depression,¿Cuánto afecta este problema del estado de ánimo la vida diaria?
+psychologist_1_3,50,dmdd_context_home,Q126,adhd,adhd|depression,¿Los estallidos o la irritabilidad intensa aparecen en casa?
+psychologist_1_3,51,dmdd_context_peers,Q127,adhd,adhd|depression,¿Los estallidos o la irritabilidad intensa aparecen con otras personas de su edad o con amistades?
+psychologist_1_3,52,dmdd_context_school,Q128,adhd,adhd|depression,¿Los estallidos o la irritabilidad intensa aparecen en el colegio?
+psychologist_1_3,53,dmdd_duration_months,Q130,adhd,adhd|conduct|elimination|depression,¿Cuántos meses lleva presente este patrón de irritabilidad y estallidos?
+psychologist_1_3,54,dmdd_irritable_between_outbursts,Q131,adhd,adhd|conduct|elimination|anxiety|depression,¿Entre estallidos se mantiene irritable o de mal genio la mayor parte del tiempo?
+psychologist_1_3,55,dmdd_outbursts_frequency_per_week,Q136,adhd,adhd|conduct|elimination|anxiety|depression,"¿Cuántos estallidos graves ocurren, en promedio, por semana?"
+psychologist_1_3,56,encopresis_duration_months_consecutive,Q139,adhd,adhd|elimination|depression,"Pensando en los escapes de heces o en ensuciarse, ¿cuántos meses seguidos lleva ocurriendo este problema?"
+psychologist_1_3,57,encopresis_event_frequency_per_month,Q140,adhd,adhd|elimination|anxiety|depression,"Pensando en los escapes de heces o en ensuciarse, ¿cuántas veces por mes ocurre este problema?"
+psychologist_1_3,58,enuresis_duration_months_consecutive,Q146,adhd,adhd|elimination|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuántos meses seguidos lleva ocurriendo este problema?"
+psychologist_1_3,59,enuresis_nocturnal,Q148,adhd,adhd|elimination|depression,¿Los escapes de orina ocurren principalmente durante el sueño o en la noche?
+psychologist_1_3,60,enuresis_primary_course,Q150,adhd,adhd|elimination|depression,¿Nunca llegó a mantener un periodo claro de continencia antes de que apareciera este problema?
+psychologist_2_3,1,age_years,Q001,adhd,adhd|conduct|elimination|anxiety|depression,"¿Qué edad tiene el niño o la niña, en años cumplidos?"
+psychologist_2_3,2,sex_assigned_at_birth,Q002,adhd,adhd|depression,¿Qué sexo se registró al nacer para el niño o la niña?
+psychologist_2_3,3,adhd_context_home,Q003,adhd,adhd|conduct|depression,"Pensando en dificultades frecuentes de atención, inquietud o impulsividad, ¿estas conductas se observan claramente en casa?"
+psychologist_2_3,4,adhd_context_other,Q004,adhd,adhd|depression,"¿Estos síntomas también se observan en otros contextos, por ejemplo con familiares, amistades o actividades?"
+psychologist_2_3,5,adhd_context_school,Q005,adhd,adhd|depression,¿Estos síntomas se observan en el colegio o en otras actividades de aprendizaje?
+psychologist_2_3,6,adhd_hypimp_01_fidgets,Q006,adhd,adhd|conduct|elimination|anxiety|depression,"¿Con qué frecuencia mueve mucho las manos o los pies, o se mueve inquieto mientras está sentado?"
+psychologist_2_3,7,adhd_hypimp_02_leaves_seat,Q007,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se levanta cuando debería permanecer sentado?
+psychologist_2_3,8,adhd_hypimp_03_runs_or_climbs_inappropriately,Q008,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia corre, trepa o se mueve excesivamente cuando no corresponde?"
+psychologist_2_3,9,adhd_hypimp_04_cannot_play_quietly,Q009,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia tiene dificultad para jugar o participar tranquilamente en actividades calmadas?
+psychologist_2_3,10,adhd_hypimp_05_driven_by_motor,Q010,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece estar acelerado o no puede quedarse quieto?
+psychologist_2_3,11,adhd_hypimp_06_talks_excessively,Q011,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia habla en exceso?
+psychologist_2_3,12,adhd_hypimp_07_blurts_out,Q012,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia responde antes de que terminen de hablarle o interrumpe la secuencia normal de la conversación?
+psychologist_2_3,13,adhd_hypimp_08_difficulty_waiting_turn,Q013,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta esperar su turno?
+psychologist_2_3,14,adhd_hypimp_09_interrupts_intrudes,Q014,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia interrumpe actividades o conversaciones de otras personas?
+psychologist_2_3,15,adhd_inatt_01_attention_to_detail_errors,Q015,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia comete errores por descuido o no presta suficiente atención a los detalles?
+psychologist_2_3,16,adhd_inatt_02_sustained_attention_difficulty,Q016,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta mantener la atención en tareas o actividades?
+psychologist_2_3,17,adhd_inatt_03_seems_not_listening,Q017,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece que no escucha cuando se le habla directamente?
+psychologist_2_3,18,adhd_inatt_04_fails_to_finish_tasks,Q018,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia empieza tareas, deberes o actividades, pero no las termina o no sigue las instrucciones hasta el final?"
+psychologist_2_3,19,adhd_inatt_05_organization_difficulty,Q019,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia tiene dificultades para organizar tareas, materiales o actividades?"
+psychologist_2_3,20,adhd_inatt_06_avoids_sustained_effort,Q020,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia evita o rechaza tareas que exigen esfuerzo mental sostenido?
+psychologist_2_3,21,adhd_inatt_07_loses_things,Q021,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia pierde objetos necesarios para sus actividades?
+psychologist_2_3,22,adhd_inatt_08_easily_distracted,Q022,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se distrae fácilmente con estímulos externos o pensamientos irrelevantes?
+psychologist_2_3,23,adhd_inatt_09_forgetful_daily_activities,Q023,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia es olvidadizo en actividades diarias?
+psychologist_2_3,24,adhd_impairment_home,Q024,adhd,adhd|conduct|elimination|anxiety|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan la convivencia o el funcionamiento en casa?"
+psychologist_2_3,25,adhd_impairment_school,Q025,adhd,adhd|conduct|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan el funcionamiento escolar o de aprendizaje?"
+psychologist_2_3,26,adhd_impairment_social,Q026,adhd,adhd|conduct|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan las amistades, el juego o la relación con otras personas?"
+psychologist_2_3,27,conduct_impairment_global,Q027,adhd,adhd|conduct|elimination|depression,"En conjunto, ¿cuánto afectan estas conductas la vida diaria?"
+psychologist_2_3,28,adhd_onset_before_12,Q028,adhd,adhd|depression,"Pensando en la historia del niño o la niña hasta hoy, ¿estas dificultades ya se observaban claramente desde años anteriores y no comenzaron solo recientemente?"
+psychologist_2_3,29,adhd_not_better_explained_other_mental,Q030,adhd,adhd|depression,"Según su juicio clínico, ¿estas dificultades de atención e hiperactividad no se explican mejor por otro trastorno mental?"
+psychologist_2_3,30,conduct_01_bullies_threatens_intimidates,Q036,adhd,adhd|conduct|elimination|anxiety|depression,"¿Ha intimidado, amenazado o acosado repetidamente a otras personas?"
+psychologist_2_3,31,conduct_02_initiates_fights,Q037,adhd,adhd|conduct|anxiety|depression,¿Ha iniciado peleas físicas?
+psychologist_2_3,32,conduct_03_weapon_use,Q038,adhd,adhd|conduct|anxiety|depression,¿Ha usado un objeto o arma que pudiera causar daño grave?
+psychologist_2_3,33,conduct_04_physical_cruelty_people,Q039,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con otras personas?
+psychologist_2_3,34,conduct_05_physical_cruelty_animals,Q040,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con animales?
+psychologist_2_3,35,conduct_06_steals_confronting_victim,Q041,adhd,adhd|conduct|anxiety|depression,"¿Ha robado algo usando amenaza, fuerza o intimidación contra otra persona?"
+psychologist_2_3,36,conduct_07_forced_sex,Q042,adhd,adhd|conduct|anxiety|depression,¿Ha forzado a otra persona a una actividad sexual?
+psychologist_2_3,37,conduct_08_fire_setting,Q043,adhd,adhd|conduct|elimination|anxiety|depression,¿Ha provocado incendios deliberadamente con intención de causar daño o problemas serios?
+psychologist_2_3,38,conduct_09_property_destruction,Q044,adhd,adhd|conduct|anxiety|depression,¿Ha destruido deliberadamente propiedad ajena?
+psychologist_2_3,39,conduct_10_breaks_into_house_building_car,Q045,adhd,adhd|conduct|anxiety|depression,"¿Ha entrado por la fuerza a una casa, edificio o vehículo que no le pertenecía?"
+psychologist_2_3,40,conduct_11_lies_to_obtain_or_avoid,Q046,adhd,adhd|conduct|anxiety|depression,"¿Miente con frecuencia para obtener beneficios, evitar consecuencias o librarse de obligaciones?"
+psychologist_2_3,41,conduct_12_steals_without_confrontation,Q047,adhd,adhd|conduct|anxiety|depression,"¿Ha robado objetos sin usar amenaza, fuerza ni contacto directo con la persona afectada?"
+psychologist_2_3,42,conduct_13_stays_out_at_night_before_13,Q048,adhd,adhd|conduct|anxiety|depression,¿Se ha quedado fuera de casa durante la noche sin permiso?
+psychologist_2_3,43,conduct_14_runs_away_overnight,Q049,adhd,adhd|conduct|anxiety|depression,¿Se ha escapado de casa pasando la noche fuera?
+psychologist_2_3,44,conduct_15_truancy_before_13,Q050,adhd,adhd|conduct|anxiety|depression,¿Ha faltado al colegio sin permiso?
+psychologist_2_3,45,agor_avoid_or_need_companion,Q052,adhd,adhd|elimination|anxiety|depression,¿Evita estas situaciones o necesita compañía para tolerarlas?
+psychologist_2_3,46,agor_duration_months,Q054,adhd,adhd|conduct|elimination|anxiety|depression,¿Cuántos meses lleva presente este patrón de miedo o evitación?
+psychologist_2_3,47,agor_escape_help_cognition,Q055,adhd,adhd|elimination|anxiety|depression,¿El miedo aparece porque piensa que escapar sería difícil o que no recibiría ayuda si algo sale mal?
+psychologist_2_3,48,agor_fear_01_public_transport,Q056,adhd,adhd|anxiety|depression,¿Tiene mucho miedo a usar transporte público?
+psychologist_2_3,49,agor_fear_02_open_spaces,Q057,adhd,adhd|anxiety|depression,¿Tiene mucho miedo a estar en espacios abiertos?
+psychologist_2_3,50,agor_fear_03_enclosed_spaces,Q058,adhd,adhd|elimination|anxiety|depression,¿Tiene mucho miedo a estar en lugares cerrados?
+psychologist_2_3,51,agor_fear_04_crowds_queues,Q059,adhd,adhd|elimination|anxiety|depression,¿Tiene mucho miedo a estar en filas o multitudes?
+psychologist_2_3,52,agor_fear_05_outside_home_alone,Q060,adhd,adhd|elimination|anxiety|depression,¿Tiene mucho miedo a estar fuera de casa solo o sola?
+psychologist_2_3,53,agor_impairment,Q061,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta este miedo la vida diaria?
+psychologist_2_3,54,gad_assoc_01_restlessness,Q064,adhd,adhd|elimination|anxiety|depression,"¿Se muestra inquieto, nervioso o incapaz de relajarse?"
+psychologist_2_3,55,gad_assoc_02_fatigue,Q065,adhd,adhd|elimination|anxiety|depression,¿Se cansa con facilidad o muestra baja energía asociada a la preocupación?
+psychologist_2_3,56,gad_assoc_03_concentration_difficulty,Q066,adhd,adhd|elimination|anxiety|depression,¿La preocupación le dificulta concentrarse o pensar con claridad?
+psychologist_2_3,57,gad_assoc_04_irritability,Q067,adhd,adhd|elimination|anxiety|depression,¿Se muestra irritable o fácilmente molesto cuando está preocupado?
+psychologist_2_3,58,gad_assoc_05_muscle_tension,Q068,adhd,adhd|elimination|anxiety|depression,¿Presenta tensión muscular asociada a preocupación o ansiedad?
+psychologist_2_3,59,gad_assoc_06_sleep_problems,Q069,adhd,adhd|elimination|anxiety|depression,¿Tiene problemas de sueño asociados a preocupación o ansiedad?
+psychologist_2_3,60,gad_difficulty_controlling_worry,Q070,adhd,adhd|elimination|anxiety|depression,¿Le cuesta controlar o detener la preocupación una vez que empieza?
+psychologist_2_3,61,gad_duration_months,Q071,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente esta preocupación excesiva?
+psychologist_2_3,62,gad_excessive_worry_multiple_areas,Q072,adhd,adhd|anxiety|depression,"¿Se preocupa en exceso por varios aspectos de la vida cotidiana, incluso cuando no parece necesario?"
+psychologist_2_3,63,gad_impairment,Q073,adhd,adhd|elimination|anxiety|depression,¿Cuánto afectan estas preocupaciones a la vida diaria?
+psychologist_2_3,64,sep_anx_01_distress_on_separation,Q076,adhd,adhd|elimination|anxiety|depression,¿Se angustia mucho cuando se separa de sus figuras de apego principales?
+psychologist_2_3,65,sep_anx_02_worry_losing_attachment_figures,Q077,adhd,adhd|elimination|anxiety|depression,¿Le preocupa perder a sus figuras de apego o que les pase algo grave?
+psychologist_2_3,66,sep_anx_03_worry_event_causing_separation,Q078,adhd,adhd|elimination|anxiety|depression,¿Le preocupa que ocurra algo que lo separe de sus figuras de apego?
+psychologist_2_3,67,sep_anx_04_refuses_leaving_home_school,Q079,adhd,adhd|elimination|anxiety|depression,"¿Evita o se niega a salir de casa, ir al colegio o quedarse en otros lugares por miedo a separarse?"
+psychologist_2_3,68,sep_anx_05_fear_being_alone_without_attachment,Q080,adhd,adhd|elimination|anxiety|depression,¿Le da miedo estar solo o sin una figura de apego cerca?
+psychologist_2_3,69,sep_anx_06_refuses_sleep_away_or_alone,Q081,adhd,adhd|elimination|anxiety|depression,¿Se niega a dormir fuera de casa o a dormir solo por miedo a la separación?
+psychologist_2_3,70,sep_anx_07_separation_nightmares,Q082,adhd,adhd|elimination|anxiety|depression,¿Tiene pesadillas relacionadas con la separación?
+psychologist_2_3,71,sep_anx_08_physical_complaints_on_separation,Q083,adhd,adhd|elimination|anxiety|depression,"¿Presenta molestias físicas, como dolor de cabeza, dolor de estómago o náuseas, cuando anticipa o vive una separación?"
+psychologist_2_3,72,sep_anx_duration_weeks,Q084,adhd,adhd|elimination|anxiety|depression,¿Desde hace cuántas semanas viene ocurriendo este miedo intenso a separarse de sus figuras de cuidado principales?
+psychologist_2_3,73,sep_anx_impairment,Q085,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta a la vida diaria este miedo a separarse de sus figuras de cuidado principales?
+psychologist_2_3,74,social_anxiety_almost_always_triggered,Q087,adhd,adhd|elimination|anxiety|depression,¿Ese miedo aparece casi siempre cuando enfrenta esas situaciones?
+psychologist_2_3,75,social_anxiety_avoid_or_endure_intense,Q088,adhd,adhd|elimination|anxiety|depression,¿Evita esas situaciones o las soporta con mucha ansiedad?
+psychologist_2_3,76,social_anxiety_duration_months,Q091,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente este patrón de ansiedad social?
+psychologist_2_3,77,social_anxiety_fear_being_observed,Q092,adhd,adhd|elimination|anxiety|depression,¿Le da mucho miedo hacer algo mientras otras personas lo observan?
+psychologist_2_3,78,social_anxiety_fear_interactions,Q093,adhd,adhd|anxiety|depression,¿Le da mucho miedo interactuar con otras personas?
+psychologist_2_3,79,social_anxiety_fear_negative_evaluation,Q094,adhd,adhd|elimination|anxiety|depression,"¿Le preocupa intensamente hacer el ridículo, quedar mal o ser juzgado negativamente?"
+psychologist_2_3,80,social_anxiety_fear_performance,Q095,adhd,adhd|elimination|anxiety|depression,"¿Le da mucho miedo actuar, exponer o hablar frente a otras personas?"
+psychologist_2_3,81,social_anxiety_impairment,Q096,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta esta ansiedad social la vida diaria?
+psychologist_2_3,82,pdd_01_appetite_change,Q099,adhd,adhd|elimination|anxiety|depression,¿Ha habido cambios persistentes en el apetito?
+psychologist_2_3,83,pdd_05_concentration_difficulty,Q103,adhd,adhd|conduct|anxiety|depression,¿Tiene dificultad persistente para concentrarse o pensar con claridad?
+psychologist_2_3,84,pdd_depressed_or_irritable_mood,Q105,adhd,adhd|elimination|anxiety|depression,"¿Se ha mostrado triste, decaído o irritable la mayor parte del tiempo?"
+psychologist_2_3,85,pdd_duration_months_child,Q106,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente este estado de ánimo triste o irritable persistente?
+psychologist_2_3,86,pdd_impairment,Q107,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta este estado de ánimo persistente la vida diaria?
+psychologist_2_3,87,mdd_02_loss_of_interest_or_pleasure,Q113,adhd,adhd|anxiety|depression,¿Ha perdido interés o disfrute en actividades que antes le gustaban?
+psychologist_2_3,88,mdd_03_weight_or_appetite_change,Q114,adhd,adhd|elimination|anxiety|depression,¿Ha habido un cambio importante de apetito o peso?
+psychologist_2_3,89,mdd_05_psychomotor_change,Q116,adhd,adhd|conduct|elimination|anxiety|depression,¿Se nota mucho más lento o mucho más inquieto de lo habitual?
+psychologist_2_3,90,mdd_06_fatigue_or_low_energy,Q117,adhd,adhd|conduct|elimination|anxiety|depression,¿Se muestra cansado o con muy poca energía?
+psychologist_2_3,91,mdd_07_worthlessness_or_excessive_guilt,Q118,adhd,adhd|elimination|anxiety|depression,¿Expresa sentirse inútil o tener culpa excesiva?
+psychologist_2_3,92,mdd_08_concentration_or_decision_difficulty,Q119,adhd,adhd|anxiety|depression,¿Tiene mucha dificultad para concentrarse o decidir?
+psychologist_2_3,93,mdd_09_death_or_suicidal_thoughts,Q120,adhd,adhd|elimination|anxiety|depression,"¿Ha expresado ideas frecuentes sobre muerte, querer desaparecer o hacerse daño?"
+psychologist_2_3,94,mdd_duration_weeks,Q121,adhd,adhd|conduct|elimination|anxiety|depression,"¿Desde hace cuántas semanas viene presentando este estado de ánimo triste, decaído o irritable?"
+psychologist_2_3,95,mdd_impairment,Q122,adhd,adhd|conduct|elimination|anxiety|depression,¿Cuánto afecta este problema del estado de ánimo la vida diaria?
+psychologist_2_3,96,dmdd_duration_months,Q130,adhd,adhd|conduct|elimination|depression,¿Cuántos meses lleva presente este patrón de irritabilidad y estallidos?
+psychologist_2_3,97,dmdd_irritable_between_outbursts,Q131,adhd,adhd|conduct|elimination|anxiety|depression,¿Entre estallidos se mantiene irritable o de mal genio la mayor parte del tiempo?
+psychologist_2_3,98,dmdd_outbursts_frequency_per_week,Q136,adhd,adhd|conduct|elimination|anxiety|depression,"¿Cuántos estallidos graves ocurren, en promedio, por semana?"
+psychologist_2_3,99,dmdd_outbursts_severity,Q137,adhd,adhd|conduct|elimination|anxiety|depression,¿Qué tan graves son los estallidos?
+psychologist_2_3,100,encopresis_constipation_present,Q138,adhd,adhd|elimination|depression,"Pensando en los problemas para evacuar o en los escapes de heces, ¿también hay estreñimiento?"
+psychologist_2_3,101,encopresis_duration_months_consecutive,Q139,adhd,adhd|elimination|depression,"Pensando en los escapes de heces o en ensuciarse, ¿cuántos meses seguidos lleva ocurriendo este problema?"
+psychologist_2_3,102,encopresis_event_frequency_per_month,Q140,adhd,adhd|elimination|anxiety|depression,"Pensando en los escapes de heces o en ensuciarse, ¿cuántas veces por mes ocurre este problema?"
+psychologist_2_3,103,encopresis_not_due_substance_medical,Q141,adhd,adhd|depression,"Según su juicio clínico, ¿este problema de escapes de heces no se explica mejor por una sustancia o un problema médico?"
+psychologist_2_3,104,enuresis_distress_impairment,Q144,adhd,adhd|elimination|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuánto malestar o impacto genera este problema?"
+psychologist_2_3,105,enuresis_diurnal,Q145,adhd,adhd|elimination|depression,¿Los escapes de orina ocurren principalmente de día?
+psychologist_2_3,106,enuresis_duration_months_consecutive,Q146,adhd,adhd|elimination|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuántos meses seguidos lleva ocurriendo este problema?"
+psychologist_2_3,107,enuresis_event_frequency_per_week,Q147,adhd,adhd|elimination|anxiety|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuántas veces por semana ocurre este problema?"
+psychologist_2_3,108,enuresis_nocturnal,Q148,adhd,adhd|elimination|depression,¿Los escapes de orina ocurren principalmente durante el sueño o en la noche?
+psychologist_2_3,109,enuresis_not_due_substance_medical,Q149,adhd,adhd|elimination|depression,"Según su juicio clínico, ¿este problema de escapes de orina no se explica mejor por una sustancia o un problema médico?"
+psychologist_2_3,110,enuresis_primary_course,Q150,adhd,adhd|elimination|depression,¿Nunca llegó a mantener un periodo claro de continencia antes de que apareciera este problema?
+psychologist_full,1,age_years,Q001,adhd,adhd|conduct|elimination|anxiety|depression,"¿Qué edad tiene el niño o la niña, en años cumplidos?"
+psychologist_full,2,sex_assigned_at_birth,Q002,adhd,adhd|depression,¿Qué sexo se registró al nacer para el niño o la niña?
+psychologist_full,3,adhd_context_home,Q003,adhd,adhd|conduct|depression,"Pensando en dificultades frecuentes de atención, inquietud o impulsividad, ¿estas conductas se observan claramente en casa?"
+psychologist_full,4,adhd_context_other,Q004,adhd,adhd|depression,"¿Estos síntomas también se observan en otros contextos, por ejemplo con familiares, amistades o actividades?"
+psychologist_full,5,adhd_context_school,Q005,adhd,adhd|depression,¿Estos síntomas se observan en el colegio o en otras actividades de aprendizaje?
+psychologist_full,6,adhd_hypimp_01_fidgets,Q006,adhd,adhd|conduct|elimination|anxiety|depression,"¿Con qué frecuencia mueve mucho las manos o los pies, o se mueve inquieto mientras está sentado?"
+psychologist_full,7,adhd_hypimp_02_leaves_seat,Q007,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se levanta cuando debería permanecer sentado?
+psychologist_full,8,adhd_hypimp_03_runs_or_climbs_inappropriately,Q008,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia corre, trepa o se mueve excesivamente cuando no corresponde?"
+psychologist_full,9,adhd_hypimp_04_cannot_play_quietly,Q009,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia tiene dificultad para jugar o participar tranquilamente en actividades calmadas?
+psychologist_full,10,adhd_hypimp_05_driven_by_motor,Q010,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece estar acelerado o no puede quedarse quieto?
+psychologist_full,11,adhd_hypimp_06_talks_excessively,Q011,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia habla en exceso?
+psychologist_full,12,adhd_hypimp_07_blurts_out,Q012,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia responde antes de que terminen de hablarle o interrumpe la secuencia normal de la conversación?
+psychologist_full,13,adhd_hypimp_08_difficulty_waiting_turn,Q013,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta esperar su turno?
+psychologist_full,14,adhd_hypimp_09_interrupts_intrudes,Q014,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia interrumpe actividades o conversaciones de otras personas?
+psychologist_full,15,adhd_inatt_01_attention_to_detail_errors,Q015,adhd,adhd|conduct|anxiety|depression,¿Con qué frecuencia comete errores por descuido o no presta suficiente atención a los detalles?
+psychologist_full,16,adhd_inatt_02_sustained_attention_difficulty,Q016,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia le cuesta mantener la atención en tareas o actividades?
+psychologist_full,17,adhd_inatt_03_seems_not_listening,Q017,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia parece que no escucha cuando se le habla directamente?
+psychologist_full,18,adhd_inatt_04_fails_to_finish_tasks,Q018,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia empieza tareas, deberes o actividades, pero no las termina o no sigue las instrucciones hasta el final?"
+psychologist_full,19,adhd_inatt_05_organization_difficulty,Q019,adhd,adhd|conduct|anxiety|depression,"¿Con qué frecuencia tiene dificultades para organizar tareas, materiales o actividades?"
+psychologist_full,20,adhd_inatt_06_avoids_sustained_effort,Q020,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia evita o rechaza tareas que exigen esfuerzo mental sostenido?
+psychologist_full,21,adhd_inatt_07_loses_things,Q021,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia pierde objetos necesarios para sus actividades?
+psychologist_full,22,adhd_inatt_08_easily_distracted,Q022,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia se distrae fácilmente con estímulos externos o pensamientos irrelevantes?
+psychologist_full,23,adhd_inatt_09_forgetful_daily_activities,Q023,adhd,adhd|conduct|elimination|anxiety|depression,¿Con qué frecuencia es olvidadizo en actividades diarias?
+psychologist_full,24,adhd_impairment_home,Q024,adhd,adhd|conduct|elimination|anxiety|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan la convivencia o el funcionamiento en casa?"
+psychologist_full,25,adhd_impairment_school,Q025,adhd,adhd|conduct|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan el funcionamiento escolar o de aprendizaje?"
+psychologist_full,26,adhd_impairment_social,Q026,adhd,adhd|conduct|depression,"Pensando en estas dificultades de atención, inquietud o impulsividad, ¿cuánto afectan las amistades, el juego o la relación con otras personas?"
+psychologist_full,27,conduct_impairment_global,Q027,adhd,adhd|conduct|elimination|depression,"En conjunto, ¿cuánto afectan estas conductas la vida diaria?"
+psychologist_full,28,adhd_onset_before_12,Q028,adhd,adhd|depression,"Pensando en la historia del niño o la niña hasta hoy, ¿estas dificultades ya se observaban claramente desde años anteriores y no comenzaron solo recientemente?"
+psychologist_full,29,conduct_onset_before_10,Q029,adhd,adhd|depression,¿Las primeras conductas problemáticas relevantes empezaron antes de los 10 años?
+psychologist_full,30,adhd_not_better_explained_other_mental,Q030,adhd,adhd|depression,"Según su juicio clínico, ¿estas dificultades de atención e hiperactividad no se explican mejor por otro trastorno mental?"
+psychologist_full,31,adhd_not_psychosis_exclusive,Q031,adhd,adhd|depression,"Según su juicio clínico, ¿estas dificultades de atención e hiperactividad no aparecen exclusivamente durante un trastorno psicótico?"
+psychologist_full,32,conduct_lpe_01_lack_remorse_guilt,Q032,adhd,adhd|conduct|depression,¿Suele mostrar poca culpa o poco remordimiento después de hacer daño o de comportarse mal?
+psychologist_full,33,conduct_lpe_02_callous_lack_empathy,Q033,adhd,adhd|conduct|depression,¿Suele mostrar poca empatía o poca preocupación por los sentimientos de otras personas?
+psychologist_full,34,conduct_lpe_03_unconcerned_performance,Q034,adhd,adhd|conduct|depression,"¿Parece poco preocupado por cómo le va en el colegio, con otras personas o con su comportamiento?"
+psychologist_full,35,conduct_lpe_04_shallow_deficient_affect,Q035,adhd,adhd|conduct|depression,"¿La forma en que expresa sus emociones parece poco sincera, superficial o muy limitada?"
+psychologist_full,36,conduct_01_bullies_threatens_intimidates,Q036,adhd,adhd|conduct|elimination|anxiety|depression,"¿Ha intimidado, amenazado o acosado repetidamente a otras personas?"
+psychologist_full,37,conduct_02_initiates_fights,Q037,adhd,adhd|conduct|anxiety|depression,¿Ha iniciado peleas físicas?
+psychologist_full,38,conduct_03_weapon_use,Q038,adhd,adhd|conduct|anxiety|depression,¿Ha usado un objeto o arma que pudiera causar daño grave?
+psychologist_full,39,conduct_04_physical_cruelty_people,Q039,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con otras personas?
+psychologist_full,40,conduct_05_physical_cruelty_animals,Q040,adhd,adhd|conduct|anxiety|depression,¿Ha sido físicamente cruel con animales?
+psychologist_full,41,conduct_06_steals_confronting_victim,Q041,adhd,adhd|conduct|anxiety|depression,"¿Ha robado algo usando amenaza, fuerza o intimidación contra otra persona?"
+psychologist_full,42,conduct_07_forced_sex,Q042,adhd,adhd|conduct|anxiety|depression,¿Ha forzado a otra persona a una actividad sexual?
+psychologist_full,43,conduct_08_fire_setting,Q043,adhd,adhd|conduct|elimination|anxiety|depression,¿Ha provocado incendios deliberadamente con intención de causar daño o problemas serios?
+psychologist_full,44,conduct_09_property_destruction,Q044,adhd,adhd|conduct|anxiety|depression,¿Ha destruido deliberadamente propiedad ajena?
+psychologist_full,45,conduct_10_breaks_into_house_building_car,Q045,adhd,adhd|conduct|anxiety|depression,"¿Ha entrado por la fuerza a una casa, edificio o vehículo que no le pertenecía?"
+psychologist_full,46,conduct_11_lies_to_obtain_or_avoid,Q046,adhd,adhd|conduct|anxiety|depression,"¿Miente con frecuencia para obtener beneficios, evitar consecuencias o librarse de obligaciones?"
+psychologist_full,47,conduct_12_steals_without_confrontation,Q047,adhd,adhd|conduct|anxiety|depression,"¿Ha robado objetos sin usar amenaza, fuerza ni contacto directo con la persona afectada?"
+psychologist_full,48,conduct_13_stays_out_at_night_before_13,Q048,adhd,adhd|conduct|anxiety|depression,¿Se ha quedado fuera de casa durante la noche sin permiso?
+psychologist_full,49,conduct_14_runs_away_overnight,Q049,adhd,adhd|conduct|anxiety|depression,¿Se ha escapado de casa pasando la noche fuera?
+psychologist_full,50,conduct_15_truancy_before_13,Q050,adhd,adhd|conduct|anxiety|depression,¿Ha faltado al colegio sin permiso?
+psychologist_full,51,agor_almost_always_triggered,Q051,adhd,adhd|anxiety|depression,"Pensando en lugares o situaciones donde siente que sería difícil salir o recibir ayuda, ¿ese miedo aparece casi siempre cuando está allí?"
+psychologist_full,52,agor_avoid_or_need_companion,Q052,adhd,adhd|elimination|anxiety|depression,¿Evita estas situaciones o necesita compañía para tolerarlas?
+psychologist_full,53,agor_disproportionate,Q053,adhd,adhd|depression,"Según su juicio clínico, ¿el miedo es claramente desproporcionado para el peligro real?"
+psychologist_full,54,agor_duration_months,Q054,adhd,adhd|conduct|elimination|anxiety|depression,¿Cuántos meses lleva presente este patrón de miedo o evitación?
+psychologist_full,55,agor_escape_help_cognition,Q055,adhd,adhd|elimination|anxiety|depression,¿El miedo aparece porque piensa que escapar sería difícil o que no recibiría ayuda si algo sale mal?
+psychologist_full,56,agor_fear_01_public_transport,Q056,adhd,adhd|anxiety|depression,¿Tiene mucho miedo a usar transporte público?
+psychologist_full,57,agor_fear_02_open_spaces,Q057,adhd,adhd|anxiety|depression,¿Tiene mucho miedo a estar en espacios abiertos?
+psychologist_full,58,agor_fear_03_enclosed_spaces,Q058,adhd,adhd|elimination|anxiety|depression,¿Tiene mucho miedo a estar en lugares cerrados?
+psychologist_full,59,agor_fear_04_crowds_queues,Q059,adhd,adhd|elimination|anxiety|depression,¿Tiene mucho miedo a estar en filas o multitudes?
+psychologist_full,60,agor_fear_05_outside_home_alone,Q060,adhd,adhd|elimination|anxiety|depression,¿Tiene mucho miedo a estar fuera de casa solo o sola?
+psychologist_full,61,agor_impairment,Q061,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta este miedo la vida diaria?
+psychologist_full,62,agor_not_better_explained,Q062,adhd,adhd|depression,"Según su juicio clínico, ¿este miedo a ciertos lugares o situaciones no se explica mejor por otro trastorno?"
+psychologist_full,63,agor_not_excessive_due_medical,Q063,adhd,adhd|depression,"Según su juicio clínico, ¿este miedo a ciertos lugares o situaciones no se explica mejor por una condición médica?"
+psychologist_full,64,gad_assoc_01_restlessness,Q064,adhd,adhd|elimination|anxiety|depression,"¿Se muestra inquieto, nervioso o incapaz de relajarse?"
+psychologist_full,65,gad_assoc_02_fatigue,Q065,adhd,adhd|elimination|anxiety|depression,¿Se cansa con facilidad o muestra baja energía asociada a la preocupación?
+psychologist_full,66,gad_assoc_03_concentration_difficulty,Q066,adhd,adhd|elimination|anxiety|depression,¿La preocupación le dificulta concentrarse o pensar con claridad?
+psychologist_full,67,gad_assoc_04_irritability,Q067,adhd,adhd|elimination|anxiety|depression,¿Se muestra irritable o fácilmente molesto cuando está preocupado?
+psychologist_full,68,gad_assoc_05_muscle_tension,Q068,adhd,adhd|elimination|anxiety|depression,¿Presenta tensión muscular asociada a preocupación o ansiedad?
+psychologist_full,69,gad_assoc_06_sleep_problems,Q069,adhd,adhd|elimination|anxiety|depression,¿Tiene problemas de sueño asociados a preocupación o ansiedad?
+psychologist_full,70,gad_difficulty_controlling_worry,Q070,adhd,adhd|elimination|anxiety|depression,¿Le cuesta controlar o detener la preocupación una vez que empieza?
+psychologist_full,71,gad_duration_months,Q071,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente esta preocupación excesiva?
+psychologist_full,72,gad_excessive_worry_multiple_areas,Q072,adhd,adhd|anxiety|depression,"¿Se preocupa en exceso por varios aspectos de la vida cotidiana, incluso cuando no parece necesario?"
+psychologist_full,73,gad_impairment,Q073,adhd,adhd|elimination|anxiety|depression,¿Cuánto afectan estas preocupaciones a la vida diaria?
+psychologist_full,74,gad_not_better_explained,Q074,adhd,adhd|depression,"Según su juicio clínico, ¿esta preocupación excesiva no se explica mejor por otro trastorno?"
+psychologist_full,75,gad_not_due_substance_medical,Q075,adhd,adhd|depression,"Según su juicio clínico, ¿esta preocupación excesiva no se explica por una sustancia o un problema médico?"
+psychologist_full,76,sep_anx_01_distress_on_separation,Q076,adhd,adhd|elimination|anxiety|depression,¿Se angustia mucho cuando se separa de sus figuras de apego principales?
+psychologist_full,77,sep_anx_02_worry_losing_attachment_figures,Q077,adhd,adhd|elimination|anxiety|depression,¿Le preocupa perder a sus figuras de apego o que les pase algo grave?
+psychologist_full,78,sep_anx_03_worry_event_causing_separation,Q078,adhd,adhd|elimination|anxiety|depression,¿Le preocupa que ocurra algo que lo separe de sus figuras de apego?
+psychologist_full,79,sep_anx_04_refuses_leaving_home_school,Q079,adhd,adhd|elimination|anxiety|depression,"¿Evita o se niega a salir de casa, ir al colegio o quedarse en otros lugares por miedo a separarse?"
+psychologist_full,80,sep_anx_05_fear_being_alone_without_attachment,Q080,adhd,adhd|elimination|anxiety|depression,¿Le da miedo estar solo o sin una figura de apego cerca?
+psychologist_full,81,sep_anx_06_refuses_sleep_away_or_alone,Q081,adhd,adhd|elimination|anxiety|depression,¿Se niega a dormir fuera de casa o a dormir solo por miedo a la separación?
+psychologist_full,82,sep_anx_07_separation_nightmares,Q082,adhd,adhd|elimination|anxiety|depression,¿Tiene pesadillas relacionadas con la separación?
+psychologist_full,83,sep_anx_08_physical_complaints_on_separation,Q083,adhd,adhd|elimination|anxiety|depression,"¿Presenta molestias físicas, como dolor de cabeza, dolor de estómago o náuseas, cuando anticipa o vive una separación?"
+psychologist_full,84,sep_anx_duration_weeks,Q084,adhd,adhd|elimination|anxiety|depression,¿Desde hace cuántas semanas viene ocurriendo este miedo intenso a separarse de sus figuras de cuidado principales?
+psychologist_full,85,sep_anx_impairment,Q085,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta a la vida diaria este miedo a separarse de sus figuras de cuidado principales?
+psychologist_full,86,sep_anx_not_better_explained,Q086,adhd,adhd|depression,"Según su juicio clínico, ¿este miedo a separarse de sus figuras de cuidado no se explica mejor por otro problema clínico?"
+psychologist_full,87,social_anxiety_almost_always_triggered,Q087,adhd,adhd|elimination|anxiety|depression,¿Ese miedo aparece casi siempre cuando enfrenta esas situaciones?
+psychologist_full,88,social_anxiety_avoid_or_endure_intense,Q088,adhd,adhd|elimination|anxiety|depression,¿Evita esas situaciones o las soporta con mucha ansiedad?
+psychologist_full,89,social_anxiety_children_peer_only_flag,Q089,adhd,adhd|depression,"¿Este miedo también aparece con personas de su misma edad, y no solo con adultos?"
+psychologist_full,90,social_anxiety_disproportionate,Q090,adhd,adhd|depression,"Según su juicio clínico, ¿el miedo es claramente desproporcionado para la situación?"
+psychologist_full,91,social_anxiety_duration_months,Q091,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente este patrón de ansiedad social?
+psychologist_full,92,social_anxiety_fear_being_observed,Q092,adhd,adhd|elimination|anxiety|depression,¿Le da mucho miedo hacer algo mientras otras personas lo observan?
+psychologist_full,93,social_anxiety_fear_interactions,Q093,adhd,adhd|anxiety|depression,¿Le da mucho miedo interactuar con otras personas?
+psychologist_full,94,social_anxiety_fear_negative_evaluation,Q094,adhd,adhd|elimination|anxiety|depression,"¿Le preocupa intensamente hacer el ridículo, quedar mal o ser juzgado negativamente?"
+psychologist_full,95,social_anxiety_fear_performance,Q095,adhd,adhd|elimination|anxiety|depression,"¿Le da mucho miedo actuar, exponer o hablar frente a otras personas?"
+psychologist_full,96,social_anxiety_impairment,Q096,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta esta ansiedad social la vida diaria?
+psychologist_full,97,social_anxiety_not_better_explained,Q097,adhd,adhd|depression,"Según su juicio clínico, ¿este miedo a interactuar o ser observado no se explica mejor por otro trastorno o condición?"
+psychologist_full,98,social_anxiety_not_due_substance_medical,Q098,adhd,adhd|depression,"Según su juicio clínico, ¿este miedo a interactuar o ser observado no se explica por una sustancia o un problema médico?"
+psychologist_full,99,pdd_01_appetite_change,Q099,adhd,adhd|elimination|anxiety|depression,¿Ha habido cambios persistentes en el apetito?
+psychologist_full,100,pdd_02_sleep_change,Q100,adhd,adhd|elimination|anxiety|depression,"Durante este periodo, ¿ha dormido mucho menos o mucho más de lo habitual?"
+psychologist_full,101,pdd_03_low_energy,Q101,adhd,adhd|elimination|anxiety|depression,¿Se ha mostrado con poca energía durante mucho tiempo?
+psychologist_full,102,pdd_04_low_self_esteem,Q102,adhd,adhd|elimination|anxiety|depression,¿Suele sentirse mal consigo mismo o con baja autoestima?
+psychologist_full,103,pdd_05_concentration_difficulty,Q103,adhd,adhd|conduct|anxiety|depression,¿Tiene dificultad persistente para concentrarse o pensar con claridad?
+psychologist_full,104,pdd_06_hopelessness,Q104,adhd,adhd|anxiety|depression,¿Se muestra sin esperanza o cree que las cosas no van a mejorar?
+psychologist_full,105,pdd_depressed_or_irritable_mood,Q105,adhd,adhd|elimination|anxiety|depression,"¿Se ha mostrado triste, decaído o irritable la mayor parte del tiempo?"
+psychologist_full,106,pdd_duration_months_child,Q106,adhd,adhd|elimination|anxiety|depression,¿Cuántos meses lleva presente este estado de ánimo triste o irritable persistente?
+psychologist_full,107,pdd_impairment,Q107,adhd,adhd|elimination|anxiety|depression,¿Cuánto afecta este estado de ánimo persistente la vida diaria?
+psychologist_full,108,pdd_no_gap_gt_2_months,Q108,adhd,adhd|depression,"Durante este periodo, ¿pasó menos de dos meses seguidos completamente sin estos síntomas?"
+psychologist_full,109,pdd_no_mania_hypomania,Q109,adhd,adhd|depression,"Según su juicio clínico, ¿no hay antecedentes de manía o hipomanía que expliquen mejor este estado de ánimo persistente?"
+psychologist_full,110,pdd_no_psychotic_explained,Q110,adhd,adhd|depression,"Según su juicio clínico, ¿este estado de ánimo persistente no se explica mejor por un trastorno psicótico?"
+psychologist_full,111,pdd_no_substance_medical,Q111,adhd,adhd|depression,"Según su juicio clínico, ¿este estado de ánimo persistente no se explica por una sustancia o un problema médico?"
+psychologist_full,112,mdd_02_loss_of_interest_or_pleasure,Q113,adhd,adhd|anxiety|depression,¿Ha perdido interés o disfrute en actividades que antes le gustaban?
+psychologist_full,113,mdd_03_weight_or_appetite_change,Q114,adhd,adhd|elimination|anxiety|depression,¿Ha habido un cambio importante de apetito o peso?
+psychologist_full,114,mdd_05_psychomotor_change,Q116,adhd,adhd|conduct|elimination|anxiety|depression,¿Se nota mucho más lento o mucho más inquieto de lo habitual?
+psychologist_full,115,mdd_06_fatigue_or_low_energy,Q117,adhd,adhd|conduct|elimination|anxiety|depression,¿Se muestra cansado o con muy poca energía?
+psychologist_full,116,mdd_07_worthlessness_or_excessive_guilt,Q118,adhd,adhd|elimination|anxiety|depression,¿Expresa sentirse inútil o tener culpa excesiva?
+psychologist_full,117,mdd_08_concentration_or_decision_difficulty,Q119,adhd,adhd|anxiety|depression,¿Tiene mucha dificultad para concentrarse o decidir?
+psychologist_full,118,mdd_09_death_or_suicidal_thoughts,Q120,adhd,adhd|elimination|anxiety|depression,"¿Ha expresado ideas frecuentes sobre muerte, querer desaparecer o hacerse daño?"
+psychologist_full,119,mdd_duration_weeks,Q121,adhd,adhd|conduct|elimination|anxiety|depression,"¿Desde hace cuántas semanas viene presentando este estado de ánimo triste, decaído o irritable?"
+psychologist_full,120,mdd_impairment,Q122,adhd,adhd|conduct|elimination|anxiety|depression,¿Cuánto afecta este problema del estado de ánimo la vida diaria?
+psychologist_full,121,dmdd_context_home,Q126,adhd,adhd|depression,¿Los estallidos o la irritabilidad intensa aparecen en casa?
+psychologist_full,122,dmdd_context_peers,Q127,adhd,adhd|depression,¿Los estallidos o la irritabilidad intensa aparecen con otras personas de su edad o con amistades?
+psychologist_full,123,dmdd_context_school,Q128,adhd,adhd|depression,¿Los estallidos o la irritabilidad intensa aparecen en el colegio?
+psychologist_full,124,dmdd_developmentally_inappropriate,Q129,adhd,adhd|depression,"Según su juicio clínico, ¿los estallidos son desproporcionados para la edad o el nivel de desarrollo?"
+psychologist_full,125,dmdd_duration_months,Q130,adhd,adhd|conduct|elimination|depression,¿Cuántos meses lleva presente este patrón de irritabilidad y estallidos?
+psychologist_full,126,dmdd_irritable_between_outbursts,Q131,adhd,adhd|conduct|elimination|anxiety|depression,¿Entre estallidos se mantiene irritable o de mal genio la mayor parte del tiempo?
+psychologist_full,127,dmdd_no_mania_hypomania,Q132,adhd,adhd|depression,"Según su juicio clínico, ¿no hay episodios de manía o hipomanía que expliquen mejor el cuadro?"
+psychologist_full,128,dmdd_no_substance_medical,Q133,adhd,adhd|depression,"Según su juicio clínico, ¿este cuadro no se explica por una sustancia o un problema médico?"
+psychologist_full,129,dmdd_not_better_explained,Q134,adhd,adhd|depression,"Según su juicio clínico, ¿este cuadro no se explica mejor por otro trastorno?"
+psychologist_full,130,dmdd_onset_before_10,Q135,adhd,adhd|depression,¿Este patrón empezó antes de los 10 años?
+psychologist_full,131,dmdd_outbursts_frequency_per_week,Q136,adhd,adhd|conduct|elimination|anxiety|depression,"¿Cuántos estallidos graves ocurren, en promedio, por semana?"
+psychologist_full,132,dmdd_outbursts_severity,Q137,adhd,adhd|conduct|elimination|anxiety|depression,¿Qué tan graves son los estallidos?
+psychologist_full,133,encopresis_constipation_present,Q138,adhd,adhd|elimination|depression,"Pensando en los problemas para evacuar o en los escapes de heces, ¿también hay estreñimiento?"
+psychologist_full,134,encopresis_duration_months_consecutive,Q139,adhd,adhd|elimination|depression,"Pensando en los escapes de heces o en ensuciarse, ¿cuántos meses seguidos lleva ocurriendo este problema?"
+psychologist_full,135,encopresis_event_frequency_per_month,Q140,adhd,adhd|elimination|anxiety|depression,"Pensando en los escapes de heces o en ensuciarse, ¿cuántas veces por mes ocurre este problema?"
+psychologist_full,136,encopresis_not_due_substance_medical,Q141,adhd,adhd|depression,"Según su juicio clínico, ¿este problema de escapes de heces no se explica mejor por una sustancia o un problema médico?"
+psychologist_full,137,encopresis_overflow_incontinence,Q142,adhd,adhd|elimination|depression,"Según su juicio clínico, ¿hay un patrón compatible con rebosamiento por estreñimiento?"
+psychologist_full,138,encopresis_visible_deposition_pattern,Q143,adhd,adhd|elimination|depression,¿Qué tan evidente es el patrón de ensuciar o evacuar en lugares inadecuados?
+psychologist_full,139,enuresis_distress_impairment,Q144,adhd,adhd|elimination|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuánto malestar o impacto genera este problema?"
+psychologist_full,140,enuresis_diurnal,Q145,adhd,adhd|elimination|depression,¿Los escapes de orina ocurren principalmente de día?
+psychologist_full,141,enuresis_duration_months_consecutive,Q146,adhd,adhd|elimination|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuántos meses seguidos lleva ocurriendo este problema?"
+psychologist_full,142,enuresis_event_frequency_per_week,Q147,adhd,adhd|elimination|anxiety|depression,"Pensando en los escapes de orina o en mojarse sin querer, ¿cuántas veces por semana ocurre este problema?"
+psychologist_full,143,enuresis_nocturnal,Q148,adhd,adhd|elimination|depression,¿Los escapes de orina ocurren principalmente durante el sueño o en la noche?
+psychologist_full,144,enuresis_not_due_substance_medical,Q149,adhd,adhd|elimination|depression,"Según su juicio clínico, ¿este problema de escapes de orina no se explica mejor por una sustancia o un problema médico?"
+psychologist_full,145,enuresis_primary_course,Q150,adhd,adhd|elimination|depression,¿Nunca llegó a mantener un periodo claro de continencia antes de que apareciera este problema?
+psychologist_full,146,enuresis_secondary_course,Q151,adhd,adhd|elimination|depression,¿Este problema apareció después de haber tenido un periodo claro de continencia?
