@@ -1,10 +1,10 @@
-# Model Registry and Inference (v8)
+# Model Registry and Inference (v9)
 
 ## Fuente de verdad
-- `data/hybrid_active_modes_freeze_v8/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_active_modes_freeze_v8/tables/hybrid_active_modes_summary.csv`
-- `data/hybrid_active_modes_freeze_v8/tables/hybrid_questionnaire_inputs_master.csv`
-- `data/hybrid_operational_freeze_v8/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v9/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v9/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v9/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v9/tables/hybrid_operational_final_champions.csv`
 
 Nota de continuidad (2026-04-22):
 - Se ejecuto la linea `hybrid_secondary_honest_retrain_v1` y se versionaron:
@@ -47,6 +47,15 @@ Nota de continuidad (2026-04-22):
   - Se aplicaron 3 rescates extra por degeneracion estructural de una sola variable: `anxiety/psychologist_full`, `elimination/caregiver_full` y `elimination/psychologist_full`.
   - Elimination queda en subsets estructurales `structural_ranked` para sus 6 modos (42/84/126 features en caregiver y 50/101/151 en psychologist). Resultado de cierre: `blacklisted_active_final=0`, `structural_extra_rescue_final=0`, `single_feature_active_final=0`, `guardrail_violations_final=0`, `policy_violations_final=0`.
   - La fuente operativa efectiva pasa a `*_freeze_v8`; `*_freeze_v6_hotfix_v1` queda historico para trazabilidad. Summary final activa: `ACTIVE_HIGH_CONFIDENCE/high=1`, `ACTIVE_MODERATE_CONFIDENCE/moderate=9`, `ACTIVE_LIMITED_USE/limited=20`.
+
+- Nota de continuidad (2026-04-26, elimination structural audit rescue v1 + OpenAPI fix):
+  - Se ejecuto `hybrid_elimination_structural_audit_rescue_v1` sobre la linea activa `v8`.
+  - Se versionaron `data/hybrid_operational_freeze_v9/` y `data/hybrid_active_modes_freeze_v9/`.
+  - Se demovieron los 6 champions Elimination de v8 por comportamiento clonado: `old_prediction_pairs_identical=15/15`.
+  - Se reentrenaron los 6 slots Elimination con universos directos enuresis/encopresis, sin `eng_elimination_intensity`, y con gate `recall|specificity|roc_auc|pr_auc <= 0.98`.
+  - Resultado: `remaining_guardrail_violations=0`, `policy_violations=0`, `new_prediction_pairs_identical=0/15`.
+  - Se corrigio `docs/openapi.yaml` eliminando un bloque duplicado dentro de `paths`; el spec conserva `openapi: 3.0.3` y vuelve a parsear sin duplicate mapping keys.
+  - La fuente operativa efectiva pasa a `*_freeze_v9`; `*_freeze_v8` queda historico para trazabilidad.
 
 ## Registro en DB
 - `model_registry`: identidad por `active_model_id`.
