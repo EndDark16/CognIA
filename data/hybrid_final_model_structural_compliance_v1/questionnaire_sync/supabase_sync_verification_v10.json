@@ -1,0 +1,19 @@
+﻿{
+  "definition_active": true,
+  "version_active": true,
+  "question_count": 146,
+  "included_mode_counts": {
+    "caregiver_1_3": 67,
+    "caregiver_2_3": 104,
+    "caregiver_full": 125,
+    "psychologist_1_3": 60,
+    "psychologist_2_3": 110,
+    "psychologist_full": 146
+  },
+  "active_model_activations": 30,
+  "duplicate_active_domain_mode_rows": 0,
+  "active_model_versions": 30,
+  "active_model_versions_without_feature_columns": 0,
+  "bootstrap_action": "python scripts/bootstrap_questionnaire_backend_v2.py load-all",
+  "bootstrap_result": "ok"
+}
