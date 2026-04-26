@@ -747,3 +747,167 @@ Correcciones/hardening aplicados:
 Estado reportado:
 - Sonar Quality Gate en `PASSED`.
 - Open issues en new code period: `0`.
+
+## Actualizacion de sesion (2026-04-22) - hybrid_final_decisive_rescue_v5 + freeze_v5
+Objetivo:
+- cerrar incoherencias entre performance real, clase metodologica, confianza y activacion operativa en una sola pasada final.
+
+Ejecucion:
+- Script: `scripts/run_hybrid_final_decisive_rescue_v5.py`.
+- Linea de campana: `data/hybrid_final_decisive_rescue_v5/`.
+- Manifest: `artifacts/hybrid_final_decisive_rescue_v5/hybrid_final_decisive_rescue_v5_manifest.json`.
+
+Resultado de seleccion:
+- Slots foco auditados/reentrenados: `16`.
+- Promociones: `1` (`depression/caregiver_2_3`).
+- Resto de slots foco: `HOLD_FOR_LIMITATION` cuando no hubo mejora material defendible o persistio anomalia metodologica relevante.
+
+Coherencia global de confianza (30 slots):
+- Se recalculo `confidence_pct/confidence_band/final_operational_class` para los `30` slots.
+- Regla dura aplicada: slots con anomalia secundaria no quedan en `ACTIVE_HIGH_CONFIDENCE`.
+- Verificacion final: `0` slots `high` con anomalia secundaria.
+- Distribucion activa v5:
+  - `ACTIVE_MODERATE_CONFIDENCE=6`
+  - `ACTIVE_LOW_CONFIDENCE=11`
+  - `ACTIVE_LIMITED_USE=13`
+
+Normalizacion metodologica:
+- Nueva linea: `data/hybrid_classification_normalization_v2/`.
+- Tabla: `tables/hybrid_operational_classification_normalized_v5.csv`.
+- Violaciones de politica: `0` (`validation/hybrid_classification_policy_violations_v5.csv`).
+
+Nuevas fuentes operativas:
+- `data/hybrid_operational_freeze_v5/` + `artifacts/hybrid_operational_freeze_v5/`
+- `data/hybrid_active_modes_freeze_v5/` + `artifacts/hybrid_active_modes_freeze_v5/`
+- `replaced_pairs=1` en manifests de freeze v5.
+
+Integracion runtime:
+- `api/services/questionnaire_v2_loader_service.py` actualizado a defaults `*_freeze_v5`.
+
+## Actualizacion de estado (2026-04-22) - hybrid_final_aggressive_rescue_v6 + freeze_v6
+- Se ejecuto campana final agresiva con multipasadas internas A/B/C sobre 18 slots priorizados (Depression + anomalias secundarias + Conduct full opcional).
+- Linea nueva:
+  - `data/hybrid_final_aggressive_rescue_v6/`
+  - `artifacts/hybrid_final_aggressive_rescue_v6/`
+- Script principal:
+  - `scripts/run_hybrid_final_aggressive_rescue_v6.py`
+- Fuentes operativas versionadas:
+  - `data/hybrid_operational_freeze_v6/`
+  - `data/hybrid_active_modes_freeze_v6/`
+- Manifests:
+  - `artifacts/hybrid_final_aggressive_rescue_v6/hybrid_final_aggressive_rescue_v6_manifest.json`
+  - `artifacts/hybrid_operational_freeze_v6/hybrid_operational_freeze_v6_manifest.json`
+  - `artifacts/hybrid_active_modes_freeze_v6/hybrid_active_modes_freeze_v6_manifest.json`
+- Resultado de seleccion:
+  - `focus_slots=18`
+  - `PROMOTE_NOW=2`
+  - `HOLD_FOR_LIMITATION=16`
+  - `policy_violations=0`
+- Reemplazos promocionados:
+  - `conduct/caregiver_full` -> `extra_trees + dsm5_core_plus_context`
+  - `conduct/psychologist_full` -> `hgb + dsm5_core_plus_context`
+- Auditorias generadas:
+  - split/duplicates (`validation/split_registry.csv`, `validation/duplicate_audit_global.csv`)
+  - trials por pasada (`trials/focus_pass_a_trials.csv`, `focus_pass_b_trials.csv`, `focus_pass_c_trials.csv`, `final_aggressive_retrain_trials.csv`)
+  - evidencia global 30 slots (`validation/global_model_evidence_v6.csv`)
+  - bootstrap/stability/ablation/stress (`bootstrap/global_bootstrap_v6.csv`, `stability/global_seed_stability_v6.csv`, `ablation/global_ablation_v6.csv`, `stress/global_stress_v6.csv`)
+  - normalizacion/policy (`data/hybrid_classification_normalization_v2/tables/hybrid_operational_classification_normalized_v6.csv`, `validation/hybrid_classification_policy_violations_v6.csv`)
+- Loader/backend:
+  - `api/services/questionnaire_v2_loader_service.py` actualizado a defaults `*_freeze_v6`.
+- Contrato funcional:
+  - No hubo cambio de inputs funcionales expuestos ni outputs funcionales expuestos.
+  - Se mantuvieron `domain/mode/role` y semantica de inferencia; cambios solo en entrenamiento interno/seleccion/calibracion/threshold/weighting.
+
+## Actualizacion de estado (2026-04-24) - hybrid_v6_quick_champion_guard_hotfix_v1
+- Objetivo:
+  - corregir de inmediato champions activos v6 que violaban guardia dura (`recall|specificity|roc_auc|pr_auc > 0.98`).
+- Script:
+  - `scripts/run_hybrid_v6_quick_champion_guard_hotfix.py`
+- Fuentes de verdad nuevas:
+  - `data/hybrid_operational_freeze_v6_hotfix_v1/tables/hybrid_operational_final_champions.csv`
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_modes_summary.csv`
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_questionnaire_inputs_master.csv`
+- Evidencia:
+  - `data/hybrid_v6_quick_champion_guard_hotfix_v1/tables/violating_slots_v6.csv`
+  - `data/hybrid_v6_quick_champion_guard_hotfix_v1/tables/final_old_vs_new_comparison.csv`
+  - `data/hybrid_v6_quick_champion_guard_hotfix_v1/tables/remaining_guard_violations_after_hotfix.csv`
+  - `data/hybrid_classification_normalization_v2/validation/hybrid_classification_policy_violations_v6_hotfix_v1.csv`
+- Resultado final:
+  - `violating_slots_before=16`
+  - `corrected_slots_total=16`
+  - `remaining_guard_violations=0`
+  - `policy_violations=0`
+- Integracion loader/runtime:
+  - defaults de `api/services/questionnaire_v2_loader_service.py` migrados a `*_freeze_v6_hotfix_v1`.
+
+
+## Actualizacion de estado (2026-04-24) - cierre operativo guardia dura v6_hotfix_v1
+- Se verifico estado real de violaciones en lineas `v6` y `v6_hotfix_v1` antes de cierre:
+  - `v6`: `16` violadores.
+  - `v6_hotfix_v1`: `0` violadores.
+- Se confirma `v6_hotfix_v1` como fuente operativa efectiva de champions activos (no `v6`).
+- Se alineo validacion contractual para evaluar la linea activa `v6_hotfix_v1`:
+  - `scripts/validate_hybrid_classification_policy_v1.py`
+  - `tests/contracts/test_hybrid_classification_policy_v1.py`
+- Se mantiene framing metodologico:
+  - screening/apoyo profesional en entorno simulado.
+  - no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-24) - coherencia confidence/clase v6_hotfix_v1
+- Auditoria inicial de linea activa real (segun loader v2):
+  - `data/hybrid_active_modes_freeze_v6_hotfix_v1/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_operational_freeze_v6_hotfix_v1/tables/hybrid_operational_final_champions.csv`
+- Guardrails duros:
+  - `0` champions activos con `recall|specificity|roc_auc|pr_auc > 0.98`.
+- Incoherencias corregidas:
+  - `12` filas `ACTIVE_MODERATE_CONFIDENCE` con `confidence_band=high`.
+- Politica comunicacional aplicada:
+  - `ACTIVE_MODERATE_CONFIDENCE -> confidence_band=moderate`.
+  - `ACTIVE_LIMITED_USE -> confidence_band=limited`.
+  - `ACTIVE_HIGH_CONFIDENCE -> confidence_band=high` solo sin caveat metodologico fuerte.
+- No hubo reemplazo de champions ni reentrenamiento en esta ventana porque la hotfix real ya no tenia violadores.
+- Se actualizaron `README.md`, `docs/traceability_map.md`, `docs/model_registry_and_inference.md` y `docs/hybrid_operational_classification_policy_v1.md` para alinear fuente activa y confianza.
+
+## Actualizacion de sesion (2026-04-25) - development branch reconciliation ops v1
+Objetivo:
+- Auditar todas las ramas remotas del backend y sanear `development` en automatizacion CI/CD y operacion.
+
+Resultado:
+- Se auditaron ramas remotas contra `origin/development` con `git fetch --all --prune`.
+- Reporte versionado: `docs/ops/development-branch-reconciliation-audit.md`.
+
+Decisiones aplicadas:
+- `.github/workflows/ci.yml` eliminado como CI legado duplicado.
+- `.github/workflows/ci-backend.yml` queda como CI backend unico y autoritativo.
+- `ci-backend.yml` suma Ruff F-check manteniendo compile/import sanity, `pytest -q` y docker build sanity.
+- `.github/workflows/deploy-backend.yml` queda robustecido:
+  - verifica `github.sha` contra `origin/development`,
+  - reconstruye `backend`,
+  - recrea `gateway` con `--force-recreate`,
+  - mantiene `readyz` y rollback,
+  - publica logs de `backend` y `gateway`.
+- `docs/openapi.yaml` corregido para que tres operaciones admin cumplan secciones obligatorias y para normalizar estados residuales health/readiness/metrics a `x-contract-status=KEEP_ACTIVE`.
+- Verificacion final local: `pytest -q` => `149 passed, 3 skipped`.
+
+No aplicado:
+- No se consolidaron ramas v6/v7 de modelado en esta ventana; requieren decision metodologica separada.
+- No se agrego `.deploy/` porque no existe version auditada en ramas remotas.
+
+Pendiente:
+- Rehabilitar workflows en GitHub con una corrida controlada tras revisar el commit final.
+
+## Actualizacion de estado (2026-04-26) - hybrid_structural_mode_rescue_v1
+- Se ejecuto una intervencion focal estructural sobre la linea activa real `v6_hotfix_v1` en la rama `fix/structural-mode-model-rescue-v1`, sin commits directos sobre `development` ni `dev.enddark`.
+- Lineas versionadas nuevas:
+  - `data/hybrid_structural_mode_rescue_v1/`
+  - `artifacts/hybrid_structural_mode_rescue_v1/`
+  - `data/hybrid_active_modes_freeze_v8/`
+  - `artifacts/hybrid_active_modes_freeze_v8/`
+  - `data/hybrid_operational_freeze_v8/`
+  - `artifacts/hybrid_operational_freeze_v8/`
+- Script principal: `scripts/run_hybrid_structural_mode_rescue_v1.py`.
+- Resultado de cierre: `blacklisted_active_initial=14`, `accepted_existing_fallbacks=0`, `structural_extra_rescue_initial=3`, `retrained_structural_replacements=17`, `blacklisted_active_final=0`, `structural_extra_rescue_final=0`, `single_feature_active_final=0`, `guardrail_violations_final=0`, `policy_violations_final=0`.
+- Los 14 champions 1/3 y 2/3 prohibidos fueron removidos de la linea activa; ademas se rescataron 3 champions extra de una sola variable (`anxiety/psychologist_full` y los dos `elimination/*_full`). Elimination queda en subsets estructurales `structural_ranked` para sus 6 modos.
+- `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v8` y `hybrid_operational_freeze_v8`.
+- Caveat metodologico vigente: persiste sensibilidad `drop_top1`/stress en Elimination y parte de Depression; la linea final queda sin champions de una sola feature y la evidencia sigue siendo para screening/apoyo profesional en entorno simulado, no diagnostico automatico.

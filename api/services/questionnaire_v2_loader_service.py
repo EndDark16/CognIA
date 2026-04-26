@@ -24,7 +24,6 @@ from app.models import (
     QuestionnaireScale,
     QuestionnaireScaleOption,
     QuestionnaireSection,
-    QuestionnaireSession,
     QuestionnaireVersion,
     db,
 )
@@ -50,10 +49,10 @@ DEFAULT_DEFINITION_NAME = "Cuestionario operacional v16.4"
 DEFAULT_VERSION_LABEL = "v16.4"
 DEFAULT_SOURCE_DIR = Path("data") / "cuestionario_v16.4"
 
-DEFAULT_ACTIVE_MODELS = Path("data") / "hybrid_active_modes_freeze_v4" / "tables" / "hybrid_active_models_30_modes.csv"
-DEFAULT_ACTIVE_SUMMARY = Path("data") / "hybrid_active_modes_freeze_v4" / "tables" / "hybrid_active_modes_summary.csv"
-DEFAULT_INPUTS_MASTER = Path("data") / "hybrid_active_modes_freeze_v4" / "tables" / "hybrid_questionnaire_inputs_master.csv"
-DEFAULT_OPERATIONAL_CHAMPIONS = Path("data") / "hybrid_operational_freeze_v4" / "tables" / "hybrid_operational_final_champions.csv"
+DEFAULT_ACTIVE_MODELS = Path("data") / "hybrid_active_modes_freeze_v8" / "tables" / "hybrid_active_models_30_modes.csv"
+DEFAULT_ACTIVE_SUMMARY = Path("data") / "hybrid_active_modes_freeze_v8" / "tables" / "hybrid_active_modes_summary.csv"
+DEFAULT_INPUTS_MASTER = Path("data") / "hybrid_active_modes_freeze_v8" / "tables" / "hybrid_questionnaire_inputs_master.csv"
+DEFAULT_OPERATIONAL_CHAMPIONS = Path("data") / "hybrid_operational_freeze_v8" / "tables" / "hybrid_operational_final_champions.csv"
 
 
 def _utcnow() -> datetime:
