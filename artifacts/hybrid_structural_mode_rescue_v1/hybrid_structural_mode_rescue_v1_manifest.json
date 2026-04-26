@@ -1,0 +1,24 @@
+{
+  "line": "hybrid_structural_mode_rescue_v1",
+  "freeze_label": "v8",
+  "generated_at_utc": "2026-04-26T04:22:47.691140+00:00",
+  "source_truth_previous": {
+    "active": "data\\hybrid_active_modes_freeze_v6_hotfix_v1\\tables\\hybrid_active_models_30_modes.csv",
+    "operational": "data\\hybrid_operational_freeze_v6_hotfix_v1\\tables\\hybrid_operational_final_champions.csv"
+  },
+  "source_truth_new": {
+    "active": "data\\hybrid_active_modes_freeze_v8\\tables\\hybrid_active_models_30_modes.csv",
+    "operational": "data\\hybrid_operational_freeze_v8\\tables\\hybrid_operational_final_champions.csv"
+  },
+  "stats": {
+    "blacklisted_active_initial": 14,
+    "blacklisted_active_final": 0,
+    "structural_extra_rescue_initial": 3,
+    "structural_extra_rescue_final": 0,
+    "guardrail_violations_initial": 0,
+    "guardrail_violations_final": 0,
+    "retrained_structural_replacements": 17,
+    "accepted_existing_fallbacks": 0,
+    "single_feature_active_final": 0
+  }
+}
