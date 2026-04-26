@@ -1,0 +1,16 @@
+domain,split,n
+adhd,train,1440
+adhd,val,480
+adhd,holdout,480
+conduct,train,1440
+conduct,val,480
+conduct,holdout,480
+elimination,train,1440
+elimination,val,480
+elimination,holdout,480
+anxiety,train,1440
+anxiety,val,480
+anxiety,holdout,480
+depression,train,1440
+depression,val,480
+depression,holdout,480

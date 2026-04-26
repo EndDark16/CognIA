@@ -448,5 +448,23 @@ Contexto metodológico:
 - Script principal: `scripts/run_hybrid_structural_mode_rescue_v1.py`.
 - Resultado de cierre: `blacklisted_active_initial=14`, `accepted_existing_fallbacks=0`, `structural_extra_rescue_initial=3`, `retrained_structural_replacements=17`, `blacklisted_active_final=0`, `structural_extra_rescue_final=0`, `single_feature_active_final=0`, `guardrail_violations_final=0`, `policy_violations_final=0`.
 - Los 14 champions 1/3 y 2/3 prohibidos fueron removidos de la linea activa; ademas se rescataron 3 champions extra de una sola variable (`anxiety/psychologist_full` y los dos `elimination/*_full`). Elimination queda en subsets estructurales `structural_ranked` para sus 6 modos.
-- `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v8` y `hybrid_operational_freeze_v8`.
+- `api/services/questionnaire_v2_loader_service.py` apunto en esa ventana a `hybrid_active_modes_freeze_v8` y `hybrid_operational_freeze_v8`; desde v9 la fuente activa vigente es `hybrid_active_modes_freeze_v9`/`hybrid_operational_freeze_v9`.
 - Caveat metodologico vigente: persiste sensibilidad `drop_top1`/stress en Elimination y parte de Depression; la linea final queda sin champions de una sola feature y la evidencia sigue siendo para screening/apoyo profesional en entorno simulado, no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-26) - hybrid_elimination_structural_audit_rescue_v1
+- Se ejecuto auditoria focal y reentrenamiento de los 6 slots Elimination sobre la linea activa `v8`.
+- Script principal: `scripts/run_hybrid_elimination_structural_audit_rescue_v1.py`.
+- Lineas versionadas nuevas:
+  - `data/hybrid_elimination_structural_audit_rescue_v1/`
+  - `artifacts/hybrid_elimination_structural_audit_rescue_v1/`
+  - `data/hybrid_operational_freeze_v9/`
+  - `artifacts/hybrid_operational_freeze_v9/`
+  - `data/hybrid_active_modes_freeze_v9/`
+  - `artifacts/hybrid_active_modes_freeze_v9/`
+- Diagnostico de v8: los 6 slots Elimination colapsaban a la misma frontera HGB; auditoria reconstruida: `old_prediction_pairs_identical=15/15`.
+- Correccion aplicada: reentrenamiento Elimination-only con features directas enuresis/encopresis por rol, exclusion de `eng_elimination_intensity`, seleccion guard-aware y regla anti-clonado.
+- Resultado v9: `remaining_guardrail_violations=0`, `policy_violations=0`, `new_prediction_pairs_identical=0/15`.
+- `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v9` y `hybrid_operational_freeze_v9`.
+- Tambien se corrigio `docs/openapi.yaml`: se elimino un bloque duplicado en `paths` que provocaba `duplicated mapping key`; el spec conserva `openapi: 3.0.3` y parsea sin claves duplicadas.
+- Claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
