@@ -1,0 +1,2 @@
+domain,slot_a,slot_b,probability_correlation,prediction_agreement,identical_predictions,near_metric_clone_flag,max_metric_abs_delta,feature_jaccard
+depression,caregiver_full,psychologist_1_3,0.9670860414160882,0.9729166666666668,no,no,0.2799999999999999,0.4074074074074074

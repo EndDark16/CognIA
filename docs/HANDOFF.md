@@ -929,3 +929,22 @@ Pendiente:
 - Tambien se corrigio `docs/openapi.yaml`: se elimino un bloque duplicado en `paths` que provocaba `duplicated mapping key`; el spec conserva `openapi: 3.0.3` y parsea sin claves duplicadas.
 - Claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
 
+
+## Actualizacion de estado (2026-04-26) - hybrid_final_model_structural_compliance_v1
+- Se ejecuto pasada final focal sobre la linea activa real `v9` en la rama `fix/final-model-structural-compliance-v1`.
+- Lineas versionadas nuevas:
+  - `data/hybrid_final_model_structural_compliance_v1/`
+  - `artifacts/hybrid_final_model_structural_compliance_v1/`
+  - `data/hybrid_active_modes_freeze_v10/`
+  - `artifacts/hybrid_active_modes_freeze_v10/`
+  - `data/hybrid_operational_freeze_v10/`
+  - `artifacts/hybrid_operational_freeze_v10/`
+- Script principal: `scripts/run_hybrid_final_model_structural_compliance_v1.py`.
+- Resultado: `target_slots_for_retrain=20`, `trials=640`, `selected_promotions=5`, `anti_clone_reverted_promotions=3`, `retained_after_retrain_attempt=15`, `remaining_guardrail_violations=0`, `policy_violations=0`.
+- Promociones: `adhd/psychologist_1_3`, `anxiety/psychologist_1_3`, `depression/caregiver_full`, `depression/psychologist_1_3`, `elimination/psychologist_full`.
+- La auditoria anti-clonado revirtio tres challengers Elimination que repetian la misma frontera practica y retuvo los champions v9 no clonados para `elimination/caregiver_2_3`, `elimination/psychologist_1_3` y `elimination/psychologist_2_3`.
+- Se sincronizaron flags del cuestionario v16.4 para modos 1_3/2_3 desde inputs finales de champions, reutilizando preguntas full auditadas; `question_text_changes=0`, `questionnaire_mode_flag_changes=68` vs `origin/development`.
+- Se reconstruyo `feature_list_pipe` para 5 champions heredados retenidos desde sus registros fuente, dejando `active_model_versions_without_feature_columns=0` en BD.
+- Supabase/Postgres se sincronizo con `python scripts/bootstrap_questionnaire_backend_v2.py load-all`: `questions=146`, `active_model_activations=30`, `duplicate_active_domain_mode_rows=0`; evidencia en `data/hybrid_final_model_structural_compliance_v1/questionnaire_sync/supabase_sync_verification_v10.json`.
+- `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v10` y `hybrid_operational_freeze_v10`, y limpia activaciones antiguas por `domain/mode` para evitar convivencia de roles legacy `caregiver` con `guardian`.
+- Claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
