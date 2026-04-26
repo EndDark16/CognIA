@@ -1,10 +1,10 @@
-# Model Registry and Inference (v9)
+﻿# Model Registry and Inference (v10)
 
 ## Fuente de verdad
-- `data/hybrid_active_modes_freeze_v9/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_active_modes_freeze_v9/tables/hybrid_active_modes_summary.csv`
-- `data/hybrid_active_modes_freeze_v9/tables/hybrid_questionnaire_inputs_master.csv`
-- `data/hybrid_operational_freeze_v9/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v10/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v10/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v10/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v10/tables/hybrid_operational_final_champions.csv`
 
 Nota de continuidad (2026-04-22):
 - Se ejecuto la linea `hybrid_secondary_honest_retrain_v1` y se versionaron:
@@ -90,3 +90,12 @@ Nota de rol operativo (2026-04-21):
 Referencia historica preservada:
 - `data/hybrid_active_modes_freeze_v1/*`
 - `data/hybrid_operational_freeze_v1/*`
+
+- Nota de continuidad (2026-04-26, final model structural compliance v1):
+  - Se ejecuto `hybrid_final_model_structural_compliance_v1` sobre `v9`.
+  - Se versionaron `data/hybrid_operational_freeze_v10/` y `data/hybrid_active_modes_freeze_v10/`.
+  - Resultado: `target_slots_for_retrain=20`, `trials=640`, `selected_promotions=5`, `anti_clone_reverted_promotions=3`, `remaining_guardrail_violations=0`, `policy_violations=0`.
+  - Se sincronizaron flags de cuestionario v16.4 para 1_3/2_3 desde los inputs de champions finales, sin cambiar textos auditados del full (`question_text_changes=0`, `questionnaire_mode_flag_changes=68`).
+  - Se reconstruyo `feature_list_pipe` para 5 champions heredados y se endurecio el loader para limpiar activaciones antiguas por `domain/mode` antes de insertar la linea vigente.
+  - Sincronizacion Supabase/Postgres validada: `questions=146`, `active_model_activations=30`, `active_model_versions=30`, `active_model_versions_without_feature_columns=0`.
+  - La fuente operativa efectiva pasa a `*_freeze_v10`; `*_freeze_v9` queda historico para trazabilidad.
