@@ -6,7 +6,7 @@ Eliminar ambigÃ¼edad en `final_class` y separar explÃ­citamente:
 1. clase operativa principal
 2. flags de riesgo metodolÃ³gico
 
-Esta politica aplica sobre la linea operativa vigente declarada por el loader v2. A 2026-04-26, esa linea es `hybrid_active_modes_freeze_v10` / `hybrid_operational_freeze_v10`; `freeze_v2` a `freeze_v9` quedan como historicos auditables.
+Esta politica aplica sobre la linea operativa vigente declarada por el loader v2. A 2026-04-27, esa linea es `hybrid_active_modes_freeze_v11` / `hybrid_operational_freeze_v11`; `freeze_v2` a `freeze_v10` quedan como historicos auditables.
 
 ## Capa 1: clase operativa principal
 Valores permitidos:
@@ -94,5 +94,9 @@ No se usa solo umbral bruto: la evaluaciÃ³n agrega combinaciones `secondary_pe
 - Produce tablas derivadas versionadas en `data/hybrid_classification_normalization_v2/` para la lÃ­nea activa reciente.
 - Mantiene el framing metodolÃ³gico: screening/apoyo profesional, no diagnÃ³stico automÃ¡tico.
 
-## Actualizacion 2026-04-26 - v10
-La linea vigente queda en `hybrid_active_modes_freeze_v10` / `hybrid_operational_freeze_v10`. La pasada `hybrid_final_model_structural_compliance_v1` mantiene el gate duro `recall|specificity|roc_auc|pr_auc <= 0.98`, aplica anti-clonado en Elimination, reconstruye `feature_list_pipe` para champions heredados retenidos, sincroniza flags de cuestionario sin modificar textos auditados y deja Supabase/Postgres con 30 activaciones activas verificadas.
+## Actualizacion 2026-04-26 - v10 (historico)
+La linea v10 queda preservada como historica en `hybrid_active_modes_freeze_v10` / `hybrid_operational_freeze_v10` tras la promocion v11. La pasada `hybrid_final_model_structural_compliance_v1` mantiene el gate duro `recall|specificity|roc_auc|pr_auc <= 0.98`, aplica anti-clonado en Elimination, reconstruye `feature_list_pipe` para champions heredados retenidos, sincroniza flags de cuestionario sin modificar textos auditados y deja Supabase/Postgres con 30 activaciones activas verificadas.
+
+
+## Actualizacion 2026-04-27 - v11 RF-only
+La linea vigente queda en `hybrid_active_modes_freeze_v11` / `hybrid_operational_freeze_v11`. La campana `hybrid_rf_max_real_metrics_v1` reentreno 30/30 slots con RandomForestClassifier exclusivamente, mantuvo los mismos `feature_list_pipe` de v10, no modifico cuestionario ni outputs funcionales y dejo `recall|specificity|roc_auc|pr_auc <= 0.98` en todos los champions activos. La clasificacion final queda `ACTIVE_MODERATE_CONFIDENCE=15` y `ACTIVE_LIMITED_USE=15`, sin `ACTIVE_HIGH_CONFIDENCE` por caveats/fragilidad persistentes.
