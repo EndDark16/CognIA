@@ -1,7 +1,7 @@
-# HANDOFF
+﻿# HANDOFF
 
 ## Resumen ejecutivo
-Este proyecto es una tesis de ingeniería aplicada en salud mental infantil. El objetivo es sostener un sistema de alerta temprana para niños de 6 a 11 años, con salida por 5 dominios:
+Este proyecto es una tesis de ingenierÃ­a aplicada en salud mental infantil. El objetivo es sostener un sistema de alerta temprana para niÃ±os de 6 a 11 aÃ±os, con salida por 5 dominios:
 
 - ADHD
 - Conduct
@@ -9,19 +9,19 @@ Este proyecto es una tesis de ingeniería aplicada en salud mental infantil. El 
 - Anxiety
 - Depression
 
-El enfoque es conservador y metodológicamente estricto:
-- HBN es la base empírica.
+El enfoque es conservador y metodolÃ³gicamente estricto:
+- HBN es la base empÃ­rica.
 - DSM-5 es el marco formal.
-- El sistema tiene una capa interna diagnóstica exacta y una capa externa por dominios.
+- El sistema tiene una capa interna diagnÃ³stica exacta y una capa externa por dominios.
 - El entorno es simulado.
-- No debe presentarse como diagnóstico clínico definitivo.
+- No debe presentarse como diagnÃ³stico clÃ­nico definitivo.
 
 ## Estado actual por dominio
-- ADHD: sólido.
-- Anxiety: sólido.
-- Conduct: sólido.
-- Depression: sólido.
-- Elimination: el dominio más difícil; sigue siendo el foco principal de mejora y validación estricta.
+- ADHD: sÃ³lido.
+- Anxiety: sÃ³lido.
+- Conduct: sÃ³lido.
+- Depression: sÃ³lido.
+- Elimination: el dominio mÃ¡s difÃ­cil; sigue siendo el foco principal de mejora y validaciÃ³n estricta.
 
 ## Arquitectura / piezas visibles
 Lo visible en el repositorio sugiere una plataforma con:
@@ -29,45 +29,45 @@ Lo visible en el repositorio sugiere una plataforma con:
 - runtime de inferencia
 - API/backend
 - cuestionario real
-- outputs para cuidador y psicólogo
+- outputs para cuidador y psicÃ³logo
 
-Los outputs deben sostener, como mínimo:
+Los outputs deben sostener, como mÃ­nimo:
 - riesgo
 - confianza
 - incertidumbre
 - caveats
 
 ## Riesgos abiertos
-- Elimination sigue siendo el dominio más frágil.
-- Existe riesgo de sobreprometer el alcance del sistema; debe mantenerse como screening/apoyo, no como diagnóstico automático.
+- Elimination sigue siendo el dominio mÃ¡s frÃ¡gil.
+- Existe riesgo de sobreprometer el alcance del sistema; debe mantenerse como screening/apoyo, no como diagnÃ³stico automÃ¡tico.
 - Cualquier cambio de contrato entre modelo, runtime y cuestionario puede romper consistencia si no se valida.
-- Si algo no está confirmado en el repo, no debe asumirse: marcarlo como `por confirmar`.
+- Si algo no estÃ¡ confirmado en el repo, no debe asumirse: marcarlo como `por confirmar`.
 
-## Decisiones metodológicas ya tomadas
-- No vender el sistema como diagnóstico clínico definitivo.
+## Decisiones metodolÃ³gicas ya tomadas
+- No vender el sistema como diagnÃ³stico clÃ­nico definitivo.
 - Priorizar robustez, honestidad y trazabilidad.
-- Evitar leakage, shortcuts y equivalencias débiles entre fuentes.
-- Mantener caveats explícitos en outputs y documentación.
-- No romper artefactos históricos o contratos sin migración clara.
+- Evitar leakage, shortcuts y equivalencias dÃ©biles entre fuentes.
+- Mantener caveats explÃ­citos en outputs y documentaciÃ³n.
+- No romper artefactos histÃ³ricos o contratos sin migraciÃ³n clara.
 
 ## Pendientes inmediatos
-- Confirmar el artefacto de inferencia que está promovido como referencia operativa.
-- Revisar la línea de Elimination antes de introducir más cambios de contrato u output.
-- Verificar la alineación entre cuestionario, runtime y API.
-- Confirmar qué artefactos están congelados y cuáles siguen experimentales.
+- Confirmar el artefacto de inferencia que estÃ¡ promovido como referencia operativa.
+- Revisar la lÃ­nea de Elimination antes de introducir mÃ¡s cambios de contrato u output.
+- Verificar la alineaciÃ³n entre cuestionario, runtime y API.
+- Confirmar quÃ© artefactos estÃ¡n congelados y cuÃ¡les siguen experimentales.
 
-## Qué revisar primero al retomar trabajo
+## QuÃ© revisar primero al retomar trabajo
 1. `README.md`
 2. `AGENTS_CONTEXT.md`
 3. `docs/openapi.yaml`
 4. `docs/OPENAPI_GUIDE.md`
-5. Estado de `artifacts/inference_v4/` si aplica; si no está confirmado, tratarlo como `por confirmar`
-6. Últimos reportes y artefactos de Elimination
+5. Estado de `artifacts/inference_v4/` si aplica; si no estÃ¡ confirmado, tratarlo como `por confirmar`
+6. Ãšltimos reportes y artefactos de Elimination
 
 ## Por confirmar
-- Versión exacta congelada del runtime final.
+- VersiÃ³n exacta congelada del runtime final.
 - Lista completa de artefactos definitivos vs experimentales.
-- Cualquier contrato o versión posterior no reflejada en `README.md`.
+- Cualquier contrato o versiÃ³n posterior no reflejada en `README.md`.
 
 ## Estado operativo de Elimination
 - Comparativa revisada: `elimination_clean_rebuild_v12` vs `elimination_final_push_v14`.
@@ -553,7 +553,7 @@ Implicacion operativa:
 Hallazgos clave:
 - No se observaron duplicados exactos globales en dataset auditado (`validation/duplicate_audit_global.csv`).
 - Persisten metricas secundarias altas (>0.98) en varios slots de Anxiety/Elimination.
-- `anxiety/psychologist_1_3` mantiene señal de shortcut dominance (feature agregada dominante), pero la mejor variante reentrenada no pasa gate secundario para promocion.
+- `anxiety/psychologist_1_3` mantiene seÃ±al de shortcut dominance (feature agregada dominante), pero la mejor variante reentrenada no pasa gate secundario para promocion.
 - `depression` short modes muestran reduccion de overfit gap, pero la calidad final sigue `malo`; no se rescatan para promocion honesta.
 
 Claim permitido:
@@ -948,3 +948,21 @@ Pendiente:
 - Supabase/Postgres se sincronizo con `python scripts/bootstrap_questionnaire_backend_v2.py load-all`: `questions=146`, `active_model_activations=30`, `duplicate_active_domain_mode_rows=0`; evidencia en `data/hybrid_final_model_structural_compliance_v1/questionnaire_sync/supabase_sync_verification_v10.json`.
 - `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v10` y `hybrid_operational_freeze_v10`, y limpia activaciones antiguas por `domain/mode` para evitar convivencia de roles legacy `caregiver` con `guardian`.
 - Claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-27) - hybrid_rf_max_real_metrics_v1
+- Se ejecuto campana RF-only sobre los 30 slots activos reales desde `hybrid_active_modes_freeze_v10` / `hybrid_operational_freeze_v10`, en rama `train/rf-max-real-metrics-v1`.
+- Script principal: `scripts/run_hybrid_rf_max_real_metrics_v1.py`.
+- Lineas versionadas nuevas:
+  - `data/hybrid_rf_max_real_metrics_v1/`
+  - `artifacts/hybrid_rf_max_real_metrics_v1/`
+  - `data/hybrid_active_modes_freeze_v11/`
+  - `artifacts/hybrid_active_modes_freeze_v11/`
+  - `data/hybrid_operational_freeze_v11/`
+  - `artifacts/hybrid_operational_freeze_v11/`
+- Resultado: `active_rows=30`, `trials=2160`, `rf_only_ok=yes`, `remaining_guardrail_violations=0`, `policy_violations=0`, `feature_contract_mismatches=0`, `questionnaire_changed=no`, `elimination_identical_prediction_pairs=0`.
+- La linea final queda RF-only para los 30 slots, manteniendo exactamente los `feature_list_pipe` de v10 por slot y sin cambios de preguntas/inputs funcionales/outputs funcionales.
+- Resultado agregado vs v10: F1 medio estable (`+0.00006`), recall medio `+0.01053`, balanced accuracy media `+0.00357`, precision media `-0.00787`, Brier medio `+0.00483`.
+- Hubo 13 regresiones de F1 frente a champions v10, documentadas como consecuencia honesta del mandato RF-only cuando el mejor RF valido no supero al champion anterior.
+- Supabase/Postgres se sincronizo con la linea v11 y quedo evidencia en `data/hybrid_rf_max_real_metrics_v1/supabase_sync/supabase_sync_verification_v11.json`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`.
+- `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v11` y `hybrid_operational_freeze_v11`.
+- Caveat metodologico vigente: evidencia para screening/apoyo profesional en entorno simulado, no diagnostico automatico; Elimination ya no presenta predicciones binarias identicas entre sus 6 slots, pero conserva alta correlacion en algunos pares full/2_3 y requiere caveat operativo.

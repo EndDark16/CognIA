@@ -1,0 +1,24 @@
+{
+  "model_key": "elimination__caregiver_full__hybrid_rf_max_real_metrics_v1__rf__same_inputs_v10",
+  "line": "hybrid_rf_max_real_metrics_v1",
+  "rf_only": true,
+  "domain": "elimination",
+  "role": "caregiver",
+  "mode": "caregiver_full",
+  "feature_columns": [
+    "enuresis_duration_months_consecutive",
+    "encopresis_event_frequency_per_month",
+    "enuresis_nocturnal",
+    "enuresis_primary_course",
+    "encopresis_duration_months_consecutive",
+    "encopresis_constipation_present",
+    "enuresis_diurnal",
+    "encopresis_visible_deposition_pattern",
+    "enuresis_secondary_course"
+  ],
+  "recommended_threshold": 0.62,
+  "calibration": "isotonic",
+  "config_id": "rf_calibrated_regularized",
+  "generated_at_utc": "2026-04-27T05:19:17.043861+00:00",
+  "note": "pipeline.joblib is local/regenerable and ignored by git policy; metadata is tracked"
+}
