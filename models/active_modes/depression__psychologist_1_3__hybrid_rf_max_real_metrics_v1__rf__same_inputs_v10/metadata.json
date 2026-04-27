@@ -1,0 +1,26 @@
+{
+  "model_key": "depression__psychologist_1_3__hybrid_rf_max_real_metrics_v1__rf__same_inputs_v10",
+  "line": "hybrid_rf_max_real_metrics_v1",
+  "rf_only": true,
+  "domain": "depression",
+  "role": "psychologist",
+  "mode": "psychologist_1_3",
+  "feature_columns": [
+    "mdd_duration_weeks",
+    "mdd_impairment",
+    "pdd_duration_months_child",
+    "dmdd_irritable_between_outbursts",
+    "dmdd_outbursts_frequency_per_week",
+    "pdd_depressed_or_irritable_mood",
+    "dmdd_duration_months",
+    "pdd_impairment",
+    "dmdd_context_home",
+    "dmdd_context_school",
+    "dmdd_context_peers"
+  ],
+  "recommended_threshold": 0.5499999999999999,
+  "calibration": "none",
+  "config_id": "rf_recall_guarded",
+  "generated_at_utc": "2026-04-27T05:19:16.730134+00:00",
+  "note": "pipeline.joblib is local/regenerable and ignored by git policy; metadata is tracked"
+}

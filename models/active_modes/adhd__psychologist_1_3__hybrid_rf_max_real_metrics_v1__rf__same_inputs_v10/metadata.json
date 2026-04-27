@@ -1,0 +1,24 @@
+{
+  "model_key": "adhd__psychologist_1_3__hybrid_rf_max_real_metrics_v1__rf__same_inputs_v10",
+  "line": "hybrid_rf_max_real_metrics_v1",
+  "rf_only": true,
+  "domain": "adhd",
+  "role": "psychologist",
+  "mode": "psychologist_1_3",
+  "feature_columns": [
+    "adhd_onset_before_12",
+    "adhd_inatt_08_easily_distracted",
+    "adhd_inatt_02_sustained_attention_difficulty",
+    "adhd_inatt_06_avoids_sustained_effort",
+    "adhd_inatt_03_seems_not_listening",
+    "adhd_hypimp_04_cannot_play_quietly",
+    "adhd_inatt_07_loses_things",
+    "adhd_hypimp_02_leaves_seat",
+    "adhd_inatt_09_forgetful_daily_activities"
+  ],
+  "recommended_threshold": 0.5499999999999999,
+  "calibration": "none",
+  "config_id": "rf_calibrated_regularized",
+  "generated_at_utc": "2026-04-27T05:19:15.805248+00:00",
+  "note": "pipeline.joblib is local/regenerable and ignored by git policy; metadata is tracked"
+}
