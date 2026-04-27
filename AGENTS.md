@@ -1,7 +1,7 @@
-# AGENTS.md
+﻿# AGENTS.md
 
-## Propósito del proyecto
-Este repositorio implementa una tesis de ingeniería aplicada en salud mental infantil: un sistema de alerta temprana para niños de 6 a 11 años.
+## PropÃ³sito del proyecto
+Este repositorio implementa una tesis de ingenierÃ­a aplicada en salud mental infantil: un sistema de alerta temprana para niÃ±os de 6 a 11 aÃ±os.
 
 El sistema trabaja con 5 dominios:
 - ADHD
@@ -10,37 +10,37 @@ El sistema trabaja con 5 dominios:
 - Anxiety
 - Depression
 
-Contexto metodológico:
-- HBN es la base empírica.
+Contexto metodolÃ³gico:
+- HBN es la base empÃ­rica.
 - DSM-5 es el marco formal.
-- Hay una capa interna diagnóstica exacta y una capa externa de 5 dominios.
-- El entorno es simulado; no es un producto de diagnóstico clínico definitivo.
+- Hay una capa interna diagnÃ³stica exacta y una capa externa de 5 dominios.
+- El entorno es simulado; no es un producto de diagnÃ³stico clÃ­nico definitivo.
 
-## Restricciones metodológicas no negociables
-- No presentar resultados como diagnóstico automático o definitivo.
+## Restricciones metodolÃ³gicas no negociables
+- No presentar resultados como diagnÃ³stico automÃ¡tico o definitivo.
 - No inventar equivalencias entre fuentes, instrumentos, modos o derivaciones.
-- No introducir leakage, shortcuts, reuse silencioso de artefactos ni atajos metodológicos.
-- No romper contratos de inferencia, API, cuestionario o outputs sin trazabilidad explícita.
-- No sobreprometer métricas, cobertura, robustez ni validez clínica.
-- Priorizar rigor metodológico, honestidad y reproducibilidad por encima de marketing o simplificación.
+- No introducir leakage, shortcuts, reuse silencioso de artefactos ni atajos metodolÃ³gicos.
+- No romper contratos de inferencia, API, cuestionario o outputs sin trazabilidad explÃ­cita.
+- No sobreprometer mÃ©tricas, cobertura, robustez ni validez clÃ­nica.
+- Priorizar rigor metodolÃ³gico, honestidad y reproducibilidad por encima de marketing o simplificaciÃ³n.
 
-## Cómo razonar sobre claims clínicos y métricas
-- Tratar las métricas como evidencia de screening/apoyo, no como validación clínica definitiva.
+## CÃ³mo razonar sobre claims clÃ­nicos y mÃ©tricas
+- Tratar las mÃ©tricas como evidencia de screening/apoyo, no como validaciÃ³n clÃ­nica definitiva.
 - Separar resultados globales, por dominio y por modo.
-- Reportar incertidumbre, caveats y límites cuando haya cobertura parcial, señales débiles o equivalencias no estrictas.
-- Si un dato o contrato no está confirmado en el repo, marcarlo como `por confirmar`.
+- Reportar incertidumbre, caveats y lÃ­mites cuando haya cobertura parcial, seÃ±ales dÃ©biles o equivalencias no estrictas.
+- Si un dato o contrato no estÃ¡ confirmado en el repo, marcarlo como `por confirmar`.
 - Evitar lenguaje absoluto; preferir formulaciones operativas como:
   - apto para screening
   - requiere caveat
   - no apto para interpretacion fuerte
   - evidencia suficiente para apoyo profesional
 
-## Cómo trabajar en este repo
+## CÃ³mo trabajar en este repo
 1. Explora antes de editar: revisa `README.md`, `AGENTS_CONTEXT.md`, `docs/openapi.yaml`, `docs/OPENAPI_GUIDE.md` y los artefactos relevantes.
 2. No rompas pipeline ni contratos de inferencia: valida el impacto sobre API, runtime, cuestionario y outputs antes de cerrar cualquier cambio.
-3. Mantén caveats y trazabilidad: toda decisión relevante debe quedar documentada en texto o en artefactos versionados.
-4. Prefiere cambios pequeños y verificables antes que refactors amplios.
-5. Si falta contexto técnico, busca evidencia en el repo primero; si sigue faltando, dilo explícitamente.
+3. MantÃ©n caveats y trazabilidad: toda decisiÃ³n relevante debe quedar documentada en texto o en artefactos versionados.
+4. Prefiere cambios pequeÃ±os y verificables antes que refactors amplios.
+5. Si falta contexto tÃ©cnico, busca evidencia en el repo primero; si sigue faltando, dilo explÃ­citamente.
 
 ## Referencias de contexto
 - `README.md`
@@ -207,7 +207,7 @@ Contexto metodológico:
 - Decision de viabilidad: linea limpia viable y metodologicamente alineada con producto real, con adopcion principal selectiva y caveats en pares fragiles.
 
 ## Actualizacion de estado (2026-04-13) - hybrid_no_external_scores_boosted_v3
-- Se ejecuto campaña focalizada de mejora sobre la linea limpia (sin scores externos) con feature engineering interno + familias tabulares alternativas.
+- Se ejecuto campaÃ±a focalizada de mejora sobre la linea limpia (sin scores externos) con feature engineering interno + familias tabulares alternativas.
 - Linea creada: `data/hybrid_no_external_scores_boosted_v3/` y `artifacts/hybrid_no_external_scores_boosted_v3/`.
 - Script: `scripts/run_hybrid_no_external_scores_boosted_v3.py`.
 - Pares priorizados: ADHD short (4), Depression (6), Elimination short (2), Anxiety caregiver_1_3 (1).
@@ -487,3 +487,21 @@ Contexto metodológico:
 - Supabase/Postgres se sincronizo con `python scripts/bootstrap_questionnaire_backend_v2.py load-all`: `questions=146`, `active_model_activations=30`, `duplicate_active_domain_mode_rows=0`; evidencia en `data/hybrid_final_model_structural_compliance_v1/questionnaire_sync/supabase_sync_verification_v10.json`.
 - `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v10` y `hybrid_operational_freeze_v10`, y limpia activaciones antiguas por `domain/mode` para evitar convivencia de roles legacy `caregiver` con `guardian`.
 - Claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-04-27) - hybrid_rf_max_real_metrics_v1
+- Se ejecuto campana RF-only sobre los 30 slots activos reales desde `hybrid_active_modes_freeze_v10` / `hybrid_operational_freeze_v10`, en rama `train/rf-max-real-metrics-v1`.
+- Script principal: `scripts/run_hybrid_rf_max_real_metrics_v1.py`.
+- Lineas versionadas nuevas:
+  - `data/hybrid_rf_max_real_metrics_v1/`
+  - `artifacts/hybrid_rf_max_real_metrics_v1/`
+  - `data/hybrid_active_modes_freeze_v11/`
+  - `artifacts/hybrid_active_modes_freeze_v11/`
+  - `data/hybrid_operational_freeze_v11/`
+  - `artifacts/hybrid_operational_freeze_v11/`
+- Resultado: `active_rows=30`, `trials=2160`, `rf_only_ok=yes`, `remaining_guardrail_violations=0`, `policy_violations=0`, `feature_contract_mismatches=0`, `questionnaire_changed=no`, `elimination_identical_prediction_pairs=0`.
+- La linea final queda RF-only para los 30 slots, manteniendo exactamente los `feature_list_pipe` de v10 por slot y sin cambios de preguntas/inputs funcionales/outputs funcionales.
+- Resultado agregado vs v10: F1 medio estable (`+0.00006`), recall medio `+0.01053`, balanced accuracy media `+0.00357`, precision media `-0.00787`, Brier medio `+0.00483`.
+- Hubo 13 regresiones de F1 frente a champions v10, documentadas como consecuencia honesta del mandato RF-only cuando el mejor RF valido no supero al champion anterior.
+- Supabase/Postgres se sincronizo con la linea v11 y quedo evidencia en `data/hybrid_rf_max_real_metrics_v1/supabase_sync/supabase_sync_verification_v11.json`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`.
+- `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v11` y `hybrid_operational_freeze_v11`.
+- Caveat metodologico vigente: evidencia para screening/apoyo profesional en entorno simulado, no diagnostico automatico; Elimination ya no presenta predicciones binarias identicas entre sus 6 slots, pero conserva alta correlacion en algunos pares full/2_3 y requiere caveat operativo.
