@@ -1,0 +1,16 @@
+domain,target,split,n,positive_n,negative_n,positive_rate,seed
+adhd,target_domain_adhd_final,train,1440,282,1158,0.19583333333333333,20261101
+adhd,target_domain_adhd_final,val,480,94,386,0.19583333333333333,20261101
+adhd,target_domain_adhd_final,holdout,480,94,386,0.19583333333333333,20261101
+conduct,target_domain_conduct_final,train,1440,479,961,0.3326388888888889,20261124
+conduct,target_domain_conduct_final,val,480,159,321,0.33125,20261124
+conduct,target_domain_conduct_final,holdout,480,160,320,0.3333333333333333,20261124
+elimination,target_domain_elimination_final,train,1440,155,1285,0.1076388888888889,20261147
+elimination,target_domain_elimination_final,val,480,52,428,0.10833333333333334,20261147
+elimination,target_domain_elimination_final,holdout,480,52,428,0.10833333333333334,20261147
+anxiety,target_domain_anxiety_final,train,1440,258,1182,0.17916666666666667,20261170
+anxiety,target_domain_anxiety_final,val,480,86,394,0.17916666666666667,20261170
+anxiety,target_domain_anxiety_final,holdout,480,86,394,0.17916666666666667,20261170
+depression,target_domain_depression_final,train,1440,245,1195,0.1701388888888889,20261193
+depression,target_domain_depression_final,val,480,82,398,0.17083333333333334,20261193
+depression,target_domain_depression_final,holdout,480,82,398,0.17083333333333334,20261193
