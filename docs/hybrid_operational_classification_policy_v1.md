@@ -6,7 +6,7 @@ Eliminar ambigÃ¼edad en `final_class` y separar explÃ­citamente:
 1. clase operativa principal
 2. flags de riesgo metodolÃ³gico
 
-Esta politica aplica sobre la linea operativa vigente declarada por el loader v2. A 2026-04-27, esa linea es `hybrid_active_modes_freeze_v11` / `hybrid_operational_freeze_v11`; `freeze_v2` a `freeze_v10` quedan como historicos auditables.
+Esta politica aplica sobre la linea operativa vigente declarada por el loader v2. A 2026-04-27, esa linea es `hybrid_active_modes_freeze_v12` / `hybrid_operational_freeze_v12`; `freeze_v2` a `freeze_v11` quedan como historicos auditables.
 
 ## Capa 1: clase operativa principal
 Valores permitidos:
@@ -100,3 +100,7 @@ La linea v10 queda preservada como historica en `hybrid_active_modes_freeze_v10`
 
 ## Actualizacion 2026-04-27 - v11 RF-only
 La linea vigente queda en `hybrid_active_modes_freeze_v11` / `hybrid_operational_freeze_v11`. La campana `hybrid_rf_max_real_metrics_v1` reentreno 30/30 slots con RandomForestClassifier exclusivamente, mantuvo los mismos `feature_list_pipe` de v10, no modifico cuestionario ni outputs funcionales y dejo `recall|specificity|roc_auc|pr_auc <= 0.98` en todos los champions activos. La clasificacion final queda `ACTIVE_MODERATE_CONFIDENCE=15` y `ACTIVE_LIMITED_USE=15`, sin `ACTIVE_HIGH_CONFIDENCE` por caveats/fragilidad persistentes.
+
+## Actualizacion 2026-04-27 - v12 RF-based final
+La linea vigente queda en `hybrid_active_modes_freeze_v12` / `hybrid_operational_freeze_v12`. La campana `hybrid_final_rf_plus_maximize_metrics_v1` evaluo 30/30 slots con RandomForestClassifier como estimador base obligatorio, mantuvo los mismos `feature_list_pipe` de v11, no modifico cuestionario ni outputs funcionales y dejo `recall|specificity|roc_auc|pr_auc <= 0.98` en todos los champions activos. La clasificacion final queda `ACTIVE_HIGH_CONFIDENCE=2`, `ACTIVE_MODERATE_CONFIDENCE=13` y `ACTIVE_LIMITED_USE=15`; la sincronizacion Supabase/Postgres queda validada en `data/hybrid_final_rf_plus_maximize_metrics_v1/supabase_sync/supabase_sync_verification_v12.json`.
+
