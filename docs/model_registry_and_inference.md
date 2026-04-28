@@ -1,10 +1,10 @@
-﻿# Model Registry and Inference (v11)
+﻿# Model Registry and Inference (v12)
 
 ## Fuente de verdad
-- `data/hybrid_active_modes_freeze_v11/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_active_modes_freeze_v11/tables/hybrid_active_modes_summary.csv`
-- `data/hybrid_active_modes_freeze_v11/tables/hybrid_questionnaire_inputs_master.csv`
-- `data/hybrid_operational_freeze_v11/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v12/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v12/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v12/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v12/tables/hybrid_operational_final_champions.csv`
 
 Nota de continuidad (2026-04-22):
 - Se ejecuto la linea `hybrid_secondary_honest_retrain_v1` y se versionaron:
@@ -107,3 +107,13 @@ Referencia historica preservada:
   - Resultado agregado vs v10: F1 medio estable (`+0.00006`), recall medio `+0.01053`, BA media `+0.00357`, precision media `-0.00787`, Brier medio `+0.00483`; 13 slots quedan documentados como regresion honesta frente al champion anterior por mandato RF-only.
   - Sincronizacion Supabase/Postgres validada tras `load-all`: `active_model_activations=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`; evidencia en `data/hybrid_rf_max_real_metrics_v1/supabase_sync/supabase_sync_verification_v11.json`.
   - La fuente operativa efectiva pasa a `*_freeze_v11`; `*_freeze_v10` queda historico para trazabilidad.
+- Nota de continuidad (2026-04-27, final RF-plus maximize metrics v1):
+  - Se ejecuto `hybrid_final_rf_plus_maximize_metrics_v1` sobre `v11`.
+  - Se versionaron `data/hybrid_operational_freeze_v12/` y `data/hybrid_active_modes_freeze_v12/`.
+  - La linea final mantiene RandomForestClassifier como base obligatoria para 30/30 slots, conserva los mismos `feature_list_pipe` de v11, no modifica cuestionario ni outputs funcionales y deja `recall|specificity|roc_auc|pr_auc <= 0.98`.
+  - Resultado agregado vs v11: F1 medio `+0.003995`, recall medio `-0.005088`, precision media `+0.011399`, BA media `-0.000095`, Brier medio `-0.001543`; 29/30 slots mejoran o empatan F1.
+  - Anti-clonado en Elimination selecciono una alternativa mas conservadora para `elimination/psychologist_full`; la regresion F1 puntual (`-0.007003`) queda aceptada por control de comportamiento no clonado.
+  - Sincronizacion Supabase/Postgres validada tras `load-all`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`; evidencia en `data/hybrid_final_rf_plus_maximize_metrics_v1/supabase_sync/supabase_sync_verification_v12.json`.
+  - La fuente operativa efectiva pasa a `*_freeze_v12`; `*_freeze_v11` queda historico para trazabilidad.
+
+
