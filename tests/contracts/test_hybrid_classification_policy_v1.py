@@ -16,9 +16,12 @@ SHORTCUT_INV_V8 = ROOT / "data" / "hybrid_structural_mode_rescue_v1" / "tables" 
 SHORTCUT_INV_V9 = ROOT / "data" / "hybrid_elimination_structural_audit_rescue_v1" / "tables" / "shortcut_inventory_elimination_structural_audit_rescue_v1.csv"
 SHORTCUT_INV_V10 = ROOT / "data" / "hybrid_final_model_structural_compliance_v1" / "tables" / "shortcut_inventory_final_model_structural_compliance_v1.csv"
 SHORTCUT_INV_V11 = ROOT / "data" / "hybrid_rf_max_real_metrics_v1" / "tables" / "shortcut_inventory_rf_max_real_metrics_v1.csv"
+SHORTCUT_INV_V12 = ROOT / "data" / "hybrid_final_rf_plus_maximize_metrics_v1" / "tables" / "shortcut_inventory_final_rf_plus_maximize_metrics_v1.csv"
 
 
 def _shortcut_inventory_for(label: str) -> Path | None:
+    if label == "v12" and SHORTCUT_INV_V12.exists():
+        return SHORTCUT_INV_V12
     if label == "v11" and SHORTCUT_INV_V11.exists():
         return SHORTCUT_INV_V11
     if label == "v10":
@@ -34,7 +37,7 @@ def _shortcut_inventory_for(label: str) -> Path | None:
 
 def _line_inputs() -> list[PolicyInputs]:
     lines: list[PolicyInputs] = []
-    for label in ["v2", "v3", "v4", "v5", "v6_hotfix_v1", "v8", "v9", "v10", "v11"]:
+    for label in ["v2", "v3", "v4", "v5", "v6_hotfix_v1", "v8", "v9", "v10", "v11", "v12"]:
         op = ROOT / "data" / f"hybrid_operational_freeze_{label}" / "tables" / "hybrid_operational_final_champions.csv"
         active = ROOT / "data" / f"hybrid_active_modes_freeze_{label}" / "tables" / "hybrid_active_models_30_modes.csv"
         if not op.exists() or not active.exists():

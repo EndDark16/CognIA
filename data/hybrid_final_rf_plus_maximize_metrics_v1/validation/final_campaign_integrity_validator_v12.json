@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "active_rows": 30,
+  "selected_rf_rows": 30,
+  "unique_slots": 30,
+  "rf_only_ok": "yes",
+  "non_rf_rows": 0,
+  "guard_violations": 0,
+  "feature_contract_mismatches": 0,
+  "same_inputs_outputs_contract_mismatches": 0,
+  "questionnaire_changed": "no",
+  "elimination_identical_prediction_pairs": 0,
+  "elimination_near_clone_pairs": 0,
+  "supabase_sync_ok": true,
+  "supabase_active_activations_db": 30,
+  "supabase_non_rf": 0,
+  "supabase_missing_expected_models": 0,
+  "supabase_mismatched_feature_columns": 0
+}

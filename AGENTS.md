@@ -505,3 +505,20 @@ Contexto metodolÃ³gico:
 - Supabase/Postgres se sincronizo con la linea v11 y quedo evidencia en `data/hybrid_rf_max_real_metrics_v1/supabase_sync/supabase_sync_verification_v11.json`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`.
 - `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v11` y `hybrid_operational_freeze_v11`.
 - Caveat metodologico vigente: evidencia para screening/apoyo profesional en entorno simulado, no diagnostico automatico; Elimination ya no presenta predicciones binarias identicas entre sus 6 slots, pero conserva alta correlacion en algunos pares full/2_3 y requiere caveat operativo.
+
+## Actualizacion de estado (2026-04-27) - hybrid_final_rf_plus_maximize_metrics_v1
+- Se ejecuto campana final RF-based sobre los 30 slots activos reales desde `hybrid_active_modes_freeze_v11` / `hybrid_operational_freeze_v11`, en rama `train/final-rf-plus-maximize-metrics-v1`.
+- Script principal: `scripts/run_hybrid_final_rf_plus_maximize_metrics_v1.py`.
+- Lineas versionadas nuevas:
+  - `data/hybrid_final_rf_plus_maximize_metrics_v1/`
+  - `artifacts/hybrid_final_rf_plus_maximize_metrics_v1/`
+  - `data/hybrid_active_modes_freeze_v12/`
+  - `artifacts/hybrid_active_modes_freeze_v12/`
+  - `data/hybrid_operational_freeze_v12/`
+  - `artifacts/hybrid_operational_freeze_v12/`
+- La linea final mantiene RandomForestClassifier como base obligatoria para 30/30 champions; se permitieron calibracion/thresholding/resampling train-only y regularizacion alrededor de RF sin usar familias no-RF como champion.
+- Resultado de campana: `trials=5400`, `rf_only_ok=yes`, `remaining_guardrail_violations=0`, `policy_violations=0`, `feature_contract_mismatches=0`, `questionnaire_changed=no`, `elimination_identical_prediction_pairs=0`.
+- Delta agregado v12 vs v11: F1 medio `+0.003995`, recall medio `-0.005088`, precision media `+0.011399`, BA media `-0.000095`, Brier medio `-0.001543`.
+- F1 mejoro o empato en `29/30` slots; la unica regresion fue `elimination/psychologist_full` (`-0.007003`) por seleccion anti-clonado metodologicamente mas conservadora.
+- Supabase/Postgres se sincronizo con la linea v12 y quedo evidencia en `data/hybrid_final_rf_plus_maximize_metrics_v1/supabase_sync/supabase_sync_verification_v12.json`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`.
+- `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v12` y `hybrid_operational_freeze_v12`.
