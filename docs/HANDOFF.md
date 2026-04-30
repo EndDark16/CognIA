@@ -983,3 +983,21 @@ Pendiente:
 - F1 mejoro o empato en `29/30` slots; la unica regresion fue `elimination/psychologist_full` (`-0.007003`) por seleccion anti-clonado metodologicamente mas conservadora.
 - Supabase/Postgres se sincronizo con la linea v12 y quedo evidencia en `data/hybrid_final_rf_plus_maximize_metrics_v1/supabase_sync/supabase_sync_verification_v12.json`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`.
 - `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v12` y `hybrid_operational_freeze_v12`.
+
+## Actualizacion de estado (2026-04-29) - hybrid_global_contract_compatible_rf_champion_selection_v13
+- Se ejecuto correccion rapida de seleccion de champions RF contract-compatible, sin campana nueva de entrenamiento.
+- Rama de trabajo: `fix/global-compatible-rf-champion-selection-v13`.
+- Script principal: `scripts/build_hybrid_global_contract_compatible_rf_champion_selection_v13.py`.
+- Linea versionada creada:
+  - `data/hybrid_global_contract_compatible_rf_champion_selection_v13/`
+  - `artifacts/hybrid_global_contract_compatible_rf_champion_selection_v13/`
+  - `data/hybrid_active_modes_freeze_v13/`
+  - `artifacts/hybrid_active_modes_freeze_v13/`
+  - `data/hybrid_operational_freeze_v13/`
+  - `artifacts/hybrid_operational_freeze_v13/`
+- Alcance: seleccion de champions activos entre RF v12, RF v11 y candidatos historicos solo si cumplen contrato actual exacto de `feature_list_pipe`, orden de columnas, threshold valido, metadata activable, metricas comparables y gate duro.
+- Resultado: `active_rows=30`, `rf_rows=30`, `selected_from_v11=17`, `selected_from_v12=13`, `guardrail_violations=0`, `policy_violations=0`, `near_clone_proxy_pairs=0`.
+- No se modificaron preguntas, cuestionario, inputs funcionales, outputs funcionales ni semantica de dominio/modo/rol.
+- `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v13` y `hybrid_operational_freeze_v13`.
+- Claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+- Supabase/Postgres sincronizado tras `load-all`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`; evidencia en `data/hybrid_global_contract_compatible_rf_champion_selection_v13/supabase_sync/supabase_sync_verification_v13.json`.
