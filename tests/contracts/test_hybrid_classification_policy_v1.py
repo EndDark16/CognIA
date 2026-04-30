@@ -37,7 +37,7 @@ def _shortcut_inventory_for(label: str) -> Path | None:
 
 def _line_inputs() -> list[PolicyInputs]:
     lines: list[PolicyInputs] = []
-    for label in ["v2", "v3", "v4", "v5", "v6_hotfix_v1", "v8", "v9", "v10", "v11", "v12"]:
+    for label in ["v2", "v3", "v4", "v5", "v6_hotfix_v1", "v8", "v9", "v10", "v11", "v12", "v13"]:
         op = ROOT / "data" / f"hybrid_operational_freeze_{label}" / "tables" / "hybrid_operational_final_champions.csv"
         active = ROOT / "data" / f"hybrid_active_modes_freeze_{label}" / "tables" / "hybrid_active_models_30_modes.csv"
         if not op.exists() or not active.exists():

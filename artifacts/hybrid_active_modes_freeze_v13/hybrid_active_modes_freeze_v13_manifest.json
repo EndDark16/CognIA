@@ -1,0 +1,32 @@
+{
+  "line": "hybrid_global_contract_compatible_rf_champion_selection_v13",
+  "freeze_label": "v13",
+  "generated_at_utc": "2026-04-30T04:20:02.787333+00:00",
+  "source_truth_initial": {
+    "active": "C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_rf_plus_maximize/data/hybrid_active_modes_freeze_v12/tables/hybrid_active_models_30_modes.csv",
+    "operational": "C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_rf_plus_maximize/data/hybrid_operational_freeze_v12/tables/hybrid_operational_final_champions.csv",
+    "inputs_master": "C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_rf_plus_maximize/data/hybrid_active_modes_freeze_v12/tables/hybrid_questionnaire_inputs_master.csv"
+  },
+  "source_truth_final": {
+    "active": "C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_rf_plus_maximize/data/hybrid_active_modes_freeze_v13/tables/hybrid_active_models_30_modes.csv",
+    "operational": "C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_rf_plus_maximize/data/hybrid_operational_freeze_v13/tables/hybrid_operational_final_champions.csv",
+    "inputs_master": "C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_rf_plus_maximize/data/hybrid_active_modes_freeze_v13/tables/hybrid_questionnaire_inputs_master.csv"
+  },
+  "rules": {
+    "selection_scope": "champions_only",
+    "model_family_allowed": "RF-based only",
+    "contract_compatibility": "exact feature_list_pipe and order versus v12 current contract",
+    "no_training": true,
+    "same_inputs_outputs": true,
+    "no_question_changes": true,
+    "guardrail_metrics_max": 0.98
+  },
+  "stats": {
+    "active_rows": 30,
+    "rf_rows": 30,
+    "selected_from_v11": 17,
+    "selected_from_v12": 13,
+    "rejected_candidates": 360,
+    "policy_violations": 0
+  }
+}
