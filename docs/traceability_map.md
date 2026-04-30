@@ -44,11 +44,11 @@ Where:
 
 ### Model activation and champions
 - Active 30-mode activation:
-  - `data/hybrid_active_modes_freeze_v12/`
-  - `artifacts/hybrid_active_modes_freeze_v12/`
+  - `data/hybrid_active_modes_freeze_v13/`
+  - `artifacts/hybrid_active_modes_freeze_v13/`
 - Operational champions:
-  - `data/hybrid_operational_freeze_v12/`
-  - `artifacts/hybrid_operational_freeze_v12/`
+  - `data/hybrid_operational_freeze_v13/`
+  - `artifacts/hybrid_operational_freeze_v13/`
 
 Audit lines:
 - `data/hybrid_secondary_honest_retrain_v1/`
@@ -61,6 +61,7 @@ Audit lines:
 - `data/hybrid_final_model_structural_compliance_v1/`
 - `data/hybrid_rf_max_real_metrics_v1/`
 - `data/hybrid_final_rf_plus_maximize_metrics_v1/`
+- `data/hybrid_global_contract_compatible_rf_champion_selection_v13/`
 - `data/hybrid_operational_freeze_v3/`
 - `data/hybrid_operational_freeze_v4/`
 - `data/hybrid_operational_freeze_v5/`
@@ -71,6 +72,7 @@ Audit lines:
 - `data/hybrid_operational_freeze_v10/`
 - `data/hybrid_operational_freeze_v11/`
 - `data/hybrid_operational_freeze_v12/`
+- `data/hybrid_operational_freeze_v13/`
 - `data/hybrid_active_modes_freeze_v3/`
 - `data/hybrid_active_modes_freeze_v4/`
 - `data/hybrid_active_modes_freeze_v5/`
@@ -81,6 +83,7 @@ Audit lines:
 - `data/hybrid_active_modes_freeze_v10/`
 - `data/hybrid_active_modes_freeze_v11/`
 - `data/hybrid_active_modes_freeze_v12/`
+- `data/hybrid_active_modes_freeze_v13/`
 - `artifacts/hybrid_secondary_honest_retrain_v1/`
 - `artifacts/hybrid_final_honest_improvement_v1/`
 - `artifacts/hybrid_final_decisive_rescue_v5/`
@@ -91,6 +94,7 @@ Audit lines:
 - `artifacts/hybrid_final_model_structural_compliance_v1/`
 - `artifacts/hybrid_rf_max_real_metrics_v1/`
 - `artifacts/hybrid_final_rf_plus_maximize_metrics_v1/`
+- `artifacts/hybrid_global_contract_compatible_rf_champion_selection_v13/`
 - `artifacts/hybrid_operational_freeze_v3/`
 - `artifacts/hybrid_operational_freeze_v4/`
 - `artifacts/hybrid_operational_freeze_v5/`
@@ -101,6 +105,7 @@ Audit lines:
 - `artifacts/hybrid_operational_freeze_v10/`
 - `artifacts/hybrid_operational_freeze_v11/`
 - `artifacts/hybrid_operational_freeze_v12/`
+- `artifacts/hybrid_operational_freeze_v13/`
 - `artifacts/hybrid_active_modes_freeze_v3/`
 - `artifacts/hybrid_active_modes_freeze_v4/`
 - `artifacts/hybrid_active_modes_freeze_v5/`
@@ -111,6 +116,7 @@ Audit lines:
 - `artifacts/hybrid_active_modes_freeze_v10/`
 - `artifacts/hybrid_active_modes_freeze_v11/`
 - `artifacts/hybrid_active_modes_freeze_v12/`
+- `artifacts/hybrid_active_modes_freeze_v13/`
 - Estado (2026-04-21): evidencia versionada de auditoria secundaria con `replaced_pairs=0`.
 - Estado (2026-04-22): campana `hybrid_final_honest_improvement_v1` con `replaced_pairs=9` desplaza la fuente operativa a `*_freeze_v4`.
 - Estado (2026-04-22): campana final decisiva `hybrid_final_decisive_rescue_v5` con `replaced_pairs=1` desplaza la fuente operativa a `*_freeze_v5`.
@@ -121,6 +127,7 @@ Audit lines:
 - Estado (2026-04-26): `hybrid_final_model_structural_compliance_v1` ejecuta retrain focal de 20 slots sobre v9, promueve 5 champions, revierte 3 challengers Elimination por anti-clonado, deja `guardrail_violations_final=0`, `policy_violations_final=0` y desplaza la fuente operativa a `*_freeze_v10`.
 - Estado (2026-04-27): `hybrid_rf_max_real_metrics_v1` reentrena 30/30 slots con RandomForestClassifier exclusivamente, mantiene feature contracts v10, deja `remaining_guardrail_violations=0`, `policy_violations=0`, `rf_only_ok=yes`, `elimination_identical_prediction_pairs=0` y desplaza la fuente operativa a `*_freeze_v11`.
 - Estado (2026-04-27): `hybrid_final_rf_plus_maximize_metrics_v1` reentrena/evalua 30/30 slots RF-based sobre v11 con tecnicas complementarias RF, mantiene mismos inputs/outputs, deja `remaining_guardrail_violations=0`, `policy_violations=0`, `rf_only_ok=yes`, `feature_contract_mismatches=0`, `questionnaire_changed=no`, `elimination_identical_prediction_pairs=0` y desplaza la fuente operativa a `*_freeze_v12`.
+- Estado (2026-04-29): `hybrid_global_contract_compatible_rf_champion_selection_v13` corrige seleccion de champions sin reentrenamiento, recupera 17 RF v11 contract-compatible y retiene 13 RF v12, mantiene mismo contrato exacto de features/outputs, deja `guardrail_violations=0`, `policy_violations=0`, `near_clone_proxy_pairs=0` y desplaza la fuente operativa a `*_freeze_v13`.
 
 Historical lines retained for traceability:
 - `data/hybrid_active_modes_freeze_v1/`
