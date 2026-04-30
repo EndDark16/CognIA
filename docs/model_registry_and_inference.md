@@ -1,10 +1,10 @@
-﻿# Model Registry and Inference (v12)
+# Model Registry and Inference (v13)
 
 ## Fuente de verdad
-- `data/hybrid_active_modes_freeze_v12/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_active_modes_freeze_v12/tables/hybrid_active_modes_summary.csv`
-- `data/hybrid_active_modes_freeze_v12/tables/hybrid_questionnaire_inputs_master.csv`
-- `data/hybrid_operational_freeze_v12/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v13/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v13/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v13/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v13/tables/hybrid_operational_final_champions.csv`
 
 Nota de continuidad (2026-04-22):
 - Se ejecuto la linea `hybrid_secondary_honest_retrain_v1` y se versionaron:
@@ -117,3 +117,10 @@ Referencia historica preservada:
   - La fuente operativa efectiva pasa a `*_freeze_v12`; `*_freeze_v11` queda historico para trazabilidad.
 
 
+- Nota de continuidad (2026-04-29, global contract-compatible RF champion selection v13):
+  - Se ejecuto `hybrid_global_contract_compatible_rf_champion_selection_v13` como correccion de seleccion de champions, sin nueva campana de entrenamiento.
+  - Se versionaron `data/hybrid_operational_freeze_v13/` y `data/hybrid_active_modes_freeze_v13/`.
+  - Regla aplicada solo a champions: elegir el mejor RF-based conocido por slot entre v11/v12/historicos si conserva contrato exacto de `feature_list_pipe`, orden de columnas, threshold, metricas comparables y metadata activable.
+  - Resultado: `selected_from_v11=17`, `selected_from_v12=13`, `active_rows=30`, `rf_rows=30`, `guardrail_violations=0`, `policy_violations=0`, `near_clone_proxy_pairs=0`.
+  - La fuente operativa efectiva pasa a `*_freeze_v13`; `*_freeze_v12` queda historico para trazabilidad.
+  - Supabase/Postgres sincronizado tras `load-all`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`; evidencia en `data/hybrid_global_contract_compatible_rf_champion_selection_v13/supabase_sync/supabase_sync_verification_v13.json`.
