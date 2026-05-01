@@ -1,0 +1,27 @@
+{
+  "model_key": "elimination__caregiver_full__hybrid_elimination_v14_real_anti_clone_rescue__rf__same_inputs_v13",
+  "line": "hybrid_elimination_v14_real_anti_clone_rescue",
+  "rf_only": true,
+  "domain": "elimination",
+  "role": "caregiver",
+  "mode": "caregiver_full",
+  "feature_columns": [
+    "enuresis_duration_months_consecutive",
+    "encopresis_event_frequency_per_month",
+    "enuresis_nocturnal",
+    "enuresis_primary_course",
+    "encopresis_duration_months_consecutive",
+    "encopresis_constipation_present",
+    "enuresis_diurnal",
+    "encopresis_visible_deposition_pattern",
+    "enuresis_secondary_course"
+  ],
+  "recommended_threshold": 0.7499999999999999,
+  "calibration": "isotonic",
+  "config_id": "rf_v14_calibrated_isotonic",
+  "generated_at_utc": "2026-05-01T03:15:14.586195+00:00",
+  "source_candidate_key": "caregiver_full::train::rf_v14_calibrated_isotonic::20270421::isotonic::max_f1_precision_guard::0.600000::joint_thr::0.750000",
+  "source_type": "trained_rf_v14",
+  "source_model_id": "trained_rf_v14",
+  "note": "pipeline.joblib is local/regenerable and ignored by git policy; metadata is tracked"
+}

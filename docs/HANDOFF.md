@@ -1037,3 +1037,30 @@ Pendiente:
   - No hubo reentrenamiento ni cambios de champions en esta ventana.
   - No hubo cambios en inputs/outputs funcionales ni en preguntas del cuestionario.
   - Estado de cierre de auditoria: bloquear promocion afirmativa de “sin clonado” hasta resolver/aceptar explicitamente los 4 pares marcados por criterio estricto.
+
+## Actualizacion de estado (2026-05-01) - hybrid_elimination_v14_real_anti_clone_rescue
+- Objetivo ejecutado: correccion focal del clonado conductual real en Elimination detectado en v13, sin campana general y sin tocar los otros 24 champions.
+- Rama: `fix/elimination-v14-real-anti-clone-rescue`.
+- Script:
+  - `scripts/run_hybrid_elimination_v14_real_anti_clone_rescue.py`
+- Salidas versionadas:
+  - `data/hybrid_elimination_v14_real_anti_clone_rescue/`
+  - `artifacts/hybrid_elimination_v14_real_anti_clone_rescue/`
+  - `data/hybrid_active_modes_freeze_v14/`
+  - `artifacts/hybrid_active_modes_freeze_v14/`
+  - `data/hybrid_operational_freeze_v14/`
+  - `artifacts/hybrid_operational_freeze_v14/`
+- Resultado tecnico:
+  - `prediction_recomputed_slots=30/30`
+  - `elimination_real_clone_count=0`
+  - `all_domains_real_clone_count=0`
+  - `artifact_duplicate_hash_count=0`
+  - `guardrail_violations=0`
+  - `final_audit_status=pass_with_warnings` (warnings near-clone sin clonado real).
+- Restricciones cumplidas:
+  - 6 slots Elimination RF-based corregidos.
+  - 24 no-Elimination sin cambios (`validation/v14_non_elimination_unchanged_validator.csv`).
+  - Contrato exacto de features/inputs/outputs 30/30 (`validation/v14_contract_compatibility_validator.csv`).
+  - Sin cambios de preguntas/cuestionario.
+- Loader/runtime:
+  - `api/services/questionnaire_v2_loader_service.py` actualizado a defaults `*_freeze_v14`.

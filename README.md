@@ -471,10 +471,10 @@ python scripts/bootstrap_questionnaire_backend_v2.py regenerate-report-snapshot 
 
 ### Fuentes default usadas por loader v2
 - `data/cuestionario_v16.4/`
-- `data/hybrid_active_modes_freeze_v13/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_active_modes_freeze_v13/tables/hybrid_active_modes_summary.csv`
-- `data/hybrid_active_modes_freeze_v13/tables/hybrid_questionnaire_inputs_master.csv`
-- `data/hybrid_operational_freeze_v13/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v14/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v14/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v14/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v14/tables/hybrid_operational_final_champions.csv`
 
 ## 14. API y gobierno de contratos
 ### Donde vive OpenAPI
@@ -666,9 +666,9 @@ Referencia: `docs/security_hardening_20260416.md`.
 - Transformar respuestas a `feature_map`, aplicar derivaciones internas, inferir por dominio y comorbilidad.
 
 ### Fuentes de verdad operativas actuales
-- `data/hybrid_active_modes_freeze_v13/*`
-- `data/hybrid_operational_freeze_v13/*`
-- `data/hybrid_global_contract_compatible_rf_champion_selection_v13/*`
+- `data/hybrid_active_modes_freeze_v14/*`
+- `data/hybrid_operational_freeze_v14/*`
+- `data/hybrid_elimination_v14_real_anti_clone_rescue/*`
 
 ### Entrenamiento/pipeline en repo
 - Existen scripts versionados de entrenamiento/auditoria (`scripts/run_hybrid_*`, `scripts/run_*ceiling*`, etc.).
@@ -889,7 +889,7 @@ Fuente de verdad: `docs/repository_artifact_policy.md`.
 ### Tecnicas
 - Coexisten capas legacy y actuales; aumenta superficie de mantenimiento.
 - `POST /api/predict` sigue presente por compatibilidad, pero deprecado.
-- Campo `model_bundle_version` en resultados v2 puede ser un metadato heredado; la linea activa efectiva de modelos se lee del loader v2 y apunta a `hybrid_active_modes_freeze_v13`.
+- Campo `model_bundle_version` en resultados v2 puede ser un metadato heredado; la linea activa efectiva de modelos se lee del loader v2 y apunta a `hybrid_active_modes_freeze_v14`.
 - No hay reporte global oficial de cobertura porcentual publicado en esta revision.
 
 ### Operativas
@@ -948,4 +948,3 @@ Si quieres entender X, lee Y:
 
 ## Nota final metodologica
 Toda interpretacion de resultados de CognIA debe mantenerse en el marco de apoyo profesional/screening en entorno simulado. No publicar ni operar claims de diagnostico clinico automatico con este backend.
-
