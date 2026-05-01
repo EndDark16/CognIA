@@ -1001,3 +1001,39 @@ Pendiente:
 - `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v13` y `hybrid_operational_freeze_v13`.
 - Claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
 - Supabase/Postgres sincronizado tras `load-all`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`; evidencia en `data/hybrid_global_contract_compatible_rf_champion_selection_v13/supabase_sync/supabase_sync_verification_v13.json`.
+
+## Actualizacion de estado (2026-05-01) - hybrid_v13_real_prediction_anti_clone_audit
+- Objetivo ejecutado: auditoria anti-clone fuerte y rapida sobre linea activa `v13`, con recomputacion real de probabilidades/predicciones en holdout para `30/30` champions.
+- Rama: `audit/v13-real-prediction-anti-clone`.
+- Script nuevo:
+  - `scripts/run_hybrid_v13_real_prediction_anti_clone_audit.py`
+- Fuente versionada de salida:
+  - `data/hybrid_v13_real_prediction_anti_clone_audit/`
+- Resultado tecnico principal:
+  - `prediction_recomputed_slots=30/30`
+  - `artifacts_available_slots=30/30`
+  - `metrics_match_registered=yes` en `30/30` slots (`tolerance=1e-6`)
+  - `artifact_duplicate_hash_count=0`
+  - `all_domains_real_clone_count=4`
+  - `elimination_real_clone_count=4`
+  - `all_domains_near_clone_warning_count=23`
+  - `final_audit_status=fail`
+- Pairs Elimination con `real_clone_flag=yes`:
+  - `caregiver_full` vs `psychologist_1_3`
+  - `caregiver_full` vs `psychologist_2_3`
+  - `caregiver_full` vs `psychologist_full` (prediccion binaria identica)
+  - `psychologist_1_3` vs `psychologist_2_3`
+- Inventario clave generado:
+  - `tables/v13_recomputed_champion_metrics.csv`
+  - `tables/v13_registered_vs_recomputed_metrics.csv`
+  - `tables/v13_pairwise_prediction_similarity_all_domains.csv`
+  - `tables/v13_elimination_real_prediction_similarity.csv`
+  - `validation/v13_real_prediction_anti_clone_validator.csv`
+  - `validation/v13_recomputed_metrics_match_validator.csv`
+  - `validation/v13_artifact_availability_validator.csv`
+  - `validation/v13_elimination_clone_risk_validator.csv`
+  - `reports/v13_real_prediction_anti_clone_report.md`
+- Notas operativas:
+  - No hubo reentrenamiento ni cambios de champions en esta ventana.
+  - No hubo cambios en inputs/outputs funcionales ni en preguntas del cuestionario.
+  - Estado de cierre de auditoria: bloquear promocion afirmativa de “sin clonado” hasta resolver/aceptar explicitamente los 4 pares marcados por criterio estricto.
