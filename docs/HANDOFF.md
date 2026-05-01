@@ -1104,3 +1104,26 @@ Pendiente:
   - Validacion DB se enfoca en integridad de set activo (`db_active_set_valid`) y no en exigir lineage unico.
 - Loader/runtime:
   - Defaults movidos a `*_freeze_v16`.
+## Actualizacion de estado (2026-05-01) - runtime_diagnostic_security_hardening_v17
+- Objetivo: hardening final backend sobre linea activa de modelos `v16` (sin reentrenamiento).
+- Implementacion:
+  - `api/services/crypto_service.py` (cifrado en reposo, AES-GCM, dual-read).
+  - `api/services/transport_crypto_service.py` (envelope cifrado de payload sensible).
+  - `api/services/questionnaire_v2_service.py` (sin fallback heuristico activo fuera de TESTING + resumen clinico simulado por secciones).
+  - `api/routes/questionnaire_v2.py` (rutas nuevas y soporte encrypted transport en endpoints sensibles).
+- Endpoints nuevos:
+  - `GET /api/v2/security/transport-key`
+  - `POST /api/v2/questionnaires/history/{session_id}/results-secure`
+  - `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`
+- Validacion/artifacts:
+  - `scripts/run_runtime_artifact_validation_v17.py`
+  - `data/hybrid_runtime_artifact_validation_v17/`
+  - `scripts/run_security_encryption_validation_v17.py`
+  - `data/security_encryption_v17/`
+- Documentacion:
+  - `docs/security_encryption.md`
+  - `docs/frontend_encrypted_transport_contract.md`
+  - `docs/clinical_summary_endpoint.md`
+- Importante:
+  - La linea de modelos permanece en `v16`.
+  - El endpoint legacy de resultados plaintext sigue activo por compatibilidad (`/history/{session_id}/results`) y marca cabecera de legado.
