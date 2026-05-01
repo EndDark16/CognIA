@@ -1,0 +1,27 @@
+{
+  "model_key": "elimination__psychologist_2_3__hybrid_elimination_v14_real_anti_clone_rescue__rf__same_inputs_v13",
+  "line": "hybrid_elimination_v14_real_anti_clone_rescue",
+  "rf_only": true,
+  "domain": "elimination",
+  "role": "psychologist",
+  "mode": "psychologist_2_3",
+  "feature_columns": [
+    "enuresis_duration_months_consecutive",
+    "encopresis_event_frequency_per_month",
+    "enuresis_nocturnal",
+    "enuresis_primary_course",
+    "encopresis_duration_months_consecutive",
+    "enuresis_not_due_substance_medical",
+    "encopresis_not_due_substance_medical",
+    "encopresis_constipation_present",
+    "enuresis_diurnal"
+  ],
+  "recommended_threshold": 0.6599999999999999,
+  "calibration": "none",
+  "config_id": "rf_calibrated_regularized",
+  "generated_at_utc": "2026-05-01T03:15:14.772968+00:00",
+  "source_candidate_key": "psychologist_2_3::hist::v10_selected::elimination__psychologist_2_3__hybrid_rf_max_real_metrics_v1__rf__same_inputs_v10::fixed::0.880000::joint_thr::0.660000",
+  "source_type": "historical_v10_selected",
+  "source_model_id": "elimination__psychologist_2_3__hybrid_rf_max_real_metrics_v1__rf__same_inputs_v10",
+  "note": "pipeline.joblib is local/regenerable and ignored by git policy; metadata is tracked"
+}

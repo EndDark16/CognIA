@@ -1,10 +1,17 @@
-# Model Registry and Inference (v13)
+# Model Registry and Inference (v14)
 
 ## Fuente de verdad
-- `data/hybrid_active_modes_freeze_v13/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_active_modes_freeze_v13/tables/hybrid_active_modes_summary.csv`
-- `data/hybrid_active_modes_freeze_v13/tables/hybrid_questionnaire_inputs_master.csv`
-- `data/hybrid_operational_freeze_v13/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_active_modes_freeze_v14/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v14/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v14/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v14/tables/hybrid_operational_final_champions.csv`
+
+Nota de continuidad (2026-05-01, elimination v14 rescue):
+- Se ejecuto `hybrid_elimination_v14_real_anti_clone_rescue` como correccion focal Elimination-only sobre v13.
+- Se versionaron `data/hybrid_operational_freeze_v14/` y `data/hybrid_active_modes_freeze_v14/`.
+- Se corrigieron solo los 6 slots Elimination con RF-based + seleccion conjunta anti-clone real.
+- Resultado: `prediction_recomputed_slots=30/30`, `elimination_real_clone_count=0`, `all_domains_real_clone_count=0`, `artifact_duplicate_hash_count=0`, `guardrail_violations=0`, `final_audit_status=pass_with_warnings`.
+- Los otros 24 champions quedaron sin cambios respecto a v13 (ver `v14_non_elimination_unchanged_validator.csv`).
 
 Nota de continuidad (2026-04-22):
 - Se ejecuto la linea `hybrid_secondary_honest_retrain_v1` y se versionaron:
