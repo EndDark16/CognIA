@@ -1064,3 +1064,19 @@ Pendiente:
   - Sin cambios de preguntas/cuestionario.
 - Loader/runtime:
   - `api/services/questionnaire_v2_loader_service.py` actualizado a defaults `*_freeze_v14`.
+
+
+## Actualizacion 2026-05-01 - v15 caregiver_full metric rescue
+- Linea nueva: `hybrid_elimination_v15_caregiver_full_metric_rescue`.
+- Freeze activo generado: `hybrid_active_modes_freeze_v15` + `hybrid_operational_freeze_v15`.
+- Mejora focal lograda en `elimination/caregiver_full` sin clonado real:
+  - `F1 0.712871 -> 0.820513`, `recall 0.692308 -> 0.923077`, `BA 0.830967 -> 0.941679`.
+- Auditoria real v15: `prediction_recomputed=30/30`, `elimination_real_clone_count=0`, `all_domains_real_clone_count=0`, `guardrail_violations=0`, `final_audit_status=pass_with_warnings`.
+- Cambios runtime/DB:
+  - Loader por defecto movido a `*_freeze_v15`.
+  - Fix aplicado en loader para serializacion JSON-safe (`NaN/inf -> null`) en `model_metrics_snapshot.metrics_json`.
+  - `python scripts/bootstrap_questionnaire_backend_v2.py load-all` exitoso contra Supabase/Postgres.
+- Evidencia principal:
+  - `data/hybrid_elimination_v15_caregiver_full_metric_rescue/reports/v15_elimination_caregiver_full_metric_rescue_report.md`
+  - `data/hybrid_elimination_v15_caregiver_full_metric_rescue/validation/v15_real_prediction_anti_clone_validator.csv`
+  - `data/hybrid_elimination_v15_caregiver_full_metric_rescue/validation/v15_supabase_sync_verification.json`

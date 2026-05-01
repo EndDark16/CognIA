@@ -1,4 +1,5 @@
 ﻿import json
+import math
 import re
 import uuid
 from dataclasses import dataclass
@@ -49,10 +50,10 @@ DEFAULT_DEFINITION_NAME = "Cuestionario operacional v16.4"
 DEFAULT_VERSION_LABEL = "v16.4"
 DEFAULT_SOURCE_DIR = Path("data") / "cuestionario_v16.4"
 
-DEFAULT_ACTIVE_MODELS = Path("data") / "hybrid_active_modes_freeze_v14" / "tables" / "hybrid_active_models_30_modes.csv"
-DEFAULT_ACTIVE_SUMMARY = Path("data") / "hybrid_active_modes_freeze_v14" / "tables" / "hybrid_active_modes_summary.csv"
-DEFAULT_INPUTS_MASTER = Path("data") / "hybrid_active_modes_freeze_v14" / "tables" / "hybrid_questionnaire_inputs_master.csv"
-DEFAULT_OPERATIONAL_CHAMPIONS = Path("data") / "hybrid_operational_freeze_v14" / "tables" / "hybrid_operational_final_champions.csv"
+DEFAULT_ACTIVE_MODELS = Path("data") / "hybrid_active_modes_freeze_v15" / "tables" / "hybrid_active_models_30_modes.csv"
+DEFAULT_ACTIVE_SUMMARY = Path("data") / "hybrid_active_modes_freeze_v15" / "tables" / "hybrid_active_modes_summary.csv"
+DEFAULT_INPUTS_MASTER = Path("data") / "hybrid_active_modes_freeze_v15" / "tables" / "hybrid_questionnaire_inputs_master.csv"
+DEFAULT_OPERATIONAL_CHAMPIONS = Path("data") / "hybrid_operational_freeze_v15" / "tables" / "hybrid_operational_final_champions.csv"
 
 
 def _utcnow() -> datetime:
@@ -112,6 +113,35 @@ def _parse_options_json(raw: Any) -> Any:
         return json.loads(text)
     except Exception:
         return None
+
+
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(k): _json_safe(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_json_safe(v) for v in value]
+    if isinstance(value, tuple):
+        return [_json_safe(v) for v in value]
+    if isinstance(value, str):
+        return None if value.strip().lower() in {"nan", "none", ""} else value
+    if value is None:
+        return None
+    # Pandas/NumPy NA-like values and non-finite floats are not valid JSON for Postgres.
+    try:
+        if pd.isna(value):
+            return None
+    except Exception:
+        pass
+    if isinstance(value, float):
+        if math.isnan(value) or math.isinf(value):
+            return None
+        return float(value)
+    if hasattr(value, "item"):
+        try:
+            return _json_safe(value.item())
+        except Exception:
+            pass
+    return value
 
 
 @dataclass
@@ -553,7 +583,7 @@ def sync_active_models() -> dict[str, Any]:
             generalization_flag=_normalize_text(row.get("generalization_flag")) or None,
             dataset_ease_flag=_normalize_text(row.get("dataset_ease_flag")) or None,
             quality_label=_normalize_text(row.get("final_operational_class")) or None,
-            metrics_json={"row": row},
+            metrics_json={"row": _json_safe(row)},
             captured_at=_utcnow(),
         )
         db.session.add(metrics)
