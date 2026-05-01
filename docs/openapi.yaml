@@ -16303,6 +16303,121 @@ paths:
           description: "El backend encontr\xF3 una falla interna durante consulta, persistencia, generaci\xF3n, inferencia\
             \ o coordinaci\xF3n del flujo."
       x-contract-status: KEEP_ACTIVE
+  /api/v2/security/transport-key:
+    get:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener clave publica de cifrado de transporte v2
+      description: '**Objetivo funcional**
+
+        Este endpoint entrega la configuracion criptografica publica para cifrado de payload sensible a nivel aplicacion.
+
+
+        **Cuando debe usarse**
+
+        Usalo antes de invocar endpoints sensibles cifrados para obtener `key_id`, algoritmo y `public_key_jwk`.
+
+
+        **Actor que lo consume**
+
+        Frontend autenticado del flujo de cuestionarios v2.
+
+
+        **Seguridad aplicable**
+
+        - Requiere esquema(s) de seguridad: bearerAuth.
+
+
+        **Entrada esperada**
+
+        - Metodo y ruta: `GET /api/v2/security/transport-key`.
+
+        - Parametros de ruta: no aplica.
+
+        - Query params: no aplica.
+
+        - Headers adicionales: no aplica.
+
+        - Body: no aplica.
+
+
+        **Resultado exitoso**
+
+        - Codigos de exito documentados: 200.
+
+        - La respuesta incluye `key_id`, `algorithm`, `public_key_jwk`, `expires_at` y `version`.
+
+
+        **Errores posibles y causa funcional**
+
+        - `400`: Solicitud invalida por formato, validacion o reglas de negocio.
+
+        - `401`: No autenticado o token invalido/expirado.
+
+        - `403`: Autenticado sin permisos suficientes para esta operacion.
+
+        - `404`: Recurso no encontrado o no visible para el actor autenticado.
+
+        - `429`: Limite de tasa excedido; reintentar segun politicas de rate limit.
+
+        - `500`: Error interno del servidor sin exposicion de detalles sensibles.
+
+
+        **Estado contractual**
+
+        - `KEEP_ACTIVE`
+
+        - Motivo: contrato de transporte cifrado para endpoints sensibles v2.
+
+        - Accion OpenAPI: mantener visible'
+      operationId: getV2SecurityTransportKey
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Devuelve material publico de cifrado para construir envelopes de transporte sensible.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: No existe autenticacion valida o la credencial no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: La cuenta esta autenticada pero no tiene permiso suficiente para esta operacion.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: La solicitud no cumple validaciones de formato o reglas de negocio.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: El recurso objetivo no existe o no esta visible para el actor actual.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Se supero el limite de solicitudes permitido por la politica de proteccion.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: El backend encontro una falla interna durante la generacion del material criptografico.
+      x-contract-status: KEEP_ACTIVE
   /api/v2/questionnaires/active:
     get:
       tags:
@@ -17609,6 +17724,283 @@ paths:
                     error: server_error
           description: "El backend encontr\xF3 una falla interna durante consulta, persistencia, generaci\xF3n, inferencia\
             \ o coordinaci\xF3n del flujo."
+      x-contract-status: KEEP_ACTIVE
+    parameters:
+    - name: session_id
+      in: path
+      required: true
+      description: Identificador del recurso `session_id` en la ruta.
+      schema:
+        type: string
+  /api/v2/questionnaires/history/{session_id}/results-secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener resultados de sesion v2 con envelope cifrado de transporte
+      description: '**Objetivo funcional**
+
+        Este endpoint retorna resultados de sesion con soporte de payload cifrado de aplicacion para datos sensibles.
+
+
+        **Cuando debe usarse**
+
+        Usalo cuando el frontend requiera leer resultados clinicos en modo cifrado y evitar body plaintext en red.
+
+
+        **Actor que lo consume**
+
+        Frontend autenticado del flujo de cuestionarios v2.
+
+
+        **Seguridad aplicable**
+
+        - Requiere esquema(s) de seguridad: bearerAuth.
+
+        - En modo estricto de produccion, requiere `X-CognIA-Encrypted: 1` y envelope `transport_envelope_v1`.
+
+
+        **Entrada esperada**
+
+        - Metodo y ruta: `POST /api/v2/questionnaires/history/{session_id}/results-secure`.
+
+        - Parametros de ruta: session_id (obligatorio).
+
+        - Query params: no aplica.
+
+        - Headers adicionales: `X-CognIA-Encrypted`, `X-CognIA-Crypto-Version` cuando aplique.
+
+        - Body `obligatorio` en: application/json (puede ser envelope cifrado).
+
+
+        **Resultado exitoso**
+
+        - Codigos de exito documentados: 200.
+
+        - La respuesta puede devolverse en envelope cifrado cuando la solicitud usa transporte cifrado.
+
+
+        **Errores posibles y causa funcional**
+
+        - `400`: Solicitud invalida, envelope malformado o plaintext no permitido por politica activa.
+
+        - `401`: No autenticado o token invalido/expirado.
+
+        - `403`: Autenticado sin permisos suficientes para esta operacion.
+
+        - `404`: Recurso no encontrado o no visible para el actor autenticado.
+
+        - `429`: Limite de tasa excedido; reintentar segun politicas de rate limit.
+
+        - `500`: Error interno del servidor sin exposicion de detalles sensibles.
+
+
+        **Estado contractual**
+
+        - `KEEP_ACTIVE`
+
+        - Motivo: canal seguro de resultados v2 para datos sensibles.
+
+        - Accion OpenAPI: mantener visible'
+      operationId: postV2QuestionnairesHistorySessionIdResultsSecure
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Devuelve resultados de sesion en JSON plano o cifrado segun politica/headers de transporte.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: No existe autenticacion valida o la credencial no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: La cuenta esta autenticada pero no tiene permiso suficiente para esta operacion.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: La solicitud no cumple validaciones de formato, contrato de transporte o reglas de negocio.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: El recurso objetivo no existe o no esta visible para el actor actual.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Se supero el limite de solicitudes permitido por la politica de proteccion.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: El backend encontro una falla interna durante la resolucion de resultados.
+      x-contract-status: KEEP_ACTIVE
+    parameters:
+    - name: session_id
+      in: path
+      required: true
+      description: Identificador del recurso `session_id` en la ruta.
+      schema:
+        type: string
+  /api/v2/questionnaires/history/{session_id}/clinical-summary:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Generar resumen clinico simulado v2 por secciones
+      description: '**Objetivo funcional**
+
+        Este endpoint construye un resumen clinico simulado de tamizaje con narrativa por secciones y disclaimer obligatorio.
+
+
+        **Cuando debe usarse**
+
+        Usalo para la vista final de resultados profesionales cuando se requiera una interpretacion estructurada sin diagnostico
+        confirmado.
+
+
+        **Actor que lo consume**
+
+        Frontend autenticado del flujo de cuestionarios v2.
+
+
+        **Seguridad aplicable**
+
+        - Requiere esquema(s) de seguridad: bearerAuth.
+
+        - Soporta transporte cifrado por envelope en endpoints sensibles.
+
+
+        **Entrada esperada**
+
+        - Metodo y ruta: `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`.
+
+        - Parametros de ruta: session_id (obligatorio).
+
+        - Query params: no aplica.
+
+        - Headers adicionales: `X-CognIA-Encrypted`, `X-CognIA-Crypto-Version` cuando aplique.
+
+        - Body `obligatorio` en: application/json (puede ser envelope cifrado o `{}` segun politica).
+
+
+        **Resultado exitoso**
+
+        - Codigos de exito documentados: 200.
+
+        - La respuesta contiene `clinical_summary_v1`, niveles de riesgo, comorbilidad y disclaimer.
+
+
+        **Errores posibles y causa funcional**
+
+        - `400`: Solicitud invalida, envelope malformado o plaintext no permitido por politica activa.
+
+        - `401`: No autenticado o token invalido/expirado.
+
+        - `403`: Autenticado sin permisos suficientes para esta operacion.
+
+        - `404`: Recurso no encontrado o no visible para el actor autenticado.
+
+        - `429`: Limite de tasa excedido; reintentar segun politicas de rate limit.
+
+        - `500`: Error interno del servidor sin exposicion de detalles sensibles.
+
+
+        **Estado contractual**
+
+        - `KEEP_ACTIVE`
+
+        - Motivo: salida narrativa profesional de tamizaje sin romper compatibilidad legado.
+
+        - Accion OpenAPI: mantener visible'
+      operationId: postV2QuestionnairesHistorySessionIdClinicalSummary
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Devuelve el resumen clinico simulado por secciones en JSON plano o cifrado segun politica/headers.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: No existe autenticacion valida o la credencial no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: La cuenta esta autenticada pero no tiene permiso suficiente para esta operacion.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: La solicitud no cumple validaciones de formato, contrato de transporte o reglas de negocio.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: El recurso objetivo no existe o no esta visible para el actor actual.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Se supero el limite de solicitudes permitido por la politica de proteccion.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: El backend encontro una falla interna durante la generacion del resumen clinico.
       x-contract-status: KEEP_ACTIVE
     parameters:
     - name: session_id

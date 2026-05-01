@@ -82,7 +82,8 @@ Nota de continuidad (2026-04-22):
    - deserializacion explicita con `joblib.load(...)` en runtime (`questionnaire_v2_service` y `questionnaire_runtime_service`).
 4. Construir vector por `feature_columns` (metadata) con defaults trazables.
 5. Ejecutar `predict_proba` cuando esta disponible.
-6. Si artefacto no esta disponible: fallback heuristico defensivo y marcado `por_confirmar` en metadata.
+6. Si artefacto no esta disponible en runtime activo (produccion): error explicito de resolucion (`runtime_artifact_unavailable`), sin fallback heuristico.
+7. En entorno `TESTING` se permite fallback heuristico solo para no romper pruebas aisladas sin artefactos.
 
 Nota de rol operativo (2026-04-21):
 - El contrato publico de API/runtime usa `guardian` (antes `caregiver`).
@@ -91,7 +92,7 @@ Nota de rol operativo (2026-04-21):
 
 ## Estado de caveat
 - La integracion respeta 30 activaciones de producto.
-- Para algunos IDs historicos, la ruta exacta de artefacto queda `por_confirmar` y se usa fallback controlado a champion por dominio.
+- `por_confirmar` para modelos activos debe quedar en `no` cuando la ruta canonica de artifact queda registrada en DB.
 - Claim permitido: screening/apoyo profesional en entorno simulado, no diagnostico automatico.
 
 Referencia historica preservada:
@@ -148,3 +149,16 @@ Referencia historica preservada:
 - Semantica de seleccion final:
   - `selection_version_final=v16` puede coexistir con `source_campaign` mixto por champion cuando el set activo reutiliza modelos RF historicos contract-compatible.
   - Esto es esperado (`mixed_lineage_by_design=yes`) y no implica error mientras la integridad del set activo en DB sea valida (`active_activations=30`, `active_model_versions=30`, `non_rf=0`, sin duplicados ni mismatch de feature columns).
+
+## Nota de actualizacion (2026-05-01) - runtime hardening v17
+- Se mantiene linea activa de modelos en `v16`.
+- Cambio de runtime:
+  - Para champions activos, `questionnaire_v2_service` ya no cae a fallback heuristico fuera de `TESTING`.
+  - Si artifact activo no existe o no puede ejecutar `predict_proba`, se levanta error explicito de resolucion runtime.
+- Validacion operativa de artifacts:
+  - `scripts/run_runtime_artifact_validation_v17.py`
+  - `data/hybrid_runtime_artifact_validation_v17/validation/runtime_artifact_validator_v17.json`
+- Transporte cifrado sensible:
+  - Endpoint de clave publica: `GET /api/v2/security/transport-key`.
+  - Endpoints sensibles cifrados: `sessions`, `answers`, `submit`, `results-secure`, `clinical-summary`.
+  - En produccion, plaintext puede ser rechazado segun politica (`COGNIA_TRANSPORT_PAYLOAD_ENCRYPTION` + enforcement).

@@ -1,0 +1,2 @@
+total_active_slots,runtime_artifact_available_slots,joblib_load_ok_slots,predict_proba_smoke_ok_slots,heuristic_fallback_used,generic_domain_fallback_unverified,feature_columns_match_slots,por_confirmar_active_models,artifact_duplicate_hash_count,runtime_artifact_validation_status
+30,0,0,0,0,0,30,0,0,fail
