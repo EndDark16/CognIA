@@ -1,0 +1,22 @@
+{
+  "model_key": "elimination__caregiver_1_3__hybrid_elimination_v14_real_anti_clone_rescue__rf__same_inputs_v13",
+  "line": "hybrid_elimination_v14_real_anti_clone_rescue",
+  "rf_only": true,
+  "domain": "elimination",
+  "role": "caregiver",
+  "mode": "caregiver_1_3",
+  "feature_columns": [
+    "enuresis_event_frequency_per_week",
+    "enuresis_distress_impairment",
+    "enuresis_duration_months_consecutive",
+    "encopresis_event_frequency_per_month"
+  ],
+  "recommended_threshold": 0.7621616091094605,
+  "calibration": "none",
+  "config_id": "rf_v14_guard_randomized",
+  "generated_at_utc": "2026-05-01T03:15:14.388965+00:00",
+  "source_candidate_key": "caregiver_1_3::train::rf_v14_guard_randomized::20270421::none::max_f1_precision_guard::0.740000::joint_thr::0.762162",
+  "source_type": "trained_rf_v14",
+  "source_model_id": "trained_rf_v14",
+  "note": "pipeline.joblib is local/regenerable and ignored by git policy; metadata is tracked"
+}

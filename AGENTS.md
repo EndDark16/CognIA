@@ -575,3 +575,29 @@ Contexto metodolÃ³gico:
 - Estado metodologico:
   - No se modificaron champions, inputs/outputs funcionales ni preguntas.
   - Claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-05-01) - hybrid_elimination_v14_real_anti_clone_rescue
+- Se ejecuto correccion focal Elimination-only sobre la linea activa v13, sin campana general y sin modificar los otros 24 champions.
+- Rama de trabajo: `fix/elimination-v14-real-anti-clone-rescue`.
+- Script principal: `scripts/run_hybrid_elimination_v14_real_anti_clone_rescue.py`.
+- Lineas/versionado generado:
+  - `data/hybrid_elimination_v14_real_anti_clone_rescue/`
+  - `artifacts/hybrid_elimination_v14_real_anti_clone_rescue/`
+  - `data/hybrid_active_modes_freeze_v14/`
+  - `artifacts/hybrid_active_modes_freeze_v14/`
+  - `data/hybrid_operational_freeze_v14/`
+  - `artifacts/hybrid_operational_freeze_v14/`
+- Resultado tecnico de cierre:
+  - `prediction_recomputed_slots=30/30`
+  - `elimination_real_clone_count=0`
+  - `all_domains_real_clone_count=0`
+  - `artifact_duplicate_hash_count=0`
+  - `guardrail_violations=0`
+  - `final_audit_status=pass_with_warnings` (persisten warnings near-clone, sin clonado real).
+- Alcance aplicado:
+  - Solo cambiaron los 6 slots Elimination.
+  - Los otros 24 slots quedaron identicos a v13 en activacion/metricas/threshold/features (validador `v14_non_elimination_unchanged_validator.csv`).
+  - Contrato de inputs/outputs y orden exacto de `feature_list_pipe` conservado en 30/30 (`v14_contract_compatibility_validator.csv`).
+  - Sin cambios de preguntas/cuestionario.
+- Integracion runtime:
+  - `api/services/questionnaire_v2_loader_service.py` apunta por defecto a `hybrid_active_modes_freeze_v14` y `hybrid_operational_freeze_v14`.
