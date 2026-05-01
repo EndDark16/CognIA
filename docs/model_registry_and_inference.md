@@ -141,3 +141,10 @@ Referencia historica preservada:
   - `metrics_json` se persiste con sanitizacion JSON-safe (`NaN/inf` convertidos a `null`) para compatibilidad PostgreSQL JSON.
 - Implicacion:
   - `bootstrap_questionnaire_backend_v2.py load-all` ya no falla por `invalid input syntax for type json` en `model_metrics_snapshot`.
+## Nota de actualizacion (2026-05-01) - v16 final clean champion resolution
+- Defaults del loader v2 actualizados a:
+  - `data/hybrid_active_modes_freeze_v16/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_operational_freeze_v16/tables/hybrid_operational_final_champions.csv`
+- Semantica de seleccion final:
+  - `selection_version_final=v16` puede coexistir con `source_campaign` mixto por champion cuando el set activo reutiliza modelos RF historicos contract-compatible.
+  - Esto es esperado (`mixed_lineage_by_design=yes`) y no implica error mientras la integridad del set activo en DB sea valida (`active_activations=30`, `active_model_versions=30`, `non_rf=0`, sin duplicados ni mismatch de feature columns).
