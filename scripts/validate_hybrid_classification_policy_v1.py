@@ -22,10 +22,12 @@ SHORTCUT_INV_V10 = ROOT / "data" / "hybrid_final_model_structural_compliance_v1"
 SHORTCUT_INV_V11 = ROOT / "data" / "hybrid_rf_max_real_metrics_v1" / "tables" / "shortcut_inventory_rf_max_real_metrics_v1.csv"
 SHORTCUT_INV_V12 = ROOT / "data" / "hybrid_final_rf_plus_maximize_metrics_v1" / "tables" / "shortcut_inventory_final_rf_plus_maximize_metrics_v1.csv"
 
-LABELS = ["v2", "v3", "v4", "v5", "v6_hotfix_v1", "v8", "v9", "v10", "v11", "v12", "v13"]
+LABELS = ["v2", "v3", "v4", "v5", "v6_hotfix_v1", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16"]
 
 
 def _shortcut_inventory_for(label: str) -> Path | None:
+    if label in {"v13", "v14", "v15", "v16"} and SHORTCUT_INV_V12.exists():
+        return SHORTCUT_INV_V12
     if label == "v12" and SHORTCUT_INV_V12.exists():
         return SHORTCUT_INV_V12
     if label == "v11" and SHORTCUT_INV_V11.exists():
