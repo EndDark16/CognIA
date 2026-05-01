@@ -636,7 +636,6 @@ Contexto metodolÃ³gico:
 - Caveat operativo abierto (sin ocultar):
   - En validacion `v15_registered_vs_recomputed_metrics.csv` quedan 2 slots Elimination con drift de metricas registradas vs recomputadas en artifacts historicos disponibles localmente (`caregiver_2_3`, `psychologist_full`).
   - El estado anti-clone real se mantiene en `0` clones reales.
-
 ## Actualizacion de estado (2026-05-01) - hybrid_final_clean_champion_resolution_v16
 - Se ejecuto cierre final limpio sobre base `v15` para resolver warnings/caveats abiertos sin cambiar cuestionario ni contrato funcional.
 - Script principal: `scripts/run_hybrid_final_clean_champion_resolution_v16.py`.

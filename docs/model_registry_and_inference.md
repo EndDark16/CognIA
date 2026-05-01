@@ -141,7 +141,6 @@ Referencia historica preservada:
   - `metrics_json` se persiste con sanitizacion JSON-safe (`NaN/inf` convertidos a `null`) para compatibilidad PostgreSQL JSON.
 - Implicacion:
   - `bootstrap_questionnaire_backend_v2.py load-all` ya no falla por `invalid input syntax for type json` en `model_metrics_snapshot`.
-
 ## Nota de actualizacion (2026-05-01) - v16 final clean champion resolution
 - Defaults del loader v2 actualizados a:
   - `data/hybrid_active_modes_freeze_v16/tables/hybrid_active_models_30_modes.csv`

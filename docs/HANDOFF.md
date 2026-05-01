@@ -1080,7 +1080,6 @@ Pendiente:
   - `data/hybrid_elimination_v15_caregiver_full_metric_rescue/reports/v15_elimination_caregiver_full_metric_rescue_report.md`
   - `data/hybrid_elimination_v15_caregiver_full_metric_rescue/validation/v15_real_prediction_anti_clone_validator.csv`
   - `data/hybrid_elimination_v15_caregiver_full_metric_rescue/validation/v15_supabase_sync_verification.json`
-
 ## Actualizacion de estado (2026-05-01) - hybrid_final_clean_champion_resolution_v16
 - Objetivo ejecutado: cierre final limpio de la linea activa para eliminar `pass_with_warnings` y pendientes ambiguos.
 - Script:
