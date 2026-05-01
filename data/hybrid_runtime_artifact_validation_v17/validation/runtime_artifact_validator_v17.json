@@ -1,0 +1,12 @@
+{
+  "total_active_slots": 30,
+  "runtime_artifact_available_slots": 0,
+  "joblib_load_ok_slots": 0,
+  "predict_proba_smoke_ok_slots": 0,
+  "heuristic_fallback_used": 0,
+  "generic_domain_fallback_unverified": 0,
+  "feature_columns_match_slots": 30,
+  "por_confirmar_active_models": 0,
+  "artifact_duplicate_hash_count": 0,
+  "runtime_artifact_validation_status": "fail"
+}

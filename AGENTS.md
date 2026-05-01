@@ -660,3 +660,27 @@ Contexto metodolÃ³gico:
   - Se mantiene reutilizacion historica RF-compatible (lineage mixto) por diseno.
 - Loader/runtime:
   - `api/services/questionnaire_v2_loader_service.py` actualizado a defaults `*_freeze_v16`.
+## Actualizacion de estado (2026-05-01) - runtime_diagnostic_security_hardening_v17
+- Objetivo ejecutado: hardening backend integral sobre la linea activa de modelos `v16` sin reentrenamiento ni cambio de cuestionario.
+- Rama de trabajo: `fix/v17-runtime-diagnostic-security-final`.
+- Cambios principales backend:
+  - Se elimina fallback heuristico para champions activos en runtime v2 fuera de `TESTING`.
+  - Se agrega validador runtime de artifacts activos 30 slots:
+    - `scripts/run_runtime_artifact_validation_v17.py`
+    - `data/hybrid_runtime_artifact_validation_v17/`
+  - Se agrega endpoint de resumen clinico simulado:
+    - `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`
+  - Se agrega endpoint de resultados sensibles cifrados:
+    - `POST /api/v2/questionnaires/history/{session_id}/results-secure`
+  - Se agrega endpoint de clave publica para transporte cifrado:
+    - `GET /api/v2/security/transport-key`
+  - Se implementa cifrado en reposo por campo (application-layer):
+    - `api/services/crypto_service.py`
+  - Se implementa cifrado de payload en transito por envelope:
+    - `api/services/transport_crypto_service.py`
+- Documentacion generada:
+  - `docs/security_encryption.md`
+  - `docs/frontend_encrypted_transport_contract.md`
+  - `docs/clinical_summary_endpoint.md`
+- Caveat operativo metodologico:
+  - `v17` es hardening de runtime/seguridad sobre linea de modelos `v16`; no redefine champions.

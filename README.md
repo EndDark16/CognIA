@@ -967,3 +967,27 @@ Toda interpretacion de resultados de CognIA debe mantenerse en el marco de apoyo
 - La linea mantiene contrato funcional exacto de inputs/outputs y cuestionario sin cambios.
 - Semantica de lineage:
   - `mixed_lineage_by_design=yes` cuando los 30 champions finales reutilizan modelos RF historicos contract-compatible.
+
+## Estado de linea activa (2026-05-01, hardening backend v17 runtime+security)
+- La linea de modelos activa se mantiene en `v16` (sin campana de reentrenamiento).
+- Se agrego validacion runtime de artifacts activos con reporte versionado:
+  - `scripts/run_runtime_artifact_validation_v17.py`
+  - `data/hybrid_runtime_artifact_validation_v17/`
+- Se elimino fallback heuristico para champions activos en runtime v2 fuera de entorno `TESTING`:
+  - `api/services/questionnaire_v2_service.py`
+  - En produccion, falta de artifact activo genera error explicito de runtime (`runtime_artifact_unavailable`) en lugar de probabilidad heuristica.
+- Se incorporo resumen clinico simulado versionado:
+  - `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`
+  - Legacy resultados plaintext queda visible para compatibilidad.
+- Se incorporo soporte backend de cifrado en reposo (application-layer field encryption):
+  - `api/services/crypto_service.py`
+  - Variables: `COGNIA_ENABLE_FIELD_ENCRYPTION`, `COGNIA_FIELD_ENCRYPTION_KEY`, `COGNIA_FIELD_ENCRYPTION_KEY_ID`.
+- Se incorporo soporte backend de cifrado de payload en transito (application envelope):
+  - `api/services/transport_crypto_service.py`
+  - `GET /api/v2/security/transport-key`
+  - Endpoints sensibles cifrados: `sessions`, `answers`, `submit`, `results-secure`, `clinical-summary`.
+- Contrato frontend documentado (sin modificar frontend):
+  - `docs/frontend_encrypted_transport_contract.md`
+- Documentacion de seguridad:
+  - `docs/security_encryption.md`
+  - `docs/clinical_summary_endpoint.md`
