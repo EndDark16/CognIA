@@ -948,3 +948,9 @@ Si quieres entender X, lee Y:
 
 ## Nota final metodologica
 Toda interpretacion de resultados de CognIA debe mantenerse en el marco de apoyo profesional/screening en entorno simulado. No publicar ni operar claims de diagnostico clinico automatico con este backend.
+
+
+## Estado de linea activa (2026-05-01)
+- Se genero `hybrid_active_modes_freeze_v15` con rescate focal en `elimination/caregiver_full` manteniendo enfoque RF-based y contrato funcional del cuestionario.
+- La auditoria real anti-clone de v15 reporta `0` clones reales globales y `0` clones reales en Elimination, con `final_audit_status=pass_with_warnings`.
+- Sync operativo en DB/Supabase se ejecuto via `python scripts/bootstrap_questionnaire_backend_v2.py load-all` luego de corregir sanitizacion JSON de metricas en loader.

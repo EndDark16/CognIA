@@ -601,3 +601,38 @@ Contexto metodolÃ³gico:
   - Sin cambios de preguntas/cuestionario.
 - Integracion runtime:
   - `api/services/questionnaire_v2_loader_service.py` apunta por defecto a `hybrid_active_modes_freeze_v14` y `hybrid_operational_freeze_v14`.
+
+
+## Actualizacion de estado (2026-05-01) - hybrid_elimination_v15_caregiver_full_metric_rescue
+- Se ejecuto rescate focal sobre `elimination/caregiver_full` partiendo de la linea activa `v14`, sin campana general.
+- Script: `scripts/run_hybrid_elimination_v15_caregiver_full_metric_rescue.py`.
+- Lineas/versionado generado:
+  - `data/hybrid_elimination_v15_caregiver_full_metric_rescue/`
+  - `artifacts/hybrid_elimination_v15_caregiver_full_metric_rescue/`
+  - `data/hybrid_active_modes_freeze_v15/`
+  - `artifacts/hybrid_active_modes_freeze_v15/`
+  - `data/hybrid_operational_freeze_v15/`
+  - `artifacts/hybrid_operational_freeze_v15/`
+- Resultado principal en `elimination/caregiver_full` (v14 -> v15):
+  - `F1: 0.712871 -> 0.820513`
+  - `recall: 0.692308 -> 0.923077`
+  - `precision: 0.734694 -> 0.738462`
+  - `balanced_accuracy: 0.830967 -> 0.941679`
+- Auditoria real final de la linea propuesta v15:
+  - `prediction_recomputed_slots=30/30`
+  - `elimination_real_clone_count=0`
+  - `all_domains_real_clone_count=0`
+  - `artifact_duplicate_hash_count=0`
+  - `guardrail_violations=0`
+  - `final_audit_status=pass_with_warnings`
+- Alcance aplicado:
+  - Cambio focal de champion en `elimination/caregiver_full`.
+  - `24` no-Elimination conservados respecto a v14 (sin cambio de `active_model_id`).
+  - Sin cambios de preguntas/cuestionario ni de contrato funcional de inputs/outputs.
+- Loader/DB:
+  - `api/services/questionnaire_v2_loader_service.py` actualizado para defaults `*_freeze_v15`.
+  - Se corrigio bug real de sync DB: sanitizacion `NaN/inf` en `metrics_json` para evitar error PostgreSQL JSON (`invalid input syntax for type json`).
+  - `bootstrap_questionnaire_backend_v2.py load-all` ejecutado con exito sobre Supabase/Postgres tras el fix.
+- Caveat operativo abierto (sin ocultar):
+  - En validacion `v15_registered_vs_recomputed_metrics.csv` quedan 2 slots Elimination con drift de metricas registradas vs recomputadas en artifacts historicos disponibles localmente (`caregiver_2_3`, `psychologist_full`).
+  - El estado anti-clone real se mantiene en `0` clones reales.
