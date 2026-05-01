@@ -21,6 +21,7 @@ from api.schemas.questionnaire_v2_schema import (
 )
 from api.services import questionnaire_v2_loader_service as loader_service
 from api.services import questionnaire_v2_service as service
+from api.services import transport_crypto_service as transport_crypto
 from app.models import AppUser, db
 
 
@@ -48,6 +49,9 @@ def _server_error(message: str, error: str = "server_error"):
 
 def _handle_backend_failure(exc: Exception, fallback_message: str, fallback_error: str = "server_error"):
     db.session.rollback()
+    if isinstance(exc, service.RuntimeArtifactResolutionError):
+        current_app.logger.error("questionnaire_v2_runtime_artifact_error: %s", exc, exc_info=True)
+        return _error("Runtime model artifact unavailable", "runtime_artifact_unavailable", 503)
     if isinstance(exc, FileNotFoundError):
         current_app.logger.error("questionnaire_v2_dependency_unavailable: %s", exc, exc_info=True)
         return _error("Service unavailable", "runtime_assets_unavailable", 503)
@@ -65,6 +69,20 @@ def _current_user() -> tuple[uuid.UUID | None, AppUser | None]:
     if not user_id:
         return None, None
     return user_id, db.session.get(AppUser, user_id)
+
+
+def _decode_sensitive_payload() -> tuple[dict, transport_crypto.TransportContext]:
+    raw_payload = request.get_json(silent=True) or {}
+    return transport_crypto.decode_sensitive_request_payload(raw_payload)
+
+
+def _sensitive_json_response(payload: dict, status_code: int, context: transport_crypto.TransportContext):
+    encoded_payload, headers = transport_crypto.encode_sensitive_response_payload(payload, context)
+    response = jsonify(encoded_payload)
+    response.status_code = status_code
+    for key, value in headers.items():
+        response.headers[key] = value
+    return response
 
 
 def _load_session_for_user(session_id: uuid.UUID, user_id: uuid.UUID):
@@ -113,6 +131,16 @@ def get_active_questionnaire():
     return jsonify(payload), 200
 
 
+@questionnaire_v2_bp.get("/security/transport-key")
+@jwt_required()
+def get_transport_key():
+    try:
+        payload = transport_crypto.transport_key_payload()
+    except Exception as exc:
+        return _handle_backend_failure(exc, "transport_key_failed", "transport_key_failed")
+    return jsonify(payload), 200
+
+
 @questionnaire_v2_bp.post("/questionnaires/sessions")
 @jwt_required()
 def create_session():
@@ -121,7 +149,10 @@ def create_session():
         return _error("invalid_user", "invalid_user", 401)
     schema = SessionCreateSchema()
     try:
-        payload = schema.load(request.get_json(silent=True) or {})
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
     except ValidationError as exc:
         return _error("validation_error", "validation_error", 400, exc.messages)
 
@@ -133,7 +164,7 @@ def create_session():
     except Exception as exc:
         return _handle_backend_failure(exc, "session_create_failed")
 
-    return jsonify({"session": service.get_session_payload(session)}), 201
+    return _sensitive_json_response({"session": service.get_session_payload(session)}, 201, transport_context)
 
 
 @questionnaire_v2_bp.get("/questionnaires/sessions/<session_id>")
@@ -197,7 +228,10 @@ def patch_answers(session_id: str):
 
     schema = SessionAnswersPatchSchema()
     try:
-        payload = schema.load(request.get_json(silent=True) or {})
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
     except ValidationError as exc:
         return _error("validation_error", "validation_error", 400, exc.messages)
 
@@ -218,7 +252,7 @@ def patch_answers(session_id: str):
     except Exception as exc:
         return _handle_backend_failure(exc, "save_failed")
 
-    return jsonify(result), 200
+    return _sensitive_json_response(result, 200, transport_context)
 
 
 @questionnaire_v2_bp.post("/questionnaires/sessions/<session_id>/submit")
@@ -233,7 +267,10 @@ def submit_session(session_id: str):
 
     schema = SessionSubmitSchema()
     try:
-        payload = schema.load(request.get_json(silent=True) or {})
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
     except ValidationError as exc:
         return _error("validation_error", "validation_error", 400, exc.messages)
 
@@ -249,7 +286,7 @@ def submit_session(session_id: str):
     except Exception as exc:
         return _handle_backend_failure(exc, "submit_failed")
 
-    return jsonify(result), 200
+    return _sensitive_json_response(result, 200, transport_context)
 
 
 @questionnaire_v2_bp.get("/questionnaires/history")
@@ -296,7 +333,64 @@ def history_results(session_id: str):
     except PermissionError as exc:
         return _error("forbidden", str(exc), 403)
 
-    return jsonify(service.get_results_payload(session)), 200
+    response = jsonify(service.get_results_payload(session))
+    response.status_code = 200
+    response.headers["X-CognIA-Endpoint-Status"] = "legacy_plaintext"
+    response.headers["X-CognIA-Replacement"] = "/api/v2/questionnaires/history/{session_id}/results-secure"
+    return response
+
+
+@questionnaire_v2_bp.post("/questionnaires/history/<session_id>/results-secure")
+@jwt_required()
+def history_results_secure(session_id: str):
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    sid = _parse_uuid(session_id)
+    if not sid:
+        return _error("invalid_session_id", "invalid_session_id", 400)
+
+    try:
+        _, transport_context = _decode_sensitive_payload()
+        session = _load_session_for_user(sid, user_id)
+        payload = service.get_results_payload(session)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
+    except LookupError as exc:
+        return _error("not_found", str(exc), 404)
+    except PermissionError as exc:
+        return _error("forbidden", str(exc), 403)
+
+    return _sensitive_json_response(payload, 200, transport_context)
+
+
+@questionnaire_v2_bp.post("/questionnaires/history/<session_id>/clinical-summary")
+@jwt_required()
+def history_clinical_summary(session_id: str):
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    sid = _parse_uuid(session_id)
+    if not sid:
+        return _error("invalid_session_id", "invalid_session_id", 400)
+
+    try:
+        _, transport_context = _decode_sensitive_payload()
+        session = _load_session_for_user(sid, user_id)
+        payload = service.get_clinical_summary_payload(session)
+        service.persist_clinical_summary_payload(session, payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
+    except LookupError as exc:
+        return _error("not_found", str(exc), 404)
+    except PermissionError as exc:
+        return _error("forbidden", str(exc), 403)
+    except ValueError as exc:
+        return _error("validation_error", str(exc), 400)
+    except Exception as exc:
+        return _handle_backend_failure(exc, "clinical_summary_failed", "clinical_summary_failed")
+
+    return _sensitive_json_response(payload, 200, transport_context)
 
 
 @questionnaire_v2_bp.post("/questionnaires/history/<session_id>/tags")

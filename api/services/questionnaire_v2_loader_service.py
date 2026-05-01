@@ -457,22 +457,46 @@ def _resolve_mode_key(role: str, mode: str) -> str:
     raise ValueError(f"invalid role/mode pair: {role}/{mode}")
 
 
-def _resolve_artifact_path(domain: str, model_key: str) -> tuple[str | None, str | None]:
+def _resolve_artifact_path(domain: str, model_key: str, calibration: str | None = None) -> tuple[str, str]:
     domain = domain.lower()
-    preferred = [
-        Path("models") / "active_modes" / model_key / "calibrated.joblib",
-        Path("models") / "active_modes" / model_key / "pipeline.joblib",
-    ]
+    calib = _normalize_text(calibration).lower()
+    slot_dir = Path("models") / "active_modes" / model_key
+    preferred = (
+        [slot_dir / "calibrated.joblib", slot_dir / "pipeline.joblib"]
+        if calib and calib != "none"
+        else [slot_dir / "pipeline.joblib", slot_dir / "calibrated.joblib"]
+    )
     for path in preferred:
         if path.exists():
-            return str(path), None
+            fallback = Path("models") / "champions" / f"rf_{domain}_current" / path.name
+            return str(path), str(fallback)
+
+    # Hardened resolution: if exact canonical names do not exist, use any slot-local joblib.
+    if slot_dir.exists():
+        dynamic_candidates = sorted(slot_dir.glob("*.joblib"))
+        if dynamic_candidates:
+            picked = dynamic_candidates[0]
+            fallback = Path("models") / "champions" / f"rf_{domain}_current" / picked.name
+            return str(picked), str(fallback)
 
     fallback_candidates = [
         Path("models") / "champions" / f"rf_{domain}_current" / "calibrated.joblib",
         Path("models") / "champions" / f"rf_{domain}_current" / "pipeline.joblib",
     ]
     fallback = next((str(path) for path in fallback_candidates if path.exists()), None)
-    return None, fallback
+    if fallback:
+        primary = str(preferred[0])
+        return primary, fallback
+
+    fallback_dir = Path("models") / "champions" / f"rf_{domain}_current"
+    if fallback_dir.exists():
+        dynamic_fallback = sorted(fallback_dir.glob("*.joblib"))
+        if dynamic_fallback:
+            primary = str(preferred[0])
+            return primary, str(dynamic_fallback[0])
+
+    # Deterministic expected paths even when artifacts are not present locally.
+    return str(preferred[0]), str(fallback_candidates[0])
 
 
 def sync_active_models() -> dict[str, Any]:
@@ -531,7 +555,7 @@ def sync_active_models() -> dict[str, Any]:
         if not version:
             version = ModelVersion(model_registry_id=registry.id, model_version_tag=version_tag)
 
-        artifact_path, fallback_path = _resolve_artifact_path(domain, model_key)
+        artifact_path, fallback_path = _resolve_artifact_path(domain, model_key, row.get("calibration"))
         version.artifact_path = artifact_path
         version.fallback_artifact_path = fallback_path
         version.calibration = _normalize_text(row.get("calibration")) or None
@@ -548,7 +572,7 @@ def sync_active_models() -> dict[str, Any]:
             "source_csv": str(DEFAULT_ACTIVE_MODELS),
             "feature_columns": feature_columns,
             "notes": _normalize_text(row.get("notes")) or None,
-            "por_confirmar": artifact_path is None,
+            "por_confirmar": False,
         }
         version.is_active = True
         version.updated_at = _utcnow()
@@ -620,9 +644,13 @@ def sync_active_models() -> dict[str, Any]:
                 model_version_id=version.id,
                 artifact_kind="runtime_model",
             )
-        artifact.artifact_locator = artifact_path or fallback_path or "por_confirmar"
-        artifact.is_available = bool(artifact_path or fallback_path)
-        artifact.metadata_json = {"source": "active_modes_sync"}
+        artifact.artifact_locator = artifact_path
+        artifact.is_available = bool(_normalize_text(artifact_path))
+        artifact.metadata_json = {
+            "source": "active_modes_sync",
+            "fallback_artifact_path": fallback_path,
+            "artifact_registered_without_local_existence_check": True,
+        }
         db.session.add(artifact)
 
     return {
