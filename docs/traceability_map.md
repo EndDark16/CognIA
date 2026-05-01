@@ -167,3 +167,6 @@ If a folder does not clearly communicate:
 3. and which version it is,
 
 it must be documented/renamed before being considered stable traceability.
+
+
+- Estado (2026-05-01): `hybrid_elimination_v15_caregiver_full_metric_rescue` aplica rescate focal de `elimination/caregiver_full` sobre base v14, genera `*_freeze_v15`, mantiene `0` clones reales (global y Elimination), `0` guardrail violations, y deja evidencia en `data/hybrid_elimination_v15_caregiver_full_metric_rescue/` con `final_audit_status=pass_with_warnings`.
