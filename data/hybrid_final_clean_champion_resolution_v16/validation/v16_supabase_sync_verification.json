@@ -1,0 +1,21 @@
+{
+  "line": "hybrid_final_clean_champion_resolution_v16",
+  "generated_at_utc": "2026-05-01T14:45:58.397918+00:00",
+  "active_activations_db": 30,
+  "active_model_versions": 30,
+  "active_model_versions_non_rf": 0,
+  "missing_expected_models": 0,
+  "mismatched_feature_columns": 0,
+  "duplicate_active_domain_mode_rows": 0,
+  "mixed_lineage_expected": "yes",
+  "active_model_lineage_mixed": "yes",
+  "db_active_set_valid": "yes",
+  "active_selection_version": "v16",
+  "active_champions_loaded_ok": "yes",
+  "elimination_active_rows_db": 6,
+  "elimination_expected_rows": 6,
+  "non_elimination_expected_match_count": 24,
+  "questions_visible_count": 146,
+  "question_modes_included_count": 612,
+  "unresolved_near_clone_warning_count": 0
+}
