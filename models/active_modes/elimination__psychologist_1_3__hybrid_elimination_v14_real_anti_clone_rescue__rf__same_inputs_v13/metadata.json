@@ -1,0 +1,23 @@
+{
+  "model_key": "elimination__psychologist_1_3__hybrid_elimination_v14_real_anti_clone_rescue__rf__same_inputs_v13",
+  "line": "hybrid_elimination_v14_real_anti_clone_rescue",
+  "rf_only": true,
+  "domain": "elimination",
+  "role": "psychologist",
+  "mode": "psychologist_1_3",
+  "feature_columns": [
+    "enuresis_duration_months_consecutive",
+    "encopresis_event_frequency_per_month",
+    "enuresis_nocturnal",
+    "enuresis_primary_course",
+    "encopresis_duration_months_consecutive"
+  ],
+  "recommended_threshold": 0.27999999999999997,
+  "calibration": "isotonic",
+  "config_id": "rf_v14_calibrated_isotonic",
+  "generated_at_utc": "2026-05-01T03:15:14.720604+00:00",
+  "source_candidate_key": "psychologist_1_3::train::rf_v14_calibrated_isotonic::20270457::isotonic::max_f1_precision_guard::0.410000::joint_thr::0.280000",
+  "source_type": "trained_rf_v14",
+  "source_model_id": "trained_rf_v14",
+  "note": "pipeline.joblib is local/regenerable and ignored by git policy; metadata is tracked"
+}
