@@ -1,0 +1,18 @@
+{
+  "line": "hybrid_final_clean_champion_resolution_v16",
+  "selection_version_final": "v16",
+  "generated_at_utc": "2026-05-01T14:46:03.419145+00:00",
+  "final_audit_status": "pass",
+  "active_rows": 30,
+  "rf_rows": 30,
+  "prediction_recomputed_slots": 30,
+  "metrics_match_yes_slots": 30,
+  "metrics_match_no_slots": 0,
+  "all_domains_real_clone_count": 0,
+  "elimination_real_clone_count": 0,
+  "all_domains_near_clone_warning_count": 22,
+  "unresolved_near_clone_warning_count": 0,
+  "artifact_duplicate_hash_count": 0,
+  "guardrail_violation_count": 0,
+  "artifact": "hybrid_active_modes_freeze_v16"
+}

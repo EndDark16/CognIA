@@ -636,3 +636,28 @@ Contexto metodolÃ³gico:
 - Caveat operativo abierto (sin ocultar):
   - En validacion `v15_registered_vs_recomputed_metrics.csv` quedan 2 slots Elimination con drift de metricas registradas vs recomputadas en artifacts historicos disponibles localmente (`caregiver_2_3`, `psychologist_full`).
   - El estado anti-clone real se mantiene en `0` clones reales.
+
+## Actualizacion de estado (2026-05-01) - hybrid_final_clean_champion_resolution_v16
+- Se ejecuto cierre final limpio sobre base `v15` para resolver warnings/caveats abiertos sin cambiar cuestionario ni contrato funcional.
+- Script principal: `scripts/run_hybrid_final_clean_champion_resolution_v16.py`.
+- Lineas/versionado generado:
+  - `data/hybrid_final_clean_champion_resolution_v16/`
+  - `artifacts/hybrid_final_clean_champion_resolution_v16/`
+  - `data/hybrid_active_modes_freeze_v16/`
+  - `artifacts/hybrid_active_modes_freeze_v16/`
+  - `data/hybrid_operational_freeze_v16/`
+  - `artifacts/hybrid_operational_freeze_v16/`
+- Resultado tecnico final:
+  - `final_audit_status=pass`
+  - `prediction_recomputed_slots=30/30`
+  - `metrics_match_registered=yes` en `30/30`
+  - `all_domains_real_clone_count=0`
+  - `elimination_real_clone_count=0`
+  - `unresolved_near_clone_warning_count=0`
+  - `artifact_duplicate_hash_count=0`
+  - `guardrail_violations=0`
+- Cambios focales reales:
+  - No se reemplazaron champions por performance; se corrigio registro de metricas en 2 slots historicos Elimination para alinear `registered vs recomputed` con artifacts reales.
+  - Se mantiene reutilizacion historica RF-compatible (lineage mixto) por diseno.
+- Loader/runtime:
+  - `api/services/questionnaire_v2_loader_service.py` actualizado a defaults `*_freeze_v16`.

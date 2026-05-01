@@ -1080,3 +1080,28 @@ Pendiente:
   - `data/hybrid_elimination_v15_caregiver_full_metric_rescue/reports/v15_elimination_caregiver_full_metric_rescue_report.md`
   - `data/hybrid_elimination_v15_caregiver_full_metric_rescue/validation/v15_real_prediction_anti_clone_validator.csv`
   - `data/hybrid_elimination_v15_caregiver_full_metric_rescue/validation/v15_supabase_sync_verification.json`
+
+## Actualizacion de estado (2026-05-01) - hybrid_final_clean_champion_resolution_v16
+- Objetivo ejecutado: cierre final limpio de la linea activa para eliminar `pass_with_warnings` y pendientes ambiguos.
+- Script:
+  - `scripts/run_hybrid_final_clean_champion_resolution_v16.py`
+- Salidas versionadas:
+  - `data/hybrid_final_clean_champion_resolution_v16/`
+  - `data/hybrid_active_modes_freeze_v16/`
+  - `artifacts/hybrid_active_modes_freeze_v16/`
+  - `data/hybrid_operational_freeze_v16/`
+  - `artifacts/hybrid_operational_freeze_v16/`
+- Resultado tecnico:
+  - `final_audit_status=pass`
+  - `prediction_recomputed_slots=30/30`
+  - `metrics_match_registered=yes 30/30`
+  - `all_domains_real_clone_count=0`
+  - `elimination_real_clone_count=0`
+  - `unresolved_near_clone_warning_count=0`
+  - `guardrail_violations=0`
+  - `artifact_duplicate_hash_count=0`
+- Semantica lineage/DB:
+  - Lineage mixto de champions RF historicos se mantiene por diseno (`mixed_lineage_expected=yes`).
+  - Validacion DB se enfoca en integridad de set activo (`db_active_set_valid`) y no en exigir lineage unico.
+- Loader/runtime:
+  - Defaults movidos a `*_freeze_v16`.
