@@ -540,3 +540,38 @@ Contexto metodolÃ³gico:
 - `api/services/questionnaire_v2_loader_service.py` apunta ahora por defecto a `hybrid_active_modes_freeze_v13` y `hybrid_operational_freeze_v13`.
 - Claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
 - Supabase/Postgres sincronizado tras `load-all`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`; evidencia en `data/hybrid_global_contract_compatible_rf_champion_selection_v13/supabase_sync/supabase_sync_verification_v13.json`.
+
+## Actualizacion de estado (2026-05-01) - hybrid_v13_real_prediction_anti_clone_audit
+- Se ejecuto auditoria anti-clone fuerte con recomputacion real de predicciones para la linea activa `v13`, sin reentrenamiento y sin reemplazo de champions.
+- Rama de trabajo: `audit/v13-real-prediction-anti-clone`.
+- Script principal: `scripts/run_hybrid_v13_real_prediction_anti_clone_audit.py`.
+- Linea versionada creada:
+  - `data/hybrid_v13_real_prediction_anti_clone_audit/`
+- Cobertura:
+  - `30/30` slots con `prediction_recomputed=yes`.
+  - `30/30` slots con `artifacts_available=yes`.
+  - `30/30` slots con match de metricas registradas vs recomputadas (`tolerance=1e-6`).
+- Origen de artifacts usados para recomputacion:
+  - `17` modelos desde `cognia_app_rf_max_real_metrics` (linea v10).
+  - `13` modelos desde `cognia_app_final_rf_plus_maximize` (linea v11).
+  - `0` artifacts duplicados por hash (`artifact_duplicate_hash_count=0`).
+- Resultado anti-clone real:
+  - `all_domains_real_clone_count=4`.
+  - `elimination_real_clone_count=4`.
+  - `all_domains_near_clone_warning_count=23`.
+  - `final_audit_status=fail`.
+- Pares Elimination marcados como `real_clone_flag=yes` segun regla estricta:
+  - `elimination/caregiver_full` vs `elimination/psychologist_1_3` (`agreement>=0.995` y `probability_correlation>=0.995`).
+  - `elimination/caregiver_full` vs `elimination/psychologist_2_3` (`agreement>=0.995` y `probability_correlation>=0.995`).
+  - `elimination/caregiver_full` vs `elimination/psychologist_full` (`binary_predictions_identical=yes`).
+  - `elimination/psychologist_1_3` vs `elimination/psychologist_2_3` (`agreement>=0.995` y `probability_correlation>=0.995`).
+- Se generaron tablas/validadores/reportes/plots en `data/hybrid_v13_real_prediction_anti_clone_audit/` incluyendo:
+  - `tables/v13_recomputed_champion_metrics.csv`
+  - `tables/v13_registered_vs_recomputed_metrics.csv`
+  - `tables/v13_pairwise_prediction_similarity_all_domains.csv`
+  - `tables/v13_elimination_real_prediction_similarity.csv`
+  - `validation/v13_real_prediction_anti_clone_validator.csv`
+  - `reports/v13_real_prediction_anti_clone_report.md`
+- Estado metodologico:
+  - No se modificaron champions, inputs/outputs funcionales ni preguntas.
+  - Claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
