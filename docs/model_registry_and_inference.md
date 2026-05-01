@@ -1,4 +1,4 @@
-# Model Registry and Inference (v14)
+﻿# Model Registry and Inference (v14)
 
 ## Fuente de verdad
 - `data/hybrid_active_modes_freeze_v14/tables/hybrid_active_models_30_modes.csv`
@@ -131,3 +131,13 @@ Referencia historica preservada:
   - Resultado: `selected_from_v11=17`, `selected_from_v12=13`, `active_rows=30`, `rf_rows=30`, `guardrail_violations=0`, `policy_violations=0`, `near_clone_proxy_pairs=0`.
   - La fuente operativa efectiva pasa a `*_freeze_v13`; `*_freeze_v12` queda historico para trazabilidad.
   - Supabase/Postgres sincronizado tras `load-all`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`; evidencia en `data/hybrid_global_contract_compatible_rf_champion_selection_v13/supabase_sync/supabase_sync_verification_v13.json`.
+
+
+## Nota de actualizacion (2026-05-01) - v15
+- Defaults del loader v2 actualizados a:
+  - `data/hybrid_active_modes_freeze_v15/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_operational_freeze_v15/tables/hybrid_operational_final_champions.csv`
+- Fix de robustez en sync de metricas:
+  - `metrics_json` se persiste con sanitizacion JSON-safe (`NaN/inf` convertidos a `null`) para compatibilidad PostgreSQL JSON.
+- Implicacion:
+  - `bootstrap_questionnaire_backend_v2.py load-all` ya no falla por `invalid input syntax for type json` en `model_metrics_snapshot`.
