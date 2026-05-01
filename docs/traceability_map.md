@@ -170,3 +170,4 @@ it must be documented/renamed before being considered stable traceability.
 
 
 - Estado (2026-05-01): `hybrid_elimination_v15_caregiver_full_metric_rescue` aplica rescate focal de `elimination/caregiver_full` sobre base v14, genera `*_freeze_v15`, mantiene `0` clones reales (global y Elimination), `0` guardrail violations, y deja evidencia en `data/hybrid_elimination_v15_caregiver_full_metric_rescue/` con `final_audit_status=pass_with_warnings`.
+- Estado (2026-05-01): `hybrid_final_clean_champion_resolution_v16` ejecuta cierre final limpio sobre v15, corrige drift registrado vs recomputado en 2 slots historicos Elimination, reclasifica near-clone con evidencia (sin pendientes reales), deja `final_audit_status=pass`, `metrics_match_registered=30/30`, `all_domains_real_clone_count=0`, `elimination_real_clone_count=0`, `unresolved_near_clone_warning_count=0`, `guardrail_violations=0`, y desplaza la fuente operativa a `*_freeze_v16`.
