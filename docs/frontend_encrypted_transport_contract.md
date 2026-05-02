@@ -1,47 +1,98 @@
-﻿# Frontend Encrypted Transport Contract (v17)
+# Frontend Encrypted Transport Contract (v17)
 
-## Scope
-This backend repo implements encrypted transport support for sensitive questionnaire v2 endpoints.
-Frontend code is **not** modified here.
+## Alcance
+Contrato operativo para transporte cifrado de endpoints sensibles en `api/v2/questionnaires`.
+La fuente de verdad machine-readable es `docs/openapi.yaml`.
 
-## Endpoints to use
-1. Public key/config bootstrap:
-   - `GET /api/v2/security/transport-key`
-2. Encrypted results (recommended, replaces plaintext legacy results endpoint):
-   - `POST /api/v2/questionnaires/history/{session_id}/results-secure`
-3. Encrypted clinical summary (new simulated diagnostic report):
-   - `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`
-4. Sensitive write endpoints (support encrypted request/response):
-   - `POST /api/v2/questionnaires/sessions`
-   - `PATCH /api/v2/questionnaires/sessions/{session_id}/answers`
-   - `POST /api/v2/questionnaires/sessions/{session_id}/submit`
+## Endpoints cubiertos (quirurgico)
 
-Legacy plaintext endpoint remains available for compatibility:
-- `GET /api/v2/questionnaires/history/{session_id}/results`
-- Status header: `X-CognIA-Endpoint-Status: legacy_plaintext`
+### `GET /api/v2/security/transport-key`
+- estado: `activo`.
+- auth: bearer obligatorio.
+- body: no aplica.
+- success `200`: `key_id`, `algorithm`, `public_key_jwk`, `expires_at`, `version`.
+- errores principales:
+  - `401 unauthorized`
+  - `429 rate_limited`
+  - `500 transport_key_failed`
+  - `503 db_unavailable|runtime_assets_unavailable`
 
-## Transport key fetch
-Request:
-- `GET /api/v2/security/transport-key`
-- Auth: Bearer token
+### `POST /api/v2/questionnaires/sessions`
+- estado: `activo` (sensible).
+- auth: bearer obligatorio.
+- headers opcionales cifrado:
+  - `X-CognIA-Encrypted: 1`
+  - `X-CognIA-Crypto-Version: transport_envelope_v1`
+- body:
+  - plaintext (solo si politica lo permite): `mode`, `role`, `child_age_years`, `child_sex_assigned_at_birth`, `metadata`.
+  - encrypted envelope: ver formato abajo.
+- success `201`: respuesta plaintext (`session`) o envelope cifrado.
+- errores principales:
+  - `400 plaintext_not_allowed|encrypted_payload_invalid|validation_error`
+  - `401 invalid_user|unauthorized`
+  - `500 db_error|session_create_failed`
+  - `503 db_unavailable|runtime_assets_unavailable`
 
-Response shape:
-```json
-{
-  "key_id": "transport-key-v1",
-  "algorithm": "RSA-OAEP-256+AES-256-GCM",
-  "public_key_jwk": {"kty":"RSA","alg":"RSA-OAEP-256","use":"enc","n":"...","e":"AQAB"},
-  "expires_at": "2026-05-01T...Z",
-  "version": "transport_envelope_v1"
-}
-```
+### `PATCH /api/v2/questionnaires/sessions/{session_id}/answers`
+- estado: `activo` (sensible).
+- auth: bearer obligatorio.
+- headers cifrado: mismos que arriba.
+- body plaintext: `answers[]` + `mark_final` (opcional).
+- success `200`: `session` + `saved_answers` (plaintext o cifrado).
+- errores principales:
+  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|validation_error`
+  - `401 invalid_user|unauthorized`
+  - `403 forbidden`
+  - `404 not_found`
+  - `500 db_error|save_failed`
+  - `503 db_unavailable|runtime_assets_unavailable`
 
-## Request envelope format
-Required headers for encrypted calls:
+### `POST /api/v2/questionnaires/sessions/{session_id}/submit`
+- estado: `activo` (sensible).
+- auth: bearer obligatorio.
+- headers cifrado: mismos que arriba.
+- body plaintext: `force_reprocess` (opcional).
+- success `200`: resultados finales de sesion (plaintext o cifrado).
+- errores principales:
+  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|validation_error`
+  - `401 invalid_user|unauthorized`
+  - `403 forbidden`
+  - `404 not_found`
+  - `500 db_error|submit_failed`
+  - `503 runtime_artifact_unavailable|runtime_assets_unavailable|db_unavailable`
+
+### `POST /api/v2/questionnaires/history/{session_id}/results-secure`
+- estado: `active secure replacement`.
+- reemplaza funcionalmente a:
+  - legacy plaintext: `GET /api/v2/questionnaires/history/{session_id}/results`
+- auth: bearer obligatorio.
+- body: `{}` o encrypted envelope segun politica.
+- success `200`: `session/result/domains/comorbidity` (plaintext o cifrado).
+- errores principales:
+  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid`
+  - `401 invalid_user|unauthorized`
+  - `403 forbidden`
+  - `404 not_found`
+
+### `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`
+- estado: `activo` (sensible).
+- auth: bearer obligatorio.
+- body: `{}` o encrypted envelope segun politica.
+- success `200`: `clinical_summary_v1` (plaintext o cifrado).
+- errores principales:
+  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|validation_error`
+  - `401 invalid_user|unauthorized`
+  - `403 forbidden`
+  - `404 not_found`
+  - `500 clinical_summary_failed|db_error`
+  - `503 runtime_artifact_unavailable|runtime_assets_unavailable|db_unavailable`
+
+## Envelope cifrado
+Headers para request cifrada:
 - `X-CognIA-Encrypted: 1`
 - `X-CognIA-Crypto-Version: transport_envelope_v1`
 
-Body:
+Request envelope:
 ```json
 {
   "encrypted": true,
@@ -51,12 +102,11 @@ Body:
   "encrypted_key": "...",
   "iv": "...",
   "ciphertext": "...",
-  "aad": "transport_envelope_v1|your_context"
+  "aad": "transport_envelope_v1|frontend"
 }
 ```
 
-## Response envelope format
-When request is encrypted and backend encryption is enabled, response comes encrypted:
+Response envelope:
 ```json
 {
   "encrypted": true,
@@ -69,72 +119,8 @@ When request is encrypted and backend encryption is enabled, response comes encr
 }
 ```
 
-Response headers:
-- `X-CognIA-Encrypted: 1`
-- `X-CognIA-Crypto-Version: transport_envelope_v1`
-
-## WebCrypto flow (frontend)
-1. Fetch transport key from `/api/v2/security/transport-key`.
-2. Generate random 32-byte AES key (`AES-GCM`) per request or very short-lived session.
-3. Generate unique 12-byte IV per encrypted request.
-4. Serialize payload JSON UTF-8 and encrypt with AES-GCM.
-5. Encrypt AES key with backend RSA public key (`RSA-OAEP-256`).
-6. Send envelope + required headers.
-7. Decrypt response envelope with same AES key.
-
-## TypeScript pseudocode
-```ts
-async function encryptRequest(payload: unknown, transportKey: TransportKey) {
-  const aesKeyBytes = crypto.getRandomValues(new Uint8Array(32));
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const aad = new TextEncoder().encode("transport_envelope_v1|frontend");
-
-  const aesKey = await crypto.subtle.importKey("raw", aesKeyBytes, "AES-GCM", false, ["encrypt", "decrypt"]);
-  const plaintext = new TextEncoder().encode(JSON.stringify(payload));
-  const ciphertext = await crypto.subtle.encrypt({ name: "AES-GCM", iv, additionalData: aad }, aesKey, plaintext);
-
-  const rsaKey = await crypto.subtle.importKey("jwk", transportKey.public_key_jwk, { name: "RSA-OAEP", hash: "SHA-256" }, false, ["encrypt"]);
-  const encryptedKey = await crypto.subtle.encrypt({ name: "RSA-OAEP" }, rsaKey, aesKeyBytes);
-
-  return {
-    envelope: {
-      encrypted: true,
-      version: "transport_envelope_v1",
-      key_id: transportKey.key_id,
-      alg: "AES-256-GCM",
-      encrypted_key: b64url(encryptedKey),
-      iv: b64url(iv),
-      ciphertext: b64url(ciphertext),
-      aad: "transport_envelope_v1|frontend"
-    },
-    aesKeyBytes
-  };
-}
-```
-
-## Error handling
-- `400 plaintext_not_allowed`: plaintext request rejected by policy.
-- `400 encrypted_payload_invalid`: envelope malformed or decrypt failure.
-- `401/403`: auth/permission error.
-- `5xx`: backend internal error.
-
-## Feature flags and environment
-- Backend flag: `COGNIA_TRANSPORT_PAYLOAD_ENCRYPTION=true`
-- Production policy can reject plaintext for sensitive endpoints.
-- In transition/dev environments plaintext may be allowed by backend policy.
-
-## What frontend must NOT do
-- Do not persist plaintext clinical payloads in `localStorage` or `sessionStorage`.
-- Do not log clinical payloads to `console.log`.
-- Do not send sensitive endpoints in plaintext when encrypted contract is enabled.
-- Do not cache decrypted reports unencrypted.
-
-## Memory handling recommendation
-- Keep decrypted payloads only in short-lived in-memory state.
-- Clear sensitive state on logout/session end.
-- Avoid redux-persist/localStorage for decrypted clinical content.
-
-## Honest limitation
-- Network tab will show ciphertext when encrypted transport is used.
-- UI must decrypt data to render it, so a user controlling browser memory/runtime can still inspect decrypted data.
-- This transport encryption does not replace frontend hardening, secure session handling, or endpoint authorization controls.
+## Notas de seguridad frontend
+- no persistir payload clinico plaintext en `localStorage/sessionStorage`.
+- no loggear payload sensible en consola.
+- mantener decrypted payload en memoria volatil.
+- esta capa no reemplaza TLS ni controles de autorizacion backend.
