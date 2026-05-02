@@ -1,0 +1,13 @@
+scope,item,classification,rationale,owner,priority,evidence
+backend_db,questionnaire_template versioning base,keep_as_is,Ya soporta version + activacion unica y traza por template,backend_bd,high,app/models.py:131-143
+backend_db,question model flat,refactor,Falta modelado de secciones/branching/required_if,backend_bd,high,app/models.py:145-170
+backend_api,GET /api/v1/questionnaires/active,keep_with_minor_changes,Correcto para bootstrap; faltan metadatos estructurales,backend_api,high,api/routes/questionnaires.py:87-125
+backend_api,POST /api/v1/evaluations,refactor,Debe separarse en draft/submit y conectar resultados,backend_api,high,api/routes/evaluations.py:41-206
+backend_api,POST /api/predict,remove,Legacy adhd-only no alineado con arquitectura final,backend_api,medium,docs/openapi.yaml:129-137
+specs,artifacts/specs/questionnaire_schema.json,keep_with_minor_changes,Util para mapping ML; no usar como cuestionario UI directo,backend_ml_interface,high,artifacts/specs/questionnaire_schema.json
+specs,data/questionnaire_dsm5_v1 registries,refactor,Base util pero no cableada a runtime y con huecos de calidad,backend_ml_interface,high,data/questionnaire_dsm5_v1/questionnaire_items_registry.csv
+frontend,useActiveQuestionnaire hook,keep_with_minor_changes,Patron reutilizable de carga y estados,frontend_handoff,medium,frontend hook file
+frontend,Cuestionario.tsx placeholder flow,replace,No submit real ni resultado remoto,frontend_handoff,high,frontend Cuestionario.tsx:229-236
+frontend,questionnaires.types.ts response types,refactor,Desalineado con tipos backend,frontend_handoff,high,frontend questionnaires.types.ts:1
+frontend,mockQuestionnaire.ts,remove,Debe quedar solo para dev controlado y no flujo productivo,frontend_handoff,low,frontend mockQuestionnaire.ts
+frontend,docs de cuestionario placeholder,refactor,Documentan estado provisional; actualizar tras diseno real,frontend_handoff,medium,frontend docs/vistas/Cuestionario/Cuestionario.md:87

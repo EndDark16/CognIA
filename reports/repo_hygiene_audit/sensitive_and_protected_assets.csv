@@ -1,0 +1,12 @@
+path,risk,category,deploy_required,recommendation
+Dockerfile,none,safe_to_commit,yes,keep_in_repo
+docker/entrypoint.sh,none,safe_to_commit,yes,keep_in_repo
+docker-compose.yml,env_references_only,deploy_required_but_protected,optional,keep_in_repo_no_secrets
+requirements.txt,none,safe_to_commit,yes,keep_in_repo
+run.py,none,safe_to_commit,yes,keep_in_repo
+config/settings.py,reads_env_vars,safe_to_commit,yes,keep_in_repo
+artifacts/inference_v4/promotion_scope.json,none,safe_to_commit,yes,keep_in_repo
+.env,secrets_embedded,must_be_secret_managed,no,exclude_and_use_env_vars
+.env.example,template_only,must_be_template_only,yes,commit_template_only
+models/,large_binaries,keep_internal_not_public,conditional,move_to_external_storage_or_slim
+artifacts/models/,large_binaries_duplicate,keep_internal_not_public,no,move_to_external_storage

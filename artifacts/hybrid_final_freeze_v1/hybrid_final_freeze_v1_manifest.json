@@ -1,0 +1,65 @@
+{
+  "line": "hybrid_final_freeze_v1",
+  "generated_at_utc": "2026-04-13T15:21:27.836473+00:00",
+  "champion_pairs": 30,
+  "quality_counts": {
+    "muy_bueno": 14,
+    "malo": 9,
+    "aceptable": 7
+  },
+  "ceiling_counts": {
+    "near_ceiling": 12,
+    "marginal_room_left": 12,
+    "ceiling_confirmed": 6
+  },
+  "should_keep_improving_counts": {
+    "only_if_new_signal": 14,
+    "no": 9,
+    "no_practical_ceiling_confirmed": 6,
+    "yes": 1
+  },
+  "input_coverage_stats": {
+    "total_inputs": 223,
+    "direct_inputs": 180,
+    "transparent_derived_inputs": 43,
+    "shown_inputs": 180
+  },
+  "source_campaigns": [
+    "hybrid_rf_ceiling_push_v1",
+    "hybrid_rf_consolidation_v2",
+    "hybrid_rf_final_ceiling_push_v3",
+    "hybrid_rf_targeted_fix_v4"
+  ],
+  "source_dataset": "data/hybrid_dsm5_rebuild_v1",
+  "caveats": {
+    "missing_hybrid_input_audit_classification_final.csv": "por_confirmar",
+    "missing_hybrid_dataset_final_registry_v1.csv": "por_confirmar"
+  },
+  "generated_files": [
+    {
+      "path": "data/hybrid_final_freeze_v1/reports/frozen_hybrid_final_status.md",
+      "sha256": "cd9d36e4a9818420b40602ef45966ba70c8dd3172b0ff383b046c34d232bf60f",
+      "bytes": 5398
+    },
+    {
+      "path": "data/hybrid_final_freeze_v1/reports/frozen_hybrid_questionnaire_coverage.md",
+      "sha256": "c7e095ef7cd9f3921631887d780c09b3261a38db3a88c2553e0641c0c6c27f12",
+      "bytes": 2770
+    },
+    {
+      "path": "data/hybrid_final_freeze_v1/tables/frozen_hybrid_champions_inputs_master.csv",
+      "sha256": "8856dad338a14fcda4f85c4df335d2492b1334244ee5970f18b79f29f337bede",
+      "bytes": 110378
+    },
+    {
+      "path": "data/hybrid_final_freeze_v1/tables/frozen_hybrid_champions_master.csv",
+      "sha256": "48d86075b2a0d83470b79a645beaf1cbc0dd40a1c589199fd6e1aee97c14b5ca",
+      "bytes": 16112
+    },
+    {
+      "path": "data/hybrid_final_freeze_v1/tables/frozen_hybrid_domain_limitations.csv",
+      "sha256": "262511ff82489bd8187bc2be7d34347fde019bd6b57b810b897c44e27782cd00",
+      "bytes": 5703
+    }
+  ]
+}

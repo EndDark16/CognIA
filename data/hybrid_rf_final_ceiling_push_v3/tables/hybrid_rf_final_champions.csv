@@ -1,0 +1,6 @@
+domain,champion_mode,champion_config_id,champion_feature_set_id,champion_calibration,champion_threshold_policy,champion_decision,precision,recall,balanced_accuracy,pr_auc,brier
+adhd,psychologist_full,rf_positive_push_strong,full_eligible,isotonic,balanced,PROMOTE_NOW,0.9484536082474226,0.9787234042553191,0.9828850181898356,0.9808743934303844,0.01064758175787938
+anxiety,caregiver_2_3,rf_positive_push_strong,precision_oriented_subset,isotonic,precision_min_recall,PROMOTE_NOW,0.95,0.8837209302325582,0.9367843229842994,0.9405128390040636,0.020748730070934605
+conduct,psychologist_2_3,rf_positive_push_strong,stability_pruned_subset,isotonic,balanced,PROMOTE_NOW,1.0,1.0,1.0,1.0,0.0006574820874469342
+depression,caregiver_full,rf_positive_push_strong,precision_oriented_subset,isotonic,balanced,PROMOTE_WITH_CAVEAT,0.8043478260869565,0.9024390243902439,0.9286064468684888,0.9115860387174166,0.037988122862413924
+elimination,psychologist_2_3,rf_positive_push_strong,balanced_subset,isotonic,balanced,PROMOTE_NOW,0.9811320754716981,1.0,0.9988317757009346,1.0,0.00043709817088018226

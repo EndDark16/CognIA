@@ -1,0 +1,14 @@
+pattern,value,subgroup
+false_positive_count,0.0,
+false_negative_count,4.0,
+high_confidence_errors,0.0,
+fp_mean_probability,,
+fn_mean_probability,0.5843018009635883,
+fp_mean_missing_ratio,,
+fn_mean_missing_ratio,0.0,
+errors_by_age_years,1.0,9.4
+errors_by_age_years,1.0,9.6
+errors_by_age_years,1.0,10.4
+errors_by_age_years,1.0,10.9
+errors_by_sex_assigned_at_birth,3.0,Female
+errors_by_sex_assigned_at_birth,1.0,Male

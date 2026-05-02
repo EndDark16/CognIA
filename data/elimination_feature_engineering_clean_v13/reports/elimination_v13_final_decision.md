@@ -1,0 +1,15 @@
+# elimination v13 final decision
+
+Decision: `UNCERTAINTY_PREFERRED_ONLY`
+
+1) v13 mejora real y limpia: no
+2) precision/generalizacion suben serio: no
+3) recall suficiente: yes
+4) resiste ablacion/stress: yes
+5) utilidad operativa mejora: no
+6) puede reemplazar v12: no
+7) limite real: not yet
+
+        mode      domain selected_operating_mode  precision   recall  specificity  balanced_accuracy       f1   pr_auc    brier  worst_stress_ba  shortcut_max_metric_diff shortcut_independence probability_ready risk_band_ready confidence_ready uncertainty_ready professional_detail_ready   final_output_status visible_user_prob_cap visible_prof_prob_cap extreme_performance_audit_trigger
+   caregiver elimination                balanced   0.877698 0.757764        0.864           0.810882 0.813333 0.913495 0.138077         0.728447                  0.180124                   yes               yes             yes              yes               yes                       yes uncertainty_preferred           [0.01,0.99]         [0.005,0.995]                                no
+psychologist elimination                balanced   0.879433 0.770186        0.864           0.817093 0.821192 0.913213 0.136763         0.735081                  0.167702                   yes               yes             yes               no               yes                       yes uncertainty_preferred           [0.01,0.99]         [0.005,0.995]                                no

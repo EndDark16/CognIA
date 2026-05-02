@@ -1,0 +1,19 @@
+instrument,coverage_ratio,clinical_specificity,note
+cbcl,0.9669291338582677,high_for_elimination,Useful but not elimination-specific
+ari_p,0.9601049868766404,indirect,No direct elimination-only instrument detected
+ari_sr,0.9574803149606299,indirect,No direct elimination-only instrument detected
+swan,0.9564304461942257,indirect,No direct elimination-only instrument detected
+icut,0.9511811023622048,indirect,No direct elimination-only instrument detected
+sdq,0.9385826771653544,high_for_elimination,Useful but not elimination-specific
+mfq_sr,0.7196850393700788,indirect,No direct elimination-only instrument detected
+scared_sr,0.7186351706036745,indirect,No direct elimination-only instrument detected
+scared_p,0.7181102362204724,indirect,No direct elimination-only instrument detected
+mfq_p,0.7165354330708661,indirect,No direct elimination-only instrument detected
+any_target_disorder,0.7034120734908137,indirect,No direct elimination-only instrument detected
+cdi,0.5727034120734908,indirect,No direct elimination-only instrument detected
+ysr,0.02257217847769029,indirect,No direct elimination-only instrument detected
+conners,0.02204724409448819,indirect,No direct elimination-only instrument detected
+caars,0.0,indirect,No direct elimination-only instrument detected
+bdi,0.0,indirect,No direct elimination-only instrument detected
+stai,0.0,indirect,No direct elimination-only instrument detected
+asr,0.0,indirect,No direct elimination-only instrument detected

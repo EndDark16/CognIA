@@ -1,0 +1,6 @@
+domain,mean,std,min,max,status
+adhd,0.05,0.0,0.05,0.05,stable
+anxiety,0.14375,0.1781602408748131,0.05,0.49999999999999994,unstable
+conduct,0.8125,0.04432026302139593,0.75,0.85,stable
+depression,0.74375,0.08210402808980465,0.6,0.9,stable
+elimination,0.05,0.0,0.05,0.05,stable

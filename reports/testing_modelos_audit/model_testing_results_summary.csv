@@ -1,0 +1,4 @@
+run_id,command,scope,tests_executed,passed,failed,skipped,status,notes
+new_model_suite,pytest tests/models tests/inference tests/api/test_predict_api_runtime.py tests/smoke/test_model_runtime_smoke.py -q,nuevo_testing_modelos,34,34,0,0,pass,Incluye unit/integration/smoke/contract/regression del apartado modelos-inferencia
+full_suite_check,pytest -q,suite_completa_repo,109,105,1,3,partial_fail,Fallo preexistente en tests/test_password_reset.py::test_rate_limit_basic_for_forgot (esperaba 429 y obtuvo 200)
+full_suite_failure_recheck,pytest tests/test_password_reset.py::test_rate_limit_basic_for_forgot -q,reproduccion_fallo_preexistente,1,0,1,0,fail,Confirma inconsistencia de rate limit no ligada a cambios de modelos

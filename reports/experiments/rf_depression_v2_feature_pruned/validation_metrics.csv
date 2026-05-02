@@ -1,0 +1,2 @@
+threshold,accuracy,balanced_accuracy,precision,recall,sensitivity,specificity,f1,support_negative,support_positive,confusion_matrix,normalized_confusion_matrix,roc_auc,pr_auc,brier_score
+0.13001429503648002,0.8741258741258742,0.885546875,0.45,0.9,0.9,0.87109375,0.6,256,30,"[[223, 33], [3, 27]]","[[0.87109375, 0.12890625], [0.1, 0.9]]",0.9397135416666667,0.6186359734490556,0.05888866173321762

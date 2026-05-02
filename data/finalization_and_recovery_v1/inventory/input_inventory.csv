@@ -1,0 +1,12 @@
+path,exists,type,size_bytes,modified_utc
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1,True,dir,,2026-03-28T01:45:58.528554+00:00
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2,True,dir,,2026-03-27T02:44:35.403443+00:00
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\reports\training_history,True,dir,,2026-03-28T02:13:26.945640+00:00
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\reports\operating_modes,True,dir,,2026-03-27T04:00:00.915403+00:00
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\artifacts\inference_v3,True,dir,,2026-03-28T02:13:26.954167+00:00
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\modelability_audit,True,dir,,2026-03-27T02:27:13.739910+00:00
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\leakage_audit_dsm5_exact.csv,True,file,136.0,2026-03-27T04:02:59.560579+00:00
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\processed_hybrid_dsm5_v2\feature_lineage_dsm5_exact.csv,True,file,903028.0,2026-03-27T04:02:59.550579+00:00
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\tables\final_model_classification.csv,True,file,1517.0,2026-03-28T02:13:26.905873+00:00
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\tables\domain_generalization_decisions.csv,True,file,611.0,2026-03-28T02:13:26.911119+00:00
+C:\Users\andre\Documents\Workspace Academic\Backend Tesis\cognia_app\data\generalization_gate_v1\tables\retraining_comparison.csv,True,file,2057.0,2026-03-28T02:13:26.876373+00:00

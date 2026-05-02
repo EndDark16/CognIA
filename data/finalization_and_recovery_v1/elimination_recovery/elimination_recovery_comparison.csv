@@ -1,0 +1,2 @@
+selected_trial,decision,reason,trial_id,threshold,val_precision,val_balanced_accuracy,test_precision,test_balanced_accuracy,test_recall,seed_std_balacc,split_std_balacc,noise_moderate_degradation,realism_worst_degradation,suspicious_perfect_score
+elim_trial_strict_minimal,still_high_risk_overfit,still yields suspiciously perfect score,elim_trial_strict_minimal,0.6,1.0,0.9658385093167702,1.0,0.9751552795031055,0.9503105590062112,0.0,0.0013052873805600167,0.0634782608695652,0.024844720496894346,True

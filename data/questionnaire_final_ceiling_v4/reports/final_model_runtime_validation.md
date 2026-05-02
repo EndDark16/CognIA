@@ -1,0 +1,33 @@
+# Final model runtime validation
+
+        mode      domain                    check status                                        details
+   caregiver     conduct         metadata_present   pass                                      rf_recall
+   caregiver     conduct input_contract_non_empty   pass                                  n_features=21
+   caregiver     conduct    output_contract_ready   pass probability/risk/confidence/uncertainty/caveat
+   caregiver  depression         metadata_present   pass                                   rf_stability
+   caregiver  depression input_contract_non_empty   pass                                  n_features=17
+   caregiver  depression    output_contract_ready   pass probability/risk/confidence/uncertainty/caveat
+   caregiver     anxiety         metadata_present   pass                                      rf_recall
+   caregiver     anxiety input_contract_non_empty   pass                                  n_features=37
+   caregiver     anxiety    output_contract_ready   pass probability/risk/confidence/uncertainty/caveat
+   caregiver        adhd         metadata_present   pass                                      rf_recall
+   caregiver        adhd input_contract_non_empty   pass                                  n_features=22
+   caregiver        adhd    output_contract_ready   pass probability/risk/confidence/uncertainty/caveat
+   caregiver elimination         metadata_present   pass                                        rf_base
+   caregiver elimination input_contract_non_empty   pass                                  n_features=16
+   caregiver elimination    output_contract_ready   pass probability/risk/confidence/uncertainty/caveat
+psychologist     anxiety         metadata_present   pass                                   rf_precision
+psychologist     anxiety input_contract_non_empty   pass                                 n_features=260
+psychologist     anxiety    output_contract_ready   pass probability/risk/confidence/uncertainty/caveat
+psychologist     conduct         metadata_present   pass                                    rf_hardened
+psychologist     conduct input_contract_non_empty   pass                                  n_features=23
+psychologist     conduct    output_contract_ready   pass probability/risk/confidence/uncertainty/caveat
+psychologist  depression         metadata_present   pass                                      rf_recall
+psychologist  depression input_contract_non_empty   pass                                  n_features=18
+psychologist  depression    output_contract_ready   pass probability/risk/confidence/uncertainty/caveat
+psychologist        adhd         metadata_present   pass                                      rf_recall
+psychologist        adhd input_contract_non_empty   pass                                  n_features=35
+psychologist        adhd    output_contract_ready   pass probability/risk/confidence/uncertainty/caveat
+psychologist elimination         metadata_present   pass                                        rf_base
+psychologist elimination input_contract_non_empty   pass                                  n_features=17
+psychologist elimination    output_contract_ready   pass probability/risk/confidence/uncertainty/caveat

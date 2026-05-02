@@ -1,0 +1,30 @@
+{
+  "line": "hybrid_elimination_v15_caregiver_full_metric_rescue",
+  "freeze_label": "v15",
+  "generated_at_utc": "2026-05-01T06:32:58.670208+00:00",
+  "scope": "elimination_only_rescue",
+  "rules": {
+    "non_elimination_slots_unchanged": true,
+    "rf_only": true,
+    "same_inputs_outputs_contract": true,
+    "no_questionnaire_changes": true,
+    "guardrail_max": 0.98
+  },
+  "stats": {
+    "active_rows": 30,
+    "elimination_rows": 6,
+    "rf_rows": 30,
+    "all_domains_real_clone_count": 0,
+    "elimination_real_clone_count": 0,
+    "all_domains_near_clone_warning_count": 22,
+    "artifact_duplicate_hash_count": 0,
+    "final_audit_status": "pass_with_warnings"
+  },
+  "paths": {
+    "active_v15": "data/hybrid_active_modes_freeze_v15/tables/hybrid_active_models_30_modes.csv",
+    "operational_v15": "data/hybrid_operational_freeze_v15/tables/hybrid_operational_final_champions.csv",
+    "rescue_tables_dir": "data/hybrid_elimination_v15_caregiver_full_metric_rescue/tables",
+    "rescue_validation_dir": "data/hybrid_elimination_v15_caregiver_full_metric_rescue/validation"
+  },
+  "artifact": "hybrid_operational_freeze_v15"
+}

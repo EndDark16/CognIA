@@ -1,0 +1,16 @@
+check_id,check_name,status,severity,details,fixed_yes_no
+CHK01,required_columns_present,pass,info,missing=[],no
+CHK02,no_shifted_columns_detected,pass,info,heuristic on enums/field lengths,no
+CHK03,critical_fields_clean,pass,info,needs_review_in_critical=0,no
+CHK04,questionnaire_mode_values_valid,pass,info,"values=['both', 'psychologist']",no
+CHK05,response_type_values_valid,pass,info,"values=['boolean', 'integer', 'ordinal', 'single_choice']",no
+CHK06,domains_values_valid,pass,info,invalid_domain_rows=0,no
+CHK07,no_open_questions_in_model_core,pass,info,open_core_rows=0,no
+CHK08,final_models_only_scope,pass,info,inputs_match_union=True; inventory_scope=True,no
+CHK09,caregiver_coverage_verified,pass,info,contract=47; covered=47; missing=0; extra=0,no
+CHK10,psychologist_coverage_verified,pass,info,contract=283; covered=283; missing=0; extra=0,no
+CHK11,critical_inputs_covered,pass,info,missing=0,no
+CHK12,derivation_rules_consistent,pass,info,supporting_without_derivation_targets=0,no
+CHK13,terminology_dual_layer_valid,pass,info,identical_prompt_questions=0,no
+CHK14,importable_to_db_runtime,pass,info,numeric_with_options=0; choice_without_options=0; mapping_empty=0,no
+CHK15,no_blocking_placeholder_in_critical_fields,pass,info,placeholder_rows=0,no

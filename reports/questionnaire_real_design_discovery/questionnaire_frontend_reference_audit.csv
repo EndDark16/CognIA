@@ -1,0 +1,9 @@
+frontend_path,artifact_type,observation,coupling_category,reusable_pattern,backend_dependency,recommendation,evidence
+src/services/questionnaires/questionnaires.api.ts,api_client,Solo implementa getActiveQuestionnaire(),frontend_dependency,yes,GET /api/v1/questionnaires/active,Conservar y extender con submit/draft/result,JeiTy29/cognIA-frontend lineas 4-5
+src/hooks/questionnaires/useActiveQuestionnaire.ts,hook,Carga activa ordenada por position y soporta switch mock,reusable_frontend_pattern,yes,GET /api/v1/questionnaires/active,Conservar patron loading/error/refetch,JeiTy29/cognIA-frontend lineas 11-38
+src/pages/Plataforma/Cuestionario/Cuestionario.tsx,page_component,Flujo local; handleFinish solo muestra exito local,frontend_blocker,partial,none (sin submit),Refactor alto: conectar submit real y estados remotos,JeiTy29/cognIA-frontend lineas 229-236
+src/services/questionnaires/questionnaires.types.ts,types,ResponseType simplificado desalineado con backend,frontend_change_request,partial,Question.response_type backend,Alinear DTOs con contrato backend final,JeiTy29/cognIA-frontend linea 1
+src/services/questionnaires/mockQuestionnaire.ts,mock_data,Mock de 25 items placeholder para dev,frontend_dependency,dev_only,none,Mantener solo dev; no fuente de verdad funcional,JeiTy29/cognIA-frontend archivo completo
+docs/vistas/Cuestionario/Cuestionario.md,doc,Declara que no se envian respuestas al backend,frontend_blocker,n/a,submit ausente,Actualizar doc cuando exista submit real,JeiTy29/cognIA-frontend linea 87
+docs/vistas/Plataforma/Cuestionario.md,doc,Lista secciones y guardado parcial como futuro,frontend_change_request,yes,Requiere soporte API/DB,Usar como backlog de handoff,JeiTy29/cognIA-frontend lineas 21-26
+repo search,code_search,Sin llamadas a /api/v1/evaluations ni /api/predict,frontend_blocker,n/a,submit/result no conectados,Agregar clientes y hooks de submit/result en fase de implementacion,gh api search/code count 0

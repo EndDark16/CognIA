@@ -1,0 +1,9 @@
+{
+  "tls_required_documented": "yes",
+  "app_payload_encryption_enabled": "yes",
+  "sensitive_endpoints_enforced": "yes",
+  "plaintext_rejected_in_production": "yes",
+  "encrypted_response_ok": "yes",
+  "devtools_network_plaintext_payload": "no_for_sensitive_body",
+  "frontend_contract_documented": "yes"
+}

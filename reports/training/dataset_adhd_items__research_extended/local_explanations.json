@@ -1,0 +1,260 @@
+{
+  "HBN_SYN_000576": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__swan_inattention_total",
+        "score": 0.1905128414687567
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.07287570863326649
+      },
+      {
+        "feature": "num__swan_total",
+        "score": 0.048082999926383346
+      },
+      {
+        "feature": "num__swan_08",
+        "score": 0.045225778560946055
+      },
+      {
+        "feature": "num__comorbidity_count_5targets",
+        "score": 0.03475139943218521
+      },
+      {
+        "feature": "num__swan_03",
+        "score": 0.02900131051964652
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 0.025082887930069773
+      },
+      {
+        "feature": "num__cbcl_033",
+        "score": 0.024030517211553123
+      },
+      {
+        "feature": "num__cbcl_034",
+        "score": 0.02229770994983381
+      },
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 0.017996713805381703
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": -0.1561174372814022
+      },
+      {
+        "feature": "num__swan_hyperactive_impulsive_total",
+        "score": -0.08967835335241527
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": -0.07548608817699644
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": -0.03689520223561176
+      },
+      {
+        "feature": "num__cbcl_037",
+        "score": -0.021302776683048814
+      },
+      {
+        "feature": "num__cbcl_043",
+        "score": -0.020776768849228175
+      },
+      {
+        "feature": "num__swan_09",
+        "score": -0.018005725709170202
+      },
+      {
+        "feature": "num__swan_14",
+        "score": -0.01740032927636763
+      },
+      {
+        "feature": "num__cbcl_044",
+        "score": -0.01731992720919427
+      },
+      {
+        "feature": "num__swan_06",
+        "score": -0.016849787309965846
+      }
+    ]
+  },
+  "HBN_SYN_000364": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__swan_14",
+        "score": 0.03480065855273526
+      },
+      {
+        "feature": "num__cbcl_040",
+        "score": 0.01798300696184741
+      },
+      {
+        "feature": "num__swan_17",
+        "score": 0.012154115296350862
+      },
+      {
+        "feature": "num__cbcl_065",
+        "score": 0.011602094303710788
+      },
+      {
+        "feature": "num__cbcl_034",
+        "score": 0.011148854974916906
+      },
+      {
+        "feature": "num__cbcl_048",
+        "score": 0.009365051334915855
+      },
+      {
+        "feature": "num__cbcl_059",
+        "score": 0.009351535170648389
+      },
+      {
+        "feature": "num__cbcl_079",
+        "score": 0.00861109402226132
+      },
+      {
+        "feature": "num__cbcl_086",
+        "score": 0.007943410868733595
+      },
+      {
+        "feature": "num__cbcl_090",
+        "score": 0.006956449909534377
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__swan_inattention_total",
+        "score": -0.3810256829375134
+      },
+      {
+        "feature": "num__swan_total",
+        "score": -0.3606224994478751
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": -0.10931356294989975
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": -0.07548608817699644
+      },
+      {
+        "feature": "num__swan_hyperactive_impulsive_total",
+        "score": -0.05978556890161018
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": -0.0520391457604674
+      },
+      {
+        "feature": "num__swan_08",
+        "score": -0.045225778560946055
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": -0.0438950538776221
+      },
+      {
+        "feature": "num__comorbidity_count_5targets",
+        "score": -0.03475139943218521
+      },
+      {
+        "feature": "num__swan_02",
+        "score": -0.030754634193759487
+      }
+    ]
+  },
+  "HBN_SYN_003740": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__swan_total",
+        "score": 0.9616599985276669
+      },
+      {
+        "feature": "num__swan_inattention_total",
+        "score": 0.8255556463646123
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.7025284677663098
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.5465678147494987
+      },
+      {
+        "feature": "num__swan_hyperactive_impulsive_total",
+        "score": 0.44839176676207637
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 0.2830728306637366
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 0.16303877154545351
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.0922380055890294
+      },
+      {
+        "feature": "num__comorbidity_count_5targets",
+        "score": 0.06950279886437041
+      },
+      {
+        "feature": "num__cbcl_033",
+        "score": 0.04806103442310625
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__swan_14",
+        "score": -0.05220098782910289
+      },
+      {
+        "feature": "num__swan_17",
+        "score": -0.018231172944526294
+      },
+      {
+        "feature": "num__cbcl_068",
+        "score": -0.003960696082172407
+      },
+      {
+        "feature": "num__cbcl_114",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_051",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_050",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_049",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_048",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_047",
+        "score": 0.0
+      },
+      {
+        "feature": "num__ysr_046",
+        "score": 0.0
+      }
+    ]
+  }
+}

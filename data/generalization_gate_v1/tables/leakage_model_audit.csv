@@ -1,0 +1,6 @@
+domain,model_id,model_risk_level,none_count,low_count,medium_count,high_count,critical_count,overfit_class_adjusted,scope
+adhd,domain_adhd_research_full,high,486,112,0,2,0,likely_generalizing,research_extended_hybrid
+anxiety,domain_anxiety_strict_full,medium,476,75,49,0,0,likely_generalizing,strict_no_leakage_hybrid
+conduct,domain_conduct_research_full,medium,485,105,10,0,0,likely_generalizing,research_extended_hybrid
+depression,domain_depression_strict_full,medium,486,112,2,0,0,likely_generalizing,strict_no_leakage_hybrid
+elimination,domain_elimination_strict_full,low,488,112,0,0,0,suspicious_perfect_score,strict_no_leakage_hybrid

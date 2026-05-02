@@ -1,0 +1,20 @@
+{
+  "model_key": "elimination__psychologist_1_3__hybrid_final_rf_plus_maximize_metrics_v1__rf__same_inputs_v11",
+  "line": "hybrid_final_rf_plus_maximize_metrics_v1",
+  "rf_only": true,
+  "domain": "elimination",
+  "role": "psychologist",
+  "mode": "psychologist_1_3",
+  "feature_columns": [
+    "enuresis_duration_months_consecutive",
+    "encopresis_event_frequency_per_month",
+    "enuresis_nocturnal",
+    "enuresis_primary_course",
+    "encopresis_duration_months_consecutive"
+  ],
+  "recommended_threshold": 0.6799999999999999,
+  "calibration": "none",
+  "config_id": "rf_v11_recall_guarded",
+  "generated_at_utc": "2026-04-28T00:47:07.473717+00:00",
+  "note": "pipeline.joblib is local/regenerable and ignored by git policy; metadata is tracked"
+}

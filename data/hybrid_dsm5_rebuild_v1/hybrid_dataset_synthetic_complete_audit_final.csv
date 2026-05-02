@@ -1,0 +1,18 @@
+check_name,status,detail
+row_count,PASS,2400 rows generated.
+column_count,PASS,224 total columns.
+participant_id_unique,PASS,participant_id is unique.
+missing_values,PASS,Total missing cells: 0.
+clean_base_presence,PASS,All clean-base features present.
+dsm_presence,PASS,All DSM-5 features present.
+age_range,PASS,age_range
+swan_total_consistency,PASS,swan_total_consistency
+sdq_total_consistency,PASS,sdq_total_consistency
+scared_p_total_consistency,PASS,scared_p_total_consistency
+scared_sr_total_consistency,PASS,scared_sr_total_consistency
+adhd_threshold_logic,PASS,adhd_threshold_logic
+conduct_threshold_logic,PASS,conduct_threshold_logic
+elimination_type_logic,PASS,elimination_type_logic
+clean_base_mean_shift,PASS,Average abs standardized mean difference vs empirical clean-base: 0.016
+correlation_preservation,PASS,Mean abs correlation diff on anchor block: 0.010
+domain_prevalence_not_absurd,PASS,"[{'domain': 'ADHD', 'positive_rate': 0.19583333333333333}, {'domain': 'Conduct', 'positive_rate': 0.3325}, {'domain': 'Anxiety_any', 'positive_rate': 0.17916666666666667}, {'domain': 'Depression_MDD', 'positive_rate': 0.12958333333333333}, {'domain': 'Depression_DMDD', 'positive_rate': 0.028333333333333332}, {'domain': 'Depression_PDD', 'positive_rate': 0.065}, {'domain': 'Enuresis', 'positive_rate': 0.0925}, {'domain': 'Encopresis', 'positive_rate': 0.020416666666666666}, {'domain': 'Elimination_any', 'positive_rate': 0.10791666666666666}]"

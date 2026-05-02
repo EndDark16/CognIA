@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "properties": {
+    "probabilities_by_domain": {
+      "type": "object"
+    },
+    "probabilities_by_internal_unit": {
+      "type": "object"
+    },
+    "confidence_level": {
+      "type": "string"
+    },
+    "coverage_summary": {
+      "type": "object"
+    },
+    "direct_proxy_absent_summary": {
+      "type": "object"
+    },
+    "key_positive_contributors": {
+      "type": "array"
+    },
+    "key_negative_contributors": {
+      "type": "array"
+    },
+    "missing_critical_inputs": {
+      "type": "array"
+    },
+    "abstention_flag": {
+      "type": "boolean"
+    },
+    "threshold_used": {
+      "type": "object"
+    },
+    "model_version": {
+      "type": "string"
+    },
+    "recommendation_text": {
+      "type": "string"
+    },
+    "disclaimers": {
+      "type": "array"
+    }
+  }
+}

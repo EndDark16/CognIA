@@ -1,0 +1,2 @@
+shortcut_feature,rule,holdout_tn,holdout_fp,holdout_fn,holdout_tp,holdout_precision,holdout_recall,holdout_balanced_accuracy
+conduct_impairment_global,conduct_impairment_global >= 2,318,2,0,160,0.9876543209876543,1.0,0.996875

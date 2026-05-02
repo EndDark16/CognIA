@@ -1,0 +1,14 @@
+{
+  "version": "v4",
+  "active_domains": [
+    "adhd",
+    "anxiety",
+    "conduct",
+    "depression"
+  ],
+  "hold_domains": [
+    "elimination"
+  ],
+  "generated_at_utc": "2026-03-28T15:42:20.303925+00:00",
+  "note": "Domains not recovered this iteration are excluded from promotion."
+}

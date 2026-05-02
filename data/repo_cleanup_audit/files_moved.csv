@@ -1,0 +1,5 @@
+from_path,to_path,reason
+.coverage,artifacts/quality/sonar/legacy_root_snapshot_20260502/.coverage,root_cleanup_generated_artifact
+coverage.xml,artifacts/quality/sonar/legacy_root_snapshot_20260502/coverage.xml,root_cleanup_generated_artifact
+sonar_issues.csv,artifacts/quality/sonar/legacy_root_snapshot_20260502/sonar_issues.csv,root_cleanup_generated_artifact
+sonar_issues.json,artifacts/quality/sonar/legacy_root_snapshot_20260502/sonar_issues.json,root_cleanup_generated_artifact

@@ -1,0 +1,11 @@
+mode,domain,recent_delta_ba,recent_delta_pr_auc,recent_delta_brier,noise_half_ba,noise_half_pr_auc,noise_half_brier,delta_within_noise,runtime_strong_entry,stability_status,ceiling_classification,decision_rationale
+caregiver,adhd,0.009012422360248462,0.0018524856499851916,-0.0030232375793540905,0.01,0.01,0.005,True,True,stable,near_ceiling,high final BA with mixed/noisy recent deltas; additional gains likely marginal
+caregiver,anxiety,-0.0013257575757575912,-0.013505892103936601,0.002550145227073898,0.01,0.01,0.005,False,True,stable,near_ceiling,high final BA with mixed/noisy recent deltas; additional gains likely marginal
+caregiver,conduct,-0.024150485436893354,-0.002789338544477604,0.005161075697913103,0.01,0.01,0.005,False,True,stable,near_ceiling,high final BA with mixed/noisy recent deltas; additional gains likely marginal
+caregiver,depression,-0.004157131960335514,-0.008234442847172008,-0.003192884106107796,0.01,0.01,0.005,True,True,stable,ceiling_reached,recent deltas within bootstrap noise and stability acceptable
+caregiver,elimination,0.0,0.0,0.0,0.04021736024844719,0.047345360419233096,0.020539393972485886,True,False,fragile_but_bounded,near_ceiling,KEEP_V12 + structural limit + uncertainty_preferred
+psychologist,adhd,0.008236024844720413,-0.0028449443478976155,0.0010266148854405077,0.01,0.01,0.005,True,True,stable,near_ceiling,high final BA with mixed/noisy recent deltas; additional gains likely marginal
+psychologist,anxiety,-0.007575757575757569,-0.008149476006040324,0.0021991613688766,0.01,0.01,0.005,True,True,watch,marginal_room_left,only small/mixed deltas after final campaign
+psychologist,conduct,-0.027942961165048574,-0.00926709001908621,0.008677426149732603,0.01,0.01,0.005,False,True,stable,near_ceiling,high final BA with mixed/noisy recent deltas; additional gains likely marginal
+psychologist,depression,-0.01860539028731245,-0.016847958398934382,0.002658180602734095,0.01,0.01,0.005,False,True,stable,near_ceiling,high final BA with mixed/noisy recent deltas; additional gains likely marginal
+psychologist,elimination,0.0,0.0,0.0,0.03982762154636965,0.08931614688546247,0.01111378804124756,True,False,fragile_but_bounded,near_ceiling,KEEP_V12 + structural limit + uncertainty_preferred

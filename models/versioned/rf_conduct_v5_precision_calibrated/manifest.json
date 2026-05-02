@@ -1,0 +1,132 @@
+{
+  "model_version": "rf_conduct_v5_precision_calibrated",
+  "parent_version": "rf_conduct_v1_baseline",
+  "task_type": "binary",
+  "status": "completed",
+  "dataset_name": "dataset_conduct_clinical",
+  "dataset_variant": "clinical",
+  "data_scope": "strict_no_leakage",
+  "split_version": "splits_strict_no_leakage_frozen_v1",
+  "preprocessing_version": "rf_preproc_v1",
+  "seed": 42,
+  "target": "target_conduct",
+  "n_features_raw": 37,
+  "n_features_final": 26,
+  "train_rows": 1333,
+  "val_rows": 286,
+  "test_rows": 286,
+  "threshold_strategy": "precision_constrained",
+  "threshold_value": 0.438892,
+  "recall_floor": 0.7547619047619047,
+  "balanced_accuracy_tolerance": 0.03,
+  "calibration_strategy": "sigmoid",
+  "validation_metrics": {
+    "threshold": 0.438892,
+    "accuracy": 0.9370629370629371,
+    "balanced_accuracy": 0.8744145199063231,
+    "precision": 0.7857142857142857,
+    "recall": 0.7857142857142857,
+    "sensitivity": 0.7857142857142857,
+    "specificity": 0.9631147540983607,
+    "f1": 0.7857142857142857,
+    "support_negative": 244,
+    "support_positive": 42,
+    "confusion_matrix": [
+      [
+        235,
+        9
+      ],
+      [
+        9,
+        33
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.9631147540983607,
+        0.036885245901639344
+      ],
+      [
+        0.21428571428571427,
+        0.7857142857142857
+      ]
+    ],
+    "roc_auc": 0.9659445745511319,
+    "pr_auc": 0.8459305861806701,
+    "brier_score": 0.04951150740953645,
+    "fpr": 0.03688524590163933,
+    "fnr": 0.2142857142857143,
+    "prevalence": 0.14685314685314685,
+    "precision_lift_vs_baseline": 0.18253968253968256,
+    "recall_delta_vs_baseline": -0.11904761904761907,
+    "balanced_accuracy_delta_vs_baseline": -0.02673692427790797
+  },
+  "test_metrics": {
+    "threshold": 0.438892,
+    "accuracy": 0.9090909090909091,
+    "balanced_accuracy": 0.8087431693989071,
+    "precision": 0.7,
+    "recall": 0.6666666666666666,
+    "sensitivity": 0.6666666666666666,
+    "specificity": 0.9508196721311475,
+    "f1": 0.6829268292682927,
+    "support_negative": 244,
+    "support_positive": 42,
+    "confusion_matrix": [
+      [
+        232,
+        12
+      ],
+      [
+        14,
+        28
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.9508196721311475,
+        0.04918032786885246
+      ],
+      [
+        0.3333333333333333,
+        0.6666666666666666
+      ]
+    ],
+    "roc_auc": 0.9515027322404372,
+    "pr_auc": 0.7244617637546886,
+    "brier_score": 0.06168269400254068,
+    "fpr": 0.049180327868852514,
+    "fnr": 0.33333333333333337,
+    "prevalence": 0.14685314685314685,
+    "precision_lift_vs_baseline": NaN,
+    "recall_delta_vs_baseline": -0.23809523809523814,
+    "balanced_accuracy_delta_vs_baseline": -0.07806401249024197
+  },
+  "abstention_validation": {
+    "low_threshold": 0.438892,
+    "high_threshold": 0.8078947368421052,
+    "coverage": 0.8951048951048951,
+    "uncertain_rate": 0.1048951048951049,
+    "precision_high": 1.0,
+    "npv_low": 0.9631147540983607,
+    "recall_effective": 0.2857142857142857,
+    "specificity_effective": 0.9631147540983607,
+    "selection_reason": "target_precision_with_coverage",
+    "target_high_precision": 0.7031746031746031,
+    "min_confident_coverage": 0.1
+  },
+  "abstention_test": {
+    "coverage": 0.9265734265734266,
+    "uncertain_rate": 0.07342657342657342,
+    "precision_high": 0.8421052631578947,
+    "npv_low": 0.943089430894309,
+    "recall_effective": 0.38095238095238093,
+    "specificity_effective": 0.9508196721311475,
+    "confident_positive_n": 19,
+    "confident_negative_n": 246,
+    "uncertain_n": 21
+  },
+  "notes": "Clinical conduct challenger with externalizing focus and calibration.",
+  "experimental": false,
+  "created_at": "2026-03-25T20:27:43.013800+00:00"
+}

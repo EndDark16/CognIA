@@ -1,0 +1,10 @@
+component,area,current_coverage_status,evidence,risk_if_untested,priority,recommended_test_type
+core/models/predictor.py,model_runtime,missing,"No matches in tests for predictor/load_model",high,high,unit+smoke
+api/services/model_service.py,model_runtime,missing,"No tests for predict_all_probabilities",high,high,unit+integration
+api/routes/predict.py,api_inference,missing,"No tests for /api/predict contract",high,high,api_contract+integration
+artifacts/inference_v4/promotion_scope.json,scope_governance,missing,"No tests validating active/hold domains",medium,high,artifact_consistency+regression
+models/adhd_model.pkl,runtime_asset,missing,"No tests validating required runtime binary exists",high,high,artifact_smoke
+run.py + app import,runtime_boot,missing,"No smoke test for model-related app boot",medium,medium,smoke
+config/settings.py (model/inference related),config,missing,"No tests for key defaults and env overrides tied to inference",medium,medium,unit
+reports/final_closure/* scope docs,operational_consistency,missing,"No regression checks linking final scope docs and runtime scope",medium,medium,artifact_consistency
+elimination hold enforcement,scope_regression,missing,"No tests preventing accidental product activation",high,high,regression

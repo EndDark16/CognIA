@@ -1,0 +1,7 @@
+mode,role,direct_features,derived_features,engineered_features,eligible_base_features,previous_freeze_mode_count,features_lost_vs_freeze,severely_impoverished_mode
+caregiver_1_3,caregiver,49,0,9,49,49,0,no
+caregiver_2_3,caregiver,98,0,9,98,98,0,no
+caregiver_full,caregiver,127,0,9,127,147,20,no
+psychologist_1_3,psychologist,60,0,9,60,60,0,no
+psychologist_2_3,psychologist,102,0,9,102,120,18,no
+psychologist_full,psychologist,152,0,9,152,180,28,no

@@ -1,0 +1,16 @@
+{
+  "active_activations_db": 30,
+  "active_model_versions": 30,
+  "active_model_versions_non_rf": 0,
+  "missing_expected_models": 0,
+  "mismatched_feature_columns": 0,
+  "mismatched_model_key": 0,
+  "duplicate_active_domain_mode_rows": 0,
+  "runtime_artifact_paths_missing": 0,
+  "mixed_lineage_expected": "yes",
+  "active_model_lineage_mixed": "yes",
+  "dominant_source_campaign": "hybrid_global_contract_compatible_rf_champion_selection_v13",
+  "db_active_set_valid": "yes",
+  "active_selection_version": "v16",
+  "active_champions_loaded_ok": "yes"
+}

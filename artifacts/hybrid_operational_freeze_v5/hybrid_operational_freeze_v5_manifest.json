@@ -1,0 +1,8 @@
+{
+  "run_id": "hybrid_operational_freeze_v5",
+  "base_line": "hybrid_operational_freeze_v4",
+  "replacement_line": "hybrid_final_decisive_rescue_v5",
+  "replaced_pairs": 1,
+  "path": "data/hybrid_operational_freeze_v5/tables/hybrid_operational_final_champions.csv",
+  "generated_at_utc": "2026-04-23T01:28:00.573393+00:00"
+}

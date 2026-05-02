@@ -1,0 +1,8 @@
+{
+  "field_encryption_text_roundtrip_ok": true,
+  "field_encryption_json_roundtrip_ok": true,
+  "plaintext_leak_in_encrypted_text": false,
+  "plaintext_leak_in_encrypted_json": false,
+  "transport_envelope_decrypt_roundtrip_ok": true,
+  "transport_encrypted_response_ok": true
+}

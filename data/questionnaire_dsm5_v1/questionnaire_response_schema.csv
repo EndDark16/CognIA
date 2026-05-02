@@ -1,0 +1,4 @@
+response_type,allowed_values,item_count,schema_notes
+boolean,"0,1",129,Derived from normative matrix and mapping rules.
+categorical,"none,low,moderate,high,unknown",52,Derived from normative matrix and mapping rules.
+integer,0..999,2,Derived from normative matrix and mapping rules.

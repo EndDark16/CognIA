@@ -1,0 +1,2 @@
+action_id,issue_type,detected_in_phase,evidence,corrective_action,applied,status,expected_impact
+V9_NO_CORRECTIVE_CODE_CHANGE,no_confirmed_pipeline_bug,phase1_phase2,No artifact hash reuse and no split overlap violations were found.,No model/pipeline code change applied in v9; only validation diagnostics generated.,no,closed_no_action,none

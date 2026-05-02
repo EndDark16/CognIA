@@ -1,0 +1,31 @@
+domain,mode,best_single_feature,best_single_rule,best_single_feature_ba,model_balanced_accuracy,shortcut_gap_vs_model_ba,shortcut_dominance_flag
+adhd,caregiver_1_3,adhd_impairment_school,adhd_impairment_school >= 2,0.8258736633226766,0.9161338330944768,-0.09026016977180018,no
+adhd,caregiver_2_3,adhd_impairment_school,adhd_impairment_school >= 2,0.8258736633226766,0.9254767941792525,-0.0996031308565759,no
+adhd,caregiver_full,,,,0.8746003748208577,,no
+adhd,psychologist_1_3,adhd_impairment_school,adhd_impairment_school >= 2,0.8258736633226766,0.8951328409216184,-0.06925917759894173,no
+adhd,psychologist_2_3,adhd_impairment_school,adhd_impairment_school >= 2,0.8258736633226766,0.9063774666519678,-0.08050380332929119,no
+adhd,psychologist_full,,,,0.902904861647007,,no
+anxiety,caregiver_1_3,,,,0.9013693778774644,,no
+anxiety,caregiver_2_3,,,,0.9084523668988314,,no
+anxiety,caregiver_full,,,,0.9066521071892338,,no
+anxiety,psychologist_1_3,gad_difficulty_controlling_worry,gad_difficulty_controlling_worry >= 2,0.8076968480698855,0.9212312595915476,-0.1135344115216621,no
+anxiety,psychologist_2_3,,,,0.9188112383425806,,no
+anxiety,psychologist_full,sep_anx_impairment,sep_anx_impairment >= 2,0.8816845708889152,0.9099279896116161,-0.028243418722700975,no
+conduct,caregiver_1_3,,,,0.9078125,,no
+conduct,caregiver_2_3,conduct_impairment_global,conduct_impairment_global >= 2,0.9984375,0.925,0.07343749999999993,yes
+conduct,caregiver_full,,,,0.9046875,,no
+conduct,psychologist_1_3,,,,0.8859375,,no
+conduct,psychologist_2_3,,,,0.903125,,no
+conduct,psychologist_full,,,,0.9140625,,no
+depression,caregiver_1_3,mdd_impairment,mdd_impairment >= 2,0.8591739183723495,0.9273501654614535,-0.06817624708910408,no
+depression,caregiver_2_3,mdd_impairment,mdd_impairment >= 2,0.8591739183723495,0.9334477264370633,-0.07427380806471384,no
+depression,caregiver_full,,,,0.866374555705356,,no
+depression,psychologist_1_3,mdd_impairment,mdd_impairment >= 2,0.8591739183723495,0.8909486456673612,-0.03177472729501174,no
+depression,psychologist_2_3,mdd_impairment,mdd_impairment >= 2,0.8591739183723495,0.9370327245986028,-0.0778588062262533,no
+depression,psychologist_full,,,,0.8737283980880011,,no
+elimination,caregiver_1_3,enuresis_distress_impairment,enuresis_distress_impairment >= 1,0.9271207764198418,0.9294572250179727,-0.002336448598130869,yes
+elimination,caregiver_2_3,enuresis_distress_impairment,enuresis_distress_impairment >= 1,0.9271207764198418,0.9294572250179727,-0.002336448598130869,yes
+elimination,caregiver_full,enuresis_distress_impairment,enuresis_distress_impairment >= 1,0.9271207764198418,0.9294572250179727,-0.002336448598130869,yes
+elimination,psychologist_1_3,enuresis_distress_impairment,enuresis_distress_impairment >= 1,0.9271207764198418,0.9294572250179727,-0.002336448598130869,yes
+elimination,psychologist_2_3,enuresis_distress_impairment,enuresis_distress_impairment >= 1,0.9271207764198418,0.9294572250179727,-0.002336448598130869,yes
+elimination,psychologist_full,enuresis_distress_impairment,enuresis_distress_impairment >= 1,0.9271207764198418,0.9294572250179727,-0.002336448598130869,yes
