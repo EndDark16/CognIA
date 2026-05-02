@@ -132,7 +132,7 @@ def get_active_questionnaire():
 
 
 @questionnaire_v2_bp.get("/security/transport-key")
-@jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_TRANSPORT_KEY_RATE_LIMIT", "60 per minute"))
 def get_transport_key():
     try:
         payload = transport_crypto.transport_key_payload()
