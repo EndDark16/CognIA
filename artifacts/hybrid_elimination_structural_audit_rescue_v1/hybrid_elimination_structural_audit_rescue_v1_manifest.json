@@ -1,0 +1,27 @@
+{
+  "line": "hybrid_elimination_structural_audit_rescue_v1",
+  "freeze_label": "v9",
+  "generated_at": "2026-04-26T15:34:07.884324+00:00",
+  "source_active": "data\\hybrid_active_modes_freeze_v8\\tables\\hybrid_active_models_30_modes.csv",
+  "source_operational": "data\\hybrid_operational_freeze_v8\\tables\\hybrid_operational_final_champions.csv",
+  "retrained_slots": [
+    "caregiver_1_3",
+    "caregiver_2_3",
+    "caregiver_full",
+    "psychologist_1_3",
+    "psychologist_2_3",
+    "psychologist_full"
+  ],
+  "selected_champions": [
+    "elimination__caregiver_1_3__hybrid_elimination_structural_audit_rescue_v1__rf__structural_ranked_direct",
+    "elimination__caregiver_2_3__hybrid_elimination_structural_audit_rescue_v1__hgb__structural_no_top1_direct",
+    "elimination__caregiver_full__hybrid_elimination_structural_audit_rescue_v1__extra_trees__structural_no_top2_direct",
+    "elimination__psychologist_1_3__hybrid_elimination_structural_audit_rescue_v1__hgb__structural_no_top2_direct",
+    "elimination__psychologist_2_3__hybrid_elimination_structural_audit_rescue_v1__rf__structural_no_top2_direct",
+    "elimination__psychologist_full__hybrid_elimination_structural_audit_rescue_v1__extra_trees__structural_no_top2_direct"
+  ],
+  "remaining_guardrail_violations": 0,
+  "policy_violations": 0,
+  "old_prediction_pairs_identical": 15,
+  "new_prediction_pairs_identical": 0
+}

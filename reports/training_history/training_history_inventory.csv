@@ -1,0 +1,11 @@
+file,exists,rows,columns
+trial_registry.csv,1,15,14
+fold_metrics_history.csv,1,252,4
+hyperparameter_search_history.csv,1,84,5
+n_estimators_curve.csv,1,56,8
+learning_curve_history.csv,1,42,7
+threshold_sweep_history.csv,1,350,22
+calibration_history.csv,1,42,5
+model_comparison_history.csv,1,15,32
+feature_importance_history.csv,1,420,4
+permutation_importance_history.csv,1,420,5

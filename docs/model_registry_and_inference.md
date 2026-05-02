@@ -1,0 +1,183 @@
+# Model Registry and Inference (v17)
+
+## Fuente de verdad activa (v17)
+- `data/hybrid_active_modes_freeze_v17/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v17/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v17/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v17/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_domain_specialized_rf_v17/validation/v17_supabase_sync_verification.json`
+
+## Alcance operativo v17
+- 30 modelos RF especializados por dominio/modo/rol (5 dominios x 3 modos x 2 roles).
+- Sin cross-domain en inferencia primaria por slot.
+- Sin `eng_*` en el contrato funcional de features activas por slot.
+- Comorbilidad construida posterior a inferencia por dominio.
+- Claim permitido: screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+Nota de continuidad (2026-05-01, elimination v14 rescue):
+- Se ejecuto `hybrid_elimination_v14_real_anti_clone_rescue` como correccion focal Elimination-only sobre v13.
+- Se versionaron `data/hybrid_operational_freeze_v14/` y `data/hybrid_active_modes_freeze_v14/`.
+- Se corrigieron solo los 6 slots Elimination con RF-based + seleccion conjunta anti-clone real.
+- Resultado: `prediction_recomputed_slots=30/30`, `elimination_real_clone_count=0`, `all_domains_real_clone_count=0`, `artifact_duplicate_hash_count=0`, `guardrail_violations=0`, `final_audit_status=pass_with_warnings`.
+- Los otros 24 champions quedaron sin cambios respecto a v13 (ver `v14_non_elimination_unchanged_validator.csv`).
+
+Nota de continuidad (2026-04-22):
+- Se ejecuto la linea `hybrid_secondary_honest_retrain_v1` y se versionaron:
+  - `data/hybrid_operational_freeze_v3/`
+  - `data/hybrid_active_modes_freeze_v3/`
+- Resultado de esa pasada: `replaced_pairs=0` (no hubo promociones).
+- En la campana `hybrid_final_honest_improvement_v1` se promovieron 9 reemplazos honestos (foco `full/2_3` en `anxiety`, `depression`, `elimination`).
+- Cambio estructural mas relevante:
+  - `depression/psychologist_2_3` pasa de `HOLD_FOR_LIMITATION` a `PRIMARY_WITH_CAVEAT`.
+- En los reemplazos de `anxiety` y `elimination` se mantiene caveat por anomalia secundaria (>0.98), por lo que no se reclasifican como robustez limpia.
+- Nota de continuidad (2026-04-22, campana final decisiva):
+  - Se ejecuto `hybrid_final_decisive_rescue_v5`.
+  - Se versionaron `data/hybrid_operational_freeze_v5/` y `data/hybrid_active_modes_freeze_v5/`.
+  - `replaced_pairs=1` (promocion focal en `depression/caregiver_2_3`).
+  - Se recalculo `confidence_pct/confidence_band/final_operational_class` para los 30 slots bajo politica normalizada.
+  - Se genero normalizacion v2 en `data/hybrid_classification_normalization_v2/` con `policy_violations=0`.
+  - La fuente operativa efectiva pasa a `*_freeze_v5`.
+- Nota de continuidad (2026-04-22, campana final agresiva):
+  - Se ejecuto `hybrid_final_aggressive_rescue_v6`.
+  - Se versionaron `data/hybrid_operational_freeze_v6/` y `data/hybrid_active_modes_freeze_v6/`.
+  - `replaced_pairs=2` (promociones focales en `conduct/caregiver_full` y `conduct/psychologist_full`).
+  - Se ejecutaron pasadas A/B/C con weighting y variantes DSM-5 trazables sobre 18 slots priorizados.
+  - Se recalculo `confidence_pct/confidence_band/final_operational_class` para los 30 slots bajo politica normalizada.
+  - Se genero normalizacion v2 en `data/hybrid_classification_normalization_v2/` con `policy_violations=0`.
+  - La fuente operativa efectiva pasa a `*_freeze_v6`.
+- Nota de continuidad (2026-04-24, cierre guardia dura):
+  - Se aplico `hybrid_v6_quick_champion_guard_hotfix_v1` sobre `v6`.
+  - Se versionaron `data/hybrid_operational_freeze_v6_hotfix_v1/` y `data/hybrid_active_modes_freeze_v6_hotfix_v1/`.
+  - Resultado de auditoria guardia: `remaining_guard_violations=0` en las metricas vigiladas (`recall`, `specificity`, `roc_auc`, `pr_auc`).
+  - La fuente operativa efectiva pasa a `*_freeze_v6_hotfix_v1`; `*_freeze_v6` queda historico para trazabilidad.
+- Nota de continuidad (2026-04-24, coherencia de confianza):
+  - Se normalizo la comunicacion de `confidence_band/confidence_pct` en `hybrid_active_modes_freeze_v6_hotfix_v1`.
+  - Resultado: `ACTIVE_HIGH_CONFIDENCE/high=1`, `ACTIVE_MODERATE_CONFIDENCE/moderate=14`, `ACTIVE_LIMITED_USE/limited=15`.
+  - No se cambiaron champions, metricas de modelo, inputs funcionales ni outputs funcionales.
+
+- Nota de continuidad (2026-04-26, structural mode rescue v1):
+  - Se ejecuto `hybrid_structural_mode_rescue_v1` sobre la linea activa real `v6_hotfix_v1`.
+  - Se versionaron `data/hybrid_operational_freeze_v8/` y `data/hybrid_active_modes_freeze_v8/`.
+  - Se reemplazaron los 14 champions 1_3/2_3 prohibidos por modelos estructurales reentrenados; `accepted_existing_fallbacks=0`.
+  - Se aplicaron 3 rescates extra por degeneracion estructural de una sola variable: `anxiety/psychologist_full`, `elimination/caregiver_full` y `elimination/psychologist_full`.
+  - Elimination queda en subsets estructurales `structural_ranked` para sus 6 modos (42/84/126 features en caregiver y 50/101/151 en psychologist). Resultado de cierre: `blacklisted_active_final=0`, `structural_extra_rescue_final=0`, `single_feature_active_final=0`, `guardrail_violations_final=0`, `policy_violations_final=0`.
+  - La fuente operativa efectiva pasa a `*_freeze_v8`; `*_freeze_v6_hotfix_v1` queda historico para trazabilidad. Summary final activa: `ACTIVE_HIGH_CONFIDENCE/high=1`, `ACTIVE_MODERATE_CONFIDENCE/moderate=9`, `ACTIVE_LIMITED_USE/limited=20`.
+
+- Nota de continuidad (2026-04-26, elimination structural audit rescue v1 + OpenAPI fix):
+  - Se ejecuto `hybrid_elimination_structural_audit_rescue_v1` sobre la linea activa `v8`.
+  - Se versionaron `data/hybrid_operational_freeze_v9/` y `data/hybrid_active_modes_freeze_v9/`.
+  - Se demovieron los 6 champions Elimination de v8 por comportamiento clonado: `old_prediction_pairs_identical=15/15`.
+  - Se reentrenaron los 6 slots Elimination con universos directos enuresis/encopresis, sin `eng_elimination_intensity`, y con gate `recall|specificity|roc_auc|pr_auc <= 0.98`.
+  - Resultado: `remaining_guardrail_violations=0`, `policy_violations=0`, `new_prediction_pairs_identical=0/15`.
+  - Se corrigio `docs/openapi.yaml` eliminando un bloque duplicado dentro de `paths`; el spec conserva `openapi: 3.0.3` y vuelve a parsear sin duplicate mapping keys.
+  - La fuente operativa efectiva pasa a `*_freeze_v9`; `*_freeze_v8` queda historico para trazabilidad.
+
+## Registro en DB
+- `model_registry`: identidad por `active_model_id`.
+- `model_versions`: versionado, calibration/threshold/seed/n_features, artifacts.
+- `model_mode_domain_activation`: activacion final por `domain + mode_key + role`.
+- `model_metrics_snapshot`: snapshot de metricas operativas.
+- `model_artifact_registry`: localizadores de artefactos.
+- `model_confidence_registry`: `% confianza`, banda y clase operativa.
+- `model_operational_caveats`: caveats por activacion.
+
+## Resolucion de modelos en runtime
+1. Resolver `mode_key` desde `(role, mode)`.
+2. Buscar activacion activa exacta (`domain, mode_key, role`).
+3. Cargar `ModelVersion` y artefacto:
+   - `artifact_path` si existe.
+   - fallback a champion por dominio `models/champions/rf_<domain>_current/*`.
+   - deserializacion explicita con `joblib.load(...)` en runtime (`questionnaire_v2_service` y `questionnaire_runtime_service`).
+4. Construir vector por `feature_columns` (metadata) con defaults trazables.
+5. Ejecutar `predict_proba` cuando esta disponible.
+6. Si artefacto no esta disponible en runtime activo (produccion): error explicito de resolucion (`runtime_artifact_unavailable`), sin fallback heuristico.
+7. En entorno `TESTING` se permite fallback heuristico solo para no romper pruebas aisladas sin artefactos.
+
+Nota de rol operativo (2026-04-21):
+- El contrato publico de API/runtime usa `guardian` (antes `caregiver`).
+- Internamente se mantiene compatibilidad de `mode_key` historico (`caregiver_1_3`, `caregiver_2_3`, `caregiver_full`) para no romper trazabilidad ni artefactos.
+- El loader/runtime normaliza alias legacy `caregiver -> guardian`.
+
+## Estado de caveat
+- La integracion respeta 30 activaciones de producto.
+- `por_confirmar` para modelos activos debe quedar en `no` cuando la ruta canonica de artifact queda registrada en DB.
+- Claim permitido: screening/apoyo profesional en entorno simulado, no diagnostico automatico.
+
+Referencia historica preservada:
+- `data/hybrid_active_modes_freeze_v1/*`
+- `data/hybrid_operational_freeze_v1/*`
+
+- Nota de continuidad (2026-04-26, final model structural compliance v1):
+  - Se ejecuto `hybrid_final_model_structural_compliance_v1` sobre `v9`.
+  - Se versionaron `data/hybrid_operational_freeze_v10/` y `data/hybrid_active_modes_freeze_v10/`.
+  - Resultado: `target_slots_for_retrain=20`, `trials=640`, `selected_promotions=5`, `anti_clone_reverted_promotions=3`, `remaining_guardrail_violations=0`, `policy_violations=0`.
+  - Se sincronizaron flags de cuestionario v16.4 para 1_3/2_3 desde los inputs de champions finales, sin cambiar textos auditados del full (`question_text_changes=0`, `questionnaire_mode_flag_changes=68`).
+  - Se reconstruyo `feature_list_pipe` para 5 champions heredados y se endurecio el loader para limpiar activaciones antiguas por `domain/mode` antes de insertar la linea vigente.
+  - Sincronizacion Supabase/Postgres validada: `questions=146`, `active_model_activations=30`, `active_model_versions=30`, `active_model_versions_without_feature_columns=0`.
+  - La fuente operativa efectiva pasa a `*_freeze_v10`; `*_freeze_v9` queda historico para trazabilidad.
+
+- Nota de continuidad (2026-04-27, RF max real metrics v1):
+  - Se ejecuto `hybrid_rf_max_real_metrics_v1` sobre `v10`.
+  - Se versionaron `data/hybrid_operational_freeze_v11/` y `data/hybrid_active_modes_freeze_v11/`.
+  - La linea final queda RF-only para 30/30 slots, con los mismos `feature_list_pipe` de v10, sin cambios de cuestionario y con gate duro `recall|specificity|roc_auc|pr_auc <= 0.98`.
+  - Resultado agregado vs v10: F1 medio estable (`+0.00006`), recall medio `+0.01053`, BA media `+0.00357`, precision media `-0.00787`, Brier medio `+0.00483`; 13 slots quedan documentados como regresion honesta frente al champion anterior por mandato RF-only.
+  - Sincronizacion Supabase/Postgres validada tras `load-all`: `active_model_activations=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`; evidencia en `data/hybrid_rf_max_real_metrics_v1/supabase_sync/supabase_sync_verification_v11.json`.
+  - La fuente operativa efectiva pasa a `*_freeze_v11`; `*_freeze_v10` queda historico para trazabilidad.
+- Nota de continuidad (2026-04-27, final RF-plus maximize metrics v1):
+  - Se ejecuto `hybrid_final_rf_plus_maximize_metrics_v1` sobre `v11`.
+  - Se versionaron `data/hybrid_operational_freeze_v12/` y `data/hybrid_active_modes_freeze_v12/`.
+  - La linea final mantiene RandomForestClassifier como base obligatoria para 30/30 slots, conserva los mismos `feature_list_pipe` de v11, no modifica cuestionario ni outputs funcionales y deja `recall|specificity|roc_auc|pr_auc <= 0.98`.
+  - Resultado agregado vs v11: F1 medio `+0.003995`, recall medio `-0.005088`, precision media `+0.011399`, BA media `-0.000095`, Brier medio `-0.001543`; 29/30 slots mejoran o empatan F1.
+  - Anti-clonado en Elimination selecciono una alternativa mas conservadora para `elimination/psychologist_full`; la regresion F1 puntual (`-0.007003`) queda aceptada por control de comportamiento no clonado.
+  - Sincronizacion Supabase/Postgres validada tras `load-all`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`; evidencia en `data/hybrid_final_rf_plus_maximize_metrics_v1/supabase_sync/supabase_sync_verification_v12.json`.
+  - La fuente operativa efectiva pasa a `*_freeze_v12`; `*_freeze_v11` queda historico para trazabilidad.
+
+
+- Nota de continuidad (2026-04-29, global contract-compatible RF champion selection v13):
+  - Se ejecuto `hybrid_global_contract_compatible_rf_champion_selection_v13` como correccion de seleccion de champions, sin nueva campana de entrenamiento.
+  - Se versionaron `data/hybrid_operational_freeze_v13/` y `data/hybrid_active_modes_freeze_v13/`.
+  - Regla aplicada solo a champions: elegir el mejor RF-based conocido por slot entre v11/v12/historicos si conserva contrato exacto de `feature_list_pipe`, orden de columnas, threshold, metricas comparables y metadata activable.
+  - Resultado: `selected_from_v11=17`, `selected_from_v12=13`, `active_rows=30`, `rf_rows=30`, `guardrail_violations=0`, `policy_violations=0`, `near_clone_proxy_pairs=0`.
+  - La fuente operativa efectiva pasa a `*_freeze_v13`; `*_freeze_v12` queda historico para trazabilidad.
+  - Supabase/Postgres sincronizado tras `load-all`: `active_activations_db=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`; evidencia en `data/hybrid_global_contract_compatible_rf_champion_selection_v13/supabase_sync/supabase_sync_verification_v13.json`.
+
+
+## Nota de actualizacion (2026-05-01) - v15
+- Defaults del loader v2 actualizados a:
+  - `data/hybrid_active_modes_freeze_v15/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_operational_freeze_v15/tables/hybrid_operational_final_champions.csv`
+- Fix de robustez en sync de metricas:
+  - `metrics_json` se persiste con sanitizacion JSON-safe (`NaN/inf` convertidos a `null`) para compatibilidad PostgreSQL JSON.
+- Implicacion:
+  - `bootstrap_questionnaire_backend_v2.py load-all` ya no falla por `invalid input syntax for type json` en `model_metrics_snapshot`.
+## Nota de actualizacion (2026-05-01) - v16 final clean champion resolution
+- Defaults del loader v2 actualizados a:
+  - `data/hybrid_active_modes_freeze_v16/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_operational_freeze_v16/tables/hybrid_operational_final_champions.csv`
+- Semantica de seleccion final:
+  - `selection_version_final=v16` puede coexistir con `source_campaign` mixto por champion cuando el set activo reutiliza modelos RF historicos contract-compatible.
+  - Esto es esperado (`mixed_lineage_by_design=yes`) y no implica error mientras la integridad del set activo en DB sea valida (`active_activations=30`, `active_model_versions=30`, `non_rf=0`, sin duplicados ni mismatch de feature columns).
+
+## Nota de actualizacion (2026-05-01) - runtime hardening v17
+- Se mantiene linea activa de modelos en `v16`.
+- Cambio de runtime:
+  - Para champions activos, `questionnaire_v2_service` ya no cae a fallback heuristico fuera de `TESTING`.
+  - Si artifact activo no existe o no puede ejecutar `predict_proba`, se levanta error explicito de resolucion runtime.
+- Validacion operativa de artifacts:
+  - `scripts/run_runtime_artifact_validation_v17.py`
+  - `data/hybrid_runtime_artifact_validation_v17/validation/runtime_artifact_validator_v17.json`
+- Transporte cifrado sensible:
+  - Endpoint de clave publica: `GET /api/v2/security/transport-key`.
+  - Endpoints sensibles cifrados: `sessions`, `answers`, `submit`, `results-secure`, `clinical-summary`.
+  - En produccion, plaintext puede ser rechazado segun politica (`COGNIA_TRANSPORT_PAYLOAD_ENCRYPTION` + enforcement).
+
+## Nota de actualizacion (2026-05-02) - activacion de modelos v17
+- Defaults de loader v2 actualizados a:
+  - `data/hybrid_active_modes_freeze_v17/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_operational_freeze_v17/tables/hybrid_operational_final_champions.csv`
+- Sync DB confirmado:
+  - `active_activations_db=30`, `active_model_versions=30`, `non_rf=0`,
+  - `missing_expected_models=0`, `mismatched_feature_columns=0`, `duplicate_active_domain_mode_rows=0`.
+- Politica de aceptacion:
+  - `high_separability_alert` no implica rechazo automatico.
+  - Se acepta `pass_high_separability_validated` cuando auditoria tecnica descarta leakage/proxy/contaminacion/clonado y la generalizacion es estable.

@@ -1,0 +1,2 @@
+"model_id,domain,path,sha256,size_bytes,runtime_required,keep_in_repo,notes"
+"runtime_adhd_v1,adhd,models/adhd_model.pkl,FB1AF72ECEBD6BCB033B77AEA6C34EC2A889E333466C038F8D6AC1767B8BB4BE,821145,yes,yes,Modelo minimo requerido por API actual"

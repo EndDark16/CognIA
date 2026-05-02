@@ -1,0 +1,107 @@
+{
+  "model_version": "rf_conduct_v2_externalizing_focus",
+  "parent_version": "rf_conduct_v1_baseline",
+  "task_type": "binary",
+  "status": "completed",
+  "dataset_name": "dataset_conduct_clinical",
+  "dataset_variant": "clinical",
+  "data_scope": "strict_no_leakage",
+  "split_version": "splits_strict_no_leakage_frozen_v1",
+  "preprocessing_version": "rf_preproc_v1",
+  "seed": 42,
+  "target": "target_conduct",
+  "n_features_raw": 37,
+  "n_features_final": 28,
+  "train_rows": 1333,
+  "val_rows": 286,
+  "test_rows": 286,
+  "best_params": {
+    "model__n_estimators": 150,
+    "model__min_samples_split": 10,
+    "model__min_samples_leaf": 4,
+    "model__max_features": "log2",
+    "model__max_depth": 10,
+    "model__class_weight": "balanced_subsample"
+  },
+  "search_meta": {
+    "best_cv_balanced_accuracy": 0.8559570774981395,
+    "cv_splits": 3,
+    "n_iter": 10
+  },
+  "threshold_strategy": "youden_j",
+  "threshold_value": 0.39653526784443116,
+  "calibration_strategy": "sigmoid",
+  "validation_metrics": {
+    "threshold": 0.39653526784443116,
+    "accuracy": 0.9440559440559441,
+    "balanced_accuracy": 0.90807962529274,
+    "precision": 0.782608695652174,
+    "recall": 0.8571428571428571,
+    "sensitivity": 0.8571428571428571,
+    "specificity": 0.9590163934426229,
+    "f1": 0.8181818181818182,
+    "support_negative": 244,
+    "support_positive": 42,
+    "confusion_matrix": [
+      [
+        234,
+        10
+      ],
+      [
+        6,
+        36
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.9590163934426229,
+        0.040983606557377046
+      ],
+      [
+        0.14285714285714285,
+        0.8571428571428571
+      ]
+    ],
+    "roc_auc": 0.9639929742388759,
+    "pr_auc": 0.8364709684853061,
+    "brier_score": 0.0500869512710615
+  },
+  "test_metrics": {
+    "threshold": 0.39653526784443116,
+    "accuracy": 0.9090909090909091,
+    "balanced_accuracy": 0.8481654957064793,
+    "precision": 0.6666666666666666,
+    "recall": 0.7619047619047619,
+    "sensitivity": 0.7619047619047619,
+    "specificity": 0.9344262295081968,
+    "f1": 0.7111111111111111,
+    "support_negative": 244,
+    "support_positive": 42,
+    "confusion_matrix": [
+      [
+        228,
+        16
+      ],
+      [
+        10,
+        32
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.9344262295081968,
+        0.06557377049180328
+      ],
+      [
+        0.23809523809523808,
+        0.7619047619047619
+      ]
+    ],
+    "roc_auc": 0.952576112412178,
+    "pr_auc": 0.7441460052786694,
+    "brier_score": 0.060628482916932645
+  },
+  "notes": "Externalizing-focused conduct feature subset (ICUT/ARI/CBCL/SDQ emphasis).",
+  "experimental": false,
+  "created_at": "2026-03-24T03:19:25.922898+00:00"
+}

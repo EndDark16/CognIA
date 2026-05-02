@@ -1,0 +1,459 @@
+{
+  "summary": {
+    "model_id": "master_multilabel_ready__research_extended",
+    "dataset_name": "master_multilabel_ready",
+    "version": "research_extended",
+    "n_rows": 1905,
+    "n_features": 813,
+    "subset_accuracy_val": 0.6188811188811189,
+    "subset_accuracy_test": 0.5979020979020979,
+    "hamming_loss_test": 0.1,
+    "micro_f1_test": 0.8,
+    "macro_f1_test": 0.6138397689840814,
+    "weighted_f1_test": 0.7636410002185657,
+    "search_meta": {
+      "source": "strict_reuse",
+      "n_iter": 0
+    },
+    "best_params": {
+      "model__estimator__n_estimators": 150,
+      "model__estimator__min_samples_split": 5,
+      "model__estimator__min_samples_leaf": 4,
+      "model__estimator__max_features": "sqrt",
+      "model__estimator__max_depth": 10,
+      "model__estimator__class_weight": null
+    },
+    "artifact_pipeline_path": "artifacts\\models\\multilabel\\master_multilabel_ready__research_extended\\pipeline.joblib",
+    "artifact_metadata_path": "artifacts\\models\\multilabel\\master_multilabel_ready__research_extended\\metadata.json",
+    "manifest_exists": true,
+    "figure_count": 15
+  },
+  "validation_metrics": {
+    "subset_accuracy": 0.6188811188811189,
+    "hamming_loss": 0.09230769230769231,
+    "micro_precision": 0.8905775075987842,
+    "micro_recall": 0.7532133676092545,
+    "micro_f1": 0.8161559888579387,
+    "macro_precision": 0.6828954309083726,
+    "macro_recall": 0.5759032840722496,
+    "macro_f1": 0.6200983045341639,
+    "weighted_precision": 0.809847171192042,
+    "weighted_recall": 0.7532133676092545,
+    "weighted_f1": 0.7775048935093725,
+    "per_label": [
+      {
+        "threshold": 0.5,
+        "accuracy": 0.8986013986013986,
+        "balanced_accuracy": 0.7434621389539422,
+        "precision": 0.7096774193548387,
+        "recall": 0.5238095238095238,
+        "sensitivity": 0.5238095238095238,
+        "specificity": 0.9631147540983607,
+        "f1": 0.6027397260273972,
+        "support_negative": 244,
+        "support_positive": 42,
+        "confusion_matrix": [
+          [
+            235,
+            9
+          ],
+          [
+            20,
+            22
+          ]
+        ],
+        "normalized_confusion_matrix": [
+          [
+            0.9631147540983607,
+            0.036885245901639344
+          ],
+          [
+            0.47619047619047616,
+            0.5238095238095238
+          ]
+        ],
+        "roc_auc": 0.9399882903981265,
+        "pr_auc": 0.7474190854514241,
+        "brier_score": 0.0665058009945805,
+        "target": "target_conduct"
+      },
+      {
+        "threshold": 0.5,
+        "accuracy": 0.9335664335664335,
+        "balanced_accuracy": 0.9330357142857143,
+        "precision": 0.9433962264150944,
+        "recall": 0.9375,
+        "sensitivity": 0.9375,
+        "specificity": 0.9285714285714286,
+        "f1": 0.9404388714733543,
+        "support_negative": 126,
+        "support_positive": 160,
+        "confusion_matrix": [
+          [
+            117,
+            9
+          ],
+          [
+            10,
+            150
+          ]
+        ],
+        "normalized_confusion_matrix": [
+          [
+            0.9285714285714286,
+            0.07142857142857142
+          ],
+          [
+            0.0625,
+            0.9375
+          ]
+        ],
+        "roc_auc": 0.9801587301587302,
+        "pr_auc": 0.9840377108314509,
+        "brier_score": 0.058913196077141544,
+        "target": "target_adhd"
+      },
+      {
+        "threshold": 0.5,
+        "accuracy": 0.8846153846153846,
+        "balanced_accuracy": 0.5,
+        "precision": 0.0,
+        "recall": 0.0,
+        "sensitivity": 0.0,
+        "specificity": 1.0,
+        "f1": 0.0,
+        "support_negative": 253,
+        "support_positive": 33,
+        "confusion_matrix": [
+          [
+            253,
+            0
+          ],
+          [
+            33,
+            0
+          ]
+        ],
+        "normalized_confusion_matrix": [
+          [
+            1.0,
+            0.0
+          ],
+          [
+            1.0,
+            0.0
+          ]
+        ],
+        "roc_auc": 0.757935082045754,
+        "pr_auc": 0.38819874478505745,
+        "brier_score": 0.09224056912845648,
+        "target": "target_elimination"
+      },
+      {
+        "threshold": 0.5,
+        "accuracy": 0.8706293706293706,
+        "balanced_accuracy": 0.8663105590062112,
+        "precision": 0.8666666666666667,
+        "recall": 0.832,
+        "sensitivity": 0.832,
+        "specificity": 0.9006211180124224,
+        "f1": 0.8489795918367347,
+        "support_negative": 161,
+        "support_positive": 125,
+        "confusion_matrix": [
+          [
+            145,
+            16
+          ],
+          [
+            21,
+            104
+          ]
+        ],
+        "normalized_confusion_matrix": [
+          [
+            0.9006211180124224,
+            0.09937888198757763
+          ],
+          [
+            0.168,
+            0.832
+          ]
+        ],
+        "roc_auc": 0.9489192546583851,
+        "pr_auc": 0.9340061823876147,
+        "brier_score": 0.0936944070504554,
+        "target": "target_anxiety"
+      },
+      {
+        "threshold": 0.5,
+        "accuracy": 0.951048951048951,
+        "balanced_accuracy": 0.7892123976922045,
+        "precision": 0.8947368421052632,
+        "recall": 0.5862068965517241,
+        "sensitivity": 0.5862068965517241,
+        "specificity": 0.9922178988326849,
+        "f1": 0.7083333333333334,
+        "support_negative": 257,
+        "support_positive": 29,
+        "confusion_matrix": [
+          [
+            255,
+            2
+          ],
+          [
+            12,
+            17
+          ]
+        ],
+        "normalized_confusion_matrix": [
+          [
+            0.9922178988326849,
+            0.007782101167315175
+          ],
+          [
+            0.41379310344827586,
+            0.5862068965517241
+          ]
+        ],
+        "roc_auc": 0.9641754997987388,
+        "pr_auc": 0.8219976771436669,
+        "brier_score": 0.04429194501683994,
+        "target": "target_depression"
+      }
+    ]
+  },
+  "test_metrics": {
+    "subset_accuracy": 0.5979020979020979,
+    "hamming_loss": 0.1,
+    "micro_precision": 0.8719512195121951,
+    "micro_recall": 0.7390180878552972,
+    "micro_f1": 0.8,
+    "macro_precision": 0.6829037744725509,
+    "macro_recall": 0.5761761006289309,
+    "macro_f1": 0.6138397689840814,
+    "weighted_precision": 0.8008945881749633,
+    "weighted_recall": 0.7390180878552972,
+    "weighted_f1": 0.7636410002185657,
+    "per_label": [
+      {
+        "threshold": 0.5,
+        "accuracy": 0.916083916083916,
+        "balanced_accuracy": 0.8256097560975609,
+        "precision": 0.7,
+        "recall": 0.7,
+        "sensitivity": 0.7,
+        "specificity": 0.9512195121951219,
+        "f1": 0.7,
+        "support_negative": 246,
+        "support_positive": 40,
+        "confusion_matrix": [
+          [
+            234,
+            12
+          ],
+          [
+            12,
+            28
+          ]
+        ],
+        "normalized_confusion_matrix": [
+          [
+            0.9512195121951219,
+            0.04878048780487805
+          ],
+          [
+            0.3,
+            0.7
+          ]
+        ],
+        "roc_auc": 0.9528455284552845,
+        "pr_auc": 0.7908138274827782,
+        "brier_score": 0.05962225882805834,
+        "target": "target_conduct"
+      },
+      {
+        "threshold": 0.5,
+        "accuracy": 0.8881118881118881,
+        "balanced_accuracy": 0.8898628237508047,
+        "precision": 0.9205298013245033,
+        "recall": 0.8742138364779874,
+        "sensitivity": 0.8742138364779874,
+        "specificity": 0.905511811023622,
+        "f1": 0.896774193548387,
+        "support_negative": 127,
+        "support_positive": 159,
+        "confusion_matrix": [
+          [
+            115,
+            12
+          ],
+          [
+            20,
+            139
+          ]
+        ],
+        "normalized_confusion_matrix": [
+          [
+            0.905511811023622,
+            0.09448818897637795
+          ],
+          [
+            0.12578616352201258,
+            0.8742138364779874
+          ]
+        ],
+        "roc_auc": 0.9579062051205863,
+        "pr_auc": 0.9682939666983769,
+        "brier_score": 0.08236507243529312,
+        "target": "target_adhd"
+      },
+      {
+        "threshold": 0.5,
+        "accuracy": 0.8846153846153846,
+        "balanced_accuracy": 0.5,
+        "precision": 0.0,
+        "recall": 0.0,
+        "sensitivity": 0.0,
+        "specificity": 1.0,
+        "f1": 0.0,
+        "support_negative": 253,
+        "support_positive": 33,
+        "confusion_matrix": [
+          [
+            253,
+            0
+          ],
+          [
+            33,
+            0
+          ]
+        ],
+        "normalized_confusion_matrix": [
+          [
+            1.0,
+            0.0
+          ],
+          [
+            1.0,
+            0.0
+          ]
+        ],
+        "roc_auc": 0.7333812432626662,
+        "pr_auc": 0.30096944089147093,
+        "brier_score": 0.09352776278015028,
+        "target": "target_elimination"
+      },
+      {
+        "threshold": 0.5,
+        "accuracy": 0.8706293706293706,
+        "balanced_accuracy": 0.8672049689440994,
+        "precision": 0.860655737704918,
+        "recall": 0.84,
+        "sensitivity": 0.84,
+        "specificity": 0.8944099378881988,
+        "f1": 0.8502024291497976,
+        "support_negative": 161,
+        "support_positive": 125,
+        "confusion_matrix": [
+          [
+            144,
+            17
+          ],
+          [
+            20,
+            105
+          ]
+        ],
+        "normalized_confusion_matrix": [
+          [
+            0.8944099378881988,
+            0.10559006211180125
+          ],
+          [
+            0.16,
+            0.84
+          ]
+        ],
+        "roc_auc": 0.9513540372670808,
+        "pr_auc": 0.9477631411274815,
+        "brier_score": 0.08835666828460906,
+        "target": "target_anxiety"
+      },
+      {
+        "threshold": 0.5,
+        "accuracy": 0.9405594405594405,
+        "balanced_accuracy": 0.7313802083333334,
+        "precision": 0.9333333333333333,
+        "recall": 0.4666666666666667,
+        "sensitivity": 0.4666666666666667,
+        "specificity": 0.99609375,
+        "f1": 0.6222222222222222,
+        "support_negative": 256,
+        "support_positive": 30,
+        "confusion_matrix": [
+          [
+            255,
+            1
+          ],
+          [
+            16,
+            14
+          ]
+        ],
+        "normalized_confusion_matrix": [
+          [
+            0.99609375,
+            0.00390625
+          ],
+          [
+            0.5333333333333333,
+            0.4666666666666667
+          ]
+        ],
+        "roc_auc": 0.9481770833333334,
+        "pr_auc": 0.7741306200523894,
+        "brier_score": 0.051882735446371724,
+        "target": "target_depression"
+      }
+    ]
+  },
+  "removed_columns": {
+    "participant_id": "meta",
+    "diag_clinician_n_diagnoses": "post_diagnostic_pattern",
+    "diag_diagnosis_ksads_d_adhd_present": "post_diagnostic_pattern",
+    "diag_diagnosis_ksads_d_interview_complete": "post_diagnostic_pattern",
+    "diag_diagnosis_ksads_d_respondent": "post_diagnostic_pattern",
+    "diag_diagnosis_ksads_p_adhd_present": "post_diagnostic_pattern",
+    "diag_diagnosis_ksads_p_interview_complete": "post_diagnostic_pattern",
+    "diag_diagnosis_ksads_p_respondent": "post_diagnostic_pattern",
+    "diag_diagnosis_ksads_t_adhd_present": "post_diagnostic_pattern",
+    "diag_diagnosis_ksads_t_interview_complete": "post_diagnostic_pattern",
+    "diag_diagnosis_ksads_t_respondent": "post_diagnostic_pattern",
+    "target_conduct": "target_column",
+    "target_adhd": "target_column",
+    "target_elimination": "target_column",
+    "target_anxiety": "target_column",
+    "target_depression": "target_column",
+    "n_diagnoses": "post_diagnostic_pattern",
+    "has_any_target_disorder": "post_diagnostic_pattern",
+    "label_pattern": "post_diagnostic_pattern"
+  },
+  "figure_paths": {
+    "target_conduct_roc": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_conduct_roc.png",
+    "target_conduct_pr": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_conduct_pr.png",
+    "target_conduct_cm": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_conduct_cm_norm.png",
+    "target_adhd_roc": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_adhd_roc.png",
+    "target_adhd_pr": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_adhd_pr.png",
+    "target_adhd_cm": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_adhd_cm_norm.png",
+    "target_elimination_roc": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_elimination_roc.png",
+    "target_elimination_pr": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_elimination_pr.png",
+    "target_elimination_cm": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_elimination_cm_norm.png",
+    "target_anxiety_roc": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_anxiety_roc.png",
+    "target_anxiety_pr": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_anxiety_pr.png",
+    "target_anxiety_cm": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_anxiety_cm_norm.png",
+    "target_depression_roc": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_depression_roc.png",
+    "target_depression_pr": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_depression_pr.png",
+    "target_depression_cm": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\reports\\figures\\master_multilabel_ready__research_extended\\master_multilabel_ready__research_extended_target_depression_cm_norm.png"
+  }
+}

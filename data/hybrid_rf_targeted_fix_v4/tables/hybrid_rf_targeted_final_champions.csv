@@ -1,0 +1,6 @@
+domain,champion_mode,champion_role,champion_decision,champion_source_line,precision,recall,balanced_accuracy,pr_auc,brier
+adhd,psychologist_full,psychologist,CARRY_FORWARD_V3,v3_carry_forward,0.9484536082474226,0.9787234042553192,0.9828850181898356,0.9808743934303844,0.0106475817578793
+anxiety,caregiver_2_3,caregiver,PROMOTE_WITH_CAVEAT,v4_targeted,0.9506172839506173,0.8953488372093024,0.9425982764726715,0.9401752429816774,0.01995237273790314
+conduct,psychologist_2_3,psychologist,CARRY_FORWARD_V3,v3_carry_forward,1.0,1.0,1.0,1.0,0.0006574820874469
+depression,psychologist_2_3,psychologist,PROMOTE_WITH_CAVEAT,v4_targeted,0.8918918918918919,0.8048780487804879,0.8923887731339626,0.8795058636783943,0.043644181809701234
+elimination,psychologist_2_3,psychologist,CEILING_CONFIRMED_NO_MATERIAL_GAIN,v4_targeted,0.9811320754716981,1.0,0.9988317757009346,1.0,0.0008869532963330752

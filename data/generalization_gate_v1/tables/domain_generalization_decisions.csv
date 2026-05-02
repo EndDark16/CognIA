@@ -1,0 +1,6 @@
+domain,best_generalizing_model,recommended_operating_mode,probability_output_ready,explanation_output_ready,product_ready,thesis_ready,main_risk
+adhd,domain_adhd_research_full,precise,True,True,False,False,possible_leakage_model
+anxiety,retrained_anxiety_anti_overfit_v1,precise,True,True,True,True,accepted_but_experimental
+conduct,domain_conduct_research_full,precise,True,True,True,True,accepted_but_experimental
+depression,domain_depression_strict_full,precise,True,True,True,True,accepted_but_experimental
+elimination,domain_elimination_strict_full,precise,True,True,False,False,high_risk_of_overfit

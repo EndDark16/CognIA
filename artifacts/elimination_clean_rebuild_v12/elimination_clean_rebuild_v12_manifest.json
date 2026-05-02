@@ -1,0 +1,54 @@
+{
+  "campaign": "elimination_clean_rebuild_v12",
+  "final_decision": "APPROVE_V12_WITH_CAVEAT",
+  "split_dir": "C:\\Users\\andre\\Documents\\Workspace Academic\\Backend Tesis\\cognia_app\\data\\processed_hybrid_dsm5_v2\\splits\\domain_elimination_strict_full",
+  "holdout_hash_ordered": "9529927227be7db57bfc27568de0e2cc43b9195a635c2f47559f15068fa0fe4a",
+  "holdout_hash_set": "be5c57d800b8da9a394599b21e324eeb07813cac1e2898e7f1e8e1edb5ab7b38",
+  "forbidden_signals": [
+    "cbcl_108",
+    "cbcl_112",
+    "shortcut_rule_cbcl108_or_cbcl112",
+    "v11_core_all_present",
+    "v11_core_balance_diff",
+    "v11_core_mean",
+    "v11_core_missing_count",
+    "v11_core_sum",
+    "v11_parent_nonmissing_ratio",
+    "v11_subtype_encopresis_proxy",
+    "v11_subtype_enuresis_proxy",
+    "v11_subtype_gap_proxy"
+  ],
+  "selected_models": {
+    "caregiver": {
+      "feature_set": "compact_clinical_clean",
+      "family": "rf",
+      "n_features": 21,
+      "threshold": 0.36000000000000004,
+      "calibration": "isotonic"
+    },
+    "psychologist": {
+      "feature_set": "compact_clinical_clean",
+      "family": "rf",
+      "n_features": 24,
+      "threshold": 0.37500000000000006,
+      "calibration": "isotonic"
+    }
+  },
+  "confidence_display_policy": {
+    "internal_raw_probability_preserved": true,
+    "user_visible": {
+      "min": 0.01,
+      "max": 0.99
+    },
+    "professional_visible": {
+      "min": 0.005,
+      "max": 0.995
+    }
+  },
+  "extreme_performance_audit_trigger": {
+    "balanced_accuracy_ge": 0.995,
+    "precision_eq": 1.0,
+    "recall_eq": 1.0,
+    "specificity_eq": 1.0
+  }
+}

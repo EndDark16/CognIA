@@ -1,0 +1,159 @@
+{
+  "campaign_line": "hybrid_rf_targeted_fix_v4",
+  "generated_at_utc": "2026-04-13T06:16:39.143332+00:00",
+  "dataset_path": "data/hybrid_dsm5_rebuild_v1/hybrid_dataset_synthetic_complete_final.csv",
+  "targeted_candidates": [
+    "depression/caregiver_1_3",
+    "depression/caregiver_2_3",
+    "depression/caregiver_full",
+    "depression/psychologist_1_3",
+    "depression/psychologist_2_3",
+    "depression/psychologist_full",
+    "adhd/caregiver_1_3",
+    "adhd/caregiver_2_3",
+    "adhd/psychologist_1_3",
+    "adhd/psychologist_2_3",
+    "elimination/caregiver_1_3",
+    "elimination/psychologist_1_3",
+    "elimination/caregiver_2_3",
+    "elimination/psychologist_2_3",
+    "anxiety/caregiver_1_3",
+    "anxiety/caregiver_2_3",
+    "anxiety/caregiver_full"
+  ],
+  "candidates_audited_count": 17,
+  "fits_total": 980,
+  "trees_total": 311700,
+  "generated_files": [
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/ablation/hybrid_rf_targeted_ablation.csv",
+      "sha256": "654a6ae4c126b51891c4a09e27e0b88640633f6e20fe712f73d919e08f422948",
+      "bytes": 37147
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/bootstrap/hybrid_rf_targeted_bootstrap_intervals.csv",
+      "sha256": "3f469f262760694f3ff0829056d4841559d0bcdc70c62c2b7c9fe2df582de4aa",
+      "bytes": 7109
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/calibration/hybrid_rf_targeted_calibration.csv",
+      "sha256": "36f767ed84aa817833b59d4721df8af10b4e4effdb4842b2f6e062b91aab6f53",
+      "bytes": 60036
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/feature_selection/hybrid_rf_targeted_feature_selection.csv",
+      "sha256": "405d9171190e68473c38f8e295db0aadd733e682550c167dfd85c17aae89fe96",
+      "bytes": 166346
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/inventory/hybrid_rf_targeted_fix_inventory.csv",
+      "sha256": "56e6d7f12ab1577e23b5b9909cab60a967adca6dbc5f6d7785bff3acee8a592f",
+      "bytes": 3888
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/inventory/hybrid_rf_targeted_fix_inventory.md",
+      "sha256": "8ee65fb907961bd397e88edd97317659bce060347402352e974823689f78773f",
+      "bytes": 4119
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/reports/hybrid_rf_targeted_ceiling_decision.md",
+      "sha256": "481054e9ff81b746625a8a4af064af666641b544332681d98c19ef09fbbbe201",
+      "bytes": 2316
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/reports/hybrid_rf_targeted_consolidated_analysis.md",
+      "sha256": "b5d59f0525a21f5ea745ee98cf3a82c6d51462633566286a30213c8a3dd1d948",
+      "bytes": 2842
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/reports/hybrid_rf_targeted_executive_summary.md",
+      "sha256": "3e5e307d4bb7b2654de2057d460cedd1b254141b15f4a04f078a65cd71d43e9a",
+      "bytes": 8453
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/reports/hybrid_rf_targeted_feature_strategy.md",
+      "sha256": "1087d926e88978b5e21f49f5697f1e7aa1f4c721c7670fdbb75ffd510fab099d",
+      "bytes": 10945
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/reports/hybrid_rf_targeted_generalization_audit.md",
+      "sha256": "4c4c10b7ee4a7b3b249ea9ddd37b0d59ac17f568eff53da3bb19162f81189bb5",
+      "bytes": 2652
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/reports/hybrid_rf_targeted_overfitting_audit.md",
+      "sha256": "e371eb1e94e4b15524b8722c80110fd53079200aeec213bf9ea1e95b0bf9ab14",
+      "bytes": 2107
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/stability/hybrid_rf_targeted_seed_stability.csv",
+      "sha256": "75916725ab9ebb97e61378853544e9b4e5031e0862d468a19a5ccc97cfa1fb34",
+      "bytes": 17626
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/stress/hybrid_rf_targeted_stress.csv",
+      "sha256": "b2ff802c030868b03081d8cbcd5b7f0e430ccb1c6dae4c9864c68aca65b10944",
+      "bytes": 39393
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/tables/domain_target_registry.csv",
+      "sha256": "ed21207f669a93353179663bbd9c1f51c32660c5f35e2350d63463b6b80352f8",
+      "bytes": 373
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/tables/hybrid_rf_candidate_stability_summary.csv",
+      "sha256": "83df5adc080b3de3da56c66b5e14d007aa46e7e23aafa3d5d74be49c5f7568c4",
+      "bytes": 3082
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/tables/hybrid_rf_targeted_decisions.csv",
+      "sha256": "bb588991e9aff83c18c022f54e41f85d16a52993d4d87676bc241598035f7561",
+      "bytes": 22914
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/tables/hybrid_rf_targeted_dsm5_vs_cleanbase.csv",
+      "sha256": "c83abc2633a21465f54c107113ca8d189ed6f0723ff7298656c507cdf6c848c3",
+      "bytes": 7538
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/tables/hybrid_rf_targeted_final_champions.csv",
+      "sha256": "7874779196722f11f86312fca9c87b04fe0abbe5eb6e250575fd8652f0d139de",
+      "bytes": 887
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/tables/hybrid_rf_targeted_operating_points.csv",
+      "sha256": "dadbfd7fcc7bca4b50f6a72a08c682d71a90e8cc5df0a1d1815d7c7ce1bf9ead",
+      "bytes": 46337
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/tables/hybrid_rf_targeted_ranked_candidates.csv",
+      "sha256": "e4c6907d32020e69da7f2ac7481fbbdad242b9b225cb036ed556f4743c34d8ca",
+      "bytes": 21769
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/tables/mode_feature_coverage_matrix.csv",
+      "sha256": "e254c551549b52b1c8dd70447886a1d7cde5b9910160380e8b6fd90f1301e99e",
+      "bytes": 336
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/tables/split_registry.csv",
+      "sha256": "1a956cffe395bdb5516fdccd246dcd14fa9f578bda3895bcec571e326875a9a2",
+      "bytes": 3006
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/thresholds/hybrid_rf_targeted_thresholds.csv",
+      "sha256": "dadbfd7fcc7bca4b50f6a72a08c682d71a90e8cc5df0a1d1815d7c7ce1bf9ead",
+      "bytes": 46337
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/trials/hybrid_rf_targeted_fix_trial_metrics_full.csv",
+      "sha256": "28c1e979dfe6336f424395de4d7b354ffcd70d283b1d5bce8803ba93ec380035",
+      "bytes": 1554238
+    },
+    {
+      "path": "data/hybrid_rf_targeted_fix_v4/trials/hybrid_rf_targeted_fix_trial_registry.csv",
+      "sha256": "987ace1dede10f6f1805b09fe1698d6509e7f153fe0a328946ad3d76ec8572a7",
+      "bytes": 538333
+    }
+  ]
+}

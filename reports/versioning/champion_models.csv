@@ -1,0 +1,7 @@
+disorder,task_type,model_version,dataset_name,data_scope,feature_strategy,training_date,status,promoted_on
+adhd,binary,rf_adhd_v1_baseline,dataset_adhd_clinical,strict_no_leakage,baseline_frozen,2026-03-24T03:03:49.546957+00:00,promoted,2026-03-25T20:32:40.028924+00:00
+anxiety,binary,rf_anxiety_v1_baseline,dataset_anxiety_items,strict_no_leakage,baseline_frozen,2026-03-24T03:03:50.481810+00:00,promoted,2026-03-25T20:32:40.028924+00:00
+conduct,binary,rf_conduct_v1_baseline,dataset_conduct_minimal,strict_no_leakage,baseline_frozen,2026-03-24T03:03:51.423149+00:00,promoted,2026-03-25T20:32:40.028924+00:00
+elimination,binary,rf_elimination_v1_baseline,dataset_elimination_core,strict_no_leakage,baseline_frozen,2026-03-24T03:03:52.333086+00:00,promoted,2026-03-25T20:32:40.028924+00:00
+multilabel,multilabel,rf_multilabel_v1_baseline,master_multilabel_ready,strict_no_leakage,baseline_frozen,2026-03-24T03:03:52.640278+00:00,promoted,2026-03-25T20:32:40.028924+00:00
+depression,binary,rf_depression_v4_precision_thresholded,dataset_depression_parent,strict_no_leakage,mi_top_k,2026-03-25T20:26:34.997845+00:00,promoted,2026-03-25T20:32:40.028924+00:00

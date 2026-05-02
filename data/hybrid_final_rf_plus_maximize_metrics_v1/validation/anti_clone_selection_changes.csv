@@ -1,0 +1,2 @@
+domain,mode,old_candidate_key,new_candidate_key,old_score,new_score,reason
+elimination,psychologist_full,elimination::psychologist_full::rf_plus_deep_controlled::20270421::none::recall_target_guard::0.850000,elimination::psychologist_full::rf_v11_calibrated_regularized::20270421::sigmoid::recall_target_guard::0.410000,0.8794417161478599,0.8697879277133047,anti_clone_alternative_selected

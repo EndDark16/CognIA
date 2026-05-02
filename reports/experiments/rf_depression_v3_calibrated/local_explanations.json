@@ -1,0 +1,260 @@
+{
+  "HBN_SYN_003314": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.553765475795273
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 0.29895378089213254
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.17633361088346644
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.11041055032781083
+      },
+      {
+        "feature": "cat__site_CUNY",
+        "score": 0.0016447043403742204
+      },
+      {
+        "feature": "num__mfq_sr_total",
+        "score": 0.0
+      },
+      {
+        "feature": "num__mfq_p_total",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 0.0
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": -0.8814128536628489
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": -0.4733072026438725
+      },
+      {
+        "feature": "num__cdi_total",
+        "score": -0.1276855552943344
+      },
+      {
+        "feature": "num__age_years",
+        "score": -0.03816111151404557
+      },
+      {
+        "feature": "cat__site_CBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Unknown",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Male",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Female",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_mfq_sr",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_sdq",
+        "score": 0.0
+      }
+    ]
+  },
+  "HBN_SYN_003134": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.1840175838796847
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.05290008326503993
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.04101966487372393
+      },
+      {
+        "feature": "num__age_years",
+        "score": 0.0336715689829814
+      },
+      {
+        "feature": "cat__site_Staten Island",
+        "score": 0.0031388856073402273
+      },
+      {
+        "feature": "num__mfq_p_total",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_RUBIC",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_mfq_p",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_cbcl",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_cdi",
+        "score": 0.0
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__mfq_sr_total",
+        "score": -1.256663486457207
+      },
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": -1.0283149959399904
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": -0.7888453377397875
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": -0.6630162656726347
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": -0.27453325305633003
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": -0.09075154452339151
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": -0.08193964795062315
+      },
+      {
+        "feature": "num__sdq_emotional_symptoms",
+        "score": -0.06467413590482163
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": -0.05979075617842651
+      },
+      {
+        "feature": "num__sdq_prosocial_behavior",
+        "score": -0.036358024818521274
+      }
+    ]
+  },
+  "HBN_SYN_000323": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": 3.8194556992056787
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": 2.0509978781234475
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 1.989048797017904
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": 0.5490665061126601
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.45121631361096326
+      },
+      {
+        "feature": "num__sdq_emotional_symptoms",
+        "score": 0.32337067952410814
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": 0.3176304058318703
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 0.25909327677318156
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": 0.24581894385186948
+      },
+      {
+        "feature": "num__sdq_prosocial_behavior",
+        "score": 0.21814814891112766
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__age_years",
+        "score": -0.0606088241693665
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Male",
+        "score": -0.0036918592992442618
+      },
+      {
+        "feature": "cat__site_Staten Island",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_cdi",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_cbcl",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_mfq_p",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_sdq",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cdi_total",
+        "score": 0.0
+      },
+      {
+        "feature": "num__has_mfq_sr",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Unknown",
+        "score": 0.0
+      }
+    ]
+  }
+}

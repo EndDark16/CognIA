@@ -1,0 +1,4 @@
+final_operational_class,confidence_band,size
+ACTIVE_HIGH_CONFIDENCE,high,1
+ACTIVE_LIMITED_USE,limited,20
+ACTIVE_MODERATE_CONFIDENCE,moderate,9

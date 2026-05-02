@@ -1,0 +1,5 @@
+generation,trial_id,precision,balanced_accuracy,recall,specificity,f1,pr_auc,suspicious_perfect_score,leakage_risk,stability,realism_shift_robustness,operational_utility,thesis_utility,product_utility,improvement_type
+v2,T02_drop_high_risk_semantic_proxies,0.9056603773584906,0.8872049689440994,0.8944099378881988,,,,False,low,good,good,moderate,high,no,structural_baseline
+v3,V3_T07_abstention_assisted_operating_mode,0.891566265060241,0.8876273291925465,0.9192546583850932,0.856,,0.96523759106069,False,low,good,good,high_abstention,high,no,operational
+v4,V4_T03_target_high_confidence,0.9741379310344828,0.8389316770186335,0.7018633540372671,0.976,0.8158844765342961,0.9656147308620276,False,low,moderate,unknown,diagnostic_analytic,high,no,diagnostic_analytic
+v5,V5_T02_composite_clinical,0.94375,0.932944099378882,0.937888198757764,0.928,0.940809968847352,0.980570549015714,False,low,good,good,high_if_abstention,high,no,structural

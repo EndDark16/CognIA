@@ -1,0 +1,14 @@
+{
+  "active_activations_db": 30,
+  "active_model_versions": 30,
+  "active_model_versions_non_rf": 0,
+  "missing_expected_models": 0,
+  "mismatched_feature_columns": 0,
+  "duplicate_active_domain_mode_rows": 0,
+  "active_line_v15_reflected": false,
+  "elimination_active_rows_db": 6,
+  "elimination_v15_active_count": 1,
+  "non_elimination_expected_match_count": 24,
+  "questions_visible_count": 146,
+  "questions_visible_changed_unexpected": "por_confirmar"
+}

@@ -1,0 +1,76 @@
+{
+  "caregiver_macro": {
+    "precision": 0.9091483222055874,
+    "recall": 0.8257439299830605,
+    "specificity": 0.9470645220730555,
+    "balanced_accuracy": 0.886404226028058,
+    "f1": 0.8575883152187165,
+    "roc_auc": 0.9520801348446671,
+    "pr_auc": 0.9356053669251494,
+    "brier": 0.07317130990922116
+  },
+  "psychologist_macro": {
+    "precision": 0.9471364608461086,
+    "recall": 0.8296016845473367,
+    "specificity": 0.9628272402099689,
+    "balanced_accuracy": 0.8962144623786529,
+    "f1": 0.8806872930131,
+    "roc_auc": 0.9539327399899715,
+    "pr_auc": 0.9421880743237819,
+    "brier": 0.06773575064817783
+  },
+  "caregiver_selected_domains": [
+    {
+      "domain": "conduct",
+      "profile_name": "base",
+      "config_id": "rf_recall"
+    },
+    {
+      "domain": "depression",
+      "profile_name": "base",
+      "config_id": "rf_stability"
+    },
+    {
+      "domain": "anxiety",
+      "profile_name": "base",
+      "config_id": "rf_recall"
+    },
+    {
+      "domain": "adhd",
+      "profile_name": "hardened_missing",
+      "config_id": "rf_recall"
+    },
+    {
+      "domain": "elimination",
+      "profile_name": "base",
+      "config_id": "rf_base"
+    }
+  ],
+  "psychologist_selected_domains": [
+    {
+      "domain": "anxiety",
+      "profile_name": "base",
+      "config_id": "rf_precision"
+    },
+    {
+      "domain": "conduct",
+      "profile_name": "base",
+      "config_id": "rf_hardened"
+    },
+    {
+      "domain": "depression",
+      "profile_name": "base",
+      "config_id": "rf_recall"
+    },
+    {
+      "domain": "adhd",
+      "profile_name": "base",
+      "config_id": "rf_recall"
+    },
+    {
+      "domain": "elimination",
+      "profile_name": "base",
+      "config_id": "rf_base"
+    }
+  ]
+}

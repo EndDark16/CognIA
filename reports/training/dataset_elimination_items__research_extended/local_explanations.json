@@ -1,0 +1,260 @@
+{
+  "HBN_SYN_000582": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.41536573872673965
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 0.3145500109106028
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.2131650577144023
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 0.1816902466048641
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.14664102860125988
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": 0.06882940862587303
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": 0.06049714557838695
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": 0.046067221838126934
+      },
+      {
+        "feature": "num__age_years",
+        "score": 0.04248438584453181
+      },
+      {
+        "feature": "num__sdq_impact",
+        "score": 0.02915694895847738
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": -0.04585105123407411
+      },
+      {
+        "feature": "num__cbcl_006",
+        "score": -0.006000589675428287
+      },
+      {
+        "feature": "num__cbcl_068",
+        "score": -0.005558225545193601
+      },
+      {
+        "feature": "num__cbcl_010",
+        "score": -0.005432938347118704
+      },
+      {
+        "feature": "num__cbcl_037",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_23",
+        "score": 0.0
+      },
+      {
+        "feature": "num__sdq_19",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_047",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_048",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_107",
+        "score": 0.0
+      }
+    ]
+  },
+  "HBN_SYN_004384": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__cbcl_114",
+        "score": 0.02177777532744056
+      },
+      {
+        "feature": "num__age_years",
+        "score": 0.021242192922265906
+      },
+      {
+        "feature": "num__sdq_23",
+        "score": 0.011107505735631885
+      },
+      {
+        "feature": "num__cbcl_048",
+        "score": 0.010591693460000124
+      },
+      {
+        "feature": "num__cbcl_110",
+        "score": 0.01042472882969506
+      },
+      {
+        "feature": "num__cbcl_017",
+        "score": 0.008989817702452224
+      },
+      {
+        "feature": "num__sdq_01",
+        "score": 0.008851418435239277
+      },
+      {
+        "feature": "num__cbcl_118",
+        "score": 0.008720617738831144
+      },
+      {
+        "feature": "num__cbcl_092",
+        "score": 0.008514158931011904
+      },
+      {
+        "feature": "num__cbcl_047",
+        "score": 0.006510739853725356
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": -0.11540670486711163
+      },
+      {
+        "feature": "num__comorbidity_count_5targets",
+        "score": -0.10887037119076261
+      },
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": -0.10485000363686761
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": -0.08881877404766764
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": -0.07641841872345685
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": -0.06645851819627835
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": -0.04399230858037797
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": -0.025955749514980586
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": -0.02016571519279565
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": -0.019665545321678007
+      }
+    ]
+  },
+  "HBN_SYN_002611": {
+    "top_positive_contributors": [
+      {
+        "feature": "num__sdq_total_difficulties",
+        "score": 0.47182501636590424
+      },
+      {
+        "feature": "num__cbcl_externalizing_proxy",
+        "score": 0.4485949978248789
+      },
+      {
+        "feature": "num__cbcl_attention_problems_proxy",
+        "score": 0.2664563221430029
+      },
+      {
+        "feature": "num__cbcl_rule_breaking_proxy",
+        "score": 0.2076459961198447
+      },
+      {
+        "feature": "num__cbcl_aggressive_behavior_proxy",
+        "score": 0.14664102860125988
+      },
+      {
+        "feature": "num__comorbidity_count_5targets",
+        "score": 0.10887037119076261
+      },
+      {
+        "feature": "num__sdq_peer_problems",
+        "score": 0.09213444367625387
+      },
+      {
+        "feature": "num__sdq_conduct_problems",
+        "score": 0.07058000317478479
+      },
+      {
+        "feature": "num__sdq_hyperactivity_inattention",
+        "score": 0.06882940862587303
+      },
+      {
+        "feature": "num__sdq_prosocial_behavior",
+        "score": 0.059940276482170624
+      }
+    ],
+    "top_negative_contributors": [
+      {
+        "feature": "num__age_years",
+        "score": -0.0590060914507386
+      },
+      {
+        "feature": "num__cbcl_internalizing_proxy",
+        "score": -0.03297334424774618
+      },
+      {
+        "feature": "num__cbcl_anxious_depressed_proxy",
+        "score": -0.01528368374469137
+      },
+      {
+        "feature": "cat__sex_assigned_at_birth_Male",
+        "score": -0.007023486228848834
+      },
+      {
+        "feature": "num__cbcl_068",
+        "score": -0.005558225545193601
+      },
+      {
+        "feature": "num__cbcl_027",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_028",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_029",
+        "score": 0.0
+      },
+      {
+        "feature": "num__cbcl_030",
+        "score": 0.0
+      },
+      {
+        "feature": "cat__site_CUNY",
+        "score": 0.0
+      }
+    ]
+  }
+}

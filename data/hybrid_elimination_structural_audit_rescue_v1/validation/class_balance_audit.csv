@@ -1,0 +1,4 @@
+domain,split,n,positive_n,positive_rate
+elimination,train,1440,155,0.1076388888888889
+elimination,val,480,52,0.10833333333333334
+elimination,holdout,480,52,0.10833333333333334

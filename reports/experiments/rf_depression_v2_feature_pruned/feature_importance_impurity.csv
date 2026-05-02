@@ -1,0 +1,26 @@
+feature,importance
+num__cbcl_internalizing_proxy,0.1823613678188884
+num__cbcl_anxious_depressed_proxy,0.17350490765109466
+num__sdq_total_difficulties,0.10867969715443769
+num__mfq_p_total,0.08785781270599193
+num__sdq_hyperactivity_inattention,0.07799650245448773
+num__sdq_peer_problems,0.06380853022780415
+num__sdq_emotional_symptoms,0.06140002539360957
+num__sdq_conduct_problems,0.04524556776056971
+num__sdq_prosocial_behavior,0.03504851979370546
+num__cbcl_attention_problems_proxy,0.029500197671204098
+num__cbcl_externalizing_proxy,0.02577155196879061
+num__cbcl_rule_breaking_proxy,0.023929342483869714
+num__cbcl_aggressive_behavior_proxy,0.023449714730592985
+num__age_years,0.021758808010002673
+num__sdq_impact,0.017296972310685825
+cat__site_CBIC,0.004971292478915083
+cat__sex_assigned_at_birth_Male,0.00489364062392674
+cat__sex_assigned_at_birth_Female,0.004339694688775643
+cat__site_Staten Island,0.003079454631913495
+cat__site_CUNY,0.0028316747042545364
+cat__site_RUBIC,0.0022747247364793
+num__has_cbcl,0.0
+num__has_sdq,0.0
+num__has_mfq_p,0.0
+cat__sex_assigned_at_birth_Unknown,0.0

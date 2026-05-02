@@ -1,0 +1,4 @@
+trial_id,method,brier_score_val,status,selected
+domain_adhd_research_full,none,0.01048951048951049,ok,False
+domain_adhd_research_full,sigmoid,0.010402965956825808,ok,True
+domain_adhd_research_full,isotonic,0.01048951048951049,ok,False

@@ -1,0 +1,132 @@
+{
+  "model_version": "rf_adhd_v2_precision_sanity",
+  "parent_version": "rf_adhd_v1_baseline",
+  "task_type": "binary",
+  "status": "completed",
+  "dataset_name": "dataset_adhd_clinical",
+  "dataset_variant": "clinical",
+  "data_scope": "strict_no_leakage",
+  "split_version": "splits_strict_no_leakage_frozen_v1",
+  "preprocessing_version": "rf_preproc_v1",
+  "seed": 42,
+  "target": "target_adhd",
+  "n_features_raw": 35,
+  "n_features_final": 20,
+  "train_rows": 1333,
+  "val_rows": 286,
+  "test_rows": 286,
+  "threshold_strategy": "precision_constrained",
+  "threshold_value": 0.644978,
+  "recall_floor": 0.7619875776397516,
+  "balanced_accuracy_tolerance": 0.03,
+  "calibration_strategy": "none",
+  "validation_metrics": {
+    "threshold": 0.644978,
+    "accuracy": 0.8776223776223776,
+    "balanced_accuracy": 0.8850434782608696,
+    "precision": 0.95,
+    "recall": 0.8260869565217391,
+    "sensitivity": 0.8260869565217391,
+    "specificity": 0.944,
+    "f1": 0.8837209302325582,
+    "support_negative": 125,
+    "support_positive": 161,
+    "confusion_matrix": [
+      [
+        118,
+        7
+      ],
+      [
+        28,
+        133
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.944,
+        0.056
+      ],
+      [
+        0.17391304347826086,
+        0.8260869565217391
+      ]
+    ],
+    "roc_auc": 0.9590062111801243,
+    "pr_auc": 0.966138458131258,
+    "brier_score": 0.08000388948667661,
+    "fpr": 0.05600000000000005,
+    "fnr": 0.17391304347826086,
+    "prevalence": 0.5629370629370629,
+    "precision_lift_vs_baseline": 0.0033333333333332993,
+    "recall_delta_vs_baseline": -0.05590062111801242,
+    "balanced_accuracy_delta_vs_baseline": -0.023950310559006205
+  },
+  "test_metrics": {
+    "threshold": 0.644978,
+    "accuracy": 0.8146853146853147,
+    "balanced_accuracy": 0.8225694444444445,
+    "precision": 0.8962962962962963,
+    "recall": 0.75625,
+    "sensitivity": 0.75625,
+    "specificity": 0.8888888888888888,
+    "f1": 0.8203389830508474,
+    "support_negative": 126,
+    "support_positive": 160,
+    "confusion_matrix": [
+      [
+        112,
+        14
+      ],
+      [
+        39,
+        121
+      ]
+    ],
+    "normalized_confusion_matrix": [
+      [
+        0.8888888888888888,
+        0.1111111111111111
+      ],
+      [
+        0.24375,
+        0.75625
+      ]
+    ],
+    "roc_auc": 0.9220238095238095,
+    "pr_auc": 0.9408673683063703,
+    "brier_score": 0.11577465366277342,
+    "fpr": 0.11111111111111116,
+    "fnr": 0.24375000000000002,
+    "prevalence": 0.5594405594405595,
+    "precision_lift_vs_baseline": NaN,
+    "recall_delta_vs_baseline": -0.03749999999999998,
+    "balanced_accuracy_delta_vs_baseline": -0.01478174603174598
+  },
+  "abstention_validation": {
+    "low_threshold": 0.5,
+    "high_threshold": 0.9018386315789473,
+    "coverage": 0.8531468531468531,
+    "uncertain_rate": 0.14685314685314685,
+    "precision_high": 0.9829059829059829,
+    "npv_low": 0.8661417322834646,
+    "recall_effective": 0.7142857142857143,
+    "specificity_effective": 0.88,
+    "selection_reason": "target_precision_with_coverage",
+    "target_high_precision": 0.95,
+    "min_confident_coverage": 0.1
+  },
+  "abstention_test": {
+    "coverage": 0.8181818181818182,
+    "uncertain_rate": 0.18181818181818182,
+    "precision_high": 0.9595959595959596,
+    "npv_low": 0.7925925925925926,
+    "recall_effective": 0.59375,
+    "specificity_effective": 0.8492063492063492,
+    "confident_positive_n": 99,
+    "confident_negative_n": 135,
+    "uncertain_n": 52
+  },
+  "notes": "Light sanity challenger for ADHD precision.",
+  "experimental": false,
+  "created_at": "2026-03-25T20:29:13.090225+00:00"
+}

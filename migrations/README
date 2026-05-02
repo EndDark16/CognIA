@@ -1,0 +1,48 @@
+This directory contains Alembic migrations for CognIA.
+
+Quick usage
+- Create new revision: `alembic revision --autogenerate -m "message"`
+- Apply all: `alembic upgrade head`
+- Show current: `alembic current`
+- Show heads: `alembic heads`
+- Config class: `APP_CONFIG_CLASS` (default: `config.settings.DevelopmentConfig`)
+
+Database credentials for migrations
+- Preferred: `MIGRATION_DATABASE_URI`
+- Or use `MIGRATION_DB_USER` + `MIGRATION_DB_PASSWORD` plus `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_SSL_MODE`
+- Runtime user is `DB_USER` / `DB_PASSWORD` (minimal privileges)
+
+Special migration flags
+- `APPLY_FULL_SCHEMA_SQL=1` is required to apply the baseline full schema migration.
+- `RUN_MIGRATIONS=false` or `SKIP_MIGRATIONS=true` disables auto-migration on container startup (see docker/entrypoint.sh).
+
+Migration catalog (chronological)
+- 20251209_01_baseline_refresh_token
+  - Creates `refresh_token` if the base schema exists (checks for `app_user`).
+  - Safe to run against an existing DB; no-op if table already exists.
+- 20251210_01_fix_user_session_defaults
+  - Backfills NULL timestamps in `user_session` and adds server defaults.
+- 20251211_01_add_mfa_models
+  - Adds MFA fields to `app_user`.
+  - Creates `user_mfa`, `recovery_code`, `mfa_login_challenge` plus indexes.
+- 20251214_01_add_auth_indexes
+  - Adds performance indexes for auth-related tables and `audit_log`.
+- 20251215_01_baseline_full_schema
+  - Optional full schema bootstrap from embedded dump.
+  - Only executes when `APPLY_FULL_SCHEMA_SQL=1` is set.
+- 20260124_01_add_evaluation_access_key_subject_guardian
+  - Adds access key lifecycle fields to `evaluation` and backfills data.
+  - Creates `subject_guardian` and indexes with constraints.
+- 20260124_02_update_access_key_placeholder
+  - Updates legacy `access_key_hash` placeholder to `reset_required:` prefix.
+- 20260124_03_add_evaluation_questionnaire_template
+  - Adds `evaluation.questionnaire_template_id`, backfills using active template, enforces NOT NULL.
+  - Fails if no active `questionnaire_template` exists.
+- 20260124_04_add_question_response_constraints
+  - Adds `response_min`, `response_max`, `response_step`, `response_options` to `question`.
+- 20260124_05_add_question_disorder_relation
+  - Creates `question_disorder` (N:M), indexes, and backfills from `question.disorder_id`.
+- 20260125_01_grant_question_disorder_privileges
+  - Grants SELECT/INSERT/UPDATE/DELETE on `public.question_disorder` to runtime role.
+  - Uses `DB_USER` (default `api_backend`) at migration time.
+  - Requires running migrations as a role with GRANT privileges (owner/migrator).

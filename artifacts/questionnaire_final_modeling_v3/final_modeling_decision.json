@@ -1,0 +1,11 @@
+{
+  "caregiver_winner": {
+    "route": "A",
+    "variant": "direct_basic"
+  },
+  "psychologist_winner": {
+    "route": "P",
+    "variant": "professional_full_coverage"
+  },
+  "hybrid_recommended": true
+}

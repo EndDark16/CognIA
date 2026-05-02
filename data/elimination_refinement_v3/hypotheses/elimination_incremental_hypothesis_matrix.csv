@@ -1,0 +1,7 @@
+hypothesis_id,hypothesis_description,evidence_for,expected_gain,methodological_risk,implementation_cost,priority
+H1,Aun quedan features generales que disparan falsos positivos.,fp=0,specificity_small_gain,low,low,1
+H2,Variante compacta puede subir especificidad sin romper recall.,"fp=0, fn=4",balanced_small_gain,moderate,medium,2
+H3,Abstention band puede mejorar utilidad operativa.,high_conf_errors=0,operational_precision_gain,low,low,3
+H4,Calibracion + threshold conservador puede mejorar punto operativo.,frontera con errores de alta confianza,operational_gain,low,low,4
+H5,Subespacio clinicamente mas especifico puede reducir ruido transdiagnostico.,cobertura indirecta y no instrumento directo,specificity_gain_with_recall_risk,moderate,medium,5
+H6,El modelo ya puede estar cerca de su techo con data actual.,v2 ya removio score perfecto en modelo elegido,none_or_marginal,none,low,6

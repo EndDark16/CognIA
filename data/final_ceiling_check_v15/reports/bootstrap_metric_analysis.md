@@ -1,0 +1,87 @@
+# Bootstrap metric analysis
+
+- no-elimination: bootstrap sobre seeds del config seleccionado.
+- elimination: bootstrap proxy por escenarios de estres; ROC-AUC con muestra unica queda `por_confirmar_single_sample_for_ci`.
+
+| mode | domain | metric | point_estimate | bootstrap_mean | ci95_low | ci95_high | ci95_half_width | n_samples | method | status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| caregiver | adhd | balanced_accuracy | 0.880267 | 0.880274 | 0.878267 | 0.881938 | 0.001835 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | adhd | brier | 0.084060 | 0.084067 | 0.082933 | 0.085610 | 0.001339 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | adhd | f1 | 0.879867 | 0.879857 | 0.878416 | 0.881184 | 0.001384 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | adhd | pr_auc | 0.953909 | 0.953914 | 0.953420 | 0.954397 | 0.000488 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | adhd | precision | 0.943241 | 0.943303 | 0.936841 | 0.949640 | 0.006399 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | adhd | recall | 0.824534 | 0.824469 | 0.819876 | 0.829193 | 0.004658 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | adhd | roc_auc | 0.952019 | 0.952017 | 0.951584 | 0.952335 | 0.000376 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | adhd | specificity | 0.936000 | 0.936080 | 0.928000 | 0.944000 | 0.008000 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | anxiety | balanced_accuracy | 0.942614 | 0.942597 | 0.938258 | 0.945644 | 0.003693 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | anxiety | brier | 0.034628 | 0.034643 | 0.033056 | 0.036200 | 0.001572 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | anxiety | f1 | 0.864405 | 0.864396 | 0.859073 | 0.869277 | 0.005102 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | anxiety | pr_auc | 0.939672 | 0.939704 | 0.934291 | 0.945053 | 0.005381 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | anxiety | precision | 0.782219 | 0.782232 | 0.778455 | 0.787715 | 0.004630 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | anxiety | recall | 0.965909 | 0.965866 | 0.958333 | 0.969697 | 0.005682 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | anxiety | roc_auc | 0.977256 | 0.977258 | 0.976705 | 0.977806 | 0.000551 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | anxiety | specificity | 0.919318 | 0.919328 | 0.918182 | 0.921591 | 0.001705 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | conduct | balanced_accuracy | 0.925182 | 0.925201 | 0.921541 | 0.928823 | 0.003641 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | conduct | brier | 0.040320 | 0.040314 | 0.038874 | 0.041765 | 0.001445 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | conduct | f1 | 0.910980 | 0.911028 | 0.901961 | 0.920000 | 0.009020 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | conduct | pr_auc | 0.949314 | 0.949296 | 0.944357 | 0.954271 | 0.004957 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | conduct | precision | 0.965460 | 0.965566 | 0.945205 | 0.985714 | 0.020254 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | conduct | recall | 0.862500 | 0.862500 | 0.862500 | 0.862500 | 0.000000 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | conduct | roc_auc | 0.981811 | 0.981815 | 0.979232 | 0.985361 | 0.003064 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | conduct | specificity | 0.987864 | 0.987902 | 0.980583 | 0.995146 | 0.007282 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | depression | balanced_accuracy | 0.908505 | 0.908515 | 0.907043 | 0.909967 | 0.001462 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | depression | brier | 0.058169 | 0.058157 | 0.057179 | 0.059232 | 0.001027 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | depression | f1 | 0.893910 | 0.893923 | 0.891892 | 0.895928 | 0.002018 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | depression | pr_auc | 0.956165 | 0.956210 | 0.951289 | 0.961129 | 0.004920 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | depression | precision | 0.929598 | 0.929627 | 0.925234 | 0.933962 | 0.004364 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | depression | recall | 0.860870 | 0.860870 | 0.860870 | 0.860870 | 0.000000 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | depression | roc_auc | 0.975477 | 0.975490 | 0.973881 | 0.978064 | 0.002091 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | depression | specificity | 0.956140 | 0.956160 | 0.953216 | 0.959064 | 0.002924 | 4 | seed_bootstrap_selected_config | ok |
+| caregiver | elimination | balanced_accuracy | 0.829938 | 0.792028 | 0.743467 | 0.823901 | 0.040217 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| caregiver | elimination | brier | 0.135959 | 0.158974 | 0.141112 | 0.182190 | 0.020539 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| caregiver | elimination | f1 | 0.843450 | 0.785046 | 0.691593 | 0.839381 | 0.073894 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| caregiver | elimination | pr_auc | 0.915299 | 0.876835 | 0.818617 | 0.913308 | 0.047345 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| caregiver | elimination | precision | 0.868421 | 0.842232 | 0.815789 | 0.864489 | 0.024350 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| caregiver | elimination | recall | 0.819876 | 0.755163 | 0.638339 | 0.824860 | 0.093261 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| caregiver | elimination | roc_auc |  |  |  |  |  | 0 | exact_selected_trial_lookup | por_confirmar_single_sample_for_ci |
+| caregiver | elimination | specificity | 0.840000 | 0.828894 | 0.796800 | 0.861771 | 0.032486 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| psychologist | adhd | balanced_accuracy | 0.880385 | 0.880390 | 0.879056 | 0.882373 | 0.001658 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | adhd | brier | 0.083509 | 0.083481 | 0.082114 | 0.085985 | 0.001936 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | adhd | f1 | 0.878085 | 0.878109 | 0.875421 | 0.882790 | 0.003684 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | adhd | pr_auc | 0.954341 | 0.954358 | 0.952363 | 0.957060 | 0.002348 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | adhd | precision | 0.949635 | 0.949577 | 0.942096 | 0.955882 | 0.006893 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | adhd | recall | 0.816770 | 0.816854 | 0.807453 | 0.830745 | 0.011646 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | adhd | roc_auc | 0.952199 | 0.952216 | 0.950422 | 0.953975 | 0.001776 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | adhd | specificity | 0.944000 | 0.943926 | 0.934000 | 0.952000 | 0.009000 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | anxiety | balanced_accuracy | 0.990152 | 0.990152 | 0.990152 | 0.990152 | 0.000000 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | anxiety | brier | 0.005041 | 0.005034 | 0.003976 | 0.006107 | 0.001065 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | anxiety | f1 | 0.984848 | 0.984848 | 0.984848 | 0.984848 | 0.000000 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | anxiety | pr_auc | 0.991624 | 0.991665 | 0.984215 | 0.999034 | 0.007409 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | anxiety | precision | 0.984848 | 0.984848 | 0.984848 | 0.984848 | 0.000000 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | anxiety | recall | 0.984848 | 0.984848 | 0.984848 | 0.984848 | 0.000000 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | anxiety | roc_auc | 0.998700 | 0.998706 | 0.997590 | 0.999811 | 0.001111 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | anxiety | specificity | 0.995455 | 0.995455 | 0.995455 | 0.995455 | 0.000000 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | conduct | balanced_accuracy | 0.923453 | 0.923435 | 0.920677 | 0.925364 | 0.002344 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | conduct | brier | 0.042717 | 0.042723 | 0.041615 | 0.043771 | 0.001078 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | conduct | f1 | 0.902613 | 0.902611 | 0.897884 | 0.906728 | 0.004422 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | conduct | pr_auc | 0.943531 | 0.943524 | 0.941853 | 0.945004 | 0.001575 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | conduct | precision | 0.939358 | 0.939428 | 0.932658 | 0.952083 | 0.009713 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | conduct | recall | 0.868750 | 0.868687 | 0.862500 | 0.875000 | 0.006250 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | conduct | roc_auc | 0.976327 | 0.976339 | 0.975053 | 0.978550 | 0.001748 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | conduct | specificity | 0.978155 | 0.978183 | 0.975728 | 0.983010 | 0.003641 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | depression | balanced_accuracy | 0.908524 | 0.908549 | 0.904157 | 0.913266 | 0.004554 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | depression | brier | 0.058397 | 0.058393 | 0.057582 | 0.059213 | 0.000816 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | depression | f1 | 0.894456 | 0.894488 | 0.888893 | 0.900809 | 0.005958 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | depression | pr_auc | 0.952288 | 0.952299 | 0.951244 | 0.953331 | 0.001044 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | depression | precision | 0.935937 | 0.935972 | 0.926887 | 0.947276 | 0.010194 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | depression | recall | 0.856522 | 0.856551 | 0.852174 | 0.860870 | 0.004348 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | depression | roc_auc | 0.975934 | 0.975937 | 0.975617 | 0.976252 | 0.000318 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | depression | specificity | 0.960526 | 0.960548 | 0.954678 | 0.967836 | 0.006579 | 4 | seed_bootstrap_selected_config | ok |
+| psychologist | elimination | balanced_accuracy | 0.831677 | 0.787410 | 0.742117 | 0.821773 | 0.039828 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| psychologist | elimination | brier | 0.134631 | 0.148770 | 0.138489 | 0.160717 | 0.011114 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| psychologist | elimination | f1 | 0.855385 | 0.790893 | 0.693216 | 0.847004 | 0.076894 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| psychologist | elimination | pr_auc | 0.912164 | 0.847598 | 0.731793 | 0.910425 | 0.089316 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| psychologist | elimination | precision | 0.847561 | 0.789810 | 0.719267 | 0.840699 | 0.060716 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| psychologist | elimination | recall | 0.863354 | 0.800263 | 0.682609 | 0.866460 | 0.091925 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |
+| psychologist | elimination | roc_auc | 0.885242 |  |  |  |  | 1 | exact_selected_trial_lookup | por_confirmar_single_sample_for_ci |
+| psychologist | elimination | specificity | 0.800000 | 0.774557 | 0.716000 | 0.827014 | 0.055507 | 10 | stress_scenario_bootstrap_proxy | proxy_not_seed_bootstrap |

@@ -1,0 +1,18 @@
+# Final caregiver closure decision
+
+     mode      domain     profile_name    config_id calibration  threshold_policy  selected_seed  n_features  precision   recall  specificity  balanced_accuracy       f1  roc_auc   pr_auc    brier  seed_std  split_std  realism_shift_delta  missingness_sensitivity  partial_questionnaire_sensitivity  uncertainty_rate  high_conf_precision  high_conf_coverage  input_missing_ratio overfit_risk leakage_risk  selection_score
+caregiver     conduct             base    rf_recall    isotonic          balanced             11          21   0.965460 0.862500     0.987864           0.925182 0.910980 0.981811 0.949314 0.040320  0.003641   0.003641            -0.003641                -0.002640                           0.017150          0.074301             0.975398            0.881119             0.032135          low          low         0.936090
+caregiver  depression             base rf_stability    isotonic precision_guarded             83          17   0.929598 0.860870     0.956140           0.908505 0.893910 0.975477 0.956165 0.058169  0.001462   0.001462             0.001462                 0.018555                           0.010984          0.076923             0.929441            0.922203             0.067051          low          low         0.916649
+caregiver     anxiety             base    rf_recall    isotonic          balanced             47          37   0.782219 0.965909     0.919318           0.942614 0.864405 0.977256 0.939672 0.034628  0.003726   0.003598            -0.003598                 0.019318                           0.036458          0.006119             0.784650            0.992133             0.085428          low          low         0.907959
+caregiver        adhd hardened_missing    rf_recall    isotonic precision_guarded             11          22   0.943241 0.824534     0.936000           0.880267 0.879867 0.952019 0.953909 0.084060  0.001999   0.003224             0.003224                 0.009602                           0.003891          0.076923             0.943241            0.916958             0.042435          low          low         0.902848
+caregiver elimination             base      rf_base    isotonic precision_guarded             83          16   0.925224 0.614907     0.936000           0.775453 0.738780 0.873839 0.878967 0.148680  0.003804   0.006211             0.006211                 0.016509                           0.125314          0.251748             0.925224            0.747378             0.031031          low          low         0.818669
+
+Macro:
+precision            0.909148
+recall               0.825744
+specificity          0.947065
+balanced_accuracy    0.886404
+f1                   0.857588
+roc_auc              0.952080
+pr_auc               0.935605
+brier                0.073171

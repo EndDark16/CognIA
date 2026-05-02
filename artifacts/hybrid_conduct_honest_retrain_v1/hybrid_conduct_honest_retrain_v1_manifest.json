@@ -1,0 +1,82 @@
+{
+  "line": "hybrid_conduct_honest_retrain_v1",
+  "generated_at_utc": "2026-04-21T07:02:01.312574+00:00",
+  "focus_domain": "conduct",
+  "focus_modes": [
+    "caregiver_2_3",
+    "caregiver_full",
+    "psychologist_2_3",
+    "psychologist_full"
+  ],
+  "source_truth_updates": {
+    "operational": "data/hybrid_operational_freeze_v2/tables/hybrid_operational_final_champions.csv",
+    "active": "data/hybrid_active_modes_freeze_v2/tables/hybrid_active_models_30_modes.csv"
+  },
+  "generated_files": [
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/ablation/conduct_honest_ablation.csv",
+      "sha256": "cf5e565c86c3a9a701416333d90dbf1e53540965d8e493f411f824530dbf4359",
+      "bytes": 666
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/bootstrap/conduct_honest_bootstrap_intervals.csv",
+      "sha256": "83268098d709a1c88d621c85c2892097e96031aac468edcb2568cd91091d07fd",
+      "bytes": 1284
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/inventory/conduct_models_demoted.csv",
+      "sha256": "9541360be6e3dc9b40c31bf58f41ad1b70b919158bdb116031aea34942232720",
+      "bytes": 1155
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/reports/conduct_demotion_decision.md",
+      "sha256": "cc91a375b2403e78ea3a551d7d5c9116f8ad48ba6b7f5a822087274e661e0ef9",
+      "bytes": 1442
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/reports/hybrid_conduct_honest_retrain_summary.md",
+      "sha256": "7c7beff0beee500a3097ff60dee445ad02b20210ffdddc2396e8ffe5b503e5cd",
+      "bytes": 2388
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/stability/conduct_honest_seed_stability.csv",
+      "sha256": "8b88a94d7951fc2bcc5960291b253196d745ed73d1e2fe0d9e21dbc4d95ec9ac",
+      "bytes": 2308
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/stress/conduct_honest_stress.csv",
+      "sha256": "1af68e7a58ea6939385e2ef634d75399e2d28b0fb01e4a6f66b6790889d16238",
+      "bytes": 1048
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/tables/conduct_honest_retrain_selected_models.csv",
+      "sha256": "ef173b66cebf8609e390525a49eae5b416a7277b577dd3292623f913ff5366c1",
+      "bytes": 8109
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/tables/conduct_old_vs_new_comparison.csv",
+      "sha256": "582af7c7e2089b4610b305d5d0414f159b0ea802e3dd4094dd225a47c56ffa70",
+      "bytes": 3733
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/trials/conduct_honest_retrain_trials.csv",
+      "sha256": "6ba58cd301156afd9f14b2b9a9018ad0c67b842a95bc54ef80e4e3e2aa6dc6c6",
+      "bytes": 122589
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/validation/conduct_duplicate_split_audit.csv",
+      "sha256": "47b4bc61e73f4f1c29c8461dcf244de9101b5403e9f95e4277f0c2dae5a69f21",
+      "bytes": 218
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/validation/conduct_shortcut_audit.csv",
+      "sha256": "57c984b14beed0694b3a5769f0f1ed904c46ad741ac38e4b169c0abc9ee40827",
+      "bytes": 228
+    },
+    {
+      "path": "data/hybrid_conduct_honest_retrain_v1/validation/conduct_split_overlap_audit.csv",
+      "sha256": "23d3110dd43fa68bba2733cfe059311a642843e9847969192063f56fa9ae41e3",
+      "bytes": 91
+    }
+  ]
+}

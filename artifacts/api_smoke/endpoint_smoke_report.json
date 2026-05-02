@@ -1,0 +1,847 @@
+{
+  "generated_at": "2026-04-18T06:24:33.450662+00:00",
+  "totals": {
+    "rules": 118,
+    "requests": 119,
+    "exceptions": 0,
+    "2xx": 40,
+    "4xx": 79
+  },
+  "failing_5xx": [],
+  "exceptions": [],
+  "results": [
+    {
+      "endpoint": "admin.admin_audit_logs",
+      "method": "GET",
+      "rule": "/api/admin/audit-logs",
+      "path": "/api/admin/audit-logs",
+      "status_code": 200
+    },
+    {
+      "endpoint": "admin.admin_email_health",
+      "method": "GET",
+      "rule": "/api/admin/email/health",
+      "path": "/api/admin/email/health",
+      "status_code": 200
+    },
+    {
+      "endpoint": "admin.admin_list_unsubscribes",
+      "method": "GET",
+      "rule": "/api/admin/email/unsubscribes",
+      "path": "/api/admin/email/unsubscribes",
+      "status_code": 200
+    },
+    {
+      "endpoint": "admin.admin_remove_unsubscribe",
+      "method": "POST",
+      "rule": "/api/admin/email/unsubscribes/<unsubscribe_id>/remove",
+      "path": "/api/admin/email/unsubscribes/sample/remove",
+      "status_code": 400
+    },
+    {
+      "endpoint": "admin.admin_evaluations",
+      "method": "GET",
+      "rule": "/api/admin/evaluations",
+      "path": "/api/admin/evaluations",
+      "status_code": 200
+    },
+    {
+      "endpoint": "admin.admin_update_evaluation_status",
+      "method": "PATCH",
+      "rule": "/api/admin/evaluations/<evaluation_id>/status",
+      "path": "/api/admin/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/status",
+      "status_code": 404
+    },
+    {
+      "endpoint": "admin.admin_impersonate_user",
+      "method": "POST",
+      "rule": "/api/admin/impersonate/<user_id>",
+      "path": "/api/admin/impersonate/d5908480-b15a-4e5b-9f55-570c9f6d5b01",
+      "status_code": 404
+    },
+    {
+      "endpoint": "admin.admin_metrics",
+      "method": "GET",
+      "rule": "/api/admin/metrics",
+      "path": "/api/admin/metrics",
+      "status_code": 200
+    },
+    {
+      "endpoint": "problem_reports.list_problem_reports_admin",
+      "method": "GET",
+      "rule": "/api/admin/problem-reports",
+      "path": "/api/admin/problem-reports",
+      "status_code": 200
+    },
+    {
+      "endpoint": "problem_reports.get_problem_report_admin",
+      "method": "GET",
+      "rule": "/api/admin/problem-reports/<report_id>",
+      "path": "/api/admin/problem-reports/d5908480-b15a-4e5b-9f55-570c9f6d5b01",
+      "status_code": 404
+    },
+    {
+      "endpoint": "problem_reports.update_problem_report_admin",
+      "method": "PATCH",
+      "rule": "/api/admin/problem-reports/<report_id>",
+      "path": "/api/admin/problem-reports/d5908480-b15a-4e5b-9f55-570c9f6d5b01",
+      "status_code": 400
+    },
+    {
+      "endpoint": "admin.admin_approve_psychologist",
+      "method": "POST",
+      "rule": "/api/admin/psychologists/<user_id>/approve",
+      "path": "/api/admin/psychologists/d5908480-b15a-4e5b-9f55-570c9f6d5b01/approve",
+      "status_code": 404
+    },
+    {
+      "endpoint": "admin.admin_reject_psychologist",
+      "method": "POST",
+      "rule": "/api/admin/psychologists/<user_id>/reject",
+      "path": "/api/admin/psychologists/d5908480-b15a-4e5b-9f55-570c9f6d5b01/reject",
+      "status_code": 404
+    },
+    {
+      "endpoint": "admin.admin_questionnaires",
+      "method": "GET",
+      "rule": "/api/admin/questionnaires",
+      "path": "/api/admin/questionnaires",
+      "status_code": 200
+    },
+    {
+      "endpoint": "admin.admin_archive_questionnaire",
+      "method": "POST",
+      "rule": "/api/admin/questionnaires/<template_id>/archive",
+      "path": "/api/admin/questionnaires/d5908480-b15a-4e5b-9f55-570c9f6d5b01/archive",
+      "status_code": 404
+    },
+    {
+      "endpoint": "admin.admin_clone_questionnaire",
+      "method": "POST",
+      "rule": "/api/admin/questionnaires/<template_id>/clone",
+      "path": "/api/admin/questionnaires/d5908480-b15a-4e5b-9f55-570c9f6d5b01/clone",
+      "status_code": 404
+    },
+    {
+      "endpoint": "admin.admin_publish_questionnaire",
+      "method": "POST",
+      "rule": "/api/admin/questionnaires/<template_id>/publish",
+      "path": "/api/admin/questionnaires/d5908480-b15a-4e5b-9f55-570c9f6d5b01/publish",
+      "status_code": 404
+    },
+    {
+      "endpoint": "admin.admin_list_roles",
+      "method": "GET",
+      "rule": "/api/admin/roles",
+      "path": "/api/admin/roles",
+      "status_code": 200
+    },
+    {
+      "endpoint": "admin.admin_create_role",
+      "method": "POST",
+      "rule": "/api/admin/roles",
+      "path": "/api/admin/roles",
+      "status_code": 400
+    },
+    {
+      "endpoint": "admin.admin_list_users",
+      "method": "GET",
+      "rule": "/api/admin/users",
+      "path": "/api/admin/users",
+      "status_code": 200
+    },
+    {
+      "endpoint": "admin.admin_patch_user",
+      "method": "PATCH",
+      "rule": "/api/admin/users/<user_id>",
+      "path": "/api/admin/users/d5908480-b15a-4e5b-9f55-570c9f6d5b01",
+      "status_code": 404
+    },
+    {
+      "endpoint": "admin.admin_mfa_reset",
+      "method": "POST",
+      "rule": "/api/admin/users/<user_id>/mfa/reset",
+      "path": "/api/admin/users/d5908480-b15a-4e5b-9f55-570c9f6d5b01/mfa/reset",
+      "status_code": 404
+    },
+    {
+      "endpoint": "admin.admin_password_reset",
+      "method": "POST",
+      "rule": "/api/admin/users/<user_id>/password-reset",
+      "path": "/api/admin/users/d5908480-b15a-4e5b-9f55-570c9f6d5b01/password-reset",
+      "status_code": 404
+    },
+    {
+      "endpoint": "admin.admin_assign_roles",
+      "method": "POST",
+      "rule": "/api/admin/users/<user_id>/roles",
+      "path": "/api/admin/users/d5908480-b15a-4e5b-9f55-570c9f6d5b01/roles",
+      "status_code": 404
+    },
+    {
+      "endpoint": "auth.login",
+      "method": "POST",
+      "rule": "/api/auth/login",
+      "path": "/api/auth/login",
+      "status_code": 400
+    },
+    {
+      "endpoint": "auth.login_mfa",
+      "method": "POST",
+      "rule": "/api/auth/login/mfa",
+      "path": "/api/auth/login/mfa",
+      "status_code": 400
+    },
+    {
+      "endpoint": "auth.logout",
+      "method": "POST",
+      "rule": "/api/auth/logout",
+      "path": "/api/auth/logout",
+      "status_code": 403
+    },
+    {
+      "endpoint": "auth.me",
+      "method": "GET",
+      "rule": "/api/auth/me",
+      "path": "/api/auth/me",
+      "status_code": 200
+    },
+    {
+      "endpoint": "auth.change_password",
+      "method": "POST",
+      "rule": "/api/auth/password/change",
+      "path": "/api/auth/password/change",
+      "status_code": 400
+    },
+    {
+      "endpoint": "auth.forgot_password",
+      "method": "POST",
+      "rule": "/api/auth/password/forgot",
+      "path": "/api/auth/password/forgot",
+      "status_code": 200
+    },
+    {
+      "endpoint": "auth.reset_password",
+      "method": "POST",
+      "rule": "/api/auth/password/reset",
+      "path": "/api/auth/password/reset",
+      "status_code": 400
+    },
+    {
+      "endpoint": "auth.verify_reset_token",
+      "method": "GET",
+      "rule": "/api/auth/password/reset/verify",
+      "path": "/api/auth/password/reset/verify",
+      "status_code": 400
+    },
+    {
+      "endpoint": "auth.refresh",
+      "method": "POST",
+      "rule": "/api/auth/refresh",
+      "path": "/api/auth/refresh",
+      "status_code": 401
+    },
+    {
+      "endpoint": "auth.register",
+      "method": "POST",
+      "rule": "/api/auth/register",
+      "path": "/api/auth/register",
+      "status_code": 400
+    },
+    {
+      "endpoint": "email.email_unsubscribe",
+      "method": "GET",
+      "rule": "/api/email/unsubscribe",
+      "path": "/api/email/unsubscribe",
+      "status_code": 400
+    },
+    {
+      "endpoint": "email.email_unsubscribe",
+      "method": "POST",
+      "rule": "/api/email/unsubscribe",
+      "path": "/api/email/unsubscribe",
+      "status_code": 400
+    },
+    {
+      "endpoint": "mfa.mfa_confirm",
+      "method": "POST",
+      "rule": "/api/mfa/confirm",
+      "path": "/api/mfa/confirm",
+      "status_code": 400
+    },
+    {
+      "endpoint": "mfa.mfa_disable",
+      "method": "POST",
+      "rule": "/api/mfa/disable",
+      "path": "/api/mfa/disable",
+      "status_code": 400
+    },
+    {
+      "endpoint": "mfa.mfa_setup",
+      "method": "POST",
+      "rule": "/api/mfa/setup",
+      "path": "/api/mfa/setup",
+      "status_code": 200
+    },
+    {
+      "endpoint": "predict.predict",
+      "method": "POST",
+      "rule": "/api/predict",
+      "path": "/api/predict",
+      "status_code": 400
+    },
+    {
+      "endpoint": "problem_reports.create_problem_report",
+      "method": "POST",
+      "rule": "/api/problem-reports",
+      "path": "/api/problem-reports",
+      "status_code": 400
+    },
+    {
+      "endpoint": "problem_reports.list_my_problem_reports",
+      "method": "GET",
+      "rule": "/api/problem-reports/mine",
+      "path": "/api/problem-reports/mine",
+      "status_code": 200
+    },
+    {
+      "endpoint": "evaluations.create_evaluation",
+      "method": "POST",
+      "rule": "/api/v1/evaluations",
+      "path": "/api/v1/evaluations",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.admin_bootstrap",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/admin/bootstrap",
+      "path": "/api/v1/questionnaire-runtime/admin/bootstrap",
+      "status_code": 201
+    },
+    {
+      "endpoint": "questionnaire_runtime.admin_create_question",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/admin/sections/<section_id>/questions",
+      "path": "/api/v1/questionnaire-runtime/admin/sections/sample/questions",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.admin_create_template",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/admin/templates",
+      "path": "/api/v1/questionnaire-runtime/admin/templates",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.admin_set_template_active",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/admin/templates/<template_id>/active",
+      "path": "/api/v1/questionnaire-runtime/admin/templates/d5908480-b15a-4e5b-9f55-570c9f6d5b01/active",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.admin_list_versions",
+      "method": "GET",
+      "rule": "/api/v1/questionnaire-runtime/admin/templates/<template_id>/versions",
+      "path": "/api/v1/questionnaire-runtime/admin/templates/d5908480-b15a-4e5b-9f55-570c9f6d5b01/versions",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_runtime.admin_create_version",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/admin/templates/<template_id>/versions",
+      "path": "/api/v1/questionnaire-runtime/admin/templates/d5908480-b15a-4e5b-9f55-570c9f6d5b01/versions",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.admin_get_version_detail",
+      "method": "GET",
+      "rule": "/api/v1/questionnaire-runtime/admin/versions/<version_id>",
+      "path": "/api/v1/questionnaire-runtime/admin/versions/sample",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.admin_upsert_disclosure",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/admin/versions/<version_id>/disclosures",
+      "path": "/api/v1/questionnaire-runtime/admin/versions/sample/disclosures",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.admin_publish_version",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/admin/versions/<version_id>/publish",
+      "path": "/api/v1/questionnaire-runtime/admin/versions/sample/publish",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.admin_create_section",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/admin/versions/<version_id>/sections",
+      "path": "/api/v1/questionnaire-runtime/admin/versions/sample/sections",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.delete_evaluation",
+      "method": "DELETE",
+      "rule": "/api/v1/questionnaire-runtime/evaluations/<evaluation_id>",
+      "path": "/api/v1/questionnaire-runtime/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.save_draft",
+      "method": "PATCH",
+      "rule": "/api/v1/questionnaire-runtime/evaluations/<evaluation_id>/draft",
+      "path": "/api/v1/questionnaire-runtime/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/draft",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.export_evaluation",
+      "method": "GET",
+      "rule": "/api/v1/questionnaire-runtime/evaluations/<evaluation_id>/export",
+      "path": "/api/v1/questionnaire-runtime/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/export",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.heartbeat",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/evaluations/<evaluation_id>/heartbeat",
+      "path": "/api/v1/questionnaire-runtime/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/heartbeat",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.get_responses",
+      "method": "GET",
+      "rule": "/api/v1/questionnaire-runtime/evaluations/<evaluation_id>/responses",
+      "path": "/api/v1/questionnaire-runtime/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/responses",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.get_results",
+      "method": "GET",
+      "rule": "/api/v1/questionnaire-runtime/evaluations/<evaluation_id>/results",
+      "path": "/api/v1/questionnaire-runtime/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/results",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.evaluation_status",
+      "method": "GET",
+      "rule": "/api/v1/questionnaire-runtime/evaluations/<evaluation_id>/status",
+      "path": "/api/v1/questionnaire-runtime/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/status",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.submit_evaluation",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/evaluations/<evaluation_id>/submit",
+      "path": "/api/v1/questionnaire-runtime/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/submit",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.validate_section",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/evaluations/<evaluation_id>/validate-section",
+      "path": "/api/v1/questionnaire-runtime/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/validate-section",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.create_draft_evaluation",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/evaluations/draft",
+      "path": "/api/v1/questionnaire-runtime/evaluations/draft",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.list_history",
+      "method": "GET",
+      "rule": "/api/v1/questionnaire-runtime/evaluations/history",
+      "path": "/api/v1/questionnaire-runtime/evaluations/history",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_runtime.list_notifications",
+      "method": "GET",
+      "rule": "/api/v1/questionnaire-runtime/notifications",
+      "path": "/api/v1/questionnaire-runtime/notifications",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_runtime.mark_notification_read",
+      "method": "PATCH",
+      "rule": "/api/v1/questionnaire-runtime/notifications/<notification_id>/read",
+      "path": "/api/v1/questionnaire-runtime/notifications/sample/read",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.professional_open_access",
+      "method": "POST",
+      "rule": "/api/v1/questionnaire-runtime/professional/access",
+      "path": "/api/v1/questionnaire-runtime/professional/access",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.professional_release_access",
+      "method": "DELETE",
+      "rule": "/api/v1/questionnaire-runtime/professional/evaluations/<evaluation_id>/access",
+      "path": "/api/v1/questionnaire-runtime/professional/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/access",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.professional_responses",
+      "method": "GET",
+      "rule": "/api/v1/questionnaire-runtime/professional/evaluations/<evaluation_id>/responses",
+      "path": "/api/v1/questionnaire-runtime/professional/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/responses",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.professional_results",
+      "method": "GET",
+      "rule": "/api/v1/questionnaire-runtime/professional/evaluations/<evaluation_id>/results",
+      "path": "/api/v1/questionnaire-runtime/professional/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/results",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_runtime.professional_tag",
+      "method": "PATCH",
+      "rule": "/api/v1/questionnaire-runtime/professional/evaluations/<evaluation_id>/tag",
+      "path": "/api/v1/questionnaire-runtime/professional/evaluations/d5908480-b15a-4e5b-9f55-570c9f6d5b01/tag",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_runtime.get_active_questionnaire",
+      "method": "GET",
+      "rule": "/api/v1/questionnaire-runtime/questionnaire/active",
+      "path": "/api/v1/questionnaire-runtime/questionnaire/active",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaires.create_questionnaire",
+      "method": "POST",
+      "rule": "/api/v1/questionnaires",
+      "path": "/api/v1/questionnaires",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaires.activate_questionnaire",
+      "method": "POST",
+      "rule": "/api/v1/questionnaires/<template_id>/activate",
+      "path": "/api/v1/questionnaires/d5908480-b15a-4e5b-9f55-570c9f6d5b01/activate",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaires.add_questions",
+      "method": "POST",
+      "rule": "/api/v1/questionnaires/<template_id>/questions",
+      "path": "/api/v1/questionnaires/d5908480-b15a-4e5b-9f55-570c9f6d5b01/questions",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaires.get_active_questionnaire",
+      "method": "GET",
+      "rule": "/api/v1/questionnaires/active",
+      "path": "/api/v1/questionnaires/active",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaires.clone_active_questionnaire",
+      "method": "POST",
+      "rule": "/api/v1/questionnaires/active/clone",
+      "path": "/api/v1/questionnaires/active/clone",
+      "status_code": 404
+    },
+    {
+      "endpoint": "users.list_users",
+      "method": "GET",
+      "rule": "/api/v1/users",
+      "path": "/api/v1/users",
+      "status_code": 200
+    },
+    {
+      "endpoint": "users.create_user",
+      "method": "POST",
+      "rule": "/api/v1/users",
+      "path": "/api/v1/users",
+      "status_code": 400
+    },
+    {
+      "endpoint": "users.deactivate_user",
+      "method": "DELETE",
+      "rule": "/api/v1/users/<user_id>",
+      "path": "/api/v1/users/d5908480-b15a-4e5b-9f55-570c9f6d5b01",
+      "status_code": 404
+    },
+    {
+      "endpoint": "users.get_user",
+      "method": "GET",
+      "rule": "/api/v1/users/<user_id>",
+      "path": "/api/v1/users/d5908480-b15a-4e5b-9f55-570c9f6d5b01",
+      "status_code": 404
+    },
+    {
+      "endpoint": "users.update_user",
+      "method": "PATCH",
+      "rule": "/api/v1/users/<user_id>",
+      "path": "/api/v1/users/d5908480-b15a-4e5b-9f55-570c9f6d5b01",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_adoption_history",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/adoption-history",
+      "path": "/api/v2/dashboard/adoption-history",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_api_health",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/api-health",
+      "path": "/api/v2/dashboard/api-health",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_data_quality",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/data-quality",
+      "path": "/api/v2/dashboard/data-quality",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_drift",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/drift",
+      "path": "/api/v2/dashboard/drift",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_equity",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/equity",
+      "path": "/api/v2/dashboard/equity",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_executive_summary",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/executive-summary",
+      "path": "/api/v2/dashboard/executive-summary",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_funnel",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/funnel",
+      "path": "/api/v2/dashboard/funnel",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_human_review",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/human-review",
+      "path": "/api/v2/dashboard/human-review",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_model_monitoring",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/model-monitoring",
+      "path": "/api/v2/dashboard/model-monitoring",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_productivity",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/productivity",
+      "path": "/api/v2/dashboard/productivity",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_questionnaire_quality",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/questionnaire-quality",
+      "path": "/api/v2/dashboard/questionnaire-quality",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_questionnaire_volume",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/questionnaire-volume",
+      "path": "/api/v2/dashboard/questionnaire-volume",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_retention",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/retention",
+      "path": "/api/v2/dashboard/retention",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.dashboard_user_growth",
+      "method": "GET",
+      "rule": "/api/v2/dashboard/user-growth",
+      "path": "/api/v2/dashboard/user-growth",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.get_active_questionnaire",
+      "method": "GET",
+      "rule": "/api/v2/questionnaires/active",
+      "path": "/api/v2/questionnaires/active",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.bootstrap_questionnaire_v2",
+      "method": "POST",
+      "rule": "/api/v2/questionnaires/admin/bootstrap",
+      "path": "/api/v2/questionnaires/admin/bootstrap",
+      "status_code": 201
+    },
+    {
+      "endpoint": "questionnaire_v2.history",
+      "method": "GET",
+      "rule": "/api/v2/questionnaires/history",
+      "path": "/api/v2/questionnaires/history",
+      "status_code": 200
+    },
+    {
+      "endpoint": "questionnaire_v2.history_item",
+      "method": "GET",
+      "rule": "/api/v2/questionnaires/history/<session_id>",
+      "path": "/api/v2/questionnaires/history/d5908480-b15a-4e5b-9f55-570c9f6d5b01",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_v2.pdf_metadata",
+      "method": "GET",
+      "rule": "/api/v2/questionnaires/history/<session_id>/pdf",
+      "path": "/api/v2/questionnaires/history/d5908480-b15a-4e5b-9f55-570c9f6d5b01/pdf",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_v2.pdf_download",
+      "method": "GET",
+      "rule": "/api/v2/questionnaires/history/<session_id>/pdf/download",
+      "path": "/api/v2/questionnaires/history/d5908480-b15a-4e5b-9f55-570c9f6d5b01/pdf/download",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_v2.pdf_generate",
+      "method": "POST",
+      "rule": "/api/v2/questionnaires/history/<session_id>/pdf/generate",
+      "path": "/api/v2/questionnaires/history/d5908480-b15a-4e5b-9f55-570c9f6d5b01/pdf/generate",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_v2.history_results",
+      "method": "GET",
+      "rule": "/api/v2/questionnaires/history/<session_id>/results",
+      "path": "/api/v2/questionnaires/history/d5908480-b15a-4e5b-9f55-570c9f6d5b01/results",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_v2.share",
+      "method": "POST",
+      "rule": "/api/v2/questionnaires/history/<session_id>/share",
+      "path": "/api/v2/questionnaires/history/d5908480-b15a-4e5b-9f55-570c9f6d5b01/share",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_v2.add_tag",
+      "method": "POST",
+      "rule": "/api/v2/questionnaires/history/<session_id>/tags",
+      "path": "/api/v2/questionnaires/history/d5908480-b15a-4e5b-9f55-570c9f6d5b01/tags",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_v2.remove_tag",
+      "method": "DELETE",
+      "rule": "/api/v2/questionnaires/history/<session_id>/tags/<tag_id>",
+      "path": "/api/v2/questionnaires/history/d5908480-b15a-4e5b-9f55-570c9f6d5b01/tags/sample",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_v2.create_session",
+      "method": "POST",
+      "rule": "/api/v2/questionnaires/sessions",
+      "path": "/api/v2/questionnaires/sessions",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_v2.get_session",
+      "method": "GET",
+      "rule": "/api/v2/questionnaires/sessions/<session_id>",
+      "path": "/api/v2/questionnaires/sessions/d5908480-b15a-4e5b-9f55-570c9f6d5b01",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_v2.patch_answers",
+      "method": "PATCH",
+      "rule": "/api/v2/questionnaires/sessions/<session_id>/answers",
+      "path": "/api/v2/questionnaires/sessions/d5908480-b15a-4e5b-9f55-570c9f6d5b01/answers",
+      "status_code": 400
+    },
+    {
+      "endpoint": "questionnaire_v2.get_session_page",
+      "method": "GET",
+      "rule": "/api/v2/questionnaires/sessions/<session_id>/page",
+      "path": "/api/v2/questionnaires/sessions/d5908480-b15a-4e5b-9f55-570c9f6d5b01/page",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_v2.submit_session",
+      "method": "POST",
+      "rule": "/api/v2/questionnaires/sessions/<session_id>/submit",
+      "path": "/api/v2/questionnaires/sessions/d5908480-b15a-4e5b-9f55-570c9f6d5b01/submit",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_v2.shared_access",
+      "method": "GET",
+      "rule": "/api/v2/questionnaires/shared/<questionnaire_id>/<share_code>",
+      "path": "/api/v2/questionnaires/shared/d5908480-b15a-4e5b-9f55-570c9f6d5b01/sample",
+      "status_code": 404
+    },
+    {
+      "endpoint": "questionnaire_v2.create_report_job",
+      "method": "POST",
+      "rule": "/api/v2/reports/jobs",
+      "path": "/api/v2/reports/jobs",
+      "status_code": 400
+    },
+    {
+      "endpoint": "docs.swagger_ui",
+      "method": "GET",
+      "rule": "/docs",
+      "path": "/docs",
+      "status_code": 200
+    },
+    {
+      "endpoint": "health.healthz",
+      "method": "GET",
+      "rule": "/healthz",
+      "path": "/healthz",
+      "status_code": 200
+    },
+    {
+      "endpoint": "metrics.metrics",
+      "method": "GET",
+      "rule": "/metrics",
+      "path": "/metrics",
+      "status_code": 401
+    },
+    {
+      "endpoint": "docs.openapi_yaml",
+      "method": "GET",
+      "rule": "/openapi.yaml",
+      "path": "/openapi.yaml",
+      "status_code": 200
+    },
+    {
+      "endpoint": "health.readyz",
+      "method": "GET",
+      "rule": "/readyz",
+      "path": "/readyz",
+      "status_code": 200
+    }
+  ]
+}

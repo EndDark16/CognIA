@@ -1,0 +1,31 @@
+domain,mode,source_campaign,note
+adhd,caregiver_1_3,rebuild_v2,bootstrap from source campaign
+adhd,caregiver_2_3,rebuild_v2,bootstrap from source campaign
+adhd,caregiver_full,rebuild_v2,bootstrap from source campaign
+adhd,psychologist_1_3,rebuild_v2,bootstrap from source campaign
+adhd,psychologist_2_3,rebuild_v2,bootstrap from source campaign
+adhd,psychologist_full,rebuild_v2,bootstrap from source campaign
+anxiety,caregiver_1_3,rebuild_v2,bootstrap from source campaign
+anxiety,caregiver_2_3,rebuild_v2,bootstrap from source campaign
+anxiety,caregiver_full,rebuild_v2,bootstrap from source campaign
+anxiety,psychologist_1_3,rebuild_v2,bootstrap from source campaign
+anxiety,psychologist_2_3,rebuild_v2,bootstrap from source campaign
+anxiety,psychologist_full,rebuild_v2,bootstrap from source campaign
+conduct,caregiver_1_3,rebuild_v2,bootstrap from source campaign
+conduct,caregiver_2_3,rebuild_v2,bootstrap from source campaign
+conduct,caregiver_full,rebuild_v2,bootstrap from source campaign
+conduct,psychologist_1_3,rebuild_v2,bootstrap from source campaign
+conduct,psychologist_2_3,rebuild_v2,bootstrap from source campaign
+conduct,psychologist_full,rebuild_v2,bootstrap from source campaign
+depression,caregiver_1_3,rebuild_v2,bootstrap from source campaign
+depression,caregiver_2_3,rebuild_v2,bootstrap from source campaign
+depression,caregiver_full,boosted_v3,bootstrap not computed in boosted_v3
+depression,psychologist_1_3,rebuild_v2,bootstrap from source campaign
+depression,psychologist_2_3,rebuild_v2,bootstrap from source campaign
+depression,psychologist_full,boosted_v3,bootstrap not computed in boosted_v3
+elimination,caregiver_1_3,boosted_v3,bootstrap not computed in boosted_v3
+elimination,caregiver_2_3,rebuild_v2,bootstrap from source campaign
+elimination,caregiver_full,rebuild_v2,bootstrap from source campaign
+elimination,psychologist_1_3,boosted_v3,bootstrap not computed in boosted_v3
+elimination,psychologist_2_3,rebuild_v2,bootstrap from source campaign
+elimination,psychologist_full,rebuild_v2,bootstrap from source campaign

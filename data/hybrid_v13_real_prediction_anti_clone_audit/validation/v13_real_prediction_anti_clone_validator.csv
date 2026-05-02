@@ -1,0 +1,2 @@
+audit_line,generated_at_utc,loader_points_v13,active_rows,prediction_recomputed_slots,artifacts_available_slots,metrics_match_yes_slots,metrics_match_no_slots,elimination_real_clone_count,all_domains_real_clone_count,all_domains_near_clone_warning_count,artifact_duplicate_hash_count,contract_compatible_yes_slots,guardrail_violation_count,final_audit_status
+hybrid_v13_real_prediction_anti_clone_audit,2026-05-01T00:54:10.850703+00:00,yes,30,30,30,30,0,4,4,23,0,30,0,fail

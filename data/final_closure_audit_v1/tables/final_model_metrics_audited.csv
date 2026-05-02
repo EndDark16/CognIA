@@ -1,0 +1,6 @@
+domain,model_version_final,dataset_version_final,threshold_final,calibration_strategy,precision,recall,specificity,balanced_accuracy,f1,roc_auc,pr_auc,support_positive,support_negative,specificity_reporting_mode,specificity_derivation,metric_confidence
+adhd,adhd_trial_compact_signal,processed_hybrid_dsm5_v2,0.75,not_explicit_in_final_artifacts,0.9797297297297296,0.9006211180124224,0.976,0.9383105590062112,,,,,,derived,specificity = 2*balanced_accuracy - recall,medium
+anxiety,retrained_anxiety_anti_overfit_v1,processed_hybrid_dsm5_v2,0.05,not_explicit_in_final_metrics_csv,0.9701492537313432,0.9848484848484848,0.9909090909090913,0.987878787878788,,,,,,derived,specificity = 2*balanced_accuracy - recall,medium
+conduct,domain_conduct_research_full,processed_hybrid_dsm5_v2,0.7,not_explicit_in_final_metrics_csv,0.9753086419753086,0.9875,0.9902912621359223,0.9888956310679612,,,,,,derived,specificity = 2*balanced_accuracy - recall,medium
+depression,domain_depression_strict_full,processed_hybrid_dsm5_v2,0.75,not_explicit_in_final_metrics_csv,0.9739130434782608,0.9739130434782608,0.9824561403508776,0.9781845919145692,,,,,,derived,specificity = 2*balanced_accuracy - recall,medium
+elimination,V5_T02_composite_clinical,processed_hybrid_dsm5_v2,0.4999999999999999,none,0.94375,0.937888198757764,0.928,0.932944099378882,,,,,,direct,not_applicable,high

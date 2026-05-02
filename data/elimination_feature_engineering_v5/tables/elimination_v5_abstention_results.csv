@@ -1,0 +1,5 @@
+version,mode,trial_id,coverage,precision_high_confidence_positive,effective_recall,uncertain_pct,low_threshold,high_threshold,thesis_utility,product_utility
+v5,binary_default,V5_T02_composite_clinical,1.0,0.94375,0.937888198757764,0.0,,,baseline,not_product_ready
+v5,abstention_assisted,V5_T02_composite_clinical,0.9440559440559441,0.9727891156462585,0.8881987577639752,0.055944055944055944,0.45000000000000007,0.6000000000000001,high_if_disclaimer_present,experimental_only
+v3_reference,abstention_assisted,V3_T07_abstention_assisted_operating_mode,0.9335664335664337,0.9225352112676056,0.8136645962732919,0.0664335664335664,,,high_if_disclaimer_present,experimental_only
+v2_reference,binary_default,T02_drop_high_risk_semantic_proxies,1.0,0.9056603773584906,0.8944099378881988,0.0,,,reference,not_product_ready

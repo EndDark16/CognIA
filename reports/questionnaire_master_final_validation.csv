@@ -1,0 +1,13 @@
+check_id,check_name,status,details
+CHK01,required_columns_present,pass,fixed columns
+CHK02,no_shifted_columns_detected,pass,dataframe writer
+CHK03,response_type_values_valid,pass,allowed set
+CHK04,required_flags_valid,pass,yes/no
+CHK05,allow_unknown_values_valid,pass,yes/no
+CHK06,domains_valid,pass,subset of five domains
+CHK07,no_open_questions_in_model_core,pass,no text/open response types
+CHK08,final_models_only_scope,pass,v15 inventory rule
+CHK09,caregiver_mode_present,pass,present
+CHK10,psychologist_mode_present,pass,present
+CHK11,critical_inputs_covered,pass,missing=0
+CHK12,no_invalid_placeholder_in_critical_fields,pass,needs_review_count=0

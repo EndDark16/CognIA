@@ -1,0 +1,14 @@
+domain,mode,ensemble_type,members,note
+adhd,caregiver_1_3,avg_top2_val,13|21,ensemble placeholder; use best single model
+adhd,caregiver_2_3,avg_top2_val,35|39,ensemble placeholder; use best single model
+adhd,psychologist_1_3,avg_top2_val,52|60,ensemble placeholder; use best single model
+adhd,psychologist_2_3,avg_top2_val,74|72,ensemble placeholder; use best single model
+anxiety,caregiver_1_3,avg_top2_val,243|247,ensemble placeholder; use best single model
+depression,caregiver_1_3,avg_top2_val,96|92,ensemble placeholder; use best single model
+depression,caregiver_2_3,avg_top2_val,102|110,ensemble placeholder; use best single model
+depression,caregiver_full,avg_top2_val,125|123,ensemble placeholder; use best single model
+depression,psychologist_1_3,avg_top2_val,153|149,ensemble placeholder; use best single model
+depression,psychologist_2_3,avg_top2_val,167|159,ensemble placeholder; use best single model
+depression,psychologist_full,avg_top2_val,189|177,ensemble placeholder; use best single model
+elimination,caregiver_1_3,avg_top2_val,210|204,ensemble placeholder; use best single model
+elimination,psychologist_1_3,avg_top2_val,222|224,ensemble placeholder; use best single model

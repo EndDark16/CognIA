@@ -1,0 +1,8 @@
+metric,value
+total_model_features,223
+direct_both,147
+direct_psychologist_only,33
+direct_caregiver_only,0
+transparent_derived,43
+caregiver_can_answer_total,148
+psychologist_can_answer_total,223

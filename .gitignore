@@ -1,0 +1,126 @@
+# -----------------------------
+# Python / Build
+# -----------------------------
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.dylib
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# -----------------------------
+# Virtual environments
+# -----------------------------
+venv/
+.venv/
+ENV/
+env/
+**/venv/
+scripts/venv/
+
+# -----------------------------
+# Test and notebook caches
+# -----------------------------
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+.sonar/
+sonar_issues.csv
+sonar_issues.json
+
+# -----------------------------
+# Logs / temp
+# -----------------------------
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
+*.bak
+*.orig
+
+# -----------------------------
+# OS / IDE
+# -----------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+.history/
+
+.worktrees/
+
+# -----------------------------
+# Secrets / local context
+# -----------------------------
+.env
+.env.*
+!.env.example
+docs/traceability_map.md
+
+# -----------------------------
+# Large ML binaries (regenerable)
+# -----------------------------
+*.joblib
+*.pkl
+*.pickle
+*.onnx
+*.npy
+*.npz
+
+# Keep the minimum runtime model required by the current API
+!models/adhd_model.pkl
+
+# -----------------------------
+# Heavy generated artifacts
+# -----------------------------
+artifacts/models/
+artifacts/versioned_models/
+artifacts/preprocessing/
+artifacts/hybrid_dsm5_v2/models/
+artifacts/inference_v5/
+
+# Keep promoted inference scope in repo
+!artifacts/inference_v4/
+!artifacts/inference_v4/**
+
+# Runtime-generated exports/uploads (never commit)
+artifacts/runtime_reports/
+artifacts/problem_reports/uploads/
+artifacts/**/uploads/
+catboost_info/
+
+# -----------------------------
+# Heavy generated data/intermediates
+# -----------------------------
+data/processed/
+data/processed_dsm5_exact_v1/
+data/processed_hybrid_dsm5_v2/
+data/**/participant_normative_evidence_long.csv
+data/**/dataset_participant_normative_evidence_long.csv
+
+# Keep normative and final closure audit references
+!data/normative_matrix/
+!data/normative_matrix/**
+!data/final_closure_audit_v1/
+!data/final_closure_audit_v1/**
+
+# -----------------------------
+# Keep final closure docs
+# -----------------------------
+!reports/final_closure/
+!reports/final_closure/**
+
+# Local notebooks/output noise
+notebooks/.ipynb_checkpoints/
