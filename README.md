@@ -89,7 +89,7 @@ Este README esta pensado como fuente principal de onboarding tecnico y operacion
   - `data/*`, `artifacts/*`, reportes de campanas, notas de release, matrices de gap.
 
 ### Despliegue (Ubuntu self-hosted operativo)
-- Linea activa de deploy backend: GitHub Actions + runner self-hosted `cognia-backend` sobre rama `development`.
+- Linea activa de deploy backend de produccion: GitHub Actions + runner self-hosted `cognia-backend` sobre rama `main`.
 - Workflows versionados en este repo:
   - CI continuo (GitHub-hosted): `.github/workflows/ci-backend.yml`
   - Deploy best effort (self-hosted): `.github/workflows/deploy-backend.yml`
@@ -805,7 +805,7 @@ Comandos:
 ```
 
 Notas:
-- Si no se usa `-SkipCoverage`, el script corre un subconjunto de tests y genera `coverage.xml`.
+- Si no se usa `-SkipCoverage`, el script corre un subconjunto de tests y genera `artifacts/quality/sonar/latest/coverage.xml`.
 - Scope Sonar actual versionado: `api`, `app`, `config` (`sonar-project.properties`).
 
 ### Calidad documental de OpenAPI
@@ -991,6 +991,9 @@ Toda interpretacion de resultados de CognIA debe mantenerse en el marco de apoyo
 - Documentacion de seguridad:
   - `docs/security_encryption.md`
   - `docs/clinical_summary_endpoint.md`
+- Documentacion de esquema DB (introspeccion estructural):
+  - `docs/database_schema.md`
+  - `data/database_schema_audit/`
 
 ## Estado de linea activa (2026-05-02, v17 domain-specialized RF)
 - Se activo `hybrid_active_modes_freeze_v17` + `hybrid_operational_freeze_v17` como linea final de modelos.
