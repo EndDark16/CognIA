@@ -1,0 +1,25 @@
+{
+  "spec_path": "docs/openapi.yaml",
+  "yaml_valid": "yes",
+  "openapi_version": "3.0.3",
+  "openapi_version_valid": "yes",
+  "duplicate_keys": 0,
+  "broken_refs": 0,
+  "duplicate_operation_ids": 0,
+  "duplicate_paths": 0,
+  "equivalent_validation_pass": "yes",
+  "swagger_renderable": "yes",
+  "tools_used": [
+    "ruamel.yaml",
+    "openapi-spec-validator"
+  ],
+  "validator_errors": [],
+  "broken_ref_list": [],
+  "duplicate_operation_id_list": [],
+  "notes": [],
+  "corrections_applied": [
+    "Se agregaron description obligatorios en components.responses para cumplimiento OpenAPI 3.0.x.",
+    "Se corrigieron parametros de path inconsistentes (name:id fuera de placeholder real) en rutas admin.",
+    "Se normalizo documentacion quirurgica de endpoints sensibles v2 con schemas y errores especificos."
+  ]
+}
