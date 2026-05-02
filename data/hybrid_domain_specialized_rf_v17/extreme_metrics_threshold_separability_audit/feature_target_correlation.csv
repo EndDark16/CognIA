@@ -1,0 +1,531 @@
+slot_key,domain,feature,feature_label,corr_train,corr_val,corr_holdout,proxy_pattern_flag
+adhd/caregiver/caregiver_1_3,adhd,adhd_onset_before_12,Adhd onset before 12,0.4792915345286189,0.45968056698629883,0.4407623049250705,no
+adhd/caregiver/caregiver_1_3,adhd,adhd_impairment_school,Adhd impairment school,0.5722919058842649,0.5772876987427996,0.5221480022257017,no
+adhd/caregiver/caregiver_1_3,adhd,adhd_impairment_home,Adhd impairment home,0.5682941404265589,0.5655910582151977,0.5082820467013798,no
+adhd/caregiver/caregiver_1_3,adhd,adhd_inatt_06_avoids_sustained_effort,Adhd inatt 06 avoids sustained effort,0.5491545614292802,0.5387281740830674,0.49005581574894763,no
+adhd/caregiver/caregiver_1_3,adhd,adhd_inatt_03_seems_not_listening,Adhd inatt 03 seems not listening,0.5608479959428437,0.5624639432307846,0.5049553818250481,no
+adhd/caregiver/caregiver_1_3,adhd,adhd_inatt_09_forgetful_daily_activities,Adhd inatt 09 forgetful daily activities,0.5347364879909658,0.5337939853243274,0.4716970808858639,no
+adhd/caregiver/caregiver_1_3,adhd,adhd_impairment_social,Adhd impairment social,0.5574697961630977,0.5536776454200264,0.5266279732803539,no
+adhd/caregiver/caregiver_1_3,adhd,adhd_inatt_07_loses_things,Adhd inatt 07 loses things,0.5472894576035113,0.5313567403844055,0.4328934142279935,no
+adhd/caregiver/caregiver_1_3,adhd,adhd_inatt_02_sustained_attention_difficulty,Adhd inatt 02 sustained attention difficulty,0.5502608824191059,0.535088155063558,0.4957255012708286,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_onset_before_12,Adhd onset before 12,0.4792915345286189,0.45968056698629883,0.4407623049250705,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_impairment_school,Adhd impairment school,0.5722919058842649,0.5772876987427996,0.5221480022257017,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_impairment_home,Adhd impairment home,0.5682941404265589,0.5655910582151977,0.5082820467013798,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_inatt_06_avoids_sustained_effort,Adhd inatt 06 avoids sustained effort,0.5491545614292802,0.5387281740830674,0.49005581574894763,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_inatt_03_seems_not_listening,Adhd inatt 03 seems not listening,0.5608479959428437,0.5624639432307846,0.5049553818250481,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_inatt_09_forgetful_daily_activities,Adhd inatt 09 forgetful daily activities,0.5347364879909658,0.5337939853243274,0.4716970808858639,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_impairment_social,Adhd impairment social,0.5574697961630977,0.5536776454200264,0.5266279732803539,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_inatt_07_loses_things,Adhd inatt 07 loses things,0.5472894576035113,0.5313567403844055,0.4328934142279935,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_inatt_02_sustained_attention_difficulty,Adhd inatt 02 sustained attention difficulty,0.5502608824191059,0.535088155063558,0.4957255012708286,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_inatt_08_easily_distracted,Adhd inatt 08 easily distracted,0.5216902183071669,0.5562765148835506,0.48262582897947726,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_hypimp_07_blurts_out,Adhd hypimp 07 blurts out,0.5412133069527403,0.46791608033026827,0.45365870313664997,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_inatt_01_attention_to_detail_errors,Adhd inatt 01 attention to detail errors,0.5431945090964168,0.5818857202828026,0.45970327402214994,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_inatt_04_fails_to_finish_tasks,Adhd inatt 04 fails to finish tasks,0.5581909860905788,0.5659415435845859,0.430558728200285,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_inatt_05_organization_difficulty,Adhd inatt 05 organization difficulty,0.5297675555971095,0.5193942098441707,0.4903059973131858,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_hypimp_02_leaves_seat,Adhd hypimp 02 leaves seat,0.4829901015619931,0.5770298628655063,0.4906848684995991,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_hypimp_05_driven_by_motor,Adhd hypimp 05 driven by motor,0.5194650514148698,0.49487233566865785,0.4951721019930024,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_hypimp_04_cannot_play_quietly,Adhd hypimp 04 cannot play quietly,0.49566878034856254,0.5696115557797294,0.45498617606991376,no
+adhd/caregiver/caregiver_2_3,adhd,adhd_context_other,Adhd context other,0.45449015439459567,0.4418040171481989,0.37368341963199764,no
+adhd/caregiver/caregiver_full,adhd,adhd_onset_before_12,Adhd onset before 12,0.4792915345286189,0.45968056698629883,0.4407623049250705,no
+adhd/caregiver/caregiver_full,adhd,adhd_impairment_school,Adhd impairment school,0.5722919058842649,0.5772876987427996,0.5221480022257017,no
+adhd/caregiver/caregiver_full,adhd,adhd_impairment_home,Adhd impairment home,0.5682941404265589,0.5655910582151977,0.5082820467013798,no
+adhd/caregiver/caregiver_full,adhd,adhd_inatt_06_avoids_sustained_effort,Adhd inatt 06 avoids sustained effort,0.5491545614292802,0.5387281740830674,0.49005581574894763,no
+adhd/caregiver/caregiver_full,adhd,adhd_inatt_03_seems_not_listening,Adhd inatt 03 seems not listening,0.5608479959428437,0.5624639432307846,0.5049553818250481,no
+adhd/caregiver/caregiver_full,adhd,adhd_inatt_09_forgetful_daily_activities,Adhd inatt 09 forgetful daily activities,0.5347364879909658,0.5337939853243274,0.4716970808858639,no
+adhd/caregiver/caregiver_full,adhd,adhd_impairment_social,Adhd impairment social,0.5574697961630977,0.5536776454200264,0.5266279732803539,no
+adhd/caregiver/caregiver_full,adhd,adhd_inatt_07_loses_things,Adhd inatt 07 loses things,0.5472894576035113,0.5313567403844055,0.4328934142279935,no
+adhd/caregiver/caregiver_full,adhd,adhd_inatt_02_sustained_attention_difficulty,Adhd inatt 02 sustained attention difficulty,0.5502608824191059,0.535088155063558,0.4957255012708286,no
+adhd/caregiver/caregiver_full,adhd,adhd_inatt_08_easily_distracted,Adhd inatt 08 easily distracted,0.5216902183071669,0.5562765148835506,0.48262582897947726,no
+adhd/caregiver/caregiver_full,adhd,adhd_hypimp_07_blurts_out,Adhd hypimp 07 blurts out,0.5412133069527403,0.46791608033026827,0.45365870313664997,no
+adhd/caregiver/caregiver_full,adhd,adhd_inatt_01_attention_to_detail_errors,Adhd inatt 01 attention to detail errors,0.5431945090964168,0.5818857202828026,0.45970327402214994,no
+adhd/caregiver/caregiver_full,adhd,adhd_inatt_04_fails_to_finish_tasks,Adhd inatt 04 fails to finish tasks,0.5581909860905788,0.5659415435845859,0.430558728200285,no
+adhd/caregiver/caregiver_full,adhd,adhd_inatt_05_organization_difficulty,Adhd inatt 05 organization difficulty,0.5297675555971095,0.5193942098441707,0.4903059973131858,no
+adhd/caregiver/caregiver_full,adhd,adhd_hypimp_02_leaves_seat,Adhd hypimp 02 leaves seat,0.4829901015619931,0.5770298628655063,0.4906848684995991,no
+adhd/caregiver/caregiver_full,adhd,adhd_hypimp_05_driven_by_motor,Adhd hypimp 05 driven by motor,0.5194650514148698,0.49487233566865785,0.4951721019930024,no
+adhd/caregiver/caregiver_full,adhd,adhd_hypimp_04_cannot_play_quietly,Adhd hypimp 04 cannot play quietly,0.49566878034856254,0.5696115557797294,0.45498617606991376,no
+adhd/caregiver/caregiver_full,adhd,adhd_context_other,Adhd context other,0.45449015439459567,0.4418040171481989,0.37368341963199764,no
+adhd/caregiver/caregiver_full,adhd,adhd_hypimp_01_fidgets,Adhd hypimp 01 fidgets,0.5135387673287232,0.4596449777703091,0.4497651889619618,no
+adhd/caregiver/caregiver_full,adhd,adhd_hypimp_06_talks_excessively,Adhd hypimp 06 talks excessively,0.49233166933733363,0.49530456070242446,0.4144089398302431,no
+adhd/caregiver/caregiver_full,adhd,adhd_context_home,Adhd context home,0.4047018658644353,0.4204149627431112,0.37856553201211274,no
+adhd/caregiver/caregiver_full,adhd,adhd_hypimp_09_interrupts_intrudes,Adhd hypimp 09 interrupts intrudes,0.4851259288637832,0.4912305645507512,0.4164232073742588,no
+adhd/caregiver/caregiver_full,adhd,adhd_hypimp_03_runs_or_climbs_inappropriately,Adhd hypimp 03 runs or climbs inappropriately,0.49244091897021447,0.5535474664188246,0.3754670265749408,no
+adhd/caregiver/caregiver_full,adhd,adhd_hypimp_08_difficulty_waiting_turn,Adhd hypimp 08 difficulty waiting turn,0.4728247929737069,0.4244665190232284,0.4456641791215581,no
+adhd/caregiver/caregiver_full,adhd,adhd_context_school,Adhd context school,0.4012756924038976,0.3938316434708857,0.34375921566415435,no
+adhd/caregiver/caregiver_full,adhd,age_years,Edad en años cumplidos,0.004652530268201025,-0.024365651050823046,-0.034525394836706476,no
+adhd/psychologist/psychologist_1_3,adhd,adhd_onset_before_12,Adhd onset before 12,0.4792915345286189,0.45968056698629883,0.4407623049250705,no
+adhd/psychologist/psychologist_1_3,adhd,adhd_inatt_06_avoids_sustained_effort,Adhd inatt 06 avoids sustained effort,0.5491545614292802,0.5387281740830674,0.49005581574894763,no
+adhd/psychologist/psychologist_1_3,adhd,adhd_inatt_09_forgetful_daily_activities,Adhd inatt 09 forgetful daily activities,0.5347364879909658,0.5337939853243274,0.4716970808858639,no
+adhd/psychologist/psychologist_1_3,adhd,adhd_inatt_03_seems_not_listening,Adhd inatt 03 seems not listening,0.5608479959428437,0.5624639432307846,0.5049553818250481,no
+adhd/psychologist/psychologist_1_3,adhd,adhd_inatt_02_sustained_attention_difficulty,Adhd inatt 02 sustained attention difficulty,0.5502608824191059,0.535088155063558,0.4957255012708286,no
+adhd/psychologist/psychologist_1_3,adhd,adhd_hypimp_07_blurts_out,Adhd hypimp 07 blurts out,0.5412133069527403,0.46791608033026827,0.45365870313664997,no
+adhd/psychologist/psychologist_1_3,adhd,adhd_inatt_08_easily_distracted,Adhd inatt 08 easily distracted,0.5216902183071669,0.5562765148835506,0.48262582897947726,no
+adhd/psychologist/psychologist_1_3,adhd,adhd_inatt_01_attention_to_detail_errors,Adhd inatt 01 attention to detail errors,0.5431945090964168,0.5818857202828026,0.45970327402214994,no
+adhd/psychologist/psychologist_1_3,adhd,adhd_inatt_07_loses_things,Adhd inatt 07 loses things,0.5472894576035113,0.5313567403844055,0.4328934142279935,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_onset_before_12,Adhd onset before 12,0.4792915345286189,0.45968056698629883,0.4407623049250705,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_not_better_explained_other_mental,Adhd not better explained other mental,0.22069133017052434,0.2004823400463397,0.20560695192702064,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_impairment_home,Adhd impairment home,0.5682941404265589,0.5655910582151977,0.5082820467013798,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_impairment_school,Adhd impairment school,0.5722919058842649,0.5772876987427996,0.5221480022257017,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_inatt_06_avoids_sustained_effort,Adhd inatt 06 avoids sustained effort,0.5491545614292802,0.5387281740830674,0.49005581574894763,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_inatt_09_forgetful_daily_activities,Adhd inatt 09 forgetful daily activities,0.5347364879909658,0.5337939853243274,0.4716970808858639,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_inatt_03_seems_not_listening,Adhd inatt 03 seems not listening,0.5608479959428437,0.5624639432307846,0.5049553818250481,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_inatt_02_sustained_attention_difficulty,Adhd inatt 02 sustained attention difficulty,0.5502608824191059,0.535088155063558,0.4957255012708286,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_impairment_social,Adhd impairment social,0.5574697961630977,0.5536776454200264,0.5266279732803539,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_hypimp_07_blurts_out,Adhd hypimp 07 blurts out,0.5412133069527403,0.46791608033026827,0.45365870313664997,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_inatt_08_easily_distracted,Adhd inatt 08 easily distracted,0.5216902183071669,0.5562765148835506,0.48262582897947726,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_inatt_01_attention_to_detail_errors,Adhd inatt 01 attention to detail errors,0.5431945090964168,0.5818857202828026,0.45970327402214994,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_inatt_07_loses_things,Adhd inatt 07 loses things,0.5472894576035113,0.5313567403844055,0.4328934142279935,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_inatt_04_fails_to_finish_tasks,Adhd inatt 04 fails to finish tasks,0.5581909860905788,0.5659415435845859,0.430558728200285,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_hypimp_02_leaves_seat,Adhd hypimp 02 leaves seat,0.4829901015619931,0.5770298628655063,0.4906848684995991,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_hypimp_01_fidgets,Adhd hypimp 01 fidgets,0.5135387673287232,0.4596449777703091,0.4497651889619618,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_inatt_05_organization_difficulty,Adhd inatt 05 organization difficulty,0.5297675555971095,0.5193942098441707,0.4903059973131858,no
+adhd/psychologist/psychologist_2_3,adhd,adhd_hypimp_04_cannot_play_quietly,Adhd hypimp 04 cannot play quietly,0.49566878034856254,0.5696115557797294,0.45498617606991376,no
+adhd/psychologist/psychologist_full,adhd,adhd_onset_before_12,Adhd onset before 12,0.4792915345286189,0.45968056698629883,0.4407623049250705,no
+adhd/psychologist/psychologist_full,adhd,adhd_not_better_explained_other_mental,Adhd not better explained other mental,0.22069133017052434,0.2004823400463397,0.20560695192702064,no
+adhd/psychologist/psychologist_full,adhd,adhd_impairment_home,Adhd impairment home,0.5682941404265589,0.5655910582151977,0.5082820467013798,no
+adhd/psychologist/psychologist_full,adhd,adhd_impairment_school,Adhd impairment school,0.5722919058842649,0.5772876987427996,0.5221480022257017,no
+adhd/psychologist/psychologist_full,adhd,adhd_inatt_06_avoids_sustained_effort,Adhd inatt 06 avoids sustained effort,0.5491545614292802,0.5387281740830674,0.49005581574894763,no
+adhd/psychologist/psychologist_full,adhd,adhd_inatt_09_forgetful_daily_activities,Adhd inatt 09 forgetful daily activities,0.5347364879909658,0.5337939853243274,0.4716970808858639,no
+adhd/psychologist/psychologist_full,adhd,adhd_inatt_03_seems_not_listening,Adhd inatt 03 seems not listening,0.5608479959428437,0.5624639432307846,0.5049553818250481,no
+adhd/psychologist/psychologist_full,adhd,adhd_inatt_02_sustained_attention_difficulty,Adhd inatt 02 sustained attention difficulty,0.5502608824191059,0.535088155063558,0.4957255012708286,no
+adhd/psychologist/psychologist_full,adhd,adhd_impairment_social,Adhd impairment social,0.5574697961630977,0.5536776454200264,0.5266279732803539,no
+adhd/psychologist/psychologist_full,adhd,adhd_hypimp_07_blurts_out,Adhd hypimp 07 blurts out,0.5412133069527403,0.46791608033026827,0.45365870313664997,no
+adhd/psychologist/psychologist_full,adhd,adhd_inatt_08_easily_distracted,Adhd inatt 08 easily distracted,0.5216902183071669,0.5562765148835506,0.48262582897947726,no
+adhd/psychologist/psychologist_full,adhd,adhd_inatt_01_attention_to_detail_errors,Adhd inatt 01 attention to detail errors,0.5431945090964168,0.5818857202828026,0.45970327402214994,no
+adhd/psychologist/psychologist_full,adhd,adhd_inatt_07_loses_things,Adhd inatt 07 loses things,0.5472894576035113,0.5313567403844055,0.4328934142279935,no
+adhd/psychologist/psychologist_full,adhd,adhd_inatt_04_fails_to_finish_tasks,Adhd inatt 04 fails to finish tasks,0.5581909860905788,0.5659415435845859,0.430558728200285,no
+adhd/psychologist/psychologist_full,adhd,adhd_hypimp_02_leaves_seat,Adhd hypimp 02 leaves seat,0.4829901015619931,0.5770298628655063,0.4906848684995991,no
+adhd/psychologist/psychologist_full,adhd,adhd_hypimp_01_fidgets,Adhd hypimp 01 fidgets,0.5135387673287232,0.4596449777703091,0.4497651889619618,no
+adhd/psychologist/psychologist_full,adhd,adhd_inatt_05_organization_difficulty,Adhd inatt 05 organization difficulty,0.5297675555971095,0.5193942098441707,0.4903059973131858,no
+adhd/psychologist/psychologist_full,adhd,adhd_hypimp_04_cannot_play_quietly,Adhd hypimp 04 cannot play quietly,0.49566878034856254,0.5696115557797294,0.45498617606991376,no
+adhd/psychologist/psychologist_full,adhd,adhd_hypimp_05_driven_by_motor,Adhd hypimp 05 driven by motor,0.5194650514148698,0.49487233566865785,0.4951721019930024,no
+adhd/psychologist/psychologist_full,adhd,adhd_hypimp_09_interrupts_intrudes,Adhd hypimp 09 interrupts intrudes,0.4851259288637832,0.4912305645507512,0.4164232073742588,no
+adhd/psychologist/psychologist_full,adhd,adhd_context_other,Adhd context other,0.45449015439459567,0.4418040171481989,0.37368341963199764,no
+adhd/psychologist/psychologist_full,adhd,adhd_hypimp_06_talks_excessively,Adhd hypimp 06 talks excessively,0.49233166933733363,0.49530456070242446,0.4144089398302431,no
+adhd/psychologist/psychologist_full,adhd,adhd_hypimp_08_difficulty_waiting_turn,Adhd hypimp 08 difficulty waiting turn,0.4728247929737069,0.4244665190232284,0.4456641791215581,no
+adhd/psychologist/psychologist_full,adhd,adhd_context_home,Adhd context home,0.4047018658644353,0.4204149627431112,0.37856553201211274,no
+adhd/psychologist/psychologist_full,adhd,adhd_hypimp_03_runs_or_climbs_inappropriately,Adhd hypimp 03 runs or climbs inappropriately,0.49244091897021447,0.5535474664188246,0.3754670265749408,no
+adhd/psychologist/psychologist_full,adhd,adhd_context_school,Adhd context school,0.4012756924038976,0.3938316434708857,0.34375921566415435,no
+adhd/psychologist/psychologist_full,adhd,adhd_not_psychosis_exclusive,Adhd not psychosis exclusive,0.06287084064724224,0.05063006346994131,0.050630063469941325,no
+anxiety/caregiver/caregiver_1_3,anxiety,sep_anx_impairment,Sep anx impairment,0.6678260713328411,0.6777649466406086,0.693279333315816,no
+anxiety/caregiver/caregiver_1_3,anxiety,gad_difficulty_controlling_worry,Gad difficulty controlling worry,0.6569544439830233,0.5543179992365774,0.625938316396956,no
+anxiety/caregiver/caregiver_1_3,anxiety,gad_impairment,Gad impairment,0.6119733444082839,0.5446627625496633,0.6526854961778134,no
+anxiety/caregiver/caregiver_1_3,anxiety,gad_excessive_worry_multiple_areas,Gad excessive worry multiple areas,0.6243833888183697,0.5705131195537686,0.6591939436078409,no
+anxiety/caregiver/caregiver_1_3,anxiety,social_anxiety_impairment,Social anxiety impairment,0.5808454880394225,0.5277846963421795,0.5629684212271087,no
+anxiety/caregiver/caregiver_2_3,anxiety,sep_anx_impairment,Sep anx impairment,0.6678260713328411,0.6777649466406086,0.693279333315816,no
+anxiety/caregiver/caregiver_2_3,anxiety,sep_anx_duration_weeks,Sep anx duration weeks,0.5062415128570534,0.5568384223375206,0.546309297161993,no
+anxiety/caregiver/caregiver_2_3,anxiety,agor_escape_help_cognition,Agor escape help cognition,0.6366811746677057,0.6363329674212237,0.5892197699897416,no
+anxiety/caregiver/caregiver_2_3,anxiety,age_years,Edad en años cumplidos,0.14700251940760614,0.13502547167795986,0.14842241373277415,no
+anxiety/caregiver/caregiver_2_3,anxiety,gad_duration_months,Gad duration months,0.5832781190709285,0.49217822992425914,0.5860476974695946,no
+anxiety/caregiver/caregiver_2_3,anxiety,gad_assoc_06_sleep_problems,Gad assoc 06 sleep problems,0.5911073376429208,0.5287957813541326,0.5792895614955275,no
+anxiety/caregiver/caregiver_2_3,anxiety,gad_difficulty_controlling_worry,Gad difficulty controlling worry,0.6569544439830233,0.5543179992365774,0.625938316396956,no
+anxiety/caregiver/caregiver_2_3,anxiety,agor_avoid_or_need_companion,Agor avoid or need companion,0.6086386424965045,0.6044462333230761,0.5907325800659068,no
+anxiety/caregiver/caregiver_2_3,anxiety,social_anxiety_duration_months,Social anxiety duration months,0.5593113124114265,0.5108149814094286,0.5289974410132811,no
+anxiety/caregiver/caregiver_2_3,anxiety,sep_anx_03_worry_event_causing_separation,Sep anx 03 worry event causing separation,0.6028320322867743,0.553548977406398,0.61341083570066,no
+anxiety/caregiver/caregiver_2_3,anxiety,gad_assoc_03_concentration_difficulty,Gad assoc 03 concentration difficulty,0.5788751063281126,0.6261194898798574,0.5662901193179477,no
+anxiety/caregiver/caregiver_2_3,anxiety,social_anxiety_fear_negative_evaluation,Social anxiety fear negative evaluation,0.612106217377865,0.598102947688679,0.623962845132777,no
+anxiety/caregiver/caregiver_2_3,anxiety,gad_assoc_05_muscle_tension,Gad assoc 05 muscle tension,0.6024279208571991,0.5608442343751694,0.6113962010821302,no
+anxiety/caregiver/caregiver_2_3,anxiety,sep_anx_07_separation_nightmares,Sep anx 07 separation nightmares,0.5749889112562848,0.5628252142103709,0.5981530697983302,no
+anxiety/caregiver/caregiver_2_3,anxiety,sep_anx_05_fear_being_alone_without_attachment,Sep anx 05 fear being alone without attachment,0.591361303434054,0.5578661875791108,0.6038042740657993,no
+anxiety/caregiver/caregiver_2_3,anxiety,gad_impairment,Gad impairment,0.6119733444082839,0.5446627625496633,0.6526854961778134,no
+anxiety/caregiver/caregiver_2_3,anxiety,sep_anx_04_refuses_leaving_home_school,Sep anx 04 refuses leaving home school,0.5977757797451982,0.5136209999167766,0.6128744813955218,no
+anxiety/caregiver/caregiver_2_3,anxiety,gad_assoc_02_fatigue,Gad assoc 02 fatigue,0.6087663765694601,0.54321609104011,0.5922158084916808,no
+anxiety/caregiver/caregiver_2_3,anxiety,gad_assoc_01_restlessness,Gad assoc 01 restlessness,0.6328936551633361,0.5793718864917343,0.6213375872715732,no
+anxiety/caregiver/caregiver_2_3,anxiety,sep_anx_08_physical_complaints_on_separation,Sep anx 08 physical complaints on separation,0.544833338840712,0.568472045340954,0.515775630847905,no
+anxiety/caregiver/caregiver_2_3,anxiety,agor_fear_01_public_transport,Agor fear 01 public transport,0.5833203413413492,0.5834726676255989,0.5680530015231798,no
+anxiety/caregiver/caregiver_2_3,anxiety,sep_anx_06_refuses_sleep_away_or_alone,Sep anx 06 refuses sleep away or alone,0.5687459952461441,0.5544251338894222,0.572263669961601,no
+anxiety/caregiver/caregiver_2_3,anxiety,gad_assoc_04_irritability,Gad assoc 04 irritability,0.6034647170915045,0.60068660071197,0.5930672693903369,no
+anxiety/caregiver/caregiver_2_3,anxiety,social_anxiety_fear_being_observed,Social anxiety fear being observed,0.586250297626316,0.5587741581918837,0.611986266617546,no
+anxiety/caregiver/caregiver_2_3,anxiety,gad_excessive_worry_multiple_areas,Gad excessive worry multiple areas,0.6243833888183697,0.5705131195537686,0.6591939436078409,no
+anxiety/caregiver/caregiver_2_3,anxiety,agor_fear_03_enclosed_spaces,Agor fear 03 enclosed spaces,0.5717139181164593,0.5836933136150857,0.5421875672057482,no
+anxiety/caregiver/caregiver_2_3,anxiety,social_anxiety_impairment,Social anxiety impairment,0.5808454880394225,0.5277846963421795,0.5629684212271087,no
+anxiety/caregiver/caregiver_full,anxiety,sep_anx_impairment,Sep anx impairment,0.6678260713328411,0.6777649466406086,0.693279333315816,no
+anxiety/caregiver/caregiver_full,anxiety,sep_anx_duration_weeks,Sep anx duration weeks,0.5062415128570534,0.5568384223375206,0.546309297161993,no
+anxiety/caregiver/caregiver_full,anxiety,agor_escape_help_cognition,Agor escape help cognition,0.6366811746677057,0.6363329674212237,0.5892197699897416,no
+anxiety/caregiver/caregiver_full,anxiety,age_years,Edad en años cumplidos,0.14700251940760614,0.13502547167795986,0.14842241373277415,no
+anxiety/caregiver/caregiver_full,anxiety,gad_duration_months,Gad duration months,0.5832781190709285,0.49217822992425914,0.5860476974695946,no
+anxiety/caregiver/caregiver_full,anxiety,gad_assoc_06_sleep_problems,Gad assoc 06 sleep problems,0.5911073376429208,0.5287957813541326,0.5792895614955275,no
+anxiety/caregiver/caregiver_full,anxiety,gad_difficulty_controlling_worry,Gad difficulty controlling worry,0.6569544439830233,0.5543179992365774,0.625938316396956,no
+anxiety/caregiver/caregiver_full,anxiety,agor_fear_05_outside_home_alone,Agor fear 05 outside home alone,0.5718329168085525,0.5471434211430424,0.5482280604525104,no
+anxiety/caregiver/caregiver_full,anxiety,agor_avoid_or_need_companion,Agor avoid or need companion,0.6086386424965045,0.6044462333230761,0.5907325800659068,no
+anxiety/caregiver/caregiver_full,anxiety,social_anxiety_duration_months,Social anxiety duration months,0.5593113124114265,0.5108149814094286,0.5289974410132811,no
+anxiety/caregiver/caregiver_full,anxiety,sep_anx_03_worry_event_causing_separation,Sep anx 03 worry event causing separation,0.6028320322867743,0.553548977406398,0.61341083570066,no
+anxiety/caregiver/caregiver_full,anxiety,gad_assoc_03_concentration_difficulty,Gad assoc 03 concentration difficulty,0.5788751063281126,0.6261194898798574,0.5662901193179477,no
+anxiety/caregiver/caregiver_full,anxiety,social_anxiety_fear_negative_evaluation,Social anxiety fear negative evaluation,0.612106217377865,0.598102947688679,0.623962845132777,no
+anxiety/caregiver/caregiver_full,anxiety,gad_assoc_05_muscle_tension,Gad assoc 05 muscle tension,0.6024279208571991,0.5608442343751694,0.6113962010821302,no
+anxiety/caregiver/caregiver_full,anxiety,sep_anx_07_separation_nightmares,Sep anx 07 separation nightmares,0.5749889112562848,0.5628252142103709,0.5981530697983302,no
+anxiety/caregiver/caregiver_full,anxiety,sep_anx_05_fear_being_alone_without_attachment,Sep anx 05 fear being alone without attachment,0.591361303434054,0.5578661875791108,0.6038042740657993,no
+anxiety/caregiver/caregiver_full,anxiety,gad_impairment,Gad impairment,0.6119733444082839,0.5446627625496633,0.6526854961778134,no
+anxiety/caregiver/caregiver_full,anxiety,agor_fear_04_crowds_queues,Agor fear 04 crowds queues,0.5855169782599285,0.5331397800141637,0.6142964590875474,no
+anxiety/caregiver/caregiver_full,anxiety,sep_anx_04_refuses_leaving_home_school,Sep anx 04 refuses leaving home school,0.5977757797451982,0.5136209999167766,0.6128744813955218,no
+anxiety/caregiver/caregiver_full,anxiety,gad_assoc_02_fatigue,Gad assoc 02 fatigue,0.6087663765694601,0.54321609104011,0.5922158084916808,no
+anxiety/caregiver/caregiver_full,anxiety,gad_assoc_01_restlessness,Gad assoc 01 restlessness,0.6328936551633361,0.5793718864917343,0.6213375872715732,no
+anxiety/caregiver/caregiver_full,anxiety,agor_almost_always_triggered,Agor almost always triggered,0.586114849432111,0.5306408883927296,0.5899492408760879,no
+anxiety/caregiver/caregiver_full,anxiety,sep_anx_08_physical_complaints_on_separation,Sep anx 08 physical complaints on separation,0.544833338840712,0.568472045340954,0.515775630847905,no
+anxiety/caregiver/caregiver_full,anxiety,agor_fear_01_public_transport,Agor fear 01 public transport,0.5833203413413492,0.5834726676255989,0.5680530015231798,no
+anxiety/caregiver/caregiver_full,anxiety,sep_anx_06_refuses_sleep_away_or_alone,Sep anx 06 refuses sleep away or alone,0.5687459952461441,0.5544251338894222,0.572263669961601,no
+anxiety/caregiver/caregiver_full,anxiety,gad_assoc_04_irritability,Gad assoc 04 irritability,0.6034647170915045,0.60068660071197,0.5930672693903369,no
+anxiety/caregiver/caregiver_full,anxiety,social_anxiety_fear_being_observed,Social anxiety fear being observed,0.586250297626316,0.5587741581918837,0.611986266617546,no
+anxiety/caregiver/caregiver_full,anxiety,gad_excessive_worry_multiple_areas,Gad excessive worry multiple areas,0.6243833888183697,0.5705131195537686,0.6591939436078409,no
+anxiety/caregiver/caregiver_full,anxiety,agor_fear_03_enclosed_spaces,Agor fear 03 enclosed spaces,0.5717139181164593,0.5836933136150857,0.5421875672057482,no
+anxiety/caregiver/caregiver_full,anxiety,social_anxiety_impairment,Social anxiety impairment,0.5808454880394225,0.5277846963421795,0.5629684212271087,no
+anxiety/caregiver/caregiver_full,anxiety,social_anxiety_avoid_or_endure_intense,Social anxiety avoid or endure intense,0.5497429395234026,0.5513496815608375,0.5851384686620975,no
+anxiety/caregiver/caregiver_full,anxiety,agor_duration_months,Agor duration months,0.44203264619618926,0.4514184067076801,0.4644730340505635,no
+anxiety/caregiver/caregiver_full,anxiety,sep_anx_02_worry_losing_attachment_figures,Sep anx 02 worry losing attachment figures,0.5940561545722993,0.5588456123794245,0.640490636664548,no
+anxiety/caregiver/caregiver_full,anxiety,social_anxiety_fear_interactions,Social anxiety fear interactions,0.5824559378660974,0.5824497247604173,0.590045138702626,no
+anxiety/caregiver/caregiver_full,anxiety,social_anxiety_almost_always_triggered,Social anxiety almost always triggered,0.5632309530253825,0.5740248929733693,0.6426255827333632,no
+anxiety/caregiver/caregiver_full,anxiety,agor_impairment,Agor impairment,0.5880315620265297,0.6419075904854767,0.6371005775068258,no
+anxiety/caregiver/caregiver_full,anxiety,social_anxiety_fear_performance,Social anxiety fear performance,0.5686118946280361,0.5568011826442766,0.5844983555072265,no
+anxiety/caregiver/caregiver_full,anxiety,agor_fear_02_open_spaces,Agor fear 02 open spaces,0.5786721580885241,0.5954629003559533,0.5323457941621257,no
+anxiety/caregiver/caregiver_full,anxiety,sep_anx_01_distress_on_separation,Sep anx 01 distress on separation,0.5593268125195338,0.579479048820987,0.6024061646391052,no
+anxiety/caregiver/caregiver_full,anxiety,social_anxiety_children_peer_only_flag,Social anxiety children peer only flag,0.12725119050063455,0.14368873672954618,0.05853568513445088,no
+anxiety/psychologist/psychologist_1_3,anxiety,gad_difficulty_controlling_worry,Gad difficulty controlling worry,0.6569544439830233,0.5543179992365774,0.625938316396956,no
+anxiety/psychologist/psychologist_1_3,anxiety,sep_anx_04_refuses_leaving_home_school,Sep anx 04 refuses leaving home school,0.5977757797451982,0.5136209999167766,0.6128744813955218,no
+anxiety/psychologist/psychologist_1_3,anxiety,sep_anx_07_separation_nightmares,Sep anx 07 separation nightmares,0.5749889112562848,0.5628252142103709,0.5981530697983302,no
+anxiety/psychologist/psychologist_1_3,anxiety,sep_anx_03_worry_event_causing_separation,Sep anx 03 worry event causing separation,0.6028320322867743,0.553548977406398,0.61341083570066,no
+anxiety/psychologist/psychologist_1_3,anxiety,sep_anx_02_worry_losing_attachment_figures,Sep anx 02 worry losing attachment figures,0.5940561545722993,0.5588456123794245,0.640490636664548,no
+anxiety/psychologist/psychologist_1_3,anxiety,sep_anx_05_fear_being_alone_without_attachment,Sep anx 05 fear being alone without attachment,0.591361303434054,0.5578661875791108,0.6038042740657993,no
+anxiety/psychologist/psychologist_1_3,anxiety,gad_excessive_worry_multiple_areas,Gad excessive worry multiple areas,0.6243833888183697,0.5705131195537686,0.6591939436078409,no
+anxiety/psychologist/psychologist_1_3,anxiety,sep_anx_01_distress_on_separation,Sep anx 01 distress on separation,0.5593268125195338,0.579479048820987,0.6024061646391052,no
+anxiety/psychologist/psychologist_1_3,anxiety,sep_anx_08_physical_complaints_on_separation,Sep anx 08 physical complaints on separation,0.544833338840712,0.568472045340954,0.515775630847905,no
+anxiety/psychologist/psychologist_1_3,anxiety,social_anxiety_almost_always_triggered,Social anxiety almost always triggered,0.5632309530253825,0.5740248929733693,0.6426255827333632,no
+anxiety/psychologist/psychologist_1_3,anxiety,sep_anx_06_refuses_sleep_away_or_alone,Sep anx 06 refuses sleep away or alone,0.5687459952461441,0.5544251338894222,0.572263669961601,no
+anxiety/psychologist/psychologist_1_3,anxiety,social_anxiety_fear_interactions,Social anxiety fear interactions,0.5824559378660974,0.5824497247604173,0.590045138702626,no
+anxiety/psychologist/psychologist_2_3,anxiety,sep_anx_impairment,Sep anx impairment,0.6678260713328411,0.6777649466406086,0.693279333315816,no
+anxiety/psychologist/psychologist_2_3,anxiety,sep_anx_duration_weeks,Sep anx duration weeks,0.5062415128570534,0.5568384223375206,0.546309297161993,no
+anxiety/psychologist/psychologist_2_3,anxiety,age_years,Edad en años cumplidos,0.14700251940760614,0.13502547167795986,0.14842241373277415,no
+anxiety/psychologist/psychologist_2_3,anxiety,gad_duration_months,Gad duration months,0.5832781190709285,0.49217822992425914,0.5860476974695946,no
+anxiety/psychologist/psychologist_2_3,anxiety,agor_escape_help_cognition,Agor escape help cognition,0.6366811746677057,0.6363329674212237,0.5892197699897416,no
+anxiety/psychologist/psychologist_2_3,anxiety,gad_difficulty_controlling_worry,Gad difficulty controlling worry,0.6569544439830233,0.5543179992365774,0.625938316396956,no
+anxiety/psychologist/psychologist_2_3,anxiety,gad_assoc_06_sleep_problems,Gad assoc 06 sleep problems,0.5911073376429208,0.5287957813541326,0.5792895614955275,no
+anxiety/psychologist/psychologist_2_3,anxiety,social_anxiety_duration_months,Social anxiety duration months,0.5593113124114265,0.5108149814094286,0.5289974410132811,no
+anxiety/psychologist/psychologist_2_3,anxiety,sep_anx_04_refuses_leaving_home_school,Sep anx 04 refuses leaving home school,0.5977757797451982,0.5136209999167766,0.6128744813955218,no
+anxiety/psychologist/psychologist_2_3,anxiety,social_anxiety_fear_negative_evaluation,Social anxiety fear negative evaluation,0.612106217377865,0.598102947688679,0.623962845132777,no
+anxiety/psychologist/psychologist_2_3,anxiety,gad_impairment,Gad impairment,0.6119733444082839,0.5446627625496633,0.6526854961778134,no
+anxiety/psychologist/psychologist_2_3,anxiety,gad_assoc_05_muscle_tension,Gad assoc 05 muscle tension,0.6024279208571991,0.5608442343751694,0.6113962010821302,no
+anxiety/psychologist/psychologist_2_3,anxiety,agor_avoid_or_need_companion,Agor avoid or need companion,0.6086386424965045,0.6044462333230761,0.5907325800659068,no
+anxiety/psychologist/psychologist_2_3,anxiety,agor_fear_01_public_transport,Agor fear 01 public transport,0.5833203413413492,0.5834726676255989,0.5680530015231798,no
+anxiety/psychologist/psychologist_2_3,anxiety,agor_fear_04_crowds_queues,Agor fear 04 crowds queues,0.5855169782599285,0.5331397800141637,0.6142964590875474,no
+anxiety/psychologist/psychologist_2_3,anxiety,sep_anx_07_separation_nightmares,Sep anx 07 separation nightmares,0.5749889112562848,0.5628252142103709,0.5981530697983302,no
+anxiety/psychologist/psychologist_2_3,anxiety,gad_assoc_01_restlessness,Gad assoc 01 restlessness,0.6328936551633361,0.5793718864917343,0.6213375872715732,no
+anxiety/psychologist/psychologist_2_3,anxiety,gad_assoc_03_concentration_difficulty,Gad assoc 03 concentration difficulty,0.5788751063281126,0.6261194898798574,0.5662901193179477,no
+anxiety/psychologist/psychologist_2_3,anxiety,gad_assoc_02_fatigue,Gad assoc 02 fatigue,0.6087663765694601,0.54321609104011,0.5922158084916808,no
+anxiety/psychologist/psychologist_2_3,anxiety,sep_anx_03_worry_event_causing_separation,Sep anx 03 worry event causing separation,0.6028320322867743,0.553548977406398,0.61341083570066,no
+anxiety/psychologist/psychologist_2_3,anxiety,agor_fear_05_outside_home_alone,Agor fear 05 outside home alone,0.5718329168085525,0.5471434211430424,0.5482280604525104,no
+anxiety/psychologist/psychologist_2_3,anxiety,sep_anx_02_worry_losing_attachment_figures,Sep anx 02 worry losing attachment figures,0.5940561545722993,0.5588456123794245,0.640490636664548,no
+anxiety/psychologist/psychologist_2_3,anxiety,social_anxiety_fear_performance,Social anxiety fear performance,0.5686118946280361,0.5568011826442766,0.5844983555072265,no
+anxiety/psychologist/psychologist_2_3,anxiety,sep_anx_05_fear_being_alone_without_attachment,Sep anx 05 fear being alone without attachment,0.591361303434054,0.5578661875791108,0.6038042740657993,no
+anxiety/psychologist/psychologist_2_3,anxiety,gad_excessive_worry_multiple_areas,Gad excessive worry multiple areas,0.6243833888183697,0.5705131195537686,0.6591939436078409,no
+anxiety/psychologist/psychologist_2_3,anxiety,sep_anx_01_distress_on_separation,Sep anx 01 distress on separation,0.5593268125195338,0.579479048820987,0.6024061646391052,no
+anxiety/psychologist/psychologist_2_3,anxiety,gad_assoc_04_irritability,Gad assoc 04 irritability,0.6034647170915045,0.60068660071197,0.5930672693903369,no
+anxiety/psychologist/psychologist_2_3,anxiety,sep_anx_08_physical_complaints_on_separation,Sep anx 08 physical complaints on separation,0.544833338840712,0.568472045340954,0.515775630847905,no
+anxiety/psychologist/psychologist_2_3,anxiety,agor_duration_months,Agor duration months,0.44203264619618926,0.4514184067076801,0.4644730340505635,no
+anxiety/psychologist/psychologist_2_3,anxiety,social_anxiety_almost_always_triggered,Social anxiety almost always triggered,0.5632309530253825,0.5740248929733693,0.6426255827333632,no
+anxiety/psychologist/psychologist_2_3,anxiety,sep_anx_06_refuses_sleep_away_or_alone,Sep anx 06 refuses sleep away or alone,0.5687459952461441,0.5544251338894222,0.572263669961601,no
+anxiety/psychologist/psychologist_2_3,anxiety,social_anxiety_fear_interactions,Social anxiety fear interactions,0.5824559378660974,0.5824497247604173,0.590045138702626,no
+anxiety/psychologist/psychologist_2_3,anxiety,social_anxiety_impairment,Social anxiety impairment,0.5808454880394225,0.5277846963421795,0.5629684212271087,no
+anxiety/psychologist/psychologist_full,anxiety,sep_anx_impairment,Sep anx impairment,0.6678260713328411,0.6777649466406086,0.693279333315816,no
+anxiety/psychologist/psychologist_full,anxiety,sep_anx_duration_weeks,Sep anx duration weeks,0.5062415128570534,0.5568384223375206,0.546309297161993,no
+anxiety/psychologist/psychologist_full,anxiety,age_years,Edad en años cumplidos,0.14700251940760614,0.13502547167795986,0.14842241373277415,no
+anxiety/psychologist/psychologist_full,anxiety,gad_duration_months,Gad duration months,0.5832781190709285,0.49217822992425914,0.5860476974695946,no
+anxiety/psychologist/psychologist_full,anxiety,agor_escape_help_cognition,Agor escape help cognition,0.6366811746677057,0.6363329674212237,0.5892197699897416,no
+anxiety/psychologist/psychologist_full,anxiety,gad_difficulty_controlling_worry,Gad difficulty controlling worry,0.6569544439830233,0.5543179992365774,0.625938316396956,no
+anxiety/psychologist/psychologist_full,anxiety,gad_assoc_06_sleep_problems,Gad assoc 06 sleep problems,0.5911073376429208,0.5287957813541326,0.5792895614955275,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_duration_months,Social anxiety duration months,0.5593113124114265,0.5108149814094286,0.5289974410132811,no
+anxiety/psychologist/psychologist_full,anxiety,sep_anx_04_refuses_leaving_home_school,Sep anx 04 refuses leaving home school,0.5977757797451982,0.5136209999167766,0.6128744813955218,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_fear_negative_evaluation,Social anxiety fear negative evaluation,0.612106217377865,0.598102947688679,0.623962845132777,no
+anxiety/psychologist/psychologist_full,anxiety,gad_impairment,Gad impairment,0.6119733444082839,0.5446627625496633,0.6526854961778134,no
+anxiety/psychologist/psychologist_full,anxiety,gad_assoc_05_muscle_tension,Gad assoc 05 muscle tension,0.6024279208571991,0.5608442343751694,0.6113962010821302,no
+anxiety/psychologist/psychologist_full,anxiety,agor_avoid_or_need_companion,Agor avoid or need companion,0.6086386424965045,0.6044462333230761,0.5907325800659068,no
+anxiety/psychologist/psychologist_full,anxiety,gad_not_better_explained,Gad not better explained,0.029067031305763533,-0.05989897050847408,0.08080815030279215,no
+anxiety/psychologist/psychologist_full,anxiety,agor_fear_01_public_transport,Agor fear 01 public transport,0.5833203413413492,0.5834726676255989,0.5680530015231798,no
+anxiety/psychologist/psychologist_full,anxiety,agor_fear_04_crowds_queues,Agor fear 04 crowds queues,0.5855169782599285,0.5331397800141637,0.6142964590875474,no
+anxiety/psychologist/psychologist_full,anxiety,sep_anx_07_separation_nightmares,Sep anx 07 separation nightmares,0.5749889112562848,0.5628252142103709,0.5981530697983302,no
+anxiety/psychologist/psychologist_full,anxiety,gad_assoc_01_restlessness,Gad assoc 01 restlessness,0.6328936551633361,0.5793718864917343,0.6213375872715732,no
+anxiety/psychologist/psychologist_full,anxiety,gad_assoc_03_concentration_difficulty,Gad assoc 03 concentration difficulty,0.5788751063281126,0.6261194898798574,0.5662901193179477,no
+anxiety/psychologist/psychologist_full,anxiety,gad_assoc_02_fatigue,Gad assoc 02 fatigue,0.6087663765694601,0.54321609104011,0.5922158084916808,no
+anxiety/psychologist/psychologist_full,anxiety,sep_anx_03_worry_event_causing_separation,Sep anx 03 worry event causing separation,0.6028320322867743,0.553548977406398,0.61341083570066,no
+anxiety/psychologist/psychologist_full,anxiety,agor_fear_05_outside_home_alone,Agor fear 05 outside home alone,0.5718329168085525,0.5471434211430424,0.5482280604525104,no
+anxiety/psychologist/psychologist_full,anxiety,sep_anx_02_worry_losing_attachment_figures,Sep anx 02 worry losing attachment figures,0.5940561545722993,0.5588456123794245,0.640490636664548,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_fear_performance,Social anxiety fear performance,0.5686118946280361,0.5568011826442766,0.5844983555072265,no
+anxiety/psychologist/psychologist_full,anxiety,sep_anx_05_fear_being_alone_without_attachment,Sep anx 05 fear being alone without attachment,0.591361303434054,0.5578661875791108,0.6038042740657993,no
+anxiety/psychologist/psychologist_full,anxiety,gad_excessive_worry_multiple_areas,Gad excessive worry multiple areas,0.6243833888183697,0.5705131195537686,0.6591939436078409,no
+anxiety/psychologist/psychologist_full,anxiety,sep_anx_01_distress_on_separation,Sep anx 01 distress on separation,0.5593268125195338,0.579479048820987,0.6024061646391052,no
+anxiety/psychologist/psychologist_full,anxiety,gad_assoc_04_irritability,Gad assoc 04 irritability,0.6034647170915045,0.60068660071197,0.5930672693903369,no
+anxiety/psychologist/psychologist_full,anxiety,agor_almost_always_triggered,Agor almost always triggered,0.586114849432111,0.5306408883927296,0.5899492408760879,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_disproportionate,Social anxiety disproportionate,0.1359628040013477,0.03928307208346748,0.2154930490544601,no
+anxiety/psychologist/psychologist_full,anxiety,sep_anx_08_physical_complaints_on_separation,Sep anx 08 physical complaints on separation,0.544833338840712,0.568472045340954,0.515775630847905,no
+anxiety/psychologist/psychologist_full,anxiety,agor_duration_months,Agor duration months,0.44203264619618926,0.4514184067076801,0.4644730340505635,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_almost_always_triggered,Social anxiety almost always triggered,0.5632309530253825,0.5740248929733693,0.6426255827333632,no
+anxiety/psychologist/psychologist_full,anxiety,sep_anx_06_refuses_sleep_away_or_alone,Sep anx 06 refuses sleep away or alone,0.5687459952461441,0.5544251338894222,0.572263669961601,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_fear_interactions,Social anxiety fear interactions,0.5824559378660974,0.5824497247604173,0.590045138702626,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_impairment,Social anxiety impairment,0.5808454880394225,0.5277846963421795,0.5629684212271087,no
+anxiety/psychologist/psychologist_full,anxiety,agor_fear_03_enclosed_spaces,Agor fear 03 enclosed spaces,0.5717139181164593,0.5836933136150857,0.5421875672057482,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_fear_being_observed,Social anxiety fear being observed,0.586250297626316,0.5587741581918837,0.611986266617546,no
+anxiety/psychologist/psychologist_full,anxiety,agor_impairment,Agor impairment,0.5880315620265297,0.6419075904854767,0.6371005775068258,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_avoid_or_endure_intense,Social anxiety avoid or endure intense,0.5497429395234026,0.5513496815608375,0.5851384686620975,no
+anxiety/psychologist/psychologist_full,anxiety,agor_fear_02_open_spaces,Agor fear 02 open spaces,0.5786721580885241,0.5954629003559533,0.5323457941621257,no
+anxiety/psychologist/psychologist_full,anxiety,agor_disproportionate,Agor disproportionate,0.13073323956898242,0.15020308925568931,0.1114001212500244,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_not_better_explained,Social anxiety not better explained,-0.047152491901402874,-0.07944830564050537,-0.02758622325197117,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_children_peer_only_flag,Social anxiety children peer only flag,0.12725119050063455,0.14368873672954618,0.05853568513445088,no
+anxiety/psychologist/psychologist_full,anxiety,gad_not_due_substance_medical,Gad not due substance medical,0.016411017689946322,0.011261004453425946,-0.05591739299108593,no
+anxiety/psychologist/psychologist_full,anxiety,sep_anx_not_better_explained,Sep anx not better explained,0.025173611208110687,0.009281404046300309,0.03192448198816945,no
+anxiety/psychologist/psychologist_full,anxiety,agor_not_better_explained,Agor not better explained,-0.03021348489474172,0.07311037114481324,-0.05867656396600895,no
+anxiety/psychologist/psychologist_full,anxiety,agor_not_excessive_due_medical,Agor not excessive due medical,0.03571370112907477,-0.012734062276597468,0.019746845737168485,no
+anxiety/psychologist/psychologist_full,anxiety,social_anxiety_not_due_substance_medical,Social anxiety not due substance medical,0.04302422437218803,-0.009757123825234347,0.05683548421369565,no
+conduct/caregiver/caregiver_1_3,conduct,conduct_impairment_global,Conduct impairment global,0.9237016599676188,0.9297699011418643,0.9226304061438728,no
+conduct/caregiver/caregiver_1_3,conduct,conduct_09_property_destruction,Conduct 09 property destruction,0.727764419850158,0.7735472787882689,0.6756368500015716,no
+conduct/caregiver/caregiver_1_3,conduct,conduct_03_weapon_use,Conduct 03 weapon use,0.7074371290383497,0.7276045956167345,0.6800254440603952,no
+conduct/caregiver/caregiver_1_3,conduct,conduct_06_steals_confronting_victim,Conduct 06 steals confronting victim,0.700524818023814,0.6683134767698116,0.6786378531589632,no
+conduct/caregiver/caregiver_1_3,conduct,conduct_15_truancy_before_13,Conduct 15 truancy before 13,0.6782453922856445,0.7095344276627079,0.6990345321450531,no
+conduct/caregiver/caregiver_1_3,conduct,conduct_08_fire_setting,Conduct 08 fire setting,0.6942264383601846,0.6830396014528127,0.6639247522956798,no
+conduct/caregiver/caregiver_1_3,conduct,conduct_01_bullies_threatens_intimidates,Conduct 01 bullies threatens intimidates,0.6878377165477477,0.6040784992873307,0.5894179917637554,no
+conduct/caregiver/caregiver_1_3,conduct,conduct_05_physical_cruelty_animals,Conduct 05 physical cruelty animals,0.6739435540957551,0.6944283979545841,0.7211270214909591,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_impairment_global,Conduct impairment global,0.9237016599676188,0.9297699011418643,0.9226304061438728,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_09_property_destruction,Conduct 09 property destruction,0.727764419850158,0.7735472787882689,0.6756368500015716,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_03_weapon_use,Conduct 03 weapon use,0.7074371290383497,0.7276045956167345,0.6800254440603952,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_06_steals_confronting_victim,Conduct 06 steals confronting victim,0.700524818023814,0.6683134767698116,0.6786378531589632,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_15_truancy_before_13,Conduct 15 truancy before 13,0.6782453922856445,0.7095344276627079,0.6990345321450531,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_08_fire_setting,Conduct 08 fire setting,0.6942264383601846,0.6830396014528127,0.6639247522956798,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_01_bullies_threatens_intimidates,Conduct 01 bullies threatens intimidates,0.6878377165477477,0.6040784992873307,0.5894179917637554,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_05_physical_cruelty_animals,Conduct 05 physical cruelty animals,0.6739435540957551,0.6944283979545841,0.7211270214909591,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_11_lies_to_obtain_or_avoid,Conduct 11 lies to obtain or avoid,0.6882410399626611,0.6777607460880863,0.6993909905536524,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_07_forced_sex,Conduct 07 forced sex,0.6847509894599813,0.6917791801397976,0.7122919972845018,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_14_runs_away_overnight,Conduct 14 runs away overnight,0.6797963381387471,0.6595225759384354,0.6719996700119731,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_12_steals_without_confrontation,Conduct 12 steals without confrontation,0.6837211535836818,0.6310009741484972,0.6420299176168752,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_02_initiates_fights,Conduct 02 initiates fights,0.6885821339055296,0.7033435467607958,0.6403045677039017,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_13_stays_out_at_night_before_13,Conduct 13 stays out at night before 13,0.6693972508385978,0.712456075446511,0.6917049570520092,no
+conduct/caregiver/caregiver_2_3,conduct,conduct_10_breaks_into_house_building_car,Conduct 10 breaks into house building car,0.6687264305085354,0.6638030826121033,0.6538114088384555,no
+conduct/caregiver/caregiver_full,conduct,conduct_impairment_global,Conduct impairment global,0.9237016599676188,0.9297699011418643,0.9226304061438728,no
+conduct/caregiver/caregiver_full,conduct,conduct_09_property_destruction,Conduct 09 property destruction,0.727764419850158,0.7735472787882689,0.6756368500015716,no
+conduct/caregiver/caregiver_full,conduct,conduct_03_weapon_use,Conduct 03 weapon use,0.7074371290383497,0.7276045956167345,0.6800254440603952,no
+conduct/caregiver/caregiver_full,conduct,conduct_06_steals_confronting_victim,Conduct 06 steals confronting victim,0.700524818023814,0.6683134767698116,0.6786378531589632,no
+conduct/caregiver/caregiver_full,conduct,conduct_15_truancy_before_13,Conduct 15 truancy before 13,0.6782453922856445,0.7095344276627079,0.6990345321450531,no
+conduct/caregiver/caregiver_full,conduct,conduct_08_fire_setting,Conduct 08 fire setting,0.6942264383601846,0.6830396014528127,0.6639247522956798,no
+conduct/caregiver/caregiver_full,conduct,conduct_01_bullies_threatens_intimidates,Conduct 01 bullies threatens intimidates,0.6878377165477477,0.6040784992873307,0.5894179917637554,no
+conduct/caregiver/caregiver_full,conduct,conduct_05_physical_cruelty_animals,Conduct 05 physical cruelty animals,0.6739435540957551,0.6944283979545841,0.7211270214909591,no
+conduct/caregiver/caregiver_full,conduct,conduct_11_lies_to_obtain_or_avoid,Conduct 11 lies to obtain or avoid,0.6882410399626611,0.6777607460880863,0.6993909905536524,no
+conduct/caregiver/caregiver_full,conduct,conduct_07_forced_sex,Conduct 07 forced sex,0.6847509894599813,0.6917791801397976,0.7122919972845018,no
+conduct/caregiver/caregiver_full,conduct,conduct_14_runs_away_overnight,Conduct 14 runs away overnight,0.6797963381387471,0.6595225759384354,0.6719996700119731,no
+conduct/caregiver/caregiver_full,conduct,conduct_12_steals_without_confrontation,Conduct 12 steals without confrontation,0.6837211535836818,0.6310009741484972,0.6420299176168752,no
+conduct/caregiver/caregiver_full,conduct,conduct_02_initiates_fights,Conduct 02 initiates fights,0.6885821339055296,0.7033435467607958,0.6403045677039017,no
+conduct/caregiver/caregiver_full,conduct,conduct_13_stays_out_at_night_before_13,Conduct 13 stays out at night before 13,0.6693972508385978,0.712456075446511,0.6917049570520092,no
+conduct/caregiver/caregiver_full,conduct,conduct_lpe_04_shallow_deficient_affect,Conduct lpe 04 shallow deficient affect,0.6781189309216299,0.6873556625104043,0.6661333115119988,no
+conduct/caregiver/caregiver_full,conduct,conduct_10_breaks_into_house_building_car,Conduct 10 breaks into house building car,0.6687264305085354,0.6638030826121033,0.6538114088384555,no
+conduct/caregiver/caregiver_full,conduct,conduct_lpe_02_callous_lack_empathy,Conduct lpe 02 callous lack empathy,0.6618622846755715,0.6813495642877617,0.6470376162271354,no
+conduct/caregiver/caregiver_full,conduct,conduct_lpe_01_lack_remorse_guilt,Conduct lpe 01 lack remorse guilt,0.6526568656254513,0.6841885766714185,0.6415415518116996,no
+conduct/caregiver/caregiver_full,conduct,conduct_04_physical_cruelty_people,Conduct 04 physical cruelty people,0.6689188175290256,0.6635905572269907,0.646713539233307,no
+conduct/caregiver/caregiver_full,conduct,conduct_lpe_03_unconcerned_performance,Conduct lpe 03 unconcerned performance,0.6629339032562322,0.6767979338481932,0.6878524587330647,no
+conduct/caregiver/caregiver_full,conduct,age_years,Edad en años cumplidos,0.03364224786198452,0.024637190789159016,-0.032450466202101916,no
+conduct/caregiver/caregiver_full,conduct,conduct_onset_before_10,Conduct onset before 10,0.42628676818915934,0.3641656428001385,0.3242708085626483,no
+conduct/psychologist/psychologist_1_3,conduct,conduct_09_property_destruction,Conduct 09 property destruction,0.727764419850158,0.7735472787882689,0.6756368500015716,no
+conduct/psychologist/psychologist_1_3,conduct,conduct_06_steals_confronting_victim,Conduct 06 steals confronting victim,0.700524818023814,0.6683134767698116,0.6786378531589632,no
+conduct/psychologist/psychologist_1_3,conduct,conduct_03_weapon_use,Conduct 03 weapon use,0.7074371290383497,0.7276045956167345,0.6800254440603952,no
+conduct/psychologist/psychologist_1_3,conduct,conduct_08_fire_setting,Conduct 08 fire setting,0.6942264383601846,0.6830396014528127,0.6639247522956798,no
+conduct/psychologist/psychologist_1_3,conduct,conduct_15_truancy_before_13,Conduct 15 truancy before 13,0.6782453922856445,0.7095344276627079,0.6990345321450531,no
+conduct/psychologist/psychologist_1_3,conduct,conduct_11_lies_to_obtain_or_avoid,Conduct 11 lies to obtain or avoid,0.6882410399626611,0.6777607460880863,0.6993909905536524,no
+conduct/psychologist/psychologist_1_3,conduct,conduct_02_initiates_fights,Conduct 02 initiates fights,0.6885821339055296,0.7033435467607958,0.6403045677039017,no
+conduct/psychologist/psychologist_1_3,conduct,conduct_01_bullies_threatens_intimidates,Conduct 01 bullies threatens intimidates,0.6878377165477477,0.6040784992873307,0.5894179917637554,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_impairment_global,Conduct impairment global,0.9237016599676188,0.9297699011418643,0.9226304061438728,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_09_property_destruction,Conduct 09 property destruction,0.727764419850158,0.7735472787882689,0.6756368500015716,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_06_steals_confronting_victim,Conduct 06 steals confronting victim,0.700524818023814,0.6683134767698116,0.6786378531589632,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_03_weapon_use,Conduct 03 weapon use,0.7074371290383497,0.7276045956167345,0.6800254440603952,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_08_fire_setting,Conduct 08 fire setting,0.6942264383601846,0.6830396014528127,0.6639247522956798,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_15_truancy_before_13,Conduct 15 truancy before 13,0.6782453922856445,0.7095344276627079,0.6990345321450531,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_11_lies_to_obtain_or_avoid,Conduct 11 lies to obtain or avoid,0.6882410399626611,0.6777607460880863,0.6993909905536524,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_02_initiates_fights,Conduct 02 initiates fights,0.6885821339055296,0.7033435467607958,0.6403045677039017,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_01_bullies_threatens_intimidates,Conduct 01 bullies threatens intimidates,0.6878377165477477,0.6040784992873307,0.5894179917637554,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_05_physical_cruelty_animals,Conduct 05 physical cruelty animals,0.6739435540957551,0.6944283979545841,0.7211270214909591,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_12_steals_without_confrontation,Conduct 12 steals without confrontation,0.6837211535836818,0.6310009741484972,0.6420299176168752,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_14_runs_away_overnight,Conduct 14 runs away overnight,0.6797963381387471,0.6595225759384354,0.6719996700119731,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_07_forced_sex,Conduct 07 forced sex,0.6847509894599813,0.6917791801397976,0.7122919972845018,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_13_stays_out_at_night_before_13,Conduct 13 stays out at night before 13,0.6693972508385978,0.712456075446511,0.6917049570520092,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_10_breaks_into_house_building_car,Conduct 10 breaks into house building car,0.6687264305085354,0.6638030826121033,0.6538114088384555,no
+conduct/psychologist/psychologist_2_3,conduct,conduct_04_physical_cruelty_people,Conduct 04 physical cruelty people,0.6689188175290256,0.6635905572269907,0.646713539233307,no
+conduct/psychologist/psychologist_full,conduct,conduct_impairment_global,Conduct impairment global,0.9237016599676188,0.9297699011418643,0.9226304061438728,no
+conduct/psychologist/psychologist_full,conduct,conduct_09_property_destruction,Conduct 09 property destruction,0.727764419850158,0.7735472787882689,0.6756368500015716,no
+conduct/psychologist/psychologist_full,conduct,conduct_06_steals_confronting_victim,Conduct 06 steals confronting victim,0.700524818023814,0.6683134767698116,0.6786378531589632,no
+conduct/psychologist/psychologist_full,conduct,conduct_03_weapon_use,Conduct 03 weapon use,0.7074371290383497,0.7276045956167345,0.6800254440603952,no
+conduct/psychologist/psychologist_full,conduct,conduct_08_fire_setting,Conduct 08 fire setting,0.6942264383601846,0.6830396014528127,0.6639247522956798,no
+conduct/psychologist/psychologist_full,conduct,conduct_15_truancy_before_13,Conduct 15 truancy before 13,0.6782453922856445,0.7095344276627079,0.6990345321450531,no
+conduct/psychologist/psychologist_full,conduct,conduct_11_lies_to_obtain_or_avoid,Conduct 11 lies to obtain or avoid,0.6882410399626611,0.6777607460880863,0.6993909905536524,no
+conduct/psychologist/psychologist_full,conduct,conduct_02_initiates_fights,Conduct 02 initiates fights,0.6885821339055296,0.7033435467607958,0.6403045677039017,no
+conduct/psychologist/psychologist_full,conduct,conduct_01_bullies_threatens_intimidates,Conduct 01 bullies threatens intimidates,0.6878377165477477,0.6040784992873307,0.5894179917637554,no
+conduct/psychologist/psychologist_full,conduct,conduct_05_physical_cruelty_animals,Conduct 05 physical cruelty animals,0.6739435540957551,0.6944283979545841,0.7211270214909591,no
+conduct/psychologist/psychologist_full,conduct,conduct_12_steals_without_confrontation,Conduct 12 steals without confrontation,0.6837211535836818,0.6310009741484972,0.6420299176168752,no
+conduct/psychologist/psychologist_full,conduct,conduct_14_runs_away_overnight,Conduct 14 runs away overnight,0.6797963381387471,0.6595225759384354,0.6719996700119731,no
+conduct/psychologist/psychologist_full,conduct,conduct_07_forced_sex,Conduct 07 forced sex,0.6847509894599813,0.6917791801397976,0.7122919972845018,no
+conduct/psychologist/psychologist_full,conduct,conduct_lpe_02_callous_lack_empathy,Conduct lpe 02 callous lack empathy,0.6618622846755715,0.6813495642877617,0.6470376162271354,no
+conduct/psychologist/psychologist_full,conduct,conduct_13_stays_out_at_night_before_13,Conduct 13 stays out at night before 13,0.6693972508385978,0.712456075446511,0.6917049570520092,no
+conduct/psychologist/psychologist_full,conduct,conduct_lpe_04_shallow_deficient_affect,Conduct lpe 04 shallow deficient affect,0.6781189309216299,0.6873556625104043,0.6661333115119988,no
+conduct/psychologist/psychologist_full,conduct,conduct_10_breaks_into_house_building_car,Conduct 10 breaks into house building car,0.6687264305085354,0.6638030826121033,0.6538114088384555,no
+conduct/psychologist/psychologist_full,conduct,conduct_04_physical_cruelty_people,Conduct 04 physical cruelty people,0.6689188175290256,0.6635905572269907,0.646713539233307,no
+conduct/psychologist/psychologist_full,conduct,conduct_lpe_03_unconcerned_performance,Conduct lpe 03 unconcerned performance,0.6629339032562322,0.6767979338481932,0.6878524587330647,no
+conduct/psychologist/psychologist_full,conduct,conduct_lpe_01_lack_remorse_guilt,Conduct lpe 01 lack remorse guilt,0.6526568656254513,0.6841885766714185,0.6415415518116996,no
+conduct/psychologist/psychologist_full,conduct,age_years,Edad en años cumplidos,0.03364224786198452,0.024637190789159016,-0.032450466202101916,no
+conduct/psychologist/psychologist_full,conduct,conduct_onset_before_10,Conduct onset before 10,0.42628676818915934,0.3641656428001385,0.3242708085626483,no
+conduct/psychologist/psychologist_full,conduct,conduct_no_antisocial_personality_if_18plus,Conduct no antisocial personality if 18plus,0.0,0.0,0.0,no
+depression/caregiver/caregiver_1_3,depression,mdd_duration_weeks,Mdd duration weeks,0.6078114751510316,0.6301607169309336,0.5970432507739928,no
+depression/caregiver/caregiver_1_3,depression,mdd_impairment,Mdd impairment,0.6423268784476481,0.6257478403540926,0.6660899476145616,no
+depression/caregiver/caregiver_1_3,depression,mdd_02_loss_of_interest_or_pleasure,Mdd 02 loss of interest or pleasure,0.5945298225133401,0.6136874448164088,0.6063183665103942,no
+depression/caregiver/caregiver_1_3,depression,pdd_depressed_or_irritable_mood,Pdd depressed or irritable mood,0.5630107857358748,0.6074647084299836,0.5714187006231887,no
+depression/caregiver/caregiver_1_3,depression,pdd_duration_months_child,Pdd duration months child,0.5405687848347979,0.5665538977682409,0.5722050771197215,no
+depression/caregiver/caregiver_1_3,depression,mdd_05_psychomotor_change,Mdd 05 psychomotor change,0.5600721117407154,0.6236889732119575,0.5578436284035831,no
+depression/caregiver/caregiver_1_3,depression,mdd_09_death_or_suicidal_thoughts,Mdd 09 death or suicidal thoughts,0.5555636731677754,0.5846355432928362,0.4919206192691767,no
+depression/caregiver/caregiver_1_3,depression,mdd_08_concentration_or_decision_difficulty,Mdd 08 concentration or decision difficulty,0.5398704227724835,0.542771729887944,0.557106109533089,no
+depression/caregiver/caregiver_1_3,depression,dmdd_duration_months,Dmdd duration months,0.49345556041324234,0.3246327792468278,0.3623999375486506,no
+depression/caregiver/caregiver_1_3,depression,mdd_03_weight_or_appetite_change,Mdd 03 weight or appetite change,0.5952641869141648,0.5472182638486096,0.6028202458156328,no
+depression/caregiver/caregiver_2_3,depression,mdd_duration_weeks,Mdd duration weeks,0.6078114751510316,0.6301607169309336,0.5970432507739928,no
+depression/caregiver/caregiver_2_3,depression,mdd_impairment,Mdd impairment,0.6423268784476481,0.6257478403540926,0.6660899476145616,no
+depression/caregiver/caregiver_2_3,depression,mdd_02_loss_of_interest_or_pleasure,Mdd 02 loss of interest or pleasure,0.5945298225133401,0.6136874448164088,0.6063183665103942,no
+depression/caregiver/caregiver_2_3,depression,pdd_depressed_or_irritable_mood,Pdd depressed or irritable mood,0.5630107857358748,0.6074647084299836,0.5714187006231887,no
+depression/caregiver/caregiver_2_3,depression,pdd_duration_months_child,Pdd duration months child,0.5405687848347979,0.5665538977682409,0.5722050771197215,no
+depression/caregiver/caregiver_2_3,depression,mdd_05_psychomotor_change,Mdd 05 psychomotor change,0.5600721117407154,0.6236889732119575,0.5578436284035831,no
+depression/caregiver/caregiver_2_3,depression,mdd_09_death_or_suicidal_thoughts,Mdd 09 death or suicidal thoughts,0.5555636731677754,0.5846355432928362,0.4919206192691767,no
+depression/caregiver/caregiver_2_3,depression,mdd_08_concentration_or_decision_difficulty,Mdd 08 concentration or decision difficulty,0.5398704227724835,0.542771729887944,0.557106109533089,no
+depression/caregiver/caregiver_2_3,depression,dmdd_duration_months,Dmdd duration months,0.49345556041324234,0.3246327792468278,0.3623999375486506,no
+depression/caregiver/caregiver_2_3,depression,mdd_03_weight_or_appetite_change,Mdd 03 weight or appetite change,0.5952641869141648,0.5472182638486096,0.6028202458156328,no
+depression/caregiver/caregiver_2_3,depression,mdd_07_worthlessness_or_excessive_guilt,Mdd 07 worthlessness or excessive guilt,0.5486200240210464,0.6073489106112215,0.5854832517274358,no
+depression/caregiver/caregiver_2_3,depression,dmdd_irritable_between_outbursts,Dmdd irritable between outbursts,0.515054338185105,0.3760268388107845,0.41953162292115775,no
+depression/caregiver/caregiver_2_3,depression,pdd_impairment,Pdd impairment,0.5451330747241665,0.5216278486282027,0.6315831697249837,no
+depression/caregiver/caregiver_2_3,depression,dmdd_outbursts_severity,Dmdd outbursts severity,0.5119537483343206,0.4127329426675872,0.4378881365733272,no
+depression/caregiver/caregiver_2_3,depression,dmdd_outbursts_frequency_per_week,Dmdd outbursts frequency per week,0.35483574703848353,0.36407478854771264,0.255361732059711,no
+depression/caregiver/caregiver_2_3,depression,pdd_01_appetite_change,Pdd 01 appetite change,0.5439820910585065,0.5580361179109349,0.5164557299598369,no
+depression/caregiver/caregiver_2_3,depression,pdd_05_concentration_difficulty,Pdd 05 concentration difficulty,0.5176787965706201,0.521558643741177,0.5404260628822063,no
+depression/caregiver/caregiver_2_3,depression,mdd_06_fatigue_or_low_energy,Mdd 06 fatigue or low energy,0.5522890251820382,0.5749913860154316,0.5948723711926723,no
+depression/caregiver/caregiver_full,depression,mdd_duration_weeks,Mdd duration weeks,0.6078114751510316,0.6301607169309336,0.5970432507739928,no
+depression/caregiver/caregiver_full,depression,mdd_impairment,Mdd impairment,0.6423268784476481,0.6257478403540926,0.6660899476145616,no
+depression/caregiver/caregiver_full,depression,mdd_02_loss_of_interest_or_pleasure,Mdd 02 loss of interest or pleasure,0.5945298225133401,0.6136874448164088,0.6063183665103942,no
+depression/caregiver/caregiver_full,depression,mdd_01_depressed_or_irritable_mood,Mdd 01 depressed or irritable mood,0.6104055838889354,0.6296857463587732,0.6335105835941097,no
+depression/caregiver/caregiver_full,depression,pdd_depressed_or_irritable_mood,Pdd depressed or irritable mood,0.5630107857358748,0.6074647084299836,0.5714187006231887,no
+depression/caregiver/caregiver_full,depression,pdd_duration_months_child,Pdd duration months child,0.5405687848347979,0.5665538977682409,0.5722050771197215,no
+depression/caregiver/caregiver_full,depression,mdd_05_psychomotor_change,Mdd 05 psychomotor change,0.5600721117407154,0.6236889732119575,0.5578436284035831,no
+depression/caregiver/caregiver_full,depression,mdd_04_sleep_change,Mdd 04 sleep change,0.553057180283131,0.5989669722553671,0.5952916504622854,no
+depression/caregiver/caregiver_full,depression,mdd_09_death_or_suicidal_thoughts,Mdd 09 death or suicidal thoughts,0.5555636731677754,0.5846355432928362,0.4919206192691767,no
+depression/caregiver/caregiver_full,depression,mdd_08_concentration_or_decision_difficulty,Mdd 08 concentration or decision difficulty,0.5398704227724835,0.542771729887944,0.557106109533089,no
+depression/caregiver/caregiver_full,depression,dmdd_duration_months,Dmdd duration months,0.49345556041324234,0.3246327792468278,0.3623999375486506,no
+depression/caregiver/caregiver_full,depression,mdd_03_weight_or_appetite_change,Mdd 03 weight or appetite change,0.5952641869141648,0.5472182638486096,0.6028202458156328,no
+depression/caregiver/caregiver_full,depression,mdd_07_worthlessness_or_excessive_guilt,Mdd 07 worthlessness or excessive guilt,0.5486200240210464,0.6073489106112215,0.5854832517274358,no
+depression/caregiver/caregiver_full,depression,dmdd_irritable_between_outbursts,Dmdd irritable between outbursts,0.515054338185105,0.3760268388107845,0.41953162292115775,no
+depression/caregiver/caregiver_full,depression,pdd_impairment,Pdd impairment,0.5451330747241665,0.5216278486282027,0.6315831697249837,no
+depression/caregiver/caregiver_full,depression,dmdd_outbursts_severity,Dmdd outbursts severity,0.5119537483343206,0.4127329426675872,0.4378881365733272,no
+depression/caregiver/caregiver_full,depression,dmdd_outbursts_frequency_per_week,Dmdd outbursts frequency per week,0.35483574703848353,0.36407478854771264,0.255361732059711,no
+depression/caregiver/caregiver_full,depression,pdd_01_appetite_change,Pdd 01 appetite change,0.5439820910585065,0.5580361179109349,0.5164557299598369,no
+depression/caregiver/caregiver_full,depression,pdd_06_hopelessness,Pdd 06 hopelessness,0.5261356107100512,0.5237399858033828,0.5240472895815417,no
+depression/caregiver/caregiver_full,depression,pdd_05_concentration_difficulty,Pdd 05 concentration difficulty,0.5176787965706201,0.521558643741177,0.5404260628822063,no
+depression/caregiver/caregiver_full,depression,mdd_06_fatigue_or_low_energy,Mdd 06 fatigue or low energy,0.5522890251820382,0.5749913860154316,0.5948723711926723,no
+depression/caregiver/caregiver_full,depression,pdd_02_sleep_change,Pdd 02 sleep change,0.4956129158578059,0.559376024800729,0.507287360784645,no
+depression/caregiver/caregiver_full,depression,dmdd_context_home,Dmdd context home,0.35146624528316206,0.3075639630302191,0.33856519861762524,no
+depression/caregiver/caregiver_full,depression,pdd_03_low_energy,Pdd 03 low energy,0.48680819687757926,0.5069907752163929,0.5213062253298727,no
+depression/caregiver/caregiver_full,depression,dmdd_context_peers,Dmdd context peers,0.3756456611757621,0.31881209885787415,0.31265851154966073,no
+depression/caregiver/caregiver_full,depression,dmdd_onset_before_10,Dmdd onset before 10,0.2461110791214081,0.22368049544522425,0.2502756771739524,no
+depression/caregiver/caregiver_full,depression,pdd_no_gap_gt_2_months,Pdd no gap gt 2 months,0.2323080310175417,0.2509662361772005,0.17881486710984293,no
+depression/caregiver/caregiver_full,depression,pdd_04_low_self_esteem,Pdd 04 low self esteem,0.48189468100936766,0.5631288935941668,0.5238824256824844,no
+depression/caregiver/caregiver_full,depression,dmdd_context_school,Dmdd context school,0.3650005886649992,0.3299076475420229,0.3214323040091541,no
+depression/psychologist/psychologist_1_3,depression,mdd_impairment,Mdd impairment,0.6423268784476481,0.6257478403540926,0.6660899476145616,no
+depression/psychologist/psychologist_1_3,depression,mdd_duration_weeks,Mdd duration weeks,0.6078114751510316,0.6301607169309336,0.5970432507739928,no
+depression/psychologist/psychologist_1_3,depression,pdd_duration_months_child,Pdd duration months child,0.5405687848347979,0.5665538977682409,0.5722050771197215,no
+depression/psychologist/psychologist_1_3,depression,pdd_depressed_or_irritable_mood,Pdd depressed or irritable mood,0.5630107857358748,0.6074647084299836,0.5714187006231887,no
+depression/psychologist/psychologist_1_3,depression,pdd_impairment,Pdd impairment,0.5451330747241665,0.5216278486282027,0.6315831697249837,no
+depression/psychologist/psychologist_1_3,depression,dmdd_duration_months,Dmdd duration months,0.49345556041324234,0.3246327792468278,0.3623999375486506,no
+depression/psychologist/psychologist_1_3,depression,dmdd_outbursts_frequency_per_week,Dmdd outbursts frequency per week,0.35483574703848353,0.36407478854771264,0.255361732059711,no
+depression/psychologist/psychologist_1_3,depression,dmdd_irritable_between_outbursts,Dmdd irritable between outbursts,0.515054338185105,0.3760268388107845,0.41953162292115775,no
+depression/psychologist/psychologist_2_3,depression,mdd_impairment,Mdd impairment,0.6423268784476481,0.6257478403540926,0.6660899476145616,no
+depression/psychologist/psychologist_2_3,depression,mdd_duration_weeks,Mdd duration weeks,0.6078114751510316,0.6301607169309336,0.5970432507739928,no
+depression/psychologist/psychologist_2_3,depression,pdd_duration_months_child,Pdd duration months child,0.5405687848347979,0.5665538977682409,0.5722050771197215,no
+depression/psychologist/psychologist_2_3,depression,mdd_02_loss_of_interest_or_pleasure,Mdd 02 loss of interest or pleasure,0.5945298225133401,0.6136874448164088,0.6063183665103942,no
+depression/psychologist/psychologist_2_3,depression,mdd_07_worthlessness_or_excessive_guilt,Mdd 07 worthlessness or excessive guilt,0.5486200240210464,0.6073489106112215,0.5854832517274358,no
+depression/psychologist/psychologist_2_3,depression,mdd_08_concentration_or_decision_difficulty,Mdd 08 concentration or decision difficulty,0.5398704227724835,0.542771729887944,0.557106109533089,no
+depression/psychologist/psychologist_2_3,depression,mdd_03_weight_or_appetite_change,Mdd 03 weight or appetite change,0.5952641869141648,0.5472182638486096,0.6028202458156328,no
+depression/psychologist/psychologist_2_3,depression,mdd_05_psychomotor_change,Mdd 05 psychomotor change,0.5600721117407154,0.6236889732119575,0.5578436284035831,no
+depression/psychologist/psychologist_2_3,depression,pdd_01_appetite_change,Pdd 01 appetite change,0.5439820910585065,0.5580361179109349,0.5164557299598369,no
+depression/psychologist/psychologist_2_3,depression,pdd_depressed_or_irritable_mood,Pdd depressed or irritable mood,0.5630107857358748,0.6074647084299836,0.5714187006231887,no
+depression/psychologist/psychologist_2_3,depression,pdd_impairment,Pdd impairment,0.5451330747241665,0.5216278486282027,0.6315831697249837,no
+depression/psychologist/psychologist_2_3,depression,mdd_09_death_or_suicidal_thoughts,Mdd 09 death or suicidal thoughts,0.5555636731677754,0.5846355432928362,0.4919206192691767,no
+depression/psychologist/psychologist_2_3,depression,dmdd_duration_months,Dmdd duration months,0.49345556041324234,0.3246327792468278,0.3623999375486506,no
+depression/psychologist/psychologist_2_3,depression,dmdd_outbursts_frequency_per_week,Dmdd outbursts frequency per week,0.35483574703848353,0.36407478854771264,0.255361732059711,no
+depression/psychologist/psychologist_2_3,depression,pdd_05_concentration_difficulty,Pdd 05 concentration difficulty,0.5176787965706201,0.521558643741177,0.5404260628822063,no
+depression/psychologist/psychologist_2_3,depression,dmdd_irritable_between_outbursts,Dmdd irritable between outbursts,0.515054338185105,0.3760268388107845,0.41953162292115775,no
+depression/psychologist/psychologist_2_3,depression,dmdd_outbursts_severity,Dmdd outbursts severity,0.5119537483343206,0.4127329426675872,0.4378881365733272,no
+depression/psychologist/psychologist_2_3,depression,mdd_06_fatigue_or_low_energy,Mdd 06 fatigue or low energy,0.5522890251820382,0.5749913860154316,0.5948723711926723,no
+depression/psychologist/psychologist_2_3,depression,age_years,Edad en años cumplidos,0.05853712275220942,0.11282970500754176,0.12683383638212423,no
+depression/psychologist/psychologist_full,depression,mdd_impairment,Mdd impairment,0.6423268784476481,0.6257478403540926,0.6660899476145616,no
+depression/psychologist/psychologist_full,depression,mdd_duration_weeks,Mdd duration weeks,0.6078114751510316,0.6301607169309336,0.5970432507739928,no
+depression/psychologist/psychologist_full,depression,pdd_duration_months_child,Pdd duration months child,0.5405687848347979,0.5665538977682409,0.5722050771197215,no
+depression/psychologist/psychologist_full,depression,mdd_02_loss_of_interest_or_pleasure,Mdd 02 loss of interest or pleasure,0.5945298225133401,0.6136874448164088,0.6063183665103942,no
+depression/psychologist/psychologist_full,depression,mdd_07_worthlessness_or_excessive_guilt,Mdd 07 worthlessness or excessive guilt,0.5486200240210464,0.6073489106112215,0.5854832517274358,no
+depression/psychologist/psychologist_full,depression,mdd_01_depressed_or_irritable_mood,Mdd 01 depressed or irritable mood,0.6104055838889354,0.6296857463587732,0.6335105835941097,no
+depression/psychologist/psychologist_full,depression,mdd_08_concentration_or_decision_difficulty,Mdd 08 concentration or decision difficulty,0.5398704227724835,0.542771729887944,0.557106109533089,no
+depression/psychologist/psychologist_full,depression,mdd_04_sleep_change,Mdd 04 sleep change,0.553057180283131,0.5989669722553671,0.5952916504622854,no
+depression/psychologist/psychologist_full,depression,mdd_03_weight_or_appetite_change,Mdd 03 weight or appetite change,0.5952641869141648,0.5472182638486096,0.6028202458156328,no
+depression/psychologist/psychologist_full,depression,mdd_05_psychomotor_change,Mdd 05 psychomotor change,0.5600721117407154,0.6236889732119575,0.5578436284035831,no
+depression/psychologist/psychologist_full,depression,pdd_01_appetite_change,Pdd 01 appetite change,0.5439820910585065,0.5580361179109349,0.5164557299598369,no
+depression/psychologist/psychologist_full,depression,pdd_depressed_or_irritable_mood,Pdd depressed or irritable mood,0.5630107857358748,0.6074647084299836,0.5714187006231887,no
+depression/psychologist/psychologist_full,depression,pdd_impairment,Pdd impairment,0.5451330747241665,0.5216278486282027,0.6315831697249837,no
+depression/psychologist/psychologist_full,depression,pdd_06_hopelessness,Pdd 06 hopelessness,0.5261356107100512,0.5237399858033828,0.5240472895815417,no
+depression/psychologist/psychologist_full,depression,mdd_09_death_or_suicidal_thoughts,Mdd 09 death or suicidal thoughts,0.5555636731677754,0.5846355432928362,0.4919206192691767,no
+depression/psychologist/psychologist_full,depression,dmdd_duration_months,Dmdd duration months,0.49345556041324234,0.3246327792468278,0.3623999375486506,no
+depression/psychologist/psychologist_full,depression,dmdd_outbursts_frequency_per_week,Dmdd outbursts frequency per week,0.35483574703848353,0.36407478854771264,0.255361732059711,no
+depression/psychologist/psychologist_full,depression,pdd_05_concentration_difficulty,Pdd 05 concentration difficulty,0.5176787965706201,0.521558643741177,0.5404260628822063,no
+depression/psychologist/psychologist_full,depression,dmdd_irritable_between_outbursts,Dmdd irritable between outbursts,0.515054338185105,0.3760268388107845,0.41953162292115775,no
+depression/psychologist/psychologist_full,depression,dmdd_outbursts_severity,Dmdd outbursts severity,0.5119537483343206,0.4127329426675872,0.4378881365733272,no
+depression/psychologist/psychologist_full,depression,mdd_06_fatigue_or_low_energy,Mdd 06 fatigue or low energy,0.5522890251820382,0.5749913860154316,0.5948723711926723,no
+depression/psychologist/psychologist_full,depression,dmdd_context_home,Dmdd context home,0.35146624528316206,0.3075639630302191,0.33856519861762524,no
+depression/psychologist/psychologist_full,depression,pdd_02_sleep_change,Pdd 02 sleep change,0.4956129158578059,0.559376024800729,0.507287360784645,no
+depression/psychologist/psychologist_full,depression,age_years,Edad en años cumplidos,0.05853712275220942,0.11282970500754176,0.12683383638212423,no
+depression/psychologist/psychologist_full,depression,pdd_03_low_energy,Pdd 03 low energy,0.48680819687757926,0.5069907752163929,0.5213062253298727,no
+depression/psychologist/psychologist_full,depression,pdd_no_gap_gt_2_months,Pdd no gap gt 2 months,0.2323080310175417,0.2509662361772005,0.17881486710984293,no
+depression/psychologist/psychologist_full,depression,pdd_04_low_self_esteem,Pdd 04 low self esteem,0.48189468100936766,0.5631288935941668,0.5238824256824844,no
+depression/psychologist/psychologist_full,depression,dmdd_context_school,Dmdd context school,0.3650005886649992,0.3299076475420229,0.3214323040091541,no
+depression/psychologist/psychologist_full,depression,dmdd_context_peers,Dmdd context peers,0.3756456611757621,0.31881209885787415,0.31265851154966073,no
+depression/psychologist/psychologist_full,depression,dmdd_onset_before_10,Dmdd onset before 10,0.2461110791214081,0.22368049544522425,0.2502756771739524,no
+depression/psychologist/psychologist_full,depression,dmdd_developmentally_inappropriate,Dmdd developmentally inappropriate,0.24136175850084937,0.22669701626230243,0.1587801609757189,no
+depression/psychologist/psychologist_full,depression,pdd_no_psychotic_explained,Pdd no psychotic explained,0.03359944443718722,0.0028584849100032695,-0.0051172501098362775,no
+depression/psychologist/psychologist_full,depression,mdd_not_psychotic_explained,Mdd not psychotic explained,0.014099944873163982,-0.013918701674976401,0.03536921806139862,no
+depression/psychologist/psychologist_full,depression,mdd_not_due_substance_medical,Mdd not due substance medical,0.02842467796645375,0.037227898799649384,0.0075305602335841255,no
+depression/psychologist/psychologist_full,depression,mdd_no_mania_hypomania_history,Mdd no mania hypomania history,0.028424677966453784,0.051068352154929206,0.07268304051360117,no
+depression/psychologist/psychologist_full,depression,dmdd_no_mania_hypomania,Dmdd no mania hypomania,0.01595797319116491,-0.013918701674976325,-0.008223231673177976,no
+depression/psychologist/psychologist_full,depression,dmdd_not_better_explained,Dmdd not better explained,-0.0009625700267467149,0.03204687388579628,-0.014095043245834524,no
+depression/psychologist/psychologist_full,depression,pdd_no_substance_medical,Pdd no substance medical,-0.02249421172902935,0.06274457635156191,-0.07845426387469537,no
+depression/psychologist/psychologist_full,depression,pdd_no_mania_hypomania,Pdd no mania hypomania,0.04021372477896754,0.0497096488392012,0.012884050276021533,no
+depression/psychologist/psychologist_full,depression,dmdd_no_substance_medical,Dmdd no substance medical,0.014289261649437576,0.07867494530251413,-0.026570089880759387,no
+elimination/caregiver/caregiver_1_3,elimination,enuresis_duration_months_consecutive,Enuresis duration months consecutive,0.7385329432785449,0.7520927537476486,0.6919017358952329,no
+elimination/caregiver/caregiver_1_3,elimination,encopresis_event_frequency_per_month,Encopresis event frequency per month,0.35080561206681987,0.342029483041543,0.4148083310706057,no
+elimination/caregiver/caregiver_2_3,elimination,enuresis_duration_months_consecutive,Enuresis duration months consecutive,0.7385329432785449,0.7520927537476486,0.6919017358952329,no
+elimination/caregiver/caregiver_2_3,elimination,encopresis_event_frequency_per_month,Encopresis event frequency per month,0.35080561206681987,0.342029483041543,0.4148083310706057,no
+elimination/caregiver/caregiver_2_3,elimination,enuresis_nocturnal,Enuresis nocturnal,0.6666886185078718,0.7356391300807574,0.6710938660713281,no
+elimination/caregiver/caregiver_2_3,elimination,enuresis_primary_course,Enuresis primary course,0.6791873504328325,0.6952460716822003,0.6274536600649069,no
+elimination/caregiver/caregiver_2_3,elimination,encopresis_duration_months_consecutive,Encopresis duration months consecutive,0.2721793213593168,0.2592493802490359,0.3758390842775471,no
+elimination/caregiver/caregiver_2_3,elimination,encopresis_constipation_present,Encopresis constipation present,0.2109409922858368,0.23074883533572926,0.18960855016443398,no
+elimination/caregiver/caregiver_full,elimination,enuresis_duration_months_consecutive,Enuresis duration months consecutive,0.7385329432785449,0.7520927537476486,0.6919017358952329,no
+elimination/caregiver/caregiver_full,elimination,encopresis_event_frequency_per_month,Encopresis event frequency per month,0.35080561206681987,0.342029483041543,0.4148083310706057,no
+elimination/caregiver/caregiver_full,elimination,enuresis_nocturnal,Enuresis nocturnal,0.6666886185078718,0.7356391300807574,0.6710938660713281,no
+elimination/caregiver/caregiver_full,elimination,enuresis_primary_course,Enuresis primary course,0.6791873504328325,0.6952460716822003,0.6274536600649069,no
+elimination/caregiver/caregiver_full,elimination,encopresis_duration_months_consecutive,Encopresis duration months consecutive,0.2721793213593168,0.2592493802490359,0.3758390842775471,no
+elimination/caregiver/caregiver_full,elimination,enuresis_secondary_course,Enuresis secondary course,0.3285554528947043,0.3379303801097644,0.308694666192935,no
+elimination/caregiver/caregiver_full,elimination,enuresis_diurnal,Enuresis diurnal,0.40066466253488625,0.4364599592578854,0.33213846271821457,no
+elimination/caregiver/caregiver_full,elimination,encopresis_visible_deposition_pattern,Encopresis visible deposition pattern,0.22235267418469443,0.15924469807990935,0.301389911208507,no
+elimination/caregiver/caregiver_full,elimination,encopresis_constipation_present,Encopresis constipation present,0.2109409922858368,0.23074883533572926,0.18960855016443398,no
+elimination/psychologist/psychologist_1_3,elimination,enuresis_duration_months_consecutive,Enuresis duration months consecutive,0.7385329432785449,0.7520927537476486,0.6919017358952329,no
+elimination/psychologist/psychologist_1_3,elimination,encopresis_event_frequency_per_month,Encopresis event frequency per month,0.35080561206681987,0.342029483041543,0.4148083310706057,no
+elimination/psychologist/psychologist_1_3,elimination,enuresis_primary_course,Enuresis primary course,0.6791873504328325,0.6952460716822003,0.6274536600649069,no
+elimination/psychologist/psychologist_1_3,elimination,enuresis_nocturnal,Enuresis nocturnal,0.6666886185078718,0.7356391300807574,0.6710938660713281,no
+elimination/psychologist/psychologist_2_3,elimination,enuresis_duration_months_consecutive,Enuresis duration months consecutive,0.7385329432785449,0.7520927537476486,0.6919017358952329,no
+elimination/psychologist/psychologist_2_3,elimination,encopresis_event_frequency_per_month,Encopresis event frequency per month,0.35080561206681987,0.342029483041543,0.4148083310706057,no
+elimination/psychologist/psychologist_2_3,elimination,enuresis_primary_course,Enuresis primary course,0.6791873504328325,0.6952460716822003,0.6274536600649069,no
+elimination/psychologist/psychologist_2_3,elimination,enuresis_nocturnal,Enuresis nocturnal,0.6666886185078718,0.7356391300807574,0.6710938660713281,no
+elimination/psychologist/psychologist_2_3,elimination,encopresis_duration_months_consecutive,Encopresis duration months consecutive,0.2721793213593168,0.2592493802490359,0.3758390842775471,no
+elimination/psychologist/psychologist_2_3,elimination,enuresis_diurnal,Enuresis diurnal,0.40066466253488625,0.4364599592578854,0.33213846271821457,no
+elimination/psychologist/psychologist_2_3,elimination,encopresis_constipation_present,Encopresis constipation present,0.2109409922858368,0.23074883533572926,0.18960855016443398,no
+elimination/psychologist/psychologist_2_3,elimination,enuresis_not_due_substance_medical,Enuresis not due substance medical,0.032511470293316545,0.07076298183794368,0.06679035510530065,no
+elimination/psychologist/psychologist_full,elimination,enuresis_duration_months_consecutive,Enuresis duration months consecutive,0.7385329432785449,0.7520927537476486,0.6919017358952329,no
+elimination/psychologist/psychologist_full,elimination,encopresis_event_frequency_per_month,Encopresis event frequency per month,0.35080561206681987,0.342029483041543,0.4148083310706057,no
+elimination/psychologist/psychologist_full,elimination,enuresis_primary_course,Enuresis primary course,0.6791873504328325,0.6952460716822003,0.6274536600649069,no
+elimination/psychologist/psychologist_full,elimination,enuresis_nocturnal,Enuresis nocturnal,0.6666886185078718,0.7356391300807574,0.6710938660713281,no
+elimination/psychologist/psychologist_full,elimination,encopresis_duration_months_consecutive,Encopresis duration months consecutive,0.2721793213593168,0.2592493802490359,0.3758390842775471,no
+elimination/psychologist/psychologist_full,elimination,enuresis_diurnal,Enuresis diurnal,0.40066466253488625,0.4364599592578854,0.33213846271821457,no
+elimination/psychologist/psychologist_full,elimination,enuresis_secondary_course,Enuresis secondary course,0.3285554528947043,0.3379303801097644,0.308694666192935,no
+elimination/psychologist/psychologist_full,elimination,encopresis_visible_deposition_pattern,Encopresis visible deposition pattern,0.22235267418469443,0.15924469807990935,0.301389911208507,no
+elimination/psychologist/psychologist_full,elimination,encopresis_constipation_present,Encopresis constipation present,0.2109409922858368,0.23074883533572926,0.18960855016443398,no
+elimination/psychologist/psychologist_full,elimination,encopresis_overflow_incontinence,Encopresis overflow incontinence,0.1562082047310821,0.2624473198068834,0.12534560897168762,no
+elimination/psychologist/psychologist_full,elimination,enuresis_not_due_substance_medical,Enuresis not due substance medical,0.032511470293316545,0.07076298183794368,0.06679035510530065,no
+elimination/psychologist/psychologist_full,elimination,encopresis_not_due_substance_medical,Encopresis not due substance medical,-0.0006193987497084617,-0.05653153660275775,-0.06465812789074094,no

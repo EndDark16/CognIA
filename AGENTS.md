@@ -707,3 +707,27 @@ Contexto metodolÃ³gico:
   - no son rechazo automatico si no hay leakage/proxy/contaminacion/clonado y la generalizacion es defendible.
 - Loader/runtime:
   - defaults de modelos activos movidos a `*_freeze_v17` en `questionnaire_v2_loader_service.py`.
+
+## Actualizacion de estado (2026-05-02) - v17_extreme_metrics_threshold_separability_audit
+- Se ejecuto auditoria focal de metricas extremas sobre la linea activa `v17` sin abrir campana de reentrenamiento global.
+- Script principal:
+  - `scripts/run_hybrid_v17_extreme_metrics_threshold_separability_audit.py`
+- Artefactos generados:
+  - `data/hybrid_domain_specialized_rf_v17/extreme_metrics_threshold_separability_audit/`
+- Cobertura:
+  - `audited_extreme_slots_count=30`
+  - `threshold_sweep_completed_count=30`
+  - `high_separability_audit_completed_count=30`
+  - `ablation_completed_count=30`
+- Resultado final:
+  - `leakage_confirmed_count=0`
+  - `target_proxy_confirmed_count=0`
+  - `split_contamination_confirmed_count=0` (sin overlap de `participant_id`; overlap de filas exactas entre participantes queda como observacion no bloqueante)
+  - `threshold_adjustment_recommended_count=0`
+  - `threshold_adjustment_applied_count=0`
+  - `retrain_required_count=0`
+  - `unresolved_issue_count=0`
+  - `final_audit_status=pass`
+- Decision operativa:
+  - no se cambiaron modelos ni thresholds de la linea activa `v17`;
+  - los casos de alta separabilidad se mantienen como `high_separability_validated` con caveat metodologico de validacion externa.
