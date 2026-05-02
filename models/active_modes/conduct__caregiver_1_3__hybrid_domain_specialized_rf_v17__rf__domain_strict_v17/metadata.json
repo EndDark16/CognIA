@@ -1,0 +1,28 @@
+{
+  "model_key": "conduct__caregiver_1_3__hybrid_domain_specialized_rf_v17__rf__domain_strict_v17",
+  "line": "hybrid_domain_specialized_rf_v17",
+  "domain": "conduct",
+  "role": "caregiver",
+  "mode": "caregiver_1_3",
+  "model_family": "rf",
+  "feature_columns": [
+    "conduct_impairment_global",
+    "conduct_09_property_destruction",
+    "conduct_03_weapon_use",
+    "conduct_06_steals_confronting_victim",
+    "conduct_15_truancy_before_13",
+    "conduct_08_fire_setting",
+    "conduct_01_bullies_threatens_intimidates",
+    "conduct_05_physical_cruelty_animals"
+  ],
+  "n_features": 8,
+  "recommended_threshold": 0.05,
+  "threshold_policy": "balanced_recall_specificity",
+  "calibration": "sigmoid",
+  "config_id": "rf_high_recall_push",
+  "seed": 20270511,
+  "generated_at_utc": "2026-05-02T05:40:31.104199+00:00",
+  "feature_set_type": "domain_strict_1_3",
+  "same_inputs_outputs_contract": true,
+  "questionnaire_changed": false
+}

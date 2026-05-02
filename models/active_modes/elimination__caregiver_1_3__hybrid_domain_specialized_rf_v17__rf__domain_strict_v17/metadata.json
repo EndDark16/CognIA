@@ -1,0 +1,22 @@
+{
+  "model_key": "elimination__caregiver_1_3__hybrid_domain_specialized_rf_v17__rf__domain_strict_v17",
+  "line": "hybrid_domain_specialized_rf_v17",
+  "domain": "elimination",
+  "role": "caregiver",
+  "mode": "caregiver_1_3",
+  "model_family": "rf",
+  "feature_columns": [
+    "enuresis_duration_months_consecutive",
+    "encopresis_event_frequency_per_month"
+  ],
+  "n_features": 2,
+  "recommended_threshold": 0.05,
+  "threshold_policy": "balanced_recall_specificity",
+  "calibration": "sigmoid",
+  "config_id": "rf_high_recall_push",
+  "seed": 20270529,
+  "generated_at_utc": "2026-05-02T05:41:20.658267+00:00",
+  "feature_set_type": "domain_strict_1_3",
+  "same_inputs_outputs_contract": true,
+  "questionnaire_changed": false
+}
