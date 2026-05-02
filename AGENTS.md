@@ -763,3 +763,26 @@ Contexto metodolÃ³gico:
   - `.github/workflows/deploy-backend.yml` ahora dispara en push a `main` y usa `DEPLOY_BRANCH=main`.
 - Claim metodologico sin cambios:
   - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-05-02) - security_transport_openapi_release_hardening
+- Se corrigio bug funcional en `GET /api/v2/security/transport-key`:
+  - se removio `@jwt_required()` para habilitar bootstrap criptografico previo al cifrado de payloads sensibles.
+  - la ruta permanece segura porque solo entrega material publico (`public_key_jwk`), sin exposicion de clave privada.
+- Se agrego hardening de abuso para endpoint publico:
+  - rate limit dedicado `QV2_TRANSPORT_KEY_RATE_LIMIT` (default `60 per minute`) en `api/routes/questionnaire_v2.py`.
+  - variable agregada en `config/settings.py` y `.env.example`.
+- Se reforzo validacion de contrato criptografico en `api/services/transport_crypto_service.py`:
+  - `X-CognIA-Encrypted` invalido -> `encrypted_payload_invalid`.
+  - `X-CognIA-Crypto-Version` faltante/invalido en modo cifrado -> `invalid_crypto_version`.
+  - payload cifrado sin `X-CognIA-Encrypted: 1` -> `encrypted_payload_invalid`.
+- Se actualizaron contratos/documentacion:
+  - `docs/openapi.yaml` alinea `transport-key` como endpoint publico (`security: []`) y corrige respuestas reales.
+  - endpoints sensibles v2 documentan `invalid_crypto_version` donde aplica.
+  - `docs/frontend_encrypted_transport_contract.md`, `docs/security_encryption.md`, `docs/clinical_summary_endpoint.md`, `docs/deployment_ubuntu_self_hosted.md`, `README.md`, `.env.example`.
+- Validacion ejecutada en esta ventana:
+  - OpenAPI: `openapi_yaml_valid`, `openapi_spec_valid`.
+  - Tests focales seguridad/API/docs: `33 passed`.
+  - Policy/model loader: `validate_hybrid_classification_policy_v1` sin violaciones + `4 passed`.
+  - Suite completa: `164 passed, 3 skipped`.
+- Claim metodologico sin cambios:
+  - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
