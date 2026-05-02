@@ -1,0 +1,28 @@
+{
+  "model_key": "elimination__psychologist_2_3__hybrid_domain_specialized_rf_v17__rf__domain_strict_v17",
+  "line": "hybrid_domain_specialized_rf_v17",
+  "domain": "elimination",
+  "role": "psychologist",
+  "mode": "psychologist_2_3",
+  "model_family": "rf",
+  "feature_columns": [
+    "enuresis_duration_months_consecutive",
+    "encopresis_event_frequency_per_month",
+    "enuresis_primary_course",
+    "enuresis_nocturnal",
+    "encopresis_duration_months_consecutive",
+    "enuresis_diurnal",
+    "encopresis_constipation_present",
+    "enuresis_not_due_substance_medical"
+  ],
+  "n_features": 8,
+  "recommended_threshold": 0.09999999999999999,
+  "threshold_policy": "balanced_recall_specificity",
+  "calibration": "sigmoid",
+  "config_id": "rf_high_recall_push",
+  "seed": 20270529,
+  "generated_at_utc": "2026-05-02T05:41:31.078837+00:00",
+  "feature_set_type": "domain_strict_2_3",
+  "same_inputs_outputs_contract": true,
+  "questionnaire_changed": false
+}

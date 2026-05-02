@@ -1,0 +1,25 @@
+{
+  "model_key": "anxiety__caregiver_1_3__hybrid_domain_specialized_rf_v17__rf__domain_strict_v17",
+  "line": "hybrid_domain_specialized_rf_v17",
+  "domain": "anxiety",
+  "role": "caregiver",
+  "mode": "caregiver_1_3",
+  "model_family": "rf",
+  "feature_columns": [
+    "sep_anx_impairment",
+    "gad_difficulty_controlling_worry",
+    "gad_impairment",
+    "gad_excessive_worry_multiple_areas",
+    "social_anxiety_impairment"
+  ],
+  "n_features": 5,
+  "recommended_threshold": 0.5199999999999999,
+  "threshold_policy": "balanced_recall_specificity",
+  "calibration": "none",
+  "config_id": "rf_sparse_stability",
+  "seed": 20270529,
+  "generated_at_utc": "2026-05-02T05:40:06.862812+00:00",
+  "feature_set_type": "domain_strict_1_3",
+  "same_inputs_outputs_contract": true,
+  "questionnaire_changed": false
+}

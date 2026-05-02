@@ -1186,6 +1186,7 @@ def get_clinical_summary_payload(session: QuestionnaireSession) -> dict[str, Any
 
     top_domains = sorted(ordered_domains, key=lambda item: item["probability"], reverse=True)
     elevated_domains = [item for item in top_domains if item["risk_level"] in {"relevante", "alta"}]
+    monitor_domains = [item for item in top_domains if item["risk_level"] in {"intermedia", "relevante", "alta"}]
     overall_risk = _overall_risk_level(ordered_domains)
 
     if top_domains:
@@ -1196,8 +1197,13 @@ def get_clinical_summary_payload(session: QuestionnaireSession) -> dict[str, Any
     else:
         top_phrase = "sin dominios procesados"
 
-    has_comorbidity_signal = len(elevated_domains) >= 2
-    comorbidity_domains = [item["domain"] for item in elevated_domains]
+    has_comorbidity_signal = len(elevated_domains) >= 2 or (
+        overall_risk in {"relevante", "alta"} and len(monitor_domains) >= 2
+    )
+    if elevated_domains:
+        comorbidity_domains = [item["domain"] for item in elevated_domains]
+    else:
+        comorbidity_domains = [item["domain"] for item in monitor_domains[:3]]
     if has_comorbidity_signal:
         comorbidity_summary = (
             "Se observan senales concurrentes en multiples dominios, compatibles con posible comorbilidad "
