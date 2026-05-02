@@ -1127,3 +1127,23 @@ Pendiente:
 - Importante:
   - La linea de modelos permanece en `v16`.
   - El endpoint legacy de resultados plaintext sigue activo por compatibilidad (`/history/{session_id}/results`) y marca cabecera de legado.
+
+## Actualizacion de estado (2026-05-02) - cierre v17 domain-specialized RF
+- Campana: `hybrid_domain_specialized_rf_v17`.
+- Se consolido freeze activo:
+  - `data/hybrid_active_modes_freeze_v17/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_operational_freeze_v17/tables/hybrid_operational_final_champions.csv`
+- Estado final validado:
+  - `final_audit_status=pass`
+  - `prediction_recomputed_slots=30/30`
+  - `metrics_match_registered_no_count=0`
+  - `all_domains_real_clone_count=0`
+  - `elimination_real_clone_count=0`
+  - `hard_fail_unresolved_count=0`
+  - `questionnaire_changed=no`
+- Semantica de alta separabilidad:
+  - `>0.98` queda como `high_separability_alert` (auditoria obligatoria), no como hard-fail automatico.
+  - slots aceptados con alta separabilidad quedan en `pass_high_separability_validated` cuando no hay leakage/proxy/contaminacion/clonado y la generalizacion es defendible.
+- DB/Supabase:
+  - `load-all` ejecutado con defaults v17.
+  - verificacion final: `active_activations_db=30`, `active_model_versions=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`, `duplicate_active_domain_mode_rows=0`, `db_active_set_valid=yes`.

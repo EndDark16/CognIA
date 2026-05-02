@@ -684,3 +684,26 @@ Contexto metodolÃ³gico:
   - `docs/clinical_summary_endpoint.md`
 - Caveat operativo metodologico:
   - `v17` es hardening de runtime/seguridad sobre linea de modelos `v16`; no redefine champions.
+
+## Actualizacion de estado (2026-05-02) - hybrid_domain_specialized_rf_v17
+- Se ejecuto campana domain-specialized RF para 30 slots con feature governance estricta por dominio/rol/modo.
+- Lineas versionadas:
+  - `data/hybrid_domain_specialized_rf_v17/`
+  - `data/hybrid_active_modes_freeze_v17/`
+  - `data/hybrid_operational_freeze_v17/`
+  - `artifacts/hybrid_domain_specialized_rf_v17/`
+  - `artifacts/hybrid_active_modes_freeze_v17/`
+  - `artifacts/hybrid_operational_freeze_v17/`
+- Resultado final de auditoria:
+  - `final_audit_status=pass`
+  - `prediction_recomputed_slots=30/30`
+  - `metrics_match_registered_yes_count=300` (`metrics_match_registered_no_count=0`)
+  - `all_domains_real_clone_count=0`
+  - `elimination_real_clone_count=0`
+  - `hard_fail_unresolved_count=0`
+  - `db_active_set_valid=yes`
+- Regla operativa actualizada:
+  - metricas `>0.98` se tratan como `high_separability_alert` con auditoria obligatoria;
+  - no son rechazo automatico si no hay leakage/proxy/contaminacion/clonado y la generalizacion es defendible.
+- Loader/runtime:
+  - defaults de modelos activos movidos a `*_freeze_v17` en `questionnaire_v2_loader_service.py`.

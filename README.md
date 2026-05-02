@@ -991,3 +991,19 @@ Toda interpretacion de resultados de CognIA debe mantenerse en el marco de apoyo
 - Documentacion de seguridad:
   - `docs/security_encryption.md`
   - `docs/clinical_summary_endpoint.md`
+
+## Estado de linea activa (2026-05-02, v17 domain-specialized RF)
+- Se activo `hybrid_active_modes_freeze_v17` + `hybrid_operational_freeze_v17` como linea final de modelos.
+- Auditoria final:
+  - `final_audit_status=pass`
+  - `prediction_recomputed_slots=30/30`
+  - `metrics_match_registered_no_count=0`
+  - `all_domains_real_clone_count=0`
+  - `elimination_real_clone_count=0`
+  - `hard_fail_unresolved_count=0`
+- Regla de alta separabilidad:
+  - metricas `>0.98` se clasifican como `high_separability_alert` y requieren auditoria;
+  - no se rechazan automaticamente si la validacion tecnica confirma separabilidad legitima.
+- Sync operativo:
+  - `python scripts/bootstrap_questionnaire_backend_v2.py load-all`
+  - verificacion DB en `data/hybrid_domain_specialized_rf_v17/validation/v17_supabase_sync_verification.json`.
