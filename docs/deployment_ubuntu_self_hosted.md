@@ -170,3 +170,24 @@ Verifica labels esperados en GitHub:
 - No versionar secretos en el repo.
 - Variables sensibles (tokens, credenciales, cloud secrets) deben residir en secretos del entorno/servidor y/o GitHub Secrets segun corresponda.
 - Mantener el claim metodologico del proyecto: screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Compatibilidad Render + Vercel y dominio propio
+Este repo opera con deploy productivo principal en `main` (self-hosted), pero mantiene compatibilidad con escenarios cloud de continuidad (frontend en Vercel y backend en Render).
+
+Variables clave para ambos escenarios:
+- `CORS_ORIGINS`: incluir exactamente el origin del frontend publico.
+- `FRONTEND_URL`: URL canónica del frontend para enlaces operativos (password reset/email flows).
+- `AUTH_CROSS_SITE_COOKIES=true` cuando frontend y backend estan en dominios distintos.
+- `JWT_COOKIE_SAMESITE=None` y `JWT_COOKIE_SECURE=true` para cookies cross-site en HTTPS.
+- `JWT_COOKIE_DOMAIN`: opcional; usar solo si se necesita compartir cookie entre subdominios del mismo dominio raiz.
+
+Ejemplo con dominio propio:
+- Frontend: `https://app.cognia.lat`
+- Backend API: `https://api.cognia.lat`
+- Config minima:
+  - `CORS_ORIGINS=https://app.cognia.lat`
+  - `FRONTEND_URL=https://app.cognia.lat`
+  - `AUTH_CROSS_SITE_COOKIES=true`
+  - `JWT_COOKIE_SAMESITE=None`
+  - `JWT_COOKIE_SECURE=true`
+  - `JWT_COOKIE_DOMAIN=.cognia.lat` (solo si aplica sharing cross-subdomain)

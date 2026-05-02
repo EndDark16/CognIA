@@ -42,7 +42,8 @@ TLS/HTTPS remains mandatory in production.
 
 ### Service and algorithm
 - Service: `api/services/transport_crypto_service.py`
-- Key bootstrap endpoint: `GET /api/v2/security/transport-key`
+- Key bootstrap endpoint: `GET /api/v2/security/transport-key` (public, no JWT required)
+- Transport key bootstrap rate limit: `QV2_TRANSPORT_KEY_RATE_LIMIT` (default `60 per minute`)
 - Envelope version: `transport_envelope_v1`
 - Key exchange: `RSA-OAEP-256`
 - Payload encryption: `AES-256-GCM`
@@ -50,6 +51,10 @@ TLS/HTTPS remains mandatory in production.
 ### Headers for encrypted requests
 - `X-CognIA-Encrypted: 1`
 - `X-CognIA-Crypto-Version: transport_envelope_v1`
+- Header validation is strict in sensitive endpoints:
+  - invalid `X-CognIA-Encrypted` -> `encrypted_payload_invalid`
+  - missing/invalid `X-CognIA-Crypto-Version` in encrypted mode -> `invalid_crypto_version`
+  - encrypted payload without `X-CognIA-Encrypted: 1` -> `encrypted_payload_invalid`
 
 ## Sensitive endpoint matrix
 
@@ -59,6 +64,7 @@ TLS/HTTPS remains mandatory in production.
 - notable errors:
   - `plaintext_not_allowed`
   - `encrypted_payload_invalid`
+  - `invalid_crypto_version`
   - `validation_error`
 
 ### `PATCH /api/v2/questionnaires/sessions/{session_id}/answers`
@@ -68,6 +74,7 @@ TLS/HTTPS remains mandatory in production.
   - `invalid_session_id`
   - `plaintext_not_allowed`
   - `encrypted_payload_invalid`
+  - `invalid_crypto_version`
   - `validation_error`
 
 ### `POST /api/v2/questionnaires/sessions/{session_id}/submit`
@@ -77,6 +84,7 @@ TLS/HTTPS remains mandatory in production.
   - `runtime_artifact_unavailable` (503)
   - `plaintext_not_allowed`
   - `encrypted_payload_invalid`
+  - `invalid_crypto_version`
 
 ### `POST /api/v2/questionnaires/history/{session_id}/results-secure`
 - request: `{}` or encrypted envelope (policy dependent).
@@ -85,6 +93,7 @@ TLS/HTTPS remains mandatory in production.
   - `invalid_session_id`
   - `plaintext_not_allowed`
   - `encrypted_payload_invalid`
+  - `invalid_crypto_version`
 
 ### `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`
 - request: `{}` or encrypted envelope (policy dependent).
@@ -94,6 +103,7 @@ TLS/HTTPS remains mandatory in production.
   - `runtime_artifact_unavailable` (503)
   - `plaintext_not_allowed`
   - `encrypted_payload_invalid`
+  - `invalid_crypto_version`
 
 ## Legacy compatibility
 - Legacy plaintext endpoint remains:
