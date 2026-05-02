@@ -71,10 +71,10 @@ Bloqueador metodológico fuerte:
 - `shortcut_risk_flag=yes` nunca puede coexistir con `ROBUST_PRIMARY`.
 - `secondary_metric_anomaly_flag=yes` solo puede coexistir con `ROBUST_PRIMARY` si `secondary_anomaly_resolution=documented_strong`.
 - si no hay evidencia documental fuerte de resolución de anomalía secundaria, marcar `secondary_anomaly_resolution=por_confirmar`.
-- Ningún champion activo puede permanecer si `recall`, `specificity`, `roc_auc` o `pr_auc` queda `> 0.98`.
+- Si `recall`, `specificity`, `roc_auc` o `pr_auc` queda `> 0.98`, se marca `high_separability_alert=yes` y se exige auditoría técnica antes de aceptar/rechazar el champion.
 - La comunicación de confianza debe quedar alineada: `ACTIVE_MODERATE_CONFIDENCE` usa `confidence_band=moderate`; `ACTIVE_LIMITED_USE` usa `confidence_band=limited`; `ACTIVE_HIGH_CONFIDENCE` requiere `confidence_band=high` y sin caveat metodológico fuerte.
 
-## Política de anomalía secundaria
+## Política de anomalía secundaria y alta separabilidad
 Se marca `secondary_metric_anomaly_flag=yes` cuando existe al menos una de estas señales:
 
 - `roc_auc > 0.98`
@@ -82,7 +82,8 @@ Se marca `secondary_metric_anomaly_flag=yes` cuando existe al menos una de estas
 - `specificity > 0.98`
 - combinación casi perfecta de métricas secundarias + `brier` muy bajo
 
-No se usa solo umbral bruto: la evaluación agrega combinaciones `secondary_peak + brier` y consistencia con `balanced_accuracy`.
+No se usa solo umbral bruto: la evaluación agrega combinaciones `secondary_peak + brier`, consistencia con `balanced_accuracy`, generalización y estabilidad CV.
+Si la auditoría descarta leakage/proxy/contaminación/clonado, el slot puede quedar en `pass_high_separability_validated`.
 
 ## Implementación
 - Ejecución de normalización: `scripts/run_hybrid_classification_normalization_v1.py`

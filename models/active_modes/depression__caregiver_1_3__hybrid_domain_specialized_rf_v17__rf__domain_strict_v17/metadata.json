@@ -1,0 +1,30 @@
+{
+  "model_key": "depression__caregiver_1_3__hybrid_domain_specialized_rf_v17__rf__domain_strict_v17",
+  "line": "hybrid_domain_specialized_rf_v17",
+  "domain": "depression",
+  "role": "caregiver",
+  "mode": "caregiver_1_3",
+  "model_family": "rf",
+  "feature_columns": [
+    "mdd_duration_weeks",
+    "mdd_impairment",
+    "mdd_02_loss_of_interest_or_pleasure",
+    "pdd_depressed_or_irritable_mood",
+    "pdd_duration_months_child",
+    "mdd_05_psychomotor_change",
+    "mdd_09_death_or_suicidal_thoughts",
+    "mdd_08_concentration_or_decision_difficulty",
+    "dmdd_duration_months",
+    "mdd_03_weight_or_appetite_change"
+  ],
+  "n_features": 10,
+  "recommended_threshold": 0.62,
+  "threshold_policy": "balanced_recall_specificity",
+  "calibration": "none",
+  "config_id": "rf_recall_guarded",
+  "seed": 20270529,
+  "generated_at_utc": "2026-05-02T05:41:02.634825+00:00",
+  "feature_set_type": "domain_strict_1_3",
+  "same_inputs_outputs_contract": true,
+  "questionnaire_changed": false
+}

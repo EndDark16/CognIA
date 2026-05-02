@@ -227,7 +227,28 @@ def test_clinical_summary_disclaimer_always_present(client, app):
 def test_clinical_summary_mentions_comorbidity_when_relevant(client, app):
     session_id, headers = _prepare_processed_session(client, app)
 
-    resp = client.post(f"/api/v2/questionnaires/history/{session_id}/clinical-summary", json={}, headers=headers)
+    from api.services import questionnaire_v2_service as questionnaire_v2_service
+
+    original_get_results_payload = questionnaire_v2_service.get_results_payload
+
+    def _mock_results_payload(session):  # noqa: ANN001
+        payload = original_get_results_payload(session)
+        payload["domains"] = [
+            {"domain": "adhd", "probability": 0.81, "confidence_pct": 88, "confidence_band": "high", "operational_class": "ACTIVE_HIGH_CONFIDENCE", "operational_caveat": ""},
+            {"domain": "conduct", "probability": 0.77, "confidence_pct": 86, "confidence_band": "high", "operational_class": "ACTIVE_HIGH_CONFIDENCE", "operational_caveat": ""},
+            {"domain": "elimination", "probability": 0.34, "confidence_pct": 63, "confidence_band": "limited", "operational_class": "ACTIVE_LIMITED_USE", "operational_caveat": ""},
+            {"domain": "anxiety", "probability": 0.29, "confidence_pct": 60, "confidence_band": "limited", "operational_class": "ACTIVE_LIMITED_USE", "operational_caveat": ""},
+            {"domain": "depression", "probability": 0.22, "confidence_pct": 58, "confidence_band": "limited", "operational_class": "ACTIVE_LIMITED_USE", "operational_caveat": ""},
+        ]
+        return payload
+
+    # Ensure this test validates comorbidity semantics independent of active model line.
+    questionnaire_v2_service.get_results_payload = _mock_results_payload
+    try:
+        resp = client.post(f"/api/v2/questionnaires/history/{session_id}/clinical-summary", json={}, headers=headers)
+    finally:
+        questionnaire_v2_service.get_results_payload = original_get_results_payload
+
     assert resp.status_code == 200
     payload = resp.get_json()
 

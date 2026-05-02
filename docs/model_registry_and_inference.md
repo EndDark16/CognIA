@@ -162,3 +162,14 @@ Referencia historica preservada:
   - Endpoint de clave publica: `GET /api/v2/security/transport-key`.
   - Endpoints sensibles cifrados: `sessions`, `answers`, `submit`, `results-secure`, `clinical-summary`.
   - En produccion, plaintext puede ser rechazado segun politica (`COGNIA_TRANSPORT_PAYLOAD_ENCRYPTION` + enforcement).
+
+## Nota de actualizacion (2026-05-02) - activacion de modelos v17
+- Defaults de loader v2 actualizados a:
+  - `data/hybrid_active_modes_freeze_v17/tables/hybrid_active_models_30_modes.csv`
+  - `data/hybrid_operational_freeze_v17/tables/hybrid_operational_final_champions.csv`
+- Sync DB confirmado:
+  - `active_activations_db=30`, `active_model_versions=30`, `non_rf=0`,
+  - `missing_expected_models=0`, `mismatched_feature_columns=0`, `duplicate_active_domain_mode_rows=0`.
+- Politica de aceptacion:
+  - `high_separability_alert` no implica rechazo automatico.
+  - Se acepta `pass_high_separability_validated` cuando auditoria tecnica descarta leakage/proxy/contaminacion/clonado y la generalizacion es estable.

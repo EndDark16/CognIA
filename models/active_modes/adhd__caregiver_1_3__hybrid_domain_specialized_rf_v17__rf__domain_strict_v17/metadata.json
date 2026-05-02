@@ -1,0 +1,29 @@
+{
+  "model_key": "adhd__caregiver_1_3__hybrid_domain_specialized_rf_v17__rf__domain_strict_v17",
+  "line": "hybrid_domain_specialized_rf_v17",
+  "domain": "adhd",
+  "role": "caregiver",
+  "mode": "caregiver_1_3",
+  "model_family": "rf",
+  "feature_columns": [
+    "adhd_onset_before_12",
+    "adhd_impairment_school",
+    "adhd_impairment_home",
+    "adhd_inatt_06_avoids_sustained_effort",
+    "adhd_inatt_03_seems_not_listening",
+    "adhd_inatt_09_forgetful_daily_activities",
+    "adhd_impairment_social",
+    "adhd_inatt_07_loses_things",
+    "adhd_inatt_02_sustained_attention_difficulty"
+  ],
+  "n_features": 9,
+  "recommended_threshold": 0.37999999999999995,
+  "threshold_policy": "balanced_recall_specificity",
+  "calibration": "none",
+  "config_id": "rf_recall_balanced_manual",
+  "seed": 20270529,
+  "generated_at_utc": "2026-05-02T05:39:35.217242+00:00",
+  "feature_set_type": "domain_strict_1_3",
+  "same_inputs_outputs_contract": true,
+  "questionnaire_changed": false
+}
