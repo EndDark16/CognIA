@@ -212,10 +212,18 @@ def _user_headers(app):
     return {"Authorization": f"Bearer {token}"}
 
 
-def _get_transport_key(client, headers):
-    resp = client.get("/api/v2/security/transport-key", headers=headers)
+def _get_transport_key(client, headers=None):
+    resp = client.get("/api/v2/security/transport-key", headers=headers or {})
     assert resp.status_code == 200
     return resp.get_json()
+
+
+def test_transport_key_is_public(client):
+    payload = _get_transport_key(client)
+    assert payload["key_id"]
+    assert payload["version"] == "transport_envelope_v1"
+    assert payload["algorithm"] == "RSA-OAEP-256+AES-256-GCM"
+    assert "public_key_jwk" in payload
 
 
 def test_encrypted_payload_roundtrip(client, app):
@@ -286,3 +294,39 @@ def test_encrypted_response_for_sensitive_endpoint(client, app):
     assert saved.headers.get("X-CognIA-Encrypted") == "1"
     decrypted_saved = _decrypt_encrypted_response(saved.get_json(), answers_key)
     assert "saved_answers" in decrypted_saved
+
+
+def test_encrypted_payload_missing_crypto_version_header_rejected(client, app):
+    headers = _user_headers(app)
+    key_payload = _get_transport_key(client)
+    envelope, _ = _encrypt_envelope(
+        {
+            "mode": "short",
+            "role": "guardian",
+            "child_age_years": 9,
+            "child_sex_assigned_at_birth": "male",
+        },
+        key_payload,
+    )
+    req_headers = {**headers, "X-CognIA-Encrypted": "1"}
+    resp = client.post("/api/v2/questionnaires/sessions", json=envelope, headers=req_headers)
+    assert resp.status_code == 400
+    assert resp.get_json()["error"] == "invalid_crypto_version"
+
+
+def test_encrypted_payload_missing_encrypted_header_rejected(client, app):
+    headers = _user_headers(app)
+    key_payload = _get_transport_key(client)
+    envelope, _ = _encrypt_envelope(
+        {
+            "mode": "short",
+            "role": "guardian",
+            "child_age_years": 9,
+            "child_sex_assigned_at_birth": "male",
+        },
+        key_payload,
+    )
+    req_headers = {**headers, "X-CognIA-Crypto-Version": "transport_envelope_v1"}
+    resp = client.post("/api/v2/questionnaires/sessions", json=envelope, headers=req_headers)
+    assert resp.status_code == 400
+    assert resp.get_json()["error"] == "encrypted_payload_invalid"

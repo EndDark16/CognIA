@@ -253,6 +253,15 @@ def _user_token(app, username: str, user_type: str = "guardian"):
         return user.id, token
 
 
+def test_transport_key_endpoint_public(client):
+    resp = client.get("/api/v2/security/transport-key")
+    assert resp.status_code == 200
+    payload = resp.get_json()
+    assert payload["version"] == "transport_envelope_v1"
+    assert payload["algorithm"] == "RSA-OAEP-256+AES-256-GCM"
+    assert "public_key_jwk" in payload
+
+
 def test_questionnaire_v2_session_flow(client, app):
     _, token = _user_token(app, "owner_qv2")
     headers = {"Authorization": f"Bearer {token}"}
@@ -476,4 +485,3 @@ def test_questionnaire_v2_pdf_download_rejects_outside_runtime_reports(client, a
     resp = client.get(f"/api/v2/questionnaires/history/{session_id}/pdf/download", headers=headers)
     assert resp.status_code == 404
     assert resp.json["error"] == "pdf_file_missing"
-
