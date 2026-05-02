@@ -1,0 +1,9 @@
+{
+  "connection_attempted": true,
+  "connected": true,
+  "source": "live_db",
+  "error": null,
+  "schema": "public",
+  "table_count": 84,
+  "notes": []
+}

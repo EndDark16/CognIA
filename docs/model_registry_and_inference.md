@@ -1,10 +1,18 @@
-﻿# Model Registry and Inference (v14)
+# Model Registry and Inference (v17)
 
-## Fuente de verdad
-- `data/hybrid_active_modes_freeze_v14/tables/hybrid_active_models_30_modes.csv`
-- `data/hybrid_active_modes_freeze_v14/tables/hybrid_active_modes_summary.csv`
-- `data/hybrid_active_modes_freeze_v14/tables/hybrid_questionnaire_inputs_master.csv`
-- `data/hybrid_operational_freeze_v14/tables/hybrid_operational_final_champions.csv`
+## Fuente de verdad activa (v17)
+- `data/hybrid_active_modes_freeze_v17/tables/hybrid_active_models_30_modes.csv`
+- `data/hybrid_active_modes_freeze_v17/tables/hybrid_active_modes_summary.csv`
+- `data/hybrid_active_modes_freeze_v17/tables/hybrid_questionnaire_inputs_master.csv`
+- `data/hybrid_operational_freeze_v17/tables/hybrid_operational_final_champions.csv`
+- `data/hybrid_domain_specialized_rf_v17/validation/v17_supabase_sync_verification.json`
+
+## Alcance operativo v17
+- 30 modelos RF especializados por dominio/modo/rol (5 dominios x 3 modos x 2 roles).
+- Sin cross-domain en inferencia primaria por slot.
+- Sin `eng_*` en el contrato funcional de features activas por slot.
+- Comorbilidad construida posterior a inferencia por dominio.
+- Claim permitido: screening/apoyo profesional en entorno simulado; no diagnostico automatico.
 
 Nota de continuidad (2026-05-01, elimination v14 rescue):
 - Se ejecuto `hybrid_elimination_v14_real_anti_clone_rescue` como correccion focal Elimination-only sobre v13.
