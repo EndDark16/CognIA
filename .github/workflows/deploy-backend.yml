@@ -2,14 +2,14 @@ name: Deploy Backend (Best Effort)
 
 on:
   push:
-    branches: ["development"]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: deploy-backend-development
+  group: deploy-backend-main
   cancel-in-progress: false
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
     runs-on: [self-hosted, linux, x64, cognia-backend]
     timeout-minutes: 45
     env:
-      DEPLOY_BRANCH: development
+      DEPLOY_BRANCH: main
       BACKEND_REPO_DIR: /opt/cognia/backend
       COMPOSE_DIR: /opt/cognia
       EXPECTED_SHA: ${{ github.sha }}
