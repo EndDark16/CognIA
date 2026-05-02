@@ -1,40 +1,60 @@
-﻿# Clinical Summary Endpoint (v17)
+# Clinical Summary Endpoint (v17)
 
 ## Endpoint
 - `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`
 
-## Purpose
-Returns a simulated professional narrative summary for screening support, organized by sections and accompanied by mandatory disclaimer.
+## Estado
+- `activo` y sensible (soporta transporte cifrado por envelope).
+- No reemplaza evaluacion clinica profesional.
 
-## Legacy compatibility
-- Existing endpoint `GET /api/v2/questionnaires/history/{session_id}/results` remains available as legacy/plaintext compatibility path.
-- New encrypted-first path for results:
+## Auth y headers
+- bearer JWT obligatorio.
+- headers opcionales para modo cifrado:
+  - `X-CognIA-Encrypted: 1`
+  - `X-CognIA-Crypto-Version: transport_envelope_v1`
+
+## Request
+- path param: `session_id` (uuid).
+- body permitido:
+  - `{}` en modo plaintext permitido por politica.
+  - envelope cifrado (`transport_envelope_v1`).
+
+## Response `200`
+- plaintext o envelope cifrado segun politica/contexto.
+- payload funcional (`clinical_summary_v1`):
+  - `session_id`
+  - `report_version`
+  - `generated_at`
+  - `overall_risk_level` (`baja|intermedia|relevante|alta`)
+  - `simulated_diagnostic_text`:
+    - `sintesis_general`
+    - `niveles_de_compatibilidad`
+    - `indicadores_principales_observados`
+    - `impacto_funcional`
+    - `recomendacion_profesional`
+    - `aclaracion_importante`
+  - `domains[]`
+  - `comorbidity`
+  - `disclaimer`
+
+## Errores especificos
+- `400 invalid_session_id`
+- `400 plaintext_not_allowed`
+- `400 encrypted_payload_invalid`
+- `400 validation_error`
+- `401 invalid_user|unauthorized`
+- `403 forbidden`
+- `404 not_found`
+- `429 rate_limited`
+- `500 clinical_summary_failed|db_error|server_error`
+- `503 runtime_artifact_unavailable|runtime_assets_unavailable|db_unavailable`
+
+## Compatibilidad y diferencia frente a resultados legacy
+- Legacy plaintext de resultados sigue en `GET /api/v2/questionnaires/history/{session_id}/results`.
+- Flujo recomendado para datos sensibles:
   - `POST /api/v2/questionnaires/history/{session_id}/results-secure`
+  - `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`
 
-## Clinical summary sections
-The response includes:
-1. `sintesis_general`
-2. `niveles_de_compatibilidad`
-3. `indicadores_principales_observados`
-4. `impacto_funcional`
-5. `recomendacion_profesional`
-6. `aclaracion_importante`
-
-## Risk levels
-Per-domain and global levels use:
-- `baja`
-- `intermedia`
-- `relevante`
-- `alta`
-
-## Comorbidity logic
-`has_comorbidity_signal=true` when two or more domains are at `relevante` or `alta`.
-
-## Mandatory disclaimer
-The response always includes an explicit statement that the output is not a clinical diagnosis and does not replace professional evaluation.
-
-## Language policy
-The generated narrative must avoid confirmed-diagnosis wording and use screening-compatible language.
-
-## Encrypted transport support
-The endpoint supports application-level encrypted envelope requests/responses when transport encryption is enabled.
+## Caveat metodologico
+- Salida apta para screening/apoyo profesional en entorno simulado.
+- No apta para diagnostico automatico o interpretacion clinica fuerte sin profesional.

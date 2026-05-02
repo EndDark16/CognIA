@@ -1,0 +1,15 @@
+{
+  "openapi_source_of_truth": "docs/openapi.yaml",
+  "openapi_source_exists": true,
+  "openapi_candidates": [
+    "docs/openapi.yaml"
+  ],
+  "openapi_contradictory_copies_outside_archive": [],
+  "root_temp_files_remaining": [],
+  "root_temp_files_remaining_count": 0,
+  "root_level_cleanup_pass": true,
+  "notes": [
+    "Historical OpenAPI copy is allowed only under docs/archive/openapi/.",
+    "Cleanup intentionally avoided deleting tracked historical docs and model/data traces."
+  ]
+}

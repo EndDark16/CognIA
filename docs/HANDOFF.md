@@ -1171,3 +1171,35 @@ Pendiente:
 - Decision operacional:
   - se mantienen modelos y thresholds actuales de `v17` (sin cambios funcionales);
   - alta separabilidad queda validada metodologicamente (no hard-fail) y documentada con caveat de validacion externa.
+
+## Actualizacion de sesion (2026-05-02) - final_openapi_repo_cleanup_main_release_prep
+- Se ejecuto correccion estructural y documental de `docs/openapi.yaml` con validacion estricta.
+- Validacion final OpenAPI:
+  - `yaml_valid=yes`
+  - `openapi_version=3.0.3`
+  - `duplicate_keys=0`
+  - `broken_refs=0`
+  - `duplicate_operation_ids=0`
+  - `equivalent_validation_pass=yes` (herramientas: `ruamel.yaml`, `openapi-spec-validator`).
+- Se generaron artefactos de validacion:
+  - `data/docs_openapi_cleanup/openapi_validation_report.md`
+  - `data/docs_openapi_cleanup/openapi_validation_validator.json`
+- Documentacion quirurgica reforzada para endpoints sensibles v2:
+  - `GET /api/v2/security/transport-key`
+  - `POST /api/v2/questionnaires/sessions`
+  - `PATCH /api/v2/questionnaires/sessions/{session_id}/answers`
+  - `POST /api/v2/questionnaires/sessions/{session_id}/submit`
+  - `POST /api/v2/questionnaires/history/{session_id}/results-secure`
+  - `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`
+- Fuente de verdad OpenAPI confirmada: `docs/openapi.yaml` (historico en `docs/archive/openapi/`).
+- Repo cleanup aplicado con trazabilidad:
+  - inventarios before/after y auditoria en `data/repo_cleanup_audit/*`.
+  - artefactos temporales sueltos de calidad movidos desde raiz a `artifacts/quality/sonar/legacy_root_snapshot_20260502/`.
+  - `scripts/run_sonar.ps1` y `sonar-project.properties` actualizados para generar coverage/reportes en `artifacts/quality/sonar/latest/`.
+- Documentacion DB actualizada por introspeccion SQL real (sin PII):
+  - `docs/database_schema.md`
+  - `data/database_schema_audit/` (`tables/columns/pk/fk/indexes/table_row_counts` + summary).
+- Workflows de deploy productivo alineados a `main`:
+  - `.github/workflows/deploy-backend.yml` ahora dispara en push a `main` y usa `DEPLOY_BRANCH=main`.
+- Claim metodologico sin cambios:
+  - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.

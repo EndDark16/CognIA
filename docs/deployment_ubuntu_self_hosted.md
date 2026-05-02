@@ -4,7 +4,7 @@
 Documentar el flujo operativo real de despliegue del backend CognIA hacia Ubuntu self-hosted, sin bloquear el desarrollo cuando el runner self-hosted este offline.
 
 ## Alcance y supuestos operativos
-- Rama de despliegue backend: `development`.
+- Rama de despliegue backend: `main`.
 - Repo backend en servidor: `/opt/cognia/backend`.
 - Compose global en servidor: `/opt/cognia`.
 - Servicios compose involucrados en deploy: `backend` y `gateway`.
@@ -33,10 +33,10 @@ Documentar el flujo operativo real de despliegue del backend CognIA hacia Ubuntu
 - Archivo: `.github/workflows/deploy-backend.yml`
 - Runner: `[self-hosted, linux, x64, cognia-backend]`
 - Trigger:
-  - push a `development`
+  - push a `main`
   - `workflow_dispatch`
 - Concurrency:
-  - `group: deploy-backend-development`
+  - `group: deploy-backend-main`
   - `cancel-in-progress: false`
 
 Regla de gobierno:
@@ -57,8 +57,8 @@ Checks recomendados para branch protection:
 
 ```bash
 cd /opt/cognia/backend
-git fetch origin development
-git checkout -B development <github.sha>
+git fetch origin main
+git checkout -B main <github.sha>
 git reset --hard <github.sha>
 ```
 
