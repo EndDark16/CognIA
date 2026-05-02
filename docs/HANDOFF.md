@@ -1147,3 +1147,27 @@ Pendiente:
 - DB/Supabase:
   - `load-all` ejecutado con defaults v17.
   - verificacion final: `active_activations_db=30`, `active_model_versions=30`, `active_model_versions_non_rf=0`, `missing_expected_models=0`, `mismatched_feature_columns=0`, `duplicate_active_domain_mode_rows=0`, `db_active_set_valid=yes`.
+
+## Actualizacion de estado (2026-05-02) - auditoria focal v17 metricas extremas
+- Objetivo:
+  - auditar slots con metricas extremas en `v17` (threshold/separabilidad/leakage/proxy/splits/ablaciones) sin abrir campana completa.
+- Script ejecutado:
+  - `scripts/run_hybrid_v17_extreme_metrics_threshold_separability_audit.py`
+- Evidencia:
+  - `data/hybrid_domain_specialized_rf_v17/extreme_metrics_threshold_separability_audit/`
+- Resultado:
+  - `audited_extreme_slots_count=30`
+  - `threshold_sweep_completed_count=30`
+  - `high_separability_audit_completed_count=30`
+  - `ablation_completed_count=30`
+  - `leakage_confirmed_count=0`
+  - `target_proxy_confirmed_count=0`
+  - `split_contamination_confirmed_count=0`
+  - `threshold_adjustment_recommended_count=0`
+  - `threshold_adjustment_applied_count=0`
+  - `retrain_required_count=0`
+  - `unresolved_issue_count=0`
+  - `final_audit_status=pass`
+- Decision operacional:
+  - se mantienen modelos y thresholds actuales de `v17` (sin cambios funcionales);
+  - alta separabilidad queda validada metodologicamente (no hard-fail) y documentada con caveat de validacion externa.
