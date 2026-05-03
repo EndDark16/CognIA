@@ -87,6 +87,13 @@ def _sensitive_json_response(payload: dict, status_code: int, context: transport
     return response
 
 
+def _legacy_plaintext_response(response, replacement: str):
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["X-CognIA-Endpoint-Status"] = "legacy_plaintext"
+    response.headers["X-CognIA-Replacement"] = replacement
+    return response
+
+
 def _load_session_for_user(session_id: uuid.UUID, user_id: uuid.UUID):
     session = service.get_session_or_404(session_id)
     service.ensure_view_access(session, user_id)
@@ -190,8 +197,35 @@ def get_session(session_id: str):
     payload["tags"] = service.list_session_tags(session.id)
     response = jsonify(payload)
     response.status_code = 200
-    response.headers["Cache-Control"] = "no-store"
-    return response
+    return _legacy_plaintext_response(
+        response,
+        "/api/v2/questionnaires/sessions/{session_id}/secure",
+    )
+
+
+@questionnaire_v2_bp.post("/questionnaires/sessions/<session_id>/secure")
+@jwt_required()
+def get_session_secure(session_id: str):
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    sid = _parse_uuid(session_id)
+    if not sid:
+        return _error("invalid_session_id", "invalid_session_id", 400)
+
+    try:
+        _, transport_context = _decode_sensitive_payload()
+        session = _load_session_for_user(sid, user_id)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
+    except LookupError as exc:
+        return _error("not_found", str(exc), 404)
+    except PermissionError as exc:
+        return _error("forbidden", str(exc), 403)
+
+    payload = service.get_session_payload(session)
+    payload["tags"] = service.list_session_tags(session.id)
+    return _sensitive_json_response(payload, 200, transport_context)
 
 
 @questionnaire_v2_bp.get("/questionnaires/sessions/<session_id>/page")
@@ -220,8 +254,40 @@ def get_session_page(session_id: str):
 
     response = jsonify(payload)
     response.status_code = 200
-    response.headers["Cache-Control"] = "no-store"
-    return response
+    return _legacy_plaintext_response(
+        response,
+        "/api/v2/questionnaires/sessions/{session_id}/page-secure",
+    )
+
+
+@questionnaire_v2_bp.post("/questionnaires/sessions/<session_id>/page-secure")
+@jwt_required()
+def get_session_page_secure(session_id: str):
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    sid = _parse_uuid(session_id)
+    if not sid:
+        return _error("invalid_session_id", "invalid_session_id", 400)
+
+    schema = SessionPageQuerySchema()
+    try:
+        raw_payload, transport_context = _decode_sensitive_payload()
+        query = schema.load(raw_payload or {})
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
+
+    try:
+        session = _load_session_for_user(sid, user_id)
+        payload = service.get_session_page_payload(session, page=query["page"], page_size=query["page_size"])
+    except LookupError as exc:
+        return _error("not_found", str(exc), 404)
+    except PermissionError as exc:
+        return _error("forbidden", str(exc), 403)
+
+    return _sensitive_json_response(payload, 200, transport_context)
 
 
 @questionnaire_v2_bp.patch("/questionnaires/sessions/<session_id>/answers")
@@ -318,8 +384,35 @@ def history():
     )
     response = jsonify(payload)
     response.status_code = 200
-    response.headers["Cache-Control"] = "no-store"
-    return response
+    return _legacy_plaintext_response(
+        response,
+        "/api/v2/questionnaires/history/secure",
+    )
+
+
+@questionnaire_v2_bp.post("/questionnaires/history/secure")
+@jwt_required()
+def history_secure():
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+
+    schema = SessionFilterSchema()
+    try:
+        raw_payload, transport_context = _decode_sensitive_payload()
+        params = schema.load(raw_payload or {})
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
+
+    payload = service.list_history(
+        user_id=user_id,
+        status=params.get("status"),
+        page=params["page"],
+        page_size=params["page_size"],
+    )
+    return _sensitive_json_response(payload, 200, transport_context)
 
 
 @questionnaire_v2_bp.get("/questionnaires/history/<session_id>")
@@ -346,10 +439,10 @@ def history_results(session_id: str):
 
     response = jsonify(service.get_results_payload(session))
     response.status_code = 200
-    response.headers["Cache-Control"] = "no-store"
-    response.headers["X-CognIA-Endpoint-Status"] = "legacy_plaintext"
-    response.headers["X-CognIA-Replacement"] = "/api/v2/questionnaires/history/{session_id}/results-secure"
-    return response
+    return _legacy_plaintext_response(
+        response,
+        "/api/v2/questionnaires/history/{session_id}/results-secure",
+    )
 
 
 @questionnaire_v2_bp.post("/questionnaires/history/<session_id>/results-secure")
@@ -416,7 +509,10 @@ def add_tag(session_id: str):
         return _error("invalid_session_id", "invalid_session_id", 400)
     schema = TagAssignSchema()
     try:
-        payload = schema.load(request.get_json(silent=True) or {})
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
     except ValidationError as exc:
         return _error("validation_error", "validation_error", 400, exc.messages)
 
@@ -437,7 +533,7 @@ def add_tag(session_id: str):
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
 
-    return jsonify({"tags": tags}), 200
+    return _sensitive_json_response({"tags": tags}, 200, transport_context)
 
 
 @questionnaire_v2_bp.delete("/questionnaires/history/<session_id>/tags/<tag_id>")
@@ -519,8 +615,36 @@ def shared_access(questionnaire_id: str, share_code: str):
 
     response = jsonify(payload)
     response.status_code = 200
-    response.headers["Cache-Control"] = "no-store"
-    return response
+    return _legacy_plaintext_response(
+        response,
+        "/api/v2/questionnaires/shared/access-secure",
+    )
+
+
+@questionnaire_v2_bp.post("/questionnaires/shared/access-secure")
+@limiter.limit(lambda: current_app.config.get("QV2_SHARED_ACCESS_RATE_LIMIT", "30 per minute"))
+def shared_access_secure():
+    schema = SharedAccessSchema()
+    try:
+        raw_payload, transport_context = _decode_sensitive_payload()
+        params = schema.load(raw_payload or {})
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
+    except ValidationError as exc:
+        return _error("validation_error", "validation_error", 400, exc.messages)
+
+    try:
+        session = service.get_shared_session(
+            questionnaire_id=params["questionnaire_id"],
+            share_code=params["share_code"],
+        )
+        payload = service.get_results_payload(session)
+    except LookupError as exc:
+        return _error("not_found", str(exc), 404)
+    except PermissionError as exc:
+        return _error("forbidden", str(exc), 403)
+
+    return _sensitive_json_response(payload, 200, transport_context)
 
 
 @questionnaire_v2_bp.post("/questionnaires/history/<session_id>/pdf/generate")
@@ -585,8 +709,47 @@ def pdf_metadata(session_id: str):
         }
     )
     response.status_code = 200
-    response.headers["Cache-Control"] = "no-store"
-    return response
+    return _legacy_plaintext_response(
+        response,
+        "/api/v2/questionnaires/history/{session_id}/pdf/secure",
+    )
+
+
+@questionnaire_v2_bp.post("/questionnaires/history/<session_id>/pdf/secure")
+@jwt_required()
+def pdf_metadata_secure(session_id: str):
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    sid = _parse_uuid(session_id)
+    if not sid:
+        return _error("invalid_session_id", "invalid_session_id", 400)
+
+    try:
+        _, transport_context = _decode_sensitive_payload()
+        session = _load_session_for_user(sid, user_id)
+        service.ensure_pdf_access(session, user_id)
+        export = service.latest_pdf(session.id)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
+    except LookupError as exc:
+        return _error("not_found", str(exc), 404)
+    except PermissionError as exc:
+        return _error("forbidden", str(exc), 403)
+
+    if not export:
+        return _error("not_found", "pdf_not_found", 404)
+
+    return _sensitive_json_response(
+        {
+            "pdf_id": str(export.id),
+            "file_name": export.file_name,
+            "download_url": f"/api/v2/questionnaires/history/{session_id}/pdf/download",
+            "created_at": export.created_at.isoformat() if export.created_at else None,
+        },
+        200,
+        transport_context,
+    )
 
 
 @questionnaire_v2_bp.get("/questionnaires/history/<session_id>/pdf/download")
@@ -615,8 +778,10 @@ def pdf_download(session_id: str):
     if path is None or not path.exists():
         return _error("not_found", "pdf_file_missing", 404)
     response = send_file(path, as_attachment=True, download_name=export.file_name)
-    response.headers["Cache-Control"] = "no-store"
-    return response
+    return _legacy_plaintext_response(
+        response,
+        "/api/v2/questionnaires/history/{session_id}/pdf/secure",
+    )
 
 
 @questionnaire_v2_bp.get("/dashboard/adoption-history")

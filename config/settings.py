@@ -240,3 +240,8 @@ class TestingConfig(Config):
     EMAIL_ENABLED = False
     SECURITY_HEADERS_ENABLED = False
     QR_PROCESS_ASYNC = False
+    # Aisla la suite de tests del .env local para evitar falsos negativos.
+    COGNIA_ENABLE_FIELD_ENCRYPTION = False
+    COGNIA_TRANSPORT_PAYLOAD_ENCRYPTION = False
+    COGNIA_TRANSPORT_REQUIRE_ENCRYPTION_PROD = True
+    COGNIA_TRANSPORT_ALLOW_PLAINTEXT_IN_DEV = True

@@ -1,28 +1,26 @@
 {
-  "total_endpoints_audited": 123,
-  "public_non_sensitive_count": 7,
-  "authenticated_non_sensitive_count": 72,
-  "sensitive_requires_encrypted_payload_count": 14,
+  "total_endpoints_audited": 135,
+  "public_non_sensitive_count": 8,
+  "authenticated_non_sensitive_count": 70,
+  "sensitive_requires_encrypted_payload_count": 27,
   "legacy_plaintext_deprecated_count": 15,
   "auth_sensitive_count": 15,
   "sensitive_endpoints_without_encryption_count": 0,
   "sensitive_endpoints_without_auth_count": 0,
   "sensitive_responses_without_no_store_count": 0,
+  "transport_key_public": true,
+  "private_key_exposed": false,
   "openapi_valid": true,
-  "sonar_executed": true,
-  "sonar_blocking_issues_remaining": 0,
-  "unresolved_issue_count": 0,
-  "final_security_audit_status": "pass",
   "notes": {
+    "missing_openapi_paths": [],
     "sensitive_without_encryption": [],
     "sensitive_without_auth": [],
-    "sensitive_without_no_store": [],
-    "sonar_quality_gate_failure_metrics": [
-      "new_coverage",
-      "new_duplicated_lines_density"
-    ],
-    "sonar_quality_gate_caveat": "quality gate global no pasa por metricas de new_coverage/new_duplicated_lines_density del baseline de proyecto; sin issues abiertas de seguridad/reliability/maintainability ni hotspots pendientes en este run."
+    "sensitive_without_no_store": []
   },
   "fields_sensitive_unencrypted_count": 0,
-  "sonar_quality_gate_status": "ERROR"
+  "sonar_executed": true,
+  "sonar_blocking_issues_remaining": 0,
+  "backend_ci_passed": true,
+  "unresolved_issue_count": 0,
+  "final_security_audit_status": "pass"
 }
