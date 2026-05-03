@@ -29,6 +29,20 @@ TLS/HTTPS remains mandatory in production.
 - `questionnaire_session_result_domains.result_summary`
 - `questionnaire_session_result_comorbidity.domains_json`
 - `questionnaire_session_result_comorbidity.summary`
+- `questionnaire_session_pdf_exports.metadata_json`
+- `qr_evaluation_response.answer_raw`
+- `qr_evaluation_response.answer_normalized`
+- `qr_domain_result.recommendation_text`
+- `qr_domain_result.explanation_short`
+- `qr_domain_result.contributors_json`
+- `qr_domain_result.caveats_json`
+- `qr_notification.title`
+- `qr_notification.body`
+- `qr_notification.payload_json`
+- `problem_reports.description`
+- `problem_reports.admin_notes`
+- `problem_reports.metadata_json`
+- `problem_report_attachments.metadata_json`
 
 ## Encrypted transport (application layer)
 
@@ -47,6 +61,8 @@ TLS/HTTPS remains mandatory in production.
 - Envelope version: `transport_envelope_v1`
 - Key exchange: `RSA-OAEP-256`
 - Payload encryption: `AES-256-GCM`
+- Public bootstrap response only contains: `key_id`, `algorithm`, `public_key_jwk`, `expires_at`, `version`.
+- Private key material is never exposed.
 
 ### Headers for encrypted requests
 - `X-CognIA-Encrypted: 1`
@@ -108,6 +124,10 @@ TLS/HTTPS remains mandatory in production.
 ## Legacy compatibility
 - Legacy plaintext endpoint remains:
   - `GET /api/v2/questionnaires/history/{session_id}/results`
+- It is JWT-protected and returns:
+  - `X-CognIA-Endpoint-Status: legacy_plaintext`
+  - `X-CognIA-Replacement: /api/v2/questionnaires/history/{session_id}/results-secure`
+  - `Cache-Control: no-store`
 - It should be treated as compatibility path, while secure endpoints are preferred.
 
 ## Operational safety

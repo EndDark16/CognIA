@@ -11,7 +11,8 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from api.app import create_app
-from app.models import AppUser, db
+from api.services import crypto_service
+from app.models import AppUser, ProblemReport, db
 from config.settings import TestingConfig
 
 
@@ -21,9 +22,12 @@ class ProblemReportTestingConfig(TestingConfig):
 
 
 @pytest.fixture
-def app(tmp_path):
+def app(tmp_path, monkeypatch):
+    monkeypatch.setenv("COGNIA_FIELD_ENCRYPTION_KEY", "0123456789abcdef0123456789abcdef")
+
     class _Cfg(ProblemReportTestingConfig):
         PROBLEM_REPORT_UPLOAD_DIR = str(tmp_path / "problem_reports_uploads")
+        COGNIA_ENABLE_FIELD_ENCRYPTION = True
 
     app = create_app(_Cfg)
     with app.app_context():
@@ -71,6 +75,11 @@ def test_create_problem_report_valid(client, app):
     assert report["issue_type"] == "questionnaire"
     assert report["attachment_count"] == 0
     assert report["report_code"].startswith("PRB-")
+    with app.app_context():
+        stored = ProblemReport.query.filter_by(report_code=report["report_code"]).first()
+        assert stored is not None
+        assert crypto_service.is_encrypted(stored.description)
+        assert crypto_service.is_encrypted(stored.metadata_json)
 
 
 def test_create_problem_report_invalid_fields(client, app):
