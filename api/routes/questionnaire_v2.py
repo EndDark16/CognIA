@@ -80,6 +80,8 @@ def _sensitive_json_response(payload: dict, status_code: int, context: transport
     encoded_payload, headers = transport_crypto.encode_sensitive_response_payload(payload, context)
     response = jsonify(encoded_payload)
     response.status_code = status_code
+    # Sensitive payloads must never be cached, even when response is plaintext in dev.
+    response.headers["Cache-Control"] = "no-store"
     for key, value in headers.items():
         response.headers[key] = value
     return response
@@ -186,7 +188,10 @@ def get_session(session_id: str):
 
     payload = service.get_session_payload(session)
     payload["tags"] = service.list_session_tags(session.id)
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @questionnaire_v2_bp.get("/questionnaires/sessions/<session_id>/page")
@@ -213,7 +218,10 @@ def get_session_page(session_id: str):
     except PermissionError as exc:
         return _error("forbidden", str(exc), 403)
 
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @questionnaire_v2_bp.patch("/questionnaires/sessions/<session_id>/answers")
@@ -308,7 +316,10 @@ def history():
         page=params["page"],
         page_size=params["page_size"],
     )
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @questionnaire_v2_bp.get("/questionnaires/history/<session_id>")
@@ -335,6 +346,7 @@ def history_results(session_id: str):
 
     response = jsonify(service.get_results_payload(session))
     response.status_code = 200
+    response.headers["Cache-Control"] = "no-store"
     response.headers["X-CognIA-Endpoint-Status"] = "legacy_plaintext"
     response.headers["X-CognIA-Replacement"] = "/api/v2/questionnaires/history/{session_id}/results-secure"
     return response
@@ -463,7 +475,10 @@ def share(session_id: str):
 
     schema = ShareCreateSchema()
     try:
-        payload = schema.load(request.get_json(silent=True) or {})
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
     except ValidationError as exc:
         return _error("validation_error", "validation_error", 400, exc.messages)
 
@@ -479,7 +494,7 @@ def share(session_id: str):
     except Exception as exc:
         return _handle_backend_failure(exc, "share_failed")
 
-    return jsonify(result), 201
+    return _sensitive_json_response(result, 201, transport_context)
 
 
 @questionnaire_v2_bp.get("/questionnaires/shared/<questionnaire_id>/<share_code>")
@@ -502,7 +517,10 @@ def shared_access(questionnaire_id: str, share_code: str):
     except PermissionError as exc:
         return _error("forbidden", str(exc), 403)
 
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @questionnaire_v2_bp.post("/questionnaires/history/<session_id>/pdf/generate")
@@ -516,9 +534,12 @@ def pdf_generate(session_id: str):
         return _error("invalid_session_id", "invalid_session_id", 400)
 
     try:
+        _, transport_context = _decode_sensitive_payload()
         session = _load_session_for_user(sid, user_id)
         service.ensure_pdf_access(session, user_id)
         export = service.generate_pdf(session, user_id)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
     except LookupError as exc:
         return _error("not_found", str(exc), 404)
     except PermissionError as exc:
@@ -526,7 +547,11 @@ def pdf_generate(session_id: str):
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
 
-    return jsonify({"pdf_id": str(export.id), "file_name": export.file_name}), 201
+    return _sensitive_json_response(
+        {"pdf_id": str(export.id), "file_name": export.file_name},
+        201,
+        transport_context,
+    )
 
 
 @questionnaire_v2_bp.get("/questionnaires/history/<session_id>/pdf")
@@ -551,14 +576,17 @@ def pdf_metadata(session_id: str):
     if not export:
         return _error("not_found", "pdf_not_found", 404)
 
-    return jsonify(
+    response = jsonify(
         {
             "pdf_id": str(export.id),
             "file_name": export.file_name,
             "download_url": f"/api/v2/questionnaires/history/{session_id}/pdf/download",
             "created_at": export.created_at.isoformat() if export.created_at else None,
         }
-    ), 200
+    )
+    response.status_code = 200
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @questionnaire_v2_bp.get("/questionnaires/history/<session_id>/pdf/download")
@@ -586,7 +614,9 @@ def pdf_download(session_id: str):
     path = service.resolve_download_path(export.file_path)
     if path is None or not path.exists():
         return _error("not_found", "pdf_file_missing", 404)
-    return send_file(path, as_attachment=True, download_name=export.file_name)
+    response = send_file(path, as_attachment=True, download_name=export.file_name)
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @questionnaire_v2_bp.get("/dashboard/adoption-history")

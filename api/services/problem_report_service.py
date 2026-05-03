@@ -13,6 +13,7 @@ from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 
 from api.repositories.admin_repository import apply_pagination, apply_sort
+from api.services import crypto_service
 from api.security import log_audit
 from app.models import (
     AppUser,
@@ -28,6 +29,22 @@ DEFAULT_ALLOWED_MIME = {
     "image/jpeg",
     "image/webp",
 }
+
+
+def _encrypt_json(value: Any, purpose: str) -> Any:
+    return crypto_service.encrypt_json(value, purpose=purpose)
+
+
+def _decrypt_json(value: Any, purpose: str) -> Any:
+    return crypto_service.decrypt_json(value, purpose=purpose)
+
+
+def _encrypt_text(value: str | None, purpose: str) -> str | None:
+    return crypto_service.encrypt_text(value, purpose=purpose)
+
+
+def _decrypt_text(value: str | None, purpose: str) -> str | None:
+    return crypto_service.decrypt_text(value, purpose=purpose)
 
 
 def _utcnow() -> datetime:
@@ -141,7 +158,10 @@ def _save_attachment(report: ProblemReport, attachment: FileStorage, actor_user_
         mime_type=content_type or None,
         size_bytes=size,
         checksum_sha256=hashlib.sha256(payload).hexdigest(),
-        metadata_json={"uploaded_at": _utcnow().isoformat()},
+        metadata_json=_encrypt_json(
+            {"uploaded_at": _utcnow().isoformat()},
+            "problem_report_attachment.metadata_json",
+        ),
     )
     db.session.add(row)
     report.attachment_count = int(report.attachment_count or 0) + 1
@@ -163,7 +183,7 @@ def serialize_problem_report(report: ProblemReport, include_private: bool = True
         "reporter_user_id": str(report.reporter_user_id),
         "reporter_role": report.reporter_role,
         "issue_type": report.issue_type,
-        "description": report.description,
+        "description": _decrypt_text(report.description, "problem_report.description"),
         "status": report.status,
         "source_module": report.source_module,
         "source_path": report.source_path,
@@ -171,7 +191,11 @@ def serialize_problem_report(report: ProblemReport, include_private: bool = True
             str(report.related_questionnaire_session_id) if report.related_questionnaire_session_id else None
         ),
         "related_questionnaire_history_id": report.related_questionnaire_history_id,
-        "admin_notes": report.admin_notes if include_private else None,
+        "admin_notes": (
+            _decrypt_text(report.admin_notes, "problem_report.admin_notes")
+            if include_private
+            else None
+        ),
         "resolved_at": report.resolved_at.isoformat() if report.resolved_at else None,
         "attachment_count": int(report.attachment_count or 0),
         "attachments": [
@@ -185,7 +209,7 @@ def serialize_problem_report(report: ProblemReport, include_private: bool = True
             }
             for item in attachments
         ],
-        "metadata": report.metadata_json or {},
+        "metadata": _decrypt_json(report.metadata_json, "problem_report.metadata_json") or {},
         "created_at": report.created_at.isoformat() if report.created_at else None,
         "updated_at": report.updated_at.isoformat() if report.updated_at else None,
     }
@@ -204,13 +228,20 @@ def create_problem_report(
         reporter_user_id=reporter.id,
         reporter_role=_primary_reporter_role(reporter, roles),
         issue_type=str(payload.get("issue_type", "")).strip().lower(),
-        description=str(payload.get("description", "")).strip(),
+        description=_encrypt_text(
+            str(payload.get("description", "")).strip(),
+            "problem_report.description",
+        )
+        or "",
         source_module=(payload.get("source_module") or "").strip() or None,
         source_path=(payload.get("source_path") or "").strip() or None,
         related_questionnaire_session_id=payload.get("related_questionnaire_session_id"),
         related_questionnaire_history_id=(payload.get("related_questionnaire_history_id") or "").strip() or None,
         status="open",
-        metadata_json=payload.get("metadata") or {},
+        metadata_json=_encrypt_json(
+            payload.get("metadata") or {},
+            "problem_report.metadata_json",
+        ),
     )
     db.session.add(report)
     db.session.flush()
@@ -246,14 +277,14 @@ def list_problem_reports(params: dict[str, Any]) -> tuple[list[ProblemReport], d
 
     q = (params.get("q") or "").strip()
     if q:
-        query = query.filter(
-            or_(
-                ProblemReport.report_code.ilike(f"%{q}%"),
-                ProblemReport.description.ilike(f"%{q}%"),
-                ProblemReport.source_module.ilike(f"%{q}%"),
-                ProblemReport.source_path.ilike(f"%{q}%"),
-            )
-        )
+        predicates = [
+            ProblemReport.report_code.ilike(f"%{q}%"),
+            ProblemReport.source_module.ilike(f"%{q}%"),
+            ProblemReport.source_path.ilike(f"%{q}%"),
+        ]
+        if not crypto_service.is_field_encryption_enabled():
+            predicates.append(ProblemReport.description.ilike(f"%{q}%"))
+        query = query.filter(or_(*predicates))
 
     sort = params.get("sort") or "created_at"
     order = params.get("order") or "desc"
@@ -300,7 +331,10 @@ def admin_update_problem_report(
         elif status in {"open", "triaged", "in_progress"}:
             report.resolved_at = None
     if notes is not None:
-        report.admin_notes = str(notes).strip()
+        report.admin_notes = _encrypt_text(
+            str(notes).strip(),
+            "problem_report.admin_notes",
+        ) or ""
         changed = True
 
     if not changed:
