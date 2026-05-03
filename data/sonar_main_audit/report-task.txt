@@ -3,5 +3,5 @@ projectKey=EndDark16_CognIA
 serverUrl=https://sonarcloud.io
 serverVersion=8.0.0.86467
 dashboardUrl=https://sonarcloud.io/dashboard?id=EndDark16_CognIA
-ceTaskId=AZ3r5hoA1hU_ZtOjCRdL
-ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZ3r5hoA1hU_ZtOjCRdL
+ceTaskId=AZ3r6ESgs-8Cb1-RFBs4
+ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZ3r6ESgs-8Cb1-RFBs4

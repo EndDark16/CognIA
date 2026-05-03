@@ -1,10 +1,10 @@
 # Sonar Run Summary
 
-- Retrieved at (UTC): 2026-05-03T03:22:31.127671+00:00
+- Retrieved at (UTC): 2026-05-03T03:36:39.477782+00:00
 - Project key: EndDark16_CognIA
-- CE task id: AZ3r1Ngam96WbL33ZPyN
+- CE task id: AZ3r6ESgs-8Cb1-RFBs4
 - CE status: SUCCESS
-- Analysis id: e50f85aa-ba5a-4484-a5bf-6f2cc0ff3b51
+- Analysis id: 81dceeb4-4400-4f7c-a08c-47c144d9790b
 - Quality gate status: ERROR
 - Unresolved issues: 0
 - Hotspots TO_REVIEW: 0

@@ -12,8 +12,3 @@
 - new_coverage: status=ERROR actual=69.0 threshold=80
 - new_duplicated_lines_density: status=ERROR actual=3.6 threshold=3
 - new_security_hotspots_reviewed: status=OK actual=100.0 threshold=100
-
-## Evidencia
-- `data/sonar_main_audit/sonar_quality_gate.json`
-- `data/sonar_main_audit/sonar_issues_summary.csv`
-- `data/sonar_main_audit/sonar_run_summary.md`
