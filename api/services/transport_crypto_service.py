@@ -227,12 +227,26 @@ def encrypt_transport_payload(payload: dict[str, Any], context: TransportContext
 def decode_sensitive_request_payload(payload: dict[str, Any] | None) -> tuple[dict[str, Any], TransportContext]:
     payload = payload or {}
     encrypted_header = str(request.headers.get("X-CognIA-Encrypted", "")).strip()
+    crypto_version_header = str(request.headers.get("X-CognIA-Crypto-Version", "")).strip()
     header_wants_encryption = encrypted_header == "1"
+    payload_is_encrypted = bool(payload.get("encrypted"))
+
+    if encrypted_header and encrypted_header != "1":
+        raise TransportCryptoError("encrypted_payload_invalid", "invalid_encrypted_header", 400)
+
+    if crypto_version_header and crypto_version_header != TRANSPORT_ENVELOPE_VERSION:
+        raise TransportCryptoError("invalid_crypto_version", "invalid_crypto_version", 400)
+
+    if payload_is_encrypted and not header_wants_encryption:
+        raise TransportCryptoError("encrypted_payload_invalid", "missing_encrypted_header", 400)
+
+    if header_wants_encryption and not crypto_version_header:
+        raise TransportCryptoError("invalid_crypto_version", "missing_crypto_version_header", 400)
 
     if not transport_payload_encryption_enabled():
         return payload, TransportContext(request_encrypted=False)
 
-    if header_wants_encryption or bool(payload.get("encrypted")):
+    if header_wants_encryption or payload_is_encrypted:
         decrypted_payload, ctx = decrypt_transport_envelope(payload)
         return decrypted_payload, ctx
 
