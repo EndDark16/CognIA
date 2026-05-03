@@ -16277,7 +16277,6 @@ paths:
         **Errores posibles y causa funcional**
         - `429`: rate limit excedido.
         - `500`: falla interna resolviendo material criptografico.
-        - `503`: dependencia temporal no disponible.
 
         **Estado contractual**
         - `KEEP_ACTIVE`
@@ -16291,6 +16290,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransportKeyResponse'
+              example:
+                key_id: transport-key-v1
+                algorithm: RSA-OAEP-256+AES-256-GCM
+                public_key_jwk:
+                  kty: RSA
+                  alg: RSA-OAEP-256
+                  use: enc
+                  n: <base64url>
+                  e: AQAB
+                expires_at: '2026-05-02T13:20:11Z'
+                version: transport_envelope_v1
         '429':
           description: Limite de solicitudes excedido.
           content:
@@ -16299,16 +16309,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Error interno al resolver el material de transporte.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Dependencia temporal no disponible.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
       x-contract-status: KEEP_ACTIVE
   /api/v2/questionnaires/active:
     get:
