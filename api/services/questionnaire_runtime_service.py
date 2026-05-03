@@ -15,6 +15,7 @@ import joblib
 import pandas as pd
 from flask import current_app
 
+from api.services import crypto_service
 from api.security import check_password, hash_password, log_audit
 from app.models import (
     QRDisclosureVersion,
@@ -97,6 +98,22 @@ ALLOWED_EXPORT_MODES = {"responses_only", "results_only", "responses_and_results
 DISCLOSURE_TYPES = {"consent_pre", "disclaimer_pre", "disclaimer_result", "disclaimer_pdf"}
 
 EXECUTOR = ThreadPoolExecutor(max_workers=2, thread_name_prefix="qr-runtime")
+
+
+def _encrypt_json(value: Any, purpose: str) -> Any:
+    return crypto_service.encrypt_json(value, purpose=purpose)
+
+
+def _decrypt_json(value: Any, purpose: str) -> Any:
+    return crypto_service.decrypt_json(value, purpose=purpose)
+
+
+def _encrypt_text(value: str | None, purpose: str) -> str | None:
+    return crypto_service.encrypt_text(value, purpose=purpose)
+
+
+def _decrypt_text(value: str | None, purpose: str) -> str | None:
+    return crypto_service.decrypt_text(value, purpose=purpose)
 
 
 def _utcnow() -> datetime:
@@ -1332,8 +1349,15 @@ def create_evaluation_draft(user_id: uuid.UUID, payload: dict[str, Any]) -> tupl
                     evaluation_id=evaluation.id,
                     question_id=question.id,
                     section_id=question.section_id,
-                    answer_raw=normalized_raw if isinstance(normalized_raw, (dict, list, int, float)) else str(normalized_raw),
-                    answer_normalized=normalized_txt,
+                    answer_raw=_encrypt_json(
+                        normalized_raw if isinstance(normalized_raw, (dict, list, int, float)) else str(normalized_raw),
+                        "qr_evaluation_response.answer_raw",
+                    ),
+                    answer_normalized=_encrypt_text(
+                        normalized_txt,
+                        "qr_evaluation_response.answer_normalized",
+                    )
+                    or "",
                 )
             )
 
@@ -1368,8 +1392,14 @@ def save_draft_answers(
     for question, normalized_raw, normalized_txt in resolved:
         row = QREvaluationResponse.query.filter_by(evaluation_id=evaluation.id, question_id=question.id).first()
         if row:
-            row.answer_raw = normalized_raw if isinstance(normalized_raw, (dict, list, int, float)) else str(normalized_raw)
-            row.answer_normalized = normalized_txt
+            row.answer_raw = _encrypt_json(
+                normalized_raw if isinstance(normalized_raw, (dict, list, int, float)) else str(normalized_raw),
+                "qr_evaluation_response.answer_raw",
+            )
+            row.answer_normalized = _encrypt_text(
+                normalized_txt,
+                "qr_evaluation_response.answer_normalized",
+            ) or ""
             row.updated_at = _utcnow()
         else:
             db.session.add(
@@ -1377,8 +1407,15 @@ def save_draft_answers(
                     evaluation_id=evaluation.id,
                     question_id=question.id,
                     section_id=question.section_id,
-                    answer_raw=normalized_raw if isinstance(normalized_raw, (dict, list, int, float)) else str(normalized_raw),
-                    answer_normalized=normalized_txt,
+                    answer_raw=_encrypt_json(
+                        normalized_raw if isinstance(normalized_raw, (dict, list, int, float)) else str(normalized_raw),
+                        "qr_evaluation_response.answer_raw",
+                    ),
+                    answer_normalized=_encrypt_text(
+                        normalized_txt,
+                        "qr_evaluation_response.answer_normalized",
+                    )
+                    or "",
                 )
             )
     evaluation.status = "draft"
@@ -1436,7 +1473,7 @@ def _build_feature_map_from_responses(evaluation: QREvaluation) -> dict[str, Any
         "release": 11.0,
     }
     for row, question in responses:
-        value: Any = row.answer_raw
+        value: Any = _decrypt_json(row.answer_raw, "qr_evaluation_response.answer_raw")
         if isinstance(value, str) and question.response_type not in {"single_choice", "consent/info_only"}:
             maybe = _safe_float(value)
             value = maybe if maybe is not None else value
@@ -1468,9 +1505,9 @@ def _create_notification(
         user_id=user_id,
         evaluation_id=evaluation_id,
         notification_type=notification_type,
-        title=title,
-        body=body,
-        payload_json=payload_json or {},
+        title=_encrypt_text(title, "qr_notification.title") or "",
+        body=_encrypt_text(body, "qr_notification.body") or "",
+        payload_json=_encrypt_json(payload_json or {}, "qr_notification.payload_json"),
         is_read=False,
         expires_at=_notification_expiry(),
     )
@@ -1496,10 +1533,24 @@ def _persist_domain_results(evaluation: QREvaluation, domain_results: dict[str, 
             uncertainty_flag=bool(payload["uncertainty_flag"]),
             abstention_flag=bool(payload["abstention_flag"]),
             recommendation_text=payload["recommendation_text"],
-            explanation_short=payload["explanation_short"],
-            contributors_json=payload["contributors"],
-            caveats_json=payload.get("caveats", []),
+            explanation_short=_encrypt_text(
+                payload["explanation_short"],
+                "qr_domain_result.explanation_short",
+            )
+            or "",
+            contributors_json=_encrypt_json(
+                payload["contributors"],
+                "qr_domain_result.contributors_json",
+            ),
+            caveats_json=_encrypt_json(
+                payload.get("caveats", []),
+                "qr_domain_result.caveats_json",
+            ),
         )
+        row.recommendation_text = _encrypt_text(
+            payload["recommendation_text"],
+            "qr_domain_result.recommendation_text",
+        ) or ""
         db.session.add(row)
 
 
@@ -1670,10 +1721,20 @@ def get_results_payload(evaluation: QREvaluation, audience: str = "user") -> dic
             "evidence_level": row.evidence_level,
             "uncertainty_flag": bool(row.uncertainty_flag),
             "abstention_flag": bool(row.abstention_flag),
-            "recommendation_text": row.recommendation_text,
-            "explanation_short": row.explanation_short,
+            "recommendation_text": _decrypt_text(
+                row.recommendation_text,
+                "qr_domain_result.recommendation_text",
+            ),
+            "explanation_short": _decrypt_text(
+                row.explanation_short,
+                "qr_domain_result.explanation_short",
+            ),
             "model_status": row.model_status,
-            "caveats": row.caveats_json or [],
+            "caveats": _decrypt_json(
+                row.caveats_json,
+                "qr_domain_result.caveats_json",
+            )
+            or [],
         }
         if audience == "professional":
             base.update(
@@ -1682,7 +1743,11 @@ def get_results_payload(evaluation: QREvaluation, audience: str = "user") -> dic
                     "threshold_used": float(row.threshold_used),
                     "model_name": row.model_name,
                     "model_version": row.model_version,
-                    "contributors": row.contributors_json or [],
+                    "contributors": _decrypt_json(
+                        row.contributors_json,
+                        "qr_domain_result.contributors_json",
+                    )
+                    or [],
                 }
             )
         else:
@@ -1715,8 +1780,14 @@ def get_responses_payload(evaluation: QREvaluation) -> dict[str, Any]:
                 "question_key": question.key,
                 "feature_key": question.feature_key,
                 "prompt": question.prompt,
-                "value": response.answer_raw,
-                "normalized": response.answer_normalized,
+                "value": _decrypt_json(
+                    response.answer_raw,
+                    "qr_evaluation_response.answer_raw",
+                ),
+                "normalized": _decrypt_text(
+                    response.answer_normalized,
+                    "qr_evaluation_response.answer_normalized",
+                ),
                 "answered_at": response.answered_at.isoformat() if response.answered_at else None,
             }
         )
@@ -1802,9 +1873,13 @@ def list_notifications(user_id: uuid.UUID, unread_only: bool = False) -> list[di
                 "id": str(row.id),
                 "evaluation_id": str(row.evaluation_id),
                 "type": row.notification_type,
-                "title": row.title,
-                "body": row.body,
-                "payload": row.payload_json or {},
+                "title": _decrypt_text(row.title, "qr_notification.title"),
+                "body": _decrypt_text(row.body, "qr_notification.body"),
+                "payload": _decrypt_json(
+                    row.payload_json,
+                    "qr_notification.payload_json",
+                )
+                or {},
                 "is_read": bool(row.is_read),
                 "read_at": row.read_at.isoformat() if row.read_at else None,
                 "created_at": row.created_at.isoformat() if row.created_at else None,
