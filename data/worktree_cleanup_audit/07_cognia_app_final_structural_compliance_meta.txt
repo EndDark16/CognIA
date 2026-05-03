@@ -1,0 +1,2 @@
+﻿PATH=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_structural_compliance
+PREFIX=07_cognia_app_final_structural_compliance

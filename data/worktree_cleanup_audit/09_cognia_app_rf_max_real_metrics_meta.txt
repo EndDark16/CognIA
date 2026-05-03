@@ -1,0 +1,2 @@
+﻿PATH=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_rf_max_real_metrics
+PREFIX=09_cognia_app_rf_max_real_metrics

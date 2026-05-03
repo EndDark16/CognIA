@@ -1,0 +1,10 @@
+﻿8c123a2 (HEAD -> train/rf-max-real-metrics-v1, origin/train/rf-max-real-metrics-v1) train: add rf-only v11 active model line
+ad78eb4 Merge v10 structural model compliance to development
+648cebd Merge v10 structural model compliance
+145af40 (origin/fix/final-model-structural-compliance-v1, fix/final-model-structural-compliance-v1) Finalize v10 structural model compliance
+b9bef32 Merge PR #67: Promote Elimination v9 rescue and OpenAPI fix
+26281d7 Merge PR #66: Fix Elimination structural rescue and OpenAPI spec
+7ed7068 (origin/fix/elimination-structural-audit-rescue-v1, fix/elimination-structural-audit-rescue-v1) Fix elimination structural rescue and OpenAPI spec
+f073a23 Merge structural mode rescue v8 to development
+f273c25 Merge structural mode champions v8
+17e7c1e (origin/fix/structural-mode-model-rescue-v1, fix/structural-mode-model-rescue-v1) Fix structural mode champions v8

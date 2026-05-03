@@ -1,0 +1,10 @@
+﻿f06f231 (HEAD -> fix/elimination-v14-real-anti-clone-rescue, origin/fix/elimination-v14-real-anti-clone-rescue) fix(elimination): v14 real anti-clone rescue with focal RF joint selection
+1ed2387 Merge pull request #77 from EndDark16/dev.enddark
+fdb0a81 Merge pull request #76 from EndDark16/audit/v13-real-prediction-anti-clone
+f6462b0 (origin/audit/v13-real-prediction-anti-clone, audit/v13-real-prediction-anti-clone) Add v13 real-prediction anti-clone audit with 30/30 recomputation
+fff3c9d Merge contract-compatible RF champions v13 to development
+170d1f2 Merge contract-compatible RF champion selection v13
+75b3a2e (origin/fix/global-compatible-rf-champion-selection-v13, fix/global-compatible-rf-champion-selection-v13) fix: select contract-compatible rf champions v13
+3d3299a Merge final RF-plus v12 model line to development
+3bf86d2 Merge final RF-plus v12 model line
+192cd11 (origin/train/final-rf-plus-maximize-metrics-v1, train/final-rf-plus-maximize-metrics-v1) train: add final rf-plus v12 model line

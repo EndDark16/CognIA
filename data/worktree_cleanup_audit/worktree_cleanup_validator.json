@@ -1,0 +1,10 @@
+{
+  "functionality_loss_detected": false,
+  "main_branch_deleted": false,
+  "development_branch_deleted": false,
+  "dev_enddark_branch_deleted": false,
+  "uncommitted_changes_lost": false,
+  "unpushed_commits_lost": false,
+  "reports_training_noise_committed": false,
+  "final_worktree_cleanup_status": "pass"
+}
