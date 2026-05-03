@@ -1,0 +1,10 @@
+﻿72f0964 (HEAD -> fix/v17-runtime-diagnostic-security-final, origin/fix/v17-runtime-diagnostic-security-final) v17 harden runtime artifacts, clinical summary, and encryption layers
+8dc9229 Merge pull request #83 from EndDark16/fix/v16-final-clean-champion-resolution
+0a5f192 (origin/fix/v16-final-clean-champion-resolution, fix/v16-final-clean-champion-resolution) Resolve dev.enddark merge conflicts for v16 final clean rollout
+b1124b2 Finalize v16 clean champion resolution with pass audit and DB sync
+aa797ce fix(v15): rescue elimination caregiver_full, real anti-clone audit, and loader JSON-safe sync (#81)
+0e705ef fix(v15): rescue elimination caregiver_full, real anti-clone audit, and loader JSON-safe sync (#80)
+78fceda Merge pull request #79 from EndDark16/dev.enddark
+7e2d8b7 Merge pull request #78 from EndDark16/fix/elimination-v14-real-anti-clone-rescue
+f06f231 (origin/fix/elimination-v14-real-anti-clone-rescue, fix/elimination-v14-real-anti-clone-rescue) fix(elimination): v14 real anti-clone rescue with focal RF joint selection
+1ed2387 Merge pull request #77 from EndDark16/dev.enddark

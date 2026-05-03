@@ -1,0 +1,10 @@
+﻿ef9e670 (HEAD -> fix/sonar-main-gate-alignment-v1, origin/dev.enddark) Merge pull request #90 from EndDark16/release/main-docs-openapi-cleanup-final
+7e6e5cc (origin/release/main-docs-openapi-cleanup-final, release/main-docs-openapi-cleanup-final) docs(db-models): add live schema audit and update v17 runtime traceability
+7d1b26a chore(repo): clean root artifacts and align deploy/sonar outputs
+62df02a docs(openapi): fix spec validity and harden v2 secure endpoint contracts
+1324fdc Merge pull request #89 from EndDark16/dev.enddark
+bc2b70e Merge pull request #88 from EndDark16/audit/v17-extreme-metrics-threshold-separability
+90f52e8 (origin/audit/v17-extreme-metrics-threshold-separability, audit/v17-extreme-metrics-threshold-separability) merge: resolve dev.enddark conflicts for v17 extreme metrics audit
+ffff635 audit(v17): validate extreme metrics separability and threshold stability
+32a4c35 (development) train(v17): deliver domain-specialized RF freeze with high-separability audited pass (#86) (#87)
+d936e1c train(v17): deliver domain-specialized RF freeze with high-separability audited pass (#86)
