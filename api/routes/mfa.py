@@ -298,9 +298,8 @@ def regenerate_recovery_codes():
         secret = decrypt_mfa_secret(user_mfa.secret_encrypted)
         if not validate_totp(secret, code):
             return _error_response("Invalid code", "invalid_mfa_code", 401)
-    elif recovery_code:
-        if not _consume_recovery_code(identity, recovery_code):
-            return _error_response("Invalid recovery code", "invalid_recovery_code", 401)
+    elif recovery_code and not _consume_recovery_code(identity, recovery_code):
+        return _error_response("Invalid recovery code", "invalid_recovery_code", 401)
 
     codes_plain = _replace_recovery_codes(identity)
     try:

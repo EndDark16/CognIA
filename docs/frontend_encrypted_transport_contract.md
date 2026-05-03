@@ -15,6 +15,9 @@ La fuente de verdad machine-readable es `docs/openapi.yaml`.
   - `429 rate_limited`
   - `500 transport_key_failed`
 - rate limit: `QV2_TRANSPORT_KEY_RATE_LIMIT` (default `60 per minute`).
+- garantias:
+  - no retorna `private_key`.
+  - no retorna PEM privada.
 
 ### `POST /api/v2/questionnaires/sessions`
 - estado: `activo` (sensible).
