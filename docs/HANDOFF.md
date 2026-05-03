@@ -1203,3 +1203,24 @@ Pendiente:
   - `.github/workflows/deploy-backend.yml` ahora dispara en push a `main` y usa `DEPLOY_BRANCH=main`.
 - Claim metodologico sin cambios:
   - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de sesion (2026-05-02) - security_transport_openapi_release_hardening
+- Bug corregido:
+  - `GET /api/v2/security/transport-key` devolvia `401` por `@jwt_required()` en `api/routes/questionnaire_v2.py`.
+  - Se removio autenticacion obligatoria para habilitar bootstrap de clave publica antes de cifrar payload sensible.
+- Hardening aplicado:
+  - rate limit dedicado para endpoint publico: `QV2_TRANSPORT_KEY_RATE_LIMIT` (default `60 per minute`).
+  - validacion estricta de headers criptograficos en `transport_crypto_service`:
+    - `invalid_encrypted_header` -> `encrypted_payload_invalid`
+    - `missing_crypto_version_header` / version invalida -> `invalid_crypto_version`
+    - payload cifrado sin header de cifrado -> `encrypted_payload_invalid`
+- Contrato/documentacion actualizados:
+  - `docs/openapi.yaml`: `transport-key` publico (`security: []`) y errores de transporte alineados con runtime.
+  - endpoints sensibles v2 (`sessions`, `answers`, `submit`, `results-secure`, `clinical-summary`) ahora documentan `invalid_crypto_version` en `400` donde aplica.
+  - docs alineadas: `docs/frontend_encrypted_transport_contract.md`, `docs/security_encryption.md`, `docs/clinical_summary_endpoint.md`.
+  - config/deploy docs alineadas: `.env.example`, `README.md`, `docs/deployment_ubuntu_self_hosted.md` (Render+Vercel + dominio propio).
+- Tests y validacion en verde:
+  - `pytest tests/api/test_encrypted_payload_transport.py tests/api/test_clinical_summary_endpoint.py tests/services/test_runtime_artifact_and_crypto_v17.py tests/api/test_questionnaire_v2_api.py tests/api/test_questionnaire_runtime_api.py tests/contracts/test_openapi_runtime_alignment.py tests/contracts/test_openapi_documentation_quality.py tests/test_docs_metrics.py -q` -> `33 passed`.
+  - `python scripts/validate_hybrid_classification_policy_v1.py` -> `violation_count=0`.
+  - `pytest tests/contracts/test_hybrid_classification_policy_v1.py tests/services/test_questionnaire_v2_loader.py -q` -> `4 passed`.
+  - `pytest -q` -> `164 passed, 3 skipped`.

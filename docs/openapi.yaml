@@ -16316,10 +16316,10 @@ paths:
         Antes de invocar cualquier endpoint sensible v2 que envie o reciba payload cifrado.
 
         **Actor que lo consume**
-        Frontend autenticado del flujo de cuestionarios v2.
+        Frontend del flujo de cuestionarios v2 (incluye bootstrap previo a autenticacion).
 
         **Seguridad aplicable**
-        Requiere `bearerAuth` valido.
+        Endpoint publico. No requiere `bearerAuth`.
 
         **Entrada esperada**
         - Metodo y ruta: `GET /api/v2/security/transport-key`.
@@ -16333,17 +16333,14 @@ paths:
         - Retorna `key_id`, `algorithm`, `public_key_jwk`, `expires_at`, `version`.
 
         **Errores posibles y causa funcional**
-        - `401 unauthorized`: token ausente o invalido.
         - `429 rate_limited`: limite de solicitudes excedido.
         - `500 transport_key_failed`: error interno al generar material criptografico.
-        - `503 db_unavailable|runtime_assets_unavailable`: dependencia temporal no disponible.
 
         **Estado contractual**
         - `KEEP_ACTIVE`.
         - Endpoint activo del canal de transporte cifrado.
       operationId: getV2SecurityTransportKey
-      security:
-      - bearerAuth: []
+      security: []
       responses:
         '200':
           description: Material publico de cifrado para construir envelopes de transporte.
@@ -16362,15 +16359,6 @@ paths:
                   e: AQAB
                 expires_at: '2026-05-02T13:20:11Z'
                 version: transport_envelope_v1
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                msg: Missing Authorization Header
-                error: unauthorized
-          description: Token ausente o invalido.
         '429':
           content:
             application/json:
@@ -16389,21 +16377,6 @@ paths:
                 msg: transport_key_failed
                 error: transport_key_failed
           description: Error interno al resolver el material de transporte.
-        '503':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                db_unavailable:
-                  value:
-                    msg: Service unavailable
-                    error: db_unavailable
-                runtime_assets_unavailable:
-                  value:
-                    msg: Service unavailable
-                    error: runtime_assets_unavailable
-          description: Dependencia o runtime temporalmente no disponible.
       x-contract-status: KEEP_ACTIVE
   /api/v2/questionnaires/active:
     get:
@@ -17749,7 +17722,7 @@ paths:
         - Respuesta: `SessionResultsResponsePlain` o `TransportEncryptedResponseEnvelope`.
 
         **Errores posibles y causa funcional**
-        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid`.
+        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version`.
         - `401 invalid_user|unauthorized`.
         - `403 forbidden`.
         - `404 not_found`.
@@ -17872,6 +17845,10 @@ paths:
                   value:
                     msg: decrypt_failed
                     error: encrypted_payload_invalid
+                invalid_crypto_version:
+                  value:
+                    msg: invalid_crypto_version
+                    error: invalid_crypto_version
           description: Request invalido por path o contrato criptografico.
         '404':
           content:
@@ -17929,7 +17906,7 @@ paths:
         - Respuesta: `ClinicalSummaryResponsePlain` o `TransportEncryptedResponseEnvelope`.
 
         **Errores posibles y causa funcional**
-        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|validation_error`.
+        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`.
         - `401 invalid_user|unauthorized`.
         - `403 forbidden`.
         - `404 not_found`.
@@ -18057,6 +18034,10 @@ paths:
                   value:
                     msg: decrypt_failed
                     error: encrypted_payload_invalid
+                invalid_crypto_version:
+                  value:
+                    msg: invalid_crypto_version
+                    error: invalid_crypto_version
                 validation_error:
                   value:
                     msg: validation_error
@@ -18677,7 +18658,7 @@ paths:
         - Respuesta: `SessionCreateResponsePlain` o `TransportEncryptedResponseEnvelope`.
 
         **Errores posibles y causa funcional**
-        - `400 plaintext_not_allowed|encrypted_payload_invalid|validation_error`.
+        - `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`.
         - `401 invalid_user|unauthorized`.
         - `429 rate_limited`.
         - `500 db_error|session_create_failed|server_error`.
@@ -18778,6 +18759,10 @@ paths:
                   value:
                     msg: decrypt_failed
                     error: encrypted_payload_invalid
+                invalid_crypto_version:
+                  value:
+                    msg: invalid_crypto_version
+                    error: invalid_crypto_version
                 validation_error:
                   value:
                     msg: validation_error
@@ -19023,7 +19008,7 @@ paths:
         - Respuesta: `SessionAnswersSaveResponsePlain` o `TransportEncryptedResponseEnvelope`.
 
         **Errores posibles y causa funcional**
-        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|validation_error`.
+        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`.
         - `401 invalid_user|unauthorized`.
         - `403 forbidden`.
         - `404 not_found`.
@@ -19145,6 +19130,10 @@ paths:
                   value:
                     msg: decrypt_failed
                     error: encrypted_payload_invalid
+                invalid_crypto_version:
+                  value:
+                    msg: invalid_crypto_version
+                    error: invalid_crypto_version
                 validation_error:
                   value:
                     msg: validation_error
@@ -19407,7 +19396,7 @@ paths:
         - Respuesta: `SessionResultsResponsePlain` o `TransportEncryptedResponseEnvelope`.
 
         **Errores posibles y causa funcional**
-        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|validation_error`.
+        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`.
         - `401 invalid_user|unauthorized`.
         - `403 forbidden`.
         - `404 not_found`.
@@ -19533,6 +19522,10 @@ paths:
                   value:
                     msg: decrypt_failed
                     error: encrypted_payload_invalid
+                invalid_crypto_version:
+                  value:
+                    msg: invalid_crypto_version
+                    error: invalid_crypto_version
                 validation_error:
                   value:
                     msg: validation_error
@@ -20448,7 +20441,7 @@ components:
       in: header
       name: X-CognIA-Encrypted
       required: false
-      description: Set `1` when request body is sent as encrypted transport envelope.
+      description: "Set `1` when request body is sent as encrypted transport envelope. If payload is encrypted, this header is mandatory."
       schema:
         type: string
         enum:
@@ -20457,7 +20450,7 @@ components:
       in: header
       name: X-CognIA-Crypto-Version
       required: false
-      description: Transport crypto envelope version expected by backend.
+      description: "Transport crypto envelope version expected by backend. Mandatory when `X-CognIA-Encrypted: 1`."
       schema:
         type: string
         enum:

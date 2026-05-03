@@ -110,6 +110,7 @@ class Config:
     QR_PIN_MAX_ATTEMPTS = int(os.getenv("QR_PIN_MAX_ATTEMPTS", "5"))
     QR_PIN_LOCK_MINUTES = int(os.getenv("QR_PIN_LOCK_MINUTES", "10"))
     QV2_SHARED_ACCESS_RATE_LIMIT = os.getenv("QV2_SHARED_ACCESS_RATE_LIMIT", "30 per minute")
+    QV2_TRANSPORT_KEY_RATE_LIMIT = os.getenv("QV2_TRANSPORT_KEY_RATE_LIMIT", "60 per minute")
     PREDICT_RATE_LIMIT = os.getenv("PREDICT_RATE_LIMIT", "30 per minute")
 
     # Problem reports
