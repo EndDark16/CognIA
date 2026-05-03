@@ -1,0 +1,9 @@
+issue_state,issue_type,severity,count,source
+CLOSED,BUG,MAJOR,2,sonar_api:/api/issues/search + /api/hotspots/search
+CLOSED,CODE_SMELL,BLOCKER,1,sonar_api:/api/issues/search + /api/hotspots/search
+CLOSED,CODE_SMELL,CRITICAL,191,sonar_api:/api/issues/search + /api/hotspots/search
+CLOSED,CODE_SMELL,MAJOR,156,sonar_api:/api/issues/search + /api/hotspots/search
+CLOSED,CODE_SMELL,MINOR,120,sonar_api:/api/issues/search + /api/hotspots/search
+CLOSED,VULNERABILITY,MAJOR,15,sonar_api:/api/issues/search + /api/hotspots/search
+CLOSED,VULNERABILITY,MINOR,1,sonar_api:/api/issues/search + /api/hotspots/search
+REVIEWED,SECURITY_HOTSPOT,HIGH,1,sonar_api:/api/issues/search + /api/hotspots/search
