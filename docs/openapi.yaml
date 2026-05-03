@@ -6991,131 +6991,73 @@ paths:
     post:
       tags:
       - Predict
-      summary: "Ejecutar la inferencia experimental o legado del payload cl\xE1sico de predicci\xF3n"
-      description: '**Objetivo funcional**
-
-        Este endpoint permite crear el recurso de `predict_legacy`.
-
+      summary: Ejecutar inferencia de prediccion legacy protegida
+      description: |-
+        **Objetivo funcional**
+        Ejecutar inferencia legacy de prediccion para compatibilidad temporal con clientes antiguos.
 
         **Cuando debe usarse**
-
-        Usalo cuando el flujo requiera invocar `POST /api/predict` y mantener trazabilidad contractual.
-
+        Solo cuando una integracion heredada aun no migra a las rutas de cuestionario runtime/v2.
 
         **Actor que lo consume**
-
-        Integracion tecnica experimental (no contrato principal).
-
+        Integracion tecnica autenticada con token JWT valido.
 
         **Seguridad aplicable**
-
-        - Endpoint publico; no requiere token JWT.
-
+        - Requiere esquema `bearerAuth`.
+        - En produccion, cuando aplica politica estricta de transporte, debe usar envelope `transport_envelope_v1`.
 
         **Entrada esperada**
-
         - Metodo y ruta: `POST /api/predict`.
-
-        - Parametros de ruta: no aplica.
-
-        - Query params: no aplica.
-
-        - Headers adicionales: no aplica.
-
-        - Body `obligatorio` en: application/json.
-
+        - Body JSON con los campos del esquema `PredictRequest`.
+        - Si se envia cifrado: `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`.
 
         **Resultado exitoso**
-
-        - Codigos de exito documentados: 200.
-
-        - La respuesta representa el estado procesado por el backend y mantiene compatibilidad con el esquema documentado.
-
+        - `200` con objeto `PredictResponse`.
+        - Si el request llega cifrado, la respuesta sensible puede devolverse cifrada segun politica de transporte.
 
         **Errores posibles y causa funcional**
-
-        - `400`: Solicitud invalida por formato, validacion o reglas de negocio.
-
-        - `500`: Error interno del servidor sin exposicion de detalles sensibles.
-
+        - `400`: validacion invalida o sobre cifrado de payload (`plaintext_not_allowed`, `encrypted_payload_invalid`, `invalid_crypto_version`).
+        - `401`: credencial ausente, invalida o vencida.
+        - `500`: falla interna durante la inferencia.
 
         **Estado contractual**
-
         - `DEPRECATE_PUBLIC`
-
-        - Motivo: Ruta experimental heredada sin contrato estable de producto.
-
-        - Accion OpenAPI: marcar deprecated'
+        - Endpoint legado/deprecado, mantenido por compatibilidad controlada mientras clientes migran.
       operationId: postPredict
       deprecated: true
+      security:
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PredictRequest'
-            examples:
-              typical:
-                summary: Typical input
-                value:
-                  age: 10
-                  sex: 1
-                  conners_inattention_score: 12.5
-                  conners_hyperactivity: 8.1
-                  cbcl_attention_score: 14.0
-                  sleep_problems: 0
-              edge:
-                summary: Edge of valid range
-                value:
-                  age: 3
-                  sex: 0
-                  conners_inattention_score: 0.0
-                  conners_hyperactivity: 0.0
-                  cbcl_attention_score: 0.0
-                  sleep_problems: 1
       responses:
         '200':
-          description: "Crea o ejecuta correctamente la acci\xF3n de negocio y devuelve el estado resultante o el recurso\
-            \ creado."
+          description: Prediccion procesada correctamente.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PredictResponse'
-              examples:
-                typical:
-                  summary: Typical prediction
-                  value:
-                    predictions:
-                      adhd: 0.42
-                      anxiety: 0.18
         '400':
-          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio
-            del endpoint.
+          description: Solicitud invalida (`validation_error|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version`).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalid_payload:
-                  summary: Missing required fields
-                  value:
-                    msg: Validation error
-                    error: validation_error
-                    errors:
-                      age:
-                      - Missing data for required field.
+        '401':
+          description: Token ausente, invalido o expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
+          description: Falla interna durante la inferencia.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                error_500:
-                  value:
-                    msg: internal failure while processing api_predict
-                    error: server_error
-          description: "El backend encontr\xF3 una falla interna durante consulta, persistencia, generaci\xF3n, inferencia\
-            \ o coordinaci\xF3n del flujo."
       x-contract-status: DEPRECATE_PUBLIC
   /api/problem-reports:
     post:
@@ -16310,35 +16252,35 @@ paths:
       summary: Obtener clave publica de transporte cifrado v2
       description: |-
         **Objetivo funcional**
-        Entregar la configuracion criptografica publica necesaria para construir envelopes `transport_envelope_v1`.
+        Entregar la clave publica y metadata para inicializar el cifrado de transporte `transport_envelope_v1`.
 
         **Cuando debe usarse**
-        Antes de invocar cualquier endpoint sensible v2 que envie o reciba payload cifrado.
+        Al inicio de una sesion del frontend o cliente antes de enviar payloads sensibles cifrados.
 
         **Actor que lo consume**
-        Frontend del flujo de cuestionarios v2 (incluye bootstrap previo a autenticacion).
+        Frontend web, apps cliente o integraciones que necesiten cifrar payload sensible en transito.
 
         **Seguridad aplicable**
-        Endpoint publico. No requiere `bearerAuth`.
+        - Endpoint publico sin JWT (`security: []`).
+        - Debe operar con HTTPS/TLS y rate limit.
+        - Nunca expone private key ni PEM.
 
         **Entrada esperada**
         - Metodo y ruta: `GET /api/v2/security/transport-key`.
-        - Parametros de ruta: no aplica.
-        - Query params: no aplica.
-        - Headers adicionales: no aplica.
-        - Body: no aplica.
+        - Sin body.
+        - Sin headers criptograficos previos.
 
         **Resultado exitoso**
-        - Codigo de exito: `200`.
-        - Retorna `key_id`, `algorithm`, `public_key_jwk`, `expires_at`, `version`.
+        - `200` con `key_id`, `algorithm`, `public_key_jwk`, `expires_at`, `version`.
+        - Respuesta pensada para bootstrap criptografico, sin informacion sensible clinica.
 
         **Errores posibles y causa funcional**
-        - `429 rate_limited`: limite de solicitudes excedido.
-        - `500 transport_key_failed`: error interno al generar material criptografico.
+        - `429`: rate limit excedido.
+        - `500`: falla interna resolviendo material criptografico.
 
         **Estado contractual**
-        - `KEEP_ACTIVE`.
-        - Endpoint activo del canal de transporte cifrado.
+        - `KEEP_ACTIVE`
+        - Endpoint publico obligatorio para bootstrap de cifrado de transporte.
       operationId: getV2SecurityTransportKey
       security: []
       responses:
@@ -16360,22 +16302,12 @@ paths:
                 expires_at: '2026-05-02T13:20:11Z'
                 version: transport_envelope_v1
         '429':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                msg: rate limit exceeded
-                error: rate_limited
           description: Limite de solicitudes excedido.
-        '500':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                msg: transport_key_failed
-                error: transport_key_failed
+        '500':
           description: Error interno al resolver el material de transporte.
       x-contract-status: KEEP_ACTIVE
   /api/v2/questionnaires/active:
