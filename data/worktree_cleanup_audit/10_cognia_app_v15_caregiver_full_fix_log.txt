@@ -1,0 +1,10 @@
+﻿7c2b987 (HEAD -> fix/v15-elimination-caregiver-full-metric-rescue, origin/fix/v15-elimination-caregiver-full-metric-rescue) fix(v15): rescue elimination caregiver_full, real anti-clone audit, and loader JSON-safe sync
+78fceda Merge pull request #79 from EndDark16/dev.enddark
+7e2d8b7 Merge pull request #78 from EndDark16/fix/elimination-v14-real-anti-clone-rescue
+f06f231 (origin/fix/elimination-v14-real-anti-clone-rescue, fix/elimination-v14-real-anti-clone-rescue) fix(elimination): v14 real anti-clone rescue with focal RF joint selection
+1ed2387 Merge pull request #77 from EndDark16/dev.enddark
+fdb0a81 Merge pull request #76 from EndDark16/audit/v13-real-prediction-anti-clone
+f6462b0 (origin/audit/v13-real-prediction-anti-clone, audit/v13-real-prediction-anti-clone) Add v13 real-prediction anti-clone audit with 30/30 recomputation
+fff3c9d Merge contract-compatible RF champions v13 to development
+170d1f2 Merge contract-compatible RF champion selection v13
+75b3a2e (origin/fix/global-compatible-rf-champion-selection-v13, fix/global-compatible-rf-champion-selection-v13) fix: select contract-compatible rf champions v13

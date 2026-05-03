@@ -1,0 +1,2 @@
+﻿PATH=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_v15_caregiver_full_fix
+PREFIX=10_cognia_app_v15_caregiver_full_fix

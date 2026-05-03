@@ -1,0 +1,2 @@
+﻿PATH=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_ci_close
+PREFIX=03_cognia_app_ci_close

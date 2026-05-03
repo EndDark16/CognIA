@@ -1,0 +1,12 @@
+﻿REMOVE path=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_audit_v13 force=False
+REMOVE path=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_ci_close force=True
+REMOVE path=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_elimination_rescue force=True
+REMOVE path=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_elimination_v14_fix force=True
+REMOVE path=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_rf_plus_maximize force=False
+REMOVE path=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_structural_compliance force=False
+REMOVE path=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_mode_rebuild force=False
+REMOVE path=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_rf_max_real_metrics force=True
+REMOVE path=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_v15_caregiver_full_fix force=True
+REMOVE path=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_v16_final_clean force=False
+REMOVE path=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_v17_runtime_security force=False
+DONE

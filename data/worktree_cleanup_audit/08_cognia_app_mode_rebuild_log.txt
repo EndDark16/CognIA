@@ -1,0 +1,10 @@
+﻿17e7c1e (HEAD -> fix/structural-mode-model-rescue-v1, origin/fix/structural-mode-model-rescue-v1) Fix structural mode champions v8
+9de7be2 test: trigger backend workflows after cleanup
+899134c Merge pull request #63 from EndDark16/fix/final-active-line-audit
+496f570 Merge branch 'development' into fix/final-active-line-audit
+2494392 chore(ops): reconcile development workflows
+0d4cefd fix(hybrid): align active confidence communication
+3202d66 fix(hybrid): close champion guardrail with v6_hotfix_v1 validation alignment
+136a683 Merge pull request #47 from EndDark16/feat/openapi-spanish-endpoint-descriptions
+690ad62 Merge pull request #53 from EndDark16/feat/backend-ubuntu-selfhosted-deploy-v1-dev
+d660e5d (origin/feat/openapi-spanish-endpoint-descriptions) docs(openapi): include mounted legacy questionnaire activation routes
