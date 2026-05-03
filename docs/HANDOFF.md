@@ -1281,3 +1281,37 @@ Pendiente:
 - Resultado final de tests locales:
   - `pytest -q` => `172 passed, 3 skipped`.
   - comandos minimos de cierre de cifrado/openapi/policy en verde.
+
+## Actualizacion de sesion (2026-05-03) - sonar_historical_quality_audit_v1
+- Se genero evidencia historica completa de Sonar en `data/sonar_historical_quality_audit/`.
+- Fuentes usadas:
+  - evidencia versionada previa en `data/sonar_main_audit/*`.
+  - Sonar API (`project_analyses`, `qualitygates/project_status`, `measures/search_history`, `measures/component`, `issues/search`, `hotspots/search`, `hotspots/show`).
+- Artefactos nuevos creados:
+  - `sonar_pre_post_comparison.csv`
+  - `sonar_metric_evolution.csv`
+  - `sonar_metric_evolution.md`
+  - `sonar_issues_by_type_and_severity.csv`
+  - `sonar_resolved_issues_detail.csv`
+  - `sonar_current_open_issues.csv`
+  - `sonar_security_hotspots_summary.csv`
+  - `sonar_quality_gate_history.json`
+  - `sonar_api_collection_log.md`
+  - `sonar_historical_quality_audit_report.md`
+  - `sonar_historical_quality_validator.json`
+- Resultado historico consolidado (API):
+  - `analyses_considered=21`
+  - `issues_resolved_total=486`
+  - `open_issues_total=0`
+  - `hotspots_total=1` (`REVIEWED`)
+  - `quality_gate_final_status=OK`
+  - `coverage_final=59.0`
+  - `duplicated_lines_density_final=1.4`
+- Validaciones locales ejecutadas:
+  - `pytest -q` -> `172 passed, 3 skipped`.
+  - `python scripts/validate_hybrid_classification_policy_v1.py` -> `violation_count=0`.
+  - `powershell -ExecutionPolicy Bypass -File scripts/run_sonar.ps1 -WaitQualityGate`:
+    - corrida sobre snapshot `dev.enddark` marco gate `FAILED` por `new_coverage/new_duplicated_lines_density`.
+    - corrida posterior sobre `origin/main` restablecio estado final `QUALITY GATE STATUS: PASSED` en SonarCloud.
+- Claim metodologico sin cambios:
+  - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.

@@ -1,0 +1,188 @@
+< 8b4f983 sync: align dev.enddark with development approved state (#108)
+> bdafd5d release: reconcile development into main (sonar/worktree close) (#107)
+> e2cd499 release: promote development to main (backend ci + encryption audit close) (#101)
+> a855a2a Release: final security encryption audit and sonar evidence (#99)
+> 19c5bfe fix(security): make transport-key public and harden encrypted transport contract (#97)
+> 4be55ca Release final CognIA v17 · Primera promoción integral a producción · development -> main (#93)
+< ef9e670 Merge pull request #90 from EndDark16/release/main-docs-openapi-cleanup-final
+< 7e6e5cc docs(db-models): add live schema audit and update v17 runtime traceability
+< 7d1b26a chore(repo): clean root artifacts and align deploy/sonar outputs
+< 62df02a docs(openapi): fix spec validity and harden v2 secure endpoint contracts
+< 1324fdc Merge pull request #89 from EndDark16/dev.enddark
+< bc2b70e Merge pull request #88 from EndDark16/audit/v17-extreme-metrics-threshold-separability
+< 90f52e8 merge: resolve dev.enddark conflicts for v17 extreme metrics audit
+< ffff635 audit(v17): validate extreme metrics separability and threshold stability
+< 32a4c35 train(v17): deliver domain-specialized RF freeze with high-separability audited pass (#86) (#87)
+< d936e1c train(v17): deliver domain-specialized RF freeze with high-separability audited pass (#86)
+< 10cbced Merge pull request #85 from EndDark16/dev.enddark
+< 7eb13a6 Merge pull request #84 from EndDark16/fix/v17-runtime-diagnostic-security-final
+< 72f0964 v17 harden runtime artifacts, clinical summary, and encryption layers
+< 8dc9229 Merge pull request #83 from EndDark16/fix/v16-final-clean-champion-resolution
+< d9b0c47 Merge pull request #82 from EndDark16/fix/v16-final-clean-champion-resolution
+< 0a5f192 Resolve dev.enddark merge conflicts for v16 final clean rollout
+< b1124b2 Finalize v16 clean champion resolution with pass audit and DB sync
+< aa797ce fix(v15): rescue elimination caregiver_full, real anti-clone audit, and loader JSON-safe sync (#81)
+< 0e705ef fix(v15): rescue elimination caregiver_full, real anti-clone audit, and loader JSON-safe sync (#80)
+< 78fceda Merge pull request #79 from EndDark16/dev.enddark
+< 7e2d8b7 Merge pull request #78 from EndDark16/fix/elimination-v14-real-anti-clone-rescue
+< f06f231 fix(elimination): v14 real anti-clone rescue with focal RF joint selection
+< 1ed2387 Merge pull request #77 from EndDark16/dev.enddark
+< fdb0a81 Merge pull request #76 from EndDark16/audit/v13-real-prediction-anti-clone
+< f6462b0 Add v13 real-prediction anti-clone audit with 30/30 recomputation
+< fff3c9d Merge contract-compatible RF champions v13 to development
+< 170d1f2 Merge contract-compatible RF champion selection v13
+< 75b3a2e fix: select contract-compatible rf champions v13
+< 3d3299a Merge final RF-plus v12 model line to development
+< 3bf86d2 Merge final RF-plus v12 model line
+< 192cd11 train: add final rf-plus v12 model line
+< aa64b2e Merge RF-only v11 active model line to development
+< 7d460de Merge RF-only v11 active model line
+< 8c123a2 train: add rf-only v11 active model line
+< ad78eb4 Merge v10 structural model compliance to development
+< 648cebd Merge v10 structural model compliance
+< 145af40 Finalize v10 structural model compliance
+< b9bef32 Merge PR #67: Promote Elimination v9 rescue and OpenAPI fix
+< 26281d7 Merge PR #66: Fix Elimination structural rescue and OpenAPI spec
+< 7ed7068 Fix elimination structural rescue and OpenAPI spec
+< f073a23 Merge structural mode rescue v8 to development
+< f273c25 Merge structural mode champions v8
+< 17e7c1e Fix structural mode champions v8
+< 9de7be2 test: trigger backend workflows after cleanup
+< 899134c Merge pull request #63 from EndDark16/fix/final-active-line-audit
+< 496f570 Merge branch 'development' into fix/final-active-line-audit
+< 2494392 chore(ops): reconcile development workflows
+< 0d4cefd fix(hybrid): align active confidence communication
+< 3202d66 fix(hybrid): close champion guardrail with v6_hotfix_v1 validation alignment
+< 136a683 Merge pull request #47 from EndDark16/feat/openapi-spanish-endpoint-descriptions
+< 690ad62 Merge pull request #53 from EndDark16/feat/backend-ubuntu-selfhosted-deploy-v1-dev
+< d660e5d docs(openapi): include mounted legacy questionnaire activation routes
+< 94c955d ci: set deterministic MFA key for github-hosted tests
+< 83a25fc ci: fix yaml dependency and stabilize branch-protection checks
+< c2fe1e0 ops: separate CI and best-effort ubuntu deploy workflows
+< ed27925 Merge pull request #62 from EndDark16/sync/local-v7-pending-20260424
+< bbb6446 Merge pull request #56 from EndDark16/fix/v6-quick-champion-guard-hotfix
+< 9ff39c8 Merge remote-tracking branch 'origin/development' into fix/v6-quick-champion-guard-hotfix
+< 4c761b3 Merge pull request #60 from EndDark16/fix/openapi-endpoint-smoke-v1
+< 5469cca Merge pull request #59 from EndDark16/fix/openapi-response-examples-pro
+< cc64971 Merge pull request #58 from EndDark16/fix/openapi-requestbody-examples
+< 9efc3f8 Merge pull request #57 from EndDark16/sync/development-pending-20260424
+< f465647 fix(ci): clear ruff F401 unused imports
+< a94cf82 fix(ci): clear ruff F401 unused imports
+< 302193a fix(ci): clear ruff F401 unused imports
+< 10cc24a fix(ci): clear ruff F401 unused imports
+< bd6aa69 fix(ci): clear ruff F401 unused imports
+< dc4d1c2 fix(ci): clear ruff F401 unused imports
+< c230a8d Merge remote-tracking branch 'origin/development' into sync/development-pending-20260424
+< 4a0cb30 chore(sync): publish pending local v7 artifacts
+< 3c54409 chore(sync): publish pending branch updates
+< 89189f3 chore(sync): publish pending branch updates
+< 66de498 chore(sync): publish pending branch updates
+< 0fac562 chore(sync): publish pending development worktree updates
+< 8c8a660 fix(models): apply v6 quick champion guard hotfix v1
+< 4d7b542 ci: run pipeline on development and add backend deploy workflow (#55)
+< dd3ee32 feat(models): final aggressive rescue campaign v6 (#54)
+< d78a586 Run decisive v5 model rescue and align confidence policy (#51)
+< f35eb74 docs(readme): guia operacional completa del backend
+< 8d62bc9 release(backend): promote 2026.04.22-r1 from dev.enddark to development
+< 3327971 merge: sync dev.enddark with development before promotion
+< 734da1c chore(backend): integrate pending local hardening, sonar workflow, and docs handoff updates
+< 71bf758 release(backend): 2026.04.22-r1 complete professional versioning + docs + API hardening
+< 822a8df Merge pull request #46 from EndDark16/fix/openapi-response-examples-pro
+< ae7b8fd docs(openapi): complete endpoint response examples and professional descriptions
+< 3543b0b Merge pull request #45 from EndDark16/fix/openapi-requestbody-examples
+< e3977bf docs(openapi): replace generic request body examples with real payloads
+< 4852f38 Merge pull request #44 from EndDark16/fix/openapi-endpoint-smoke-v1
+< efcc565 fix: smoke-validate endpoints and harden bootstrap idempotency
+< b4a33be Merge pull request #43 from EndDark16/fix/db-migration-recovery-v1
+< 4e1905b fix: harden runtime bootstrap and db error handling
+< 6041116 chore: recover worktree hygiene and enforce openapi source of truth
+< 985a890 Merge pull request #42 from EndDark16/dev.enddark
+< 709a515 Merge pull request #41 from EndDark16/feat/openapi-runtime-contract-v6
+< a5af841 merge: update branch with latest dev.enddark before PR merge
+< 1cc3269 docs(openapi): rebuild spanish endpoint contract and lifecycle matrix
+< 9f1bd38 feat(api): harden predict/runtime flows and restore admin operations
+< 70405d1 Merge branch 'dev.enddark' into feat/openapi-contract-hardening-es-v5
+< e8e7ba8 Merge pull request #40 from EndDark16/dev.enddark
+< 398f334 Merge pull request #39 from EndDark16/feat/openapi-runtime-hardening-v2
+< c13091b docs(openapi): rebuild endpoint-by-endpoint spanish contract and guards
+< f10db7b feat(api): harden auth/admin guards and normalize user+mfa schemas
+< 85b3e75 Merge pull request #38 from EndDark16/dev.enddark
+< 9373912 Merge pull request #37 from EndDark16/feat/openapi-spanish-endpoint-descriptions
+< bedb1ee docs(openapi): add complete spanish endpoint descriptions
+< b2a0915 Merge pull request #36 from EndDark16/dev.enddark
+< b244987 merge: reconcile dev.enddark with development for PR #36
+< 0ce74a4 Merge pull request #35 from EndDark16/feature/api-platform-hardening-openapi-v1
+< 038507b feat(api): harden runtime security and align OpenAPI with runtime
+< 0627564 docs(handoff): record full questionnaire runtime/v2 versioning
+< c7c6fef feat(questionnaire): version runtime/v2 backend stack end-to-end
+< 67374ad docs(handoff): record full questionnaire runtime/v2 versioning
+< 96d3ffe feat(questionnaire): version runtime/v2 backend stack end-to-end
+< 48ad567 docs(handoff): record render startup hotfix
+< 0067481 fix(startup): make questionnaire route imports optional
+< ed5f57e fix(startup): make questionnaire route imports optional
+< b01841e Merge pull request #34 from EndDark16/dev.enddark
+< 479b83e docs(repo): overhaul readme, api references, and artifact policy (#33)
+< 24cf8fe feat(problem-reports): add problem report backend with admin workflow (#32)
+< 19b9a7b Merge pull request #31 from EndDark16/dev.enddark
+< ec84732 merge: sync dev.enddark into development
+< d1368a7 merge: finalize repo/deploy closure into dev.enddark
+< f50b009 feat: finalize repo closure and deploy readiness
+< 281a811 Merge pull request #30 from EndDark16/dev.enddark
+< a3a27cd fix(auth,email): add forgot-password and SMTP observability logs (#29)
+< 431eafb Merge pull request #28 from EndDark16/dev.enddark
+< 7b0a9d4 Merge pull request #27 from EndDark16/feature/admin-colpsic-governance
+< 042c940 feat(admin): add COLPSIC moderation workflow and admin control APIs
+< efb7d77 Merge pull request #26 from EndDark16/dev.enddark
+< b9b9843 Merge pull request #25 from EndDark16/feature/email-smtp-welcome
+< f9fb455 feat: email templates, unsubscribe flow, smtp tooling
+< 3dd31c6 feat: add password reset/change endpoints
+< d958ba0 feat: add email sandbox and validation
+< cf4b8e9 feat: add SMTP welcome email
+< b7f8f3a Merge pull request #24 from EndDark16/dev.enddark
+< 696a126 Merge pull request #23 from EndDark16/fix/entrypoint-lf
+< bc2bcdf fix: normalize entrypoint line endings
+< f234642 Merge pull request #22 from EndDark16/dev.enddark
+< ca6c602 Merge pull request #21 from EndDark16/feature/validation-user-crud
+< 5567a08 fix: enforce LF for shell scripts
+< 91d580f Merge pull request #20 from EndDark16/dev.enddark
+< 2ac0103 Merge pull request #19 from EndDark16/feature/validation-user-crud
+< 7206385 feat: harden auth validation and add users CRUD
+< 00caf4c Merge pull request #18 from EndDark16/dev.enddark
+< 8b44e61 Merge pull request #17 from EndDark16/feat/questionnaire-v1
+< dea7455 chore: expand auth profile response
+< 79ddb2b feat: add auth profile endpoint
+< a204000 docs: document schema context and models
+< ee03a46 feat: support multi-disorder questions
+< 365e757 chore: update demo questionnaire items
+< ecde9d0 feat: add data-driven question constraints
+< b1ec3db feat: enforce quantitative question types
+< e143e2f chore: update demo seed disorder mapping
+< 1331110 chore: add demo questionnaire seed
+< 0bf7e54 feat: questionnaires v1 and evaluation linkage
+< f1a5e3f Merge pull request #16 from EndDark16/dev.enddark
+< 5395e53 Merge pull request #15 from EndDark16/feat/docs-metrics-startup
+< 786ab97 Merge pull request #14 from EndDark16/dev.enddark
+< af2fab5 fix: honor WEB_CONCURRENCY in entrypoint
+< 1a6f654 fix: tune gunicorn defaults for low-memory
+< 0180072 Merge pull request #13 from EndDark16/feat/docs-metrics-startup
+< 4437785 test: isolate metrics from env token
+< 49ce657 feat: harden docs, metrics, and startup
+< 96579ff fix: normalize entrypoint line endings
+< e1b5c8e Merge pull request #10 from EndDark16/dev.enddark
+< 1a5aa17 fix: normalize entrypoint line endings
+< a22f523 Merge pull request #9 from EndDark16/dev.enddark
+< 8ac8c14 fix: correct openapi yaml indentation
+< a0b1204 Merge pull request #8 from EndDark16/dev.enddark
+< 3885483 Merge pull request #7 from EndDark16/feat/openapi-docs
+< 9ecbdfe docs: expand openapi specification
+< 20095e6 Merge pull request #6 from EndDark16/feat/test-hardening
+< 1f55e3a test: harden auth security cases
+< 9ebc2fc Merge pull request #5 from EndDark16/dev.enddark
+< 5ad037e Merge pull request #4 from EndDark16/feat/api-docs
+< 6525713 feat: add openapi docs and swagger ui
+< 69b9c10 Merge pull request #3 from EndDark16/chore/repo-standards
+< 3a2cd9e chore: add contributing and issue templates
+< 271145e Merge pull request #2 from EndDark16/dev.enddark to development
+< e03e9fb Merge pull request #1 from EndDark16/feature/observability-ci
+< 6ad0f8b chore: merge dev.enddark base
+< 8b67234 feat: initial backend + observability + CI
