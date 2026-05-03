@@ -1,1 +1,3 @@
-key,type,severity,status,rule,component,line,message
+kind,key,count
+issues_total,OPEN,0
+hotspots_total,ALL,1
