@@ -1,6 +1,6 @@
 {
   "projectStatus": {
-    "status": "ERROR",
+    "status": "OK",
     "conditions": [
       {
         "status": "OK",
@@ -27,22 +27,6 @@
         "actualValue": "1"
       },
       {
-        "status": "ERROR",
-        "metricKey": "new_coverage",
-        "comparator": "LT",
-        "periodIndex": 1,
-        "errorThreshold": "80",
-        "actualValue": "51.6"
-      },
-      {
-        "status": "ERROR",
-        "metricKey": "new_duplicated_lines_density",
-        "comparator": "GT",
-        "periodIndex": 1,
-        "errorThreshold": "3",
-        "actualValue": "4.8"
-      },
-      {
         "status": "OK",
         "metricKey": "new_security_hotspots_reviewed",
         "comparator": "LT",
@@ -55,7 +39,8 @@
       {
         "index": 1,
         "mode": "previous_version",
-        "date": "2026-04-22T02:07:27+0000"
+        "date": "2026-05-03T15:52:47+0000",
+        "parameter": "not provided"
       }
     ],
     "ignoredConditions": false
