@@ -96,6 +96,8 @@ Este README esta pensado como fuente principal de onboarding tecnico y operacion
 - Guia operativa de referencia:
   - `docs/deployment_ubuntu_self_hosted.md`
   - `docs/deployment_playbook_ingest_20260422.md` (ingesta historica)
+- Compatibilidad cloud de continuidad:
+  - `docs/deployment_ubuntu_self_hosted.md` (seccion Render+Vercel+dominio propio y variables CORS/cookies).
 - Branch protection recomendado:
   - Required check: `CI Backend / backend-ci`
   - No requerido (best effort): `Deploy Backend (Best Effort) / backend-deploy-best-effort`
@@ -346,6 +348,7 @@ Variables avanzadas adicionales: `config/settings.py`, `migrations/env.py`, `api
 | Variables | Proposito | Criticas | Notas |
 |---|---|---|---|
 | `CORS_ORIGINS` | Origins permitidos | Alta | Se usa en `CORS(... supports_credentials=True)`. |
+| `FRONTEND_URL` | URL base frontend para flujos de email/reset | Media | En despliegues `Vercel + Render` o dominio propio, debe ser origin HTTPS final del frontend. |
 
 ### 10.7 Seguridad/hardening y rate limiting global
 | Variables | Proposito | Criticas | Notas |
@@ -377,6 +380,7 @@ Variables avanzadas adicionales: `config/settings.py`, `migrations/env.py`, `api
 | `QR_PROCESS_ASYNC`, `QR_LIVE_HEARTBEAT_GRACE_SECONDS` | Runtime v1 procesamiento/presencia | Media | |
 | `QR_RETENTION_*`, `QR_PIN_*` | Retencion/PIN runtime v1 | Media | |
 | `QV2_SHARED_ACCESS_RATE_LIMIT` | Throttle public shared access v2 | Media | Seguridad anti abuso. |
+| `QV2_TRANSPORT_KEY_RATE_LIMIT` | Throttle endpoint publico de bootstrap criptografico | Media | Aplica a `GET /api/v2/security/transport-key`. |
 | `QV2_ALERT_THRESHOLDS` | Umbrales de alerta v2 | Baja/Media | Config opcional (dict). |
 | `PREDICT_RATE_LIMIT` | Rate limit endpoint legacy predict | Baja | |
 
