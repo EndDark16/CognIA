@@ -1,0 +1,10 @@
+﻿75b3a2e (HEAD -> fix/global-compatible-rf-champion-selection-v13, origin/fix/global-compatible-rf-champion-selection-v13) fix: select contract-compatible rf champions v13
+3d3299a Merge final RF-plus v12 model line to development
+3bf86d2 Merge final RF-plus v12 model line
+192cd11 (origin/train/final-rf-plus-maximize-metrics-v1, train/final-rf-plus-maximize-metrics-v1) train: add final rf-plus v12 model line
+aa64b2e Merge RF-only v11 active model line to development
+7d460de Merge RF-only v11 active model line
+8c123a2 (origin/train/rf-max-real-metrics-v1, train/rf-max-real-metrics-v1) train: add rf-only v11 active model line
+ad78eb4 Merge v10 structural model compliance to development
+648cebd Merge v10 structural model compliance
+145af40 (origin/fix/final-model-structural-compliance-v1, fix/final-model-structural-compliance-v1) Finalize v10 structural model compliance

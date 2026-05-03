@@ -8,14 +8,16 @@ La fuente de verdad machine-readable es `docs/openapi.yaml`.
 
 ### `GET /api/v2/security/transport-key`
 - estado: `activo`.
-- auth: bearer obligatorio.
+- auth: publico (sin JWT obligatorio).
 - body: no aplica.
 - success `200`: `key_id`, `algorithm`, `public_key_jwk`, `expires_at`, `version`.
 - errores principales:
-  - `401 unauthorized`
   - `429 rate_limited`
   - `500 transport_key_failed`
-  - `503 db_unavailable|runtime_assets_unavailable`
+- rate limit: `QV2_TRANSPORT_KEY_RATE_LIMIT` (default `60 per minute`).
+- garantias:
+  - no retorna `private_key`.
+  - no retorna PEM privada.
 
 ### `POST /api/v2/questionnaires/sessions`
 - estado: `activo` (sensible).
@@ -28,7 +30,7 @@ La fuente de verdad machine-readable es `docs/openapi.yaml`.
   - encrypted envelope: ver formato abajo.
 - success `201`: respuesta plaintext (`session`) o envelope cifrado.
 - errores principales:
-  - `400 plaintext_not_allowed|encrypted_payload_invalid|validation_error`
+  - `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`
   - `401 invalid_user|unauthorized`
   - `500 db_error|session_create_failed`
   - `503 db_unavailable|runtime_assets_unavailable`
@@ -40,7 +42,7 @@ La fuente de verdad machine-readable es `docs/openapi.yaml`.
 - body plaintext: `answers[]` + `mark_final` (opcional).
 - success `200`: `session` + `saved_answers` (plaintext o cifrado).
 - errores principales:
-  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|validation_error`
+  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`
   - `401 invalid_user|unauthorized`
   - `403 forbidden`
   - `404 not_found`
@@ -54,7 +56,7 @@ La fuente de verdad machine-readable es `docs/openapi.yaml`.
 - body plaintext: `force_reprocess` (opcional).
 - success `200`: resultados finales de sesion (plaintext o cifrado).
 - errores principales:
-  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|validation_error`
+  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`
   - `401 invalid_user|unauthorized`
   - `403 forbidden`
   - `404 not_found`
@@ -69,7 +71,7 @@ La fuente de verdad machine-readable es `docs/openapi.yaml`.
 - body: `{}` o encrypted envelope segun politica.
 - success `200`: `session/result/domains/comorbidity` (plaintext o cifrado).
 - errores principales:
-  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid`
+  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version`
   - `401 invalid_user|unauthorized`
   - `403 forbidden`
   - `404 not_found`
@@ -80,7 +82,7 @@ La fuente de verdad machine-readable es `docs/openapi.yaml`.
 - body: `{}` o encrypted envelope segun politica.
 - success `200`: `clinical_summary_v1` (plaintext o cifrado).
 - errores principales:
-  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|validation_error`
+  - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`
   - `401 invalid_user|unauthorized`
   - `403 forbidden`
   - `404 not_found`
@@ -124,3 +126,4 @@ Response envelope:
 - no loggear payload sensible en consola.
 - mantener decrypted payload en memoria volatil.
 - esta capa no reemplaza TLS ni controles de autorizacion backend.
+- no usar endpoints `legacy_plaintext` en frontend de produccion salvo ventana de compatibilidad explicitamente autorizada.

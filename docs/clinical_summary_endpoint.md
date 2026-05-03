@@ -12,6 +12,7 @@
 - headers opcionales para modo cifrado:
   - `X-CognIA-Encrypted: 1`
   - `X-CognIA-Crypto-Version: transport_envelope_v1`
+- cuando el body va cifrado, ambos headers son obligatorios.
 
 ## Request
 - path param: `session_id` (uuid).
@@ -41,6 +42,7 @@
 - `400 invalid_session_id`
 - `400 plaintext_not_allowed`
 - `400 encrypted_payload_invalid`
+- `400 invalid_crypto_version`
 - `400 validation_error`
 - `401 invalid_user|unauthorized`
 - `403 forbidden`

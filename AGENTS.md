@@ -763,3 +763,82 @@ Contexto metodolÃ³gico:
   - `.github/workflows/deploy-backend.yml` ahora dispara en push a `main` y usa `DEPLOY_BRANCH=main`.
 - Claim metodologico sin cambios:
   - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-05-02) - security_transport_openapi_release_hardening
+- Se corrigio bug funcional en `GET /api/v2/security/transport-key`:
+  - se removio `@jwt_required()` para habilitar bootstrap criptografico previo al cifrado de payloads sensibles.
+  - la ruta permanece segura porque solo entrega material publico (`public_key_jwk`), sin exposicion de clave privada.
+- Se agrego hardening de abuso para endpoint publico:
+  - rate limit dedicado `QV2_TRANSPORT_KEY_RATE_LIMIT` (default `60 per minute`) en `api/routes/questionnaire_v2.py`.
+  - variable agregada en `config/settings.py` y `.env.example`.
+- Se reforzo validacion de contrato criptografico en `api/services/transport_crypto_service.py`:
+  - `X-CognIA-Encrypted` invalido -> `encrypted_payload_invalid`.
+  - `X-CognIA-Crypto-Version` faltante/invalido en modo cifrado -> `invalid_crypto_version`.
+  - payload cifrado sin `X-CognIA-Encrypted: 1` -> `encrypted_payload_invalid`.
+- Se actualizaron contratos/documentacion:
+  - `docs/openapi.yaml` alinea `transport-key` como endpoint publico (`security: []`) y corrige respuestas reales.
+  - endpoints sensibles v2 documentan `invalid_crypto_version` donde aplica.
+  - `docs/frontend_encrypted_transport_contract.md`, `docs/security_encryption.md`, `docs/clinical_summary_endpoint.md`, `docs/deployment_ubuntu_self_hosted.md`, `README.md`, `.env.example`.
+- Validacion ejecutada en esta ventana:
+  - OpenAPI: `openapi_yaml_valid`, `openapi_spec_valid`.
+  - Tests focales seguridad/API/docs: `33 passed`.
+  - Policy/model loader: `validate_hybrid_classification_policy_v1` sin violaciones + `4 passed`.
+  - Suite completa: `164 passed, 3 skipped`.
+- Claim metodologico sin cambios:
+  - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-05-03) - final_security_encryption_sonar_audit_v1
+- Se ejecuto auditoria final de cifrado sensible + contratos de transporte sobre rutas activas del backend (v1 runtime, v2 questionnaire, predict, auth/mfa, admin y soporte).
+- Endpoints sensibles reforzados en codigo:
+  - `api/routes/questionnaire_v2.py`: `Cache-Control: no-store` consolidado para respuestas sensibles/legacy (`sessions`, `history`, `results legacy`, `pdf`, `shared`).
+  - `api/routes/questionnaire_runtime.py`: decode/encode envelope en writes sensibles + `no-store` en lecturas sensibles.
+  - `api/routes/predict.py`: ahora requiere JWT y soporta envelope sensible con respuesta no-cacheable.
+- Cifrado en reposo consolidado:
+  - `api/services/questionnaire_runtime_service.py`: cifrado/descifrado para `QREvaluationResponse`, `QRDomainResult`, `QRNotification`.
+  - `api/services/problem_report_service.py`: cifrado/descifrado para `description/admin_notes/metadata_json` y metadata de adjuntos.
+  - `api/services/questionnaire_v2_service.py`: cifrado de `questionnaire_session_pdf_export.metadata_json`.
+- Sonar:
+  - corrida ejecutada con evidencia en `data/sonar_main_audit/`.
+  - issues abiertas: `0`.
+  - hotspots `TO_REVIEW`: `0`.
+  - `quality_gate_status=ERROR` por umbrales globales de `new_coverage` y `new_duplicated_lines_density` de baseline del proyecto (no por issues abiertas de seguridad/reliability/maintainability).
+- Artefactos de auditoria generados:
+  - `data/security_sensitive_endpoint_audit/endpoint_sensitivity_matrix.csv`
+  - `data/security_sensitive_endpoint_audit/field_encryption_audit.csv`
+  - `data/security_sensitive_endpoint_audit/legacy_plaintext_endpoint_audit.csv`
+  - `data/security_sensitive_endpoint_audit/encrypted_transport_endpoint_validator.json`
+  - `data/security_sensitive_endpoint_audit/field_encryption_validator.json`
+  - `data/security_sensitive_endpoint_audit/openapi_security_contract_validation.json`
+  - `data/security_sensitive_endpoint_audit/security_transport_encryption_audit_report.md`
+  - `data/security_sensitive_endpoint_audit/sonar_main_audit_report.md`
+  - `data/sonar_main_audit/sonar_run_summary.md`
+  - `data/sonar_main_audit/sonar_issues_summary.csv`
+  - `data/sonar_main_audit/sonar_quality_gate.json`
+  - `data/sonar_main_audit/sonar_audit_report.md`
+- Validaciones locales ejecutadas:
+  - `pytest -q` -> `170 passed, 3 skipped`.
+  - suites focales de cifrado/runtime/openapi/predict/problem-reports en verde.
+  - `python scripts/validate_hybrid_classification_policy_v1.py` sin violaciones.
+- Continuidad metodologica:
+  - claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-05-03) - ci_close_backend_encryption_release_fix
+- Se corrigio falla critica de CI backend detectada en GitHub Actions:
+  - test afectado: `tests/api/test_encrypted_payload_transport.py::test_legacy_results_endpoint_sets_no_store_and_replacement`.
+  - causa: dependencia de artefactos runtime en el test legacy (`503` en submit).
+  - fix: `monkeypatch` de `_model_probability` para aislar CI de artefactos locales sin relajar reglas de seguridad productiva.
+- Se completo migracion operativa de lecturas sensibles legacy plaintext a replacements seguros (envelope):
+  - `api/routes/questionnaire_v2.py` y `api/routes/questionnaire_runtime.py` incorporan endpoints `POST .../secure` para lecturas sensibles y headers legacy de deprecacion (`X-CognIA-Endpoint-Status`, `X-CognIA-Replacement`, `Cache-Control: no-store`).
+- Se cerro contrato OpenAPI para nuevos replacements seguros y estado legacy/deprecated.
+- Sonar:
+  - corrida ejecutada con coverage exportable (ajuste en `scripts/run_sonar.ps1` para `coverage --source=api,app,config` + `coverage xml -i`).
+  - estado actual: `quality_gate=ERROR` por umbrales globales (`new_coverage=51.6`, `new_duplicated_lines_density=4.8`), con `open_issues=0` y `sonar_blocking_issues_remaining=0`.
+- Validacion final de pruebas en esta ventana:
+  - `pytest -q` => `172 passed, 3 skipped`.
+  - suites focales de cifrado/runtime/openapi/policy en verde.
+- Estado auditoria de seguridad:
+  - `unresolved_issue_count=0`
+  - `sensitive_endpoints_without_encryption_count=0`
+  - `sensitive_endpoints_without_auth_count=0`
+  - `fields_sensitive_unencrypted_count=0`
+  - `final_security_audit_status=pass`

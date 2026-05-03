@@ -1,0 +1,2 @@
+﻿PATH=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_audit_v13
+PREFIX=02_cognia_app_audit_v13

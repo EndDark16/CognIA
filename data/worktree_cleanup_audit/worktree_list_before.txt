@@ -1,0 +1,48 @@
+﻿worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app
+HEAD a855a2a3417b1f5f5fef89977cc0b70015bf58c5
+branch refs/heads/main
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_audit_v13
+HEAD f6462b05c50eb2a98a9a0ffda52cccc84876359e
+branch refs/heads/audit/v13-real-prediction-anti-clone
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_ci_close
+HEAD ef9e6707b24e6724d745d9158def32fad1183e35
+branch refs/heads/fix/sonar-main-gate-alignment-v1
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_elimination_rescue
+HEAD 7ed7068a8446d9dbba067fca467392def2777612
+branch refs/heads/fix/elimination-structural-audit-rescue-v1
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_elimination_v14_fix
+HEAD f06f2315ff6e91128669ef6ce8e16733cf323c63
+branch refs/heads/fix/elimination-v14-real-anti-clone-rescue
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_rf_plus_maximize
+HEAD 75b3a2ef15e0a24cb728db63aae90a7a4b237222
+branch refs/heads/fix/global-compatible-rf-champion-selection-v13
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_structural_compliance
+HEAD 145af400a01dc5ecaa7b348338b4f2313b05c939
+branch refs/heads/fix/final-model-structural-compliance-v1
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_mode_rebuild
+HEAD 17e7c1e0729895559e57a3911987b5d8d23ef7b2
+branch refs/heads/fix/structural-mode-model-rescue-v1
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_rf_max_real_metrics
+HEAD 8c123a2be9e2f3bb1b5fa35a2a541885bad49750
+branch refs/heads/train/rf-max-real-metrics-v1
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_v15_caregiver_full_fix
+HEAD 7c2b98723eea3c9eec09f28fc80c66cd67881857
+branch refs/heads/fix/v15-elimination-caregiver-full-metric-rescue
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_v16_final_clean
+HEAD 0a5f1923c6f5dee374e161ddf0473e1287875190
+branch refs/heads/fix/v16-final-clean-champion-resolution
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_v17_runtime_security
+HEAD 72f096457bc663faddae26248e584c8612c94ef1
+branch refs/heads/fix/v17-runtime-diagnostic-security-final
+

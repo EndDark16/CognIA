@@ -1203,3 +1203,81 @@ Pendiente:
   - `.github/workflows/deploy-backend.yml` ahora dispara en push a `main` y usa `DEPLOY_BRANCH=main`.
 - Claim metodologico sin cambios:
   - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de sesion (2026-05-02) - security_transport_openapi_release_hardening
+- Bug corregido:
+  - `GET /api/v2/security/transport-key` devolvia `401` por `@jwt_required()` en `api/routes/questionnaire_v2.py`.
+  - Se removio autenticacion obligatoria para habilitar bootstrap de clave publica antes de cifrar payload sensible.
+- Hardening aplicado:
+  - rate limit dedicado para endpoint publico: `QV2_TRANSPORT_KEY_RATE_LIMIT` (default `60 per minute`).
+  - validacion estricta de headers criptograficos en `transport_crypto_service`:
+    - `invalid_encrypted_header` -> `encrypted_payload_invalid`
+    - `missing_crypto_version_header` / version invalida -> `invalid_crypto_version`
+    - payload cifrado sin header de cifrado -> `encrypted_payload_invalid`
+- Contrato/documentacion actualizados:
+  - `docs/openapi.yaml`: `transport-key` publico (`security: []`) y errores de transporte alineados con runtime.
+  - endpoints sensibles v2 (`sessions`, `answers`, `submit`, `results-secure`, `clinical-summary`) ahora documentan `invalid_crypto_version` en `400` donde aplica.
+  - docs alineadas: `docs/frontend_encrypted_transport_contract.md`, `docs/security_encryption.md`, `docs/clinical_summary_endpoint.md`.
+  - config/deploy docs alineadas: `.env.example`, `README.md`, `docs/deployment_ubuntu_self_hosted.md` (Render+Vercel + dominio propio).
+- Tests y validacion en verde:
+  - `pytest tests/api/test_encrypted_payload_transport.py tests/api/test_clinical_summary_endpoint.py tests/services/test_runtime_artifact_and_crypto_v17.py tests/api/test_questionnaire_v2_api.py tests/api/test_questionnaire_runtime_api.py tests/contracts/test_openapi_runtime_alignment.py tests/contracts/test_openapi_documentation_quality.py tests/test_docs_metrics.py -q` -> `33 passed`.
+  - `python scripts/validate_hybrid_classification_policy_v1.py` -> `violation_count=0`.
+  - `pytest tests/contracts/test_hybrid_classification_policy_v1.py tests/services/test_questionnaire_v2_loader.py -q` -> `4 passed`.
+  - `pytest -q` -> `164 passed, 3 skipped`.
+
+## Actualizacion de sesion (2026-05-03) - final_security_encryption_sonar_audit_v1
+- Alcance ejecutado:
+  - auditoria final de endpoints sensibles (transporte cifrado + auth + legado plaintext).
+  - auditoria de cifrado en reposo para cuestionarios runtime/v2 y problem reports.
+  - corrida Sonar con evidencia versionada local.
+- Cambios de codigo relevantes:
+  - `api/routes/questionnaire_v2.py`:
+    - `Cache-Control: no-store` en `GET /questionnaires/sessions/{id}`, `GET /questionnaires/sessions/{id}/page`, `GET /questionnaires/history`, y mantenimiento de headers legacy en resultados/pdf/shared.
+  - `api/routes/questionnaire_runtime.py`:
+    - decode/encode envelope en writes sensibles y politicas `no-store` en lecturas sensibles.
+  - `api/routes/predict.py`:
+    - JWT obligatorio + contrato de envelope sensible + respuesta no-cacheable.
+  - `api/services/questionnaire_runtime_service.py`:
+    - cifrado/descifrado de campos sensibles (`QREvaluationResponse`, `QRDomainResult`, `QRNotification`).
+  - `api/services/problem_report_service.py`:
+    - cifrado/descifrado de texto/metadata sensible.
+  - `api/services/questionnaire_v2_service.py`:
+    - cifrado de metadata de export PDF.
+- Sonar (evidencia):
+  - `data/sonar_main_audit/sonar_quality_gate.json`
+  - `data/sonar_main_audit/sonar_issues_summary.csv`
+  - `data/sonar_main_audit/sonar_run_summary.md`
+  - `data/sonar_main_audit/sonar_audit_report.md`
+  - estado: `unresolved_issues=0`, `hotspots_to_review=0`, `quality_gate=ERROR` por metricas globales de `new_coverage/new_duplicated_lines_density` del baseline.
+- Artefactos finales de seguridad:
+  - `data/security_sensitive_endpoint_audit/endpoint_sensitivity_matrix.csv`
+  - `data/security_sensitive_endpoint_audit/field_encryption_audit.csv`
+  - `data/security_sensitive_endpoint_audit/legacy_plaintext_endpoint_audit.csv`
+  - `data/security_sensitive_endpoint_audit/encrypted_transport_endpoint_validator.json`
+  - `data/security_sensitive_endpoint_audit/field_encryption_validator.json`
+  - `data/security_sensitive_endpoint_audit/openapi_security_contract_validation.json`
+  - `data/security_sensitive_endpoint_audit/security_transport_encryption_audit_report.md`
+  - `data/security_sensitive_endpoint_audit/sonar_main_audit_report.md`
+- Resultado de pruebas:
+  - `pytest -q` -> `170 passed, 3 skipped`.
+  - pruebas focales de cifrado/runtime/openapi/predict/problem-reports en verde.
+
+## Actualizacion de sesion (2026-05-03) - ci_close_backend_encryption_release_fix
+- CI backend corregido para falla en GitHub Actions:
+  - `tests/api/test_encrypted_payload_transport.py::test_legacy_results_endpoint_sets_no_store_and_replacement`
+  - fix aplicado: `monkeypatch` de `_model_probability` para eliminar dependencia de artefactos locales (`503 -> 200` esperado en flujo test).
+- Endpoints legacy plaintext sensibles quedaron con replacement seguro operativo:
+  - `questionnaire_v2`: nuevas rutas `POST .../secure` para `sessions/{id}`, `sessions/{id}/page`, `history`, `shared/access`, `history/{id}/pdf`.
+  - `questionnaire_runtime`: nuevas rutas `POST .../secure` para `responses`, `results`, `history`, `export`, `professional responses/results`, `notifications`.
+  - respuestas legacy marcan deprecacion con headers:
+    - `X-CognIA-Endpoint-Status: legacy_plaintext`
+    - `X-CognIA-Replacement: <ruta-segura>`
+    - `Cache-Control: no-store`
+- OpenAPI actualizado para cubrir replacements seguros y contrato de seguridad de endpoints sensibles.
+- Sonar re-ejecutado con coverage exportable:
+  - ajuste tecnico en `scripts/run_sonar.ps1` (`coverage --source=api,app,config` y `coverage xml -i`).
+  - estado gate: `ERROR` por metricas globales (`new_coverage=51.6`, `new_duplicated_lines_density=4.8`).
+  - estado de issues: `open_issues_total=0`, `sonar_blocking_issues_remaining=0`.
+- Resultado final de tests locales:
+  - `pytest -q` => `172 passed, 3 skipped`.
+  - comandos minimos de cierre de cifrado/openapi/policy en verde.

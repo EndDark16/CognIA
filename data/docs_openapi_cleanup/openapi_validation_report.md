@@ -16,6 +16,7 @@
 - Ninguno (estado final: validacion estructural en verde).
 
 ## Correcciones aplicadas
-- Se agregaron description obligatorios en components.responses para cumplimiento OpenAPI 3.0.x.
-- Se corrigieron parametros de path inconsistentes (name:id fuera de placeholder real) en rutas admin.
-- Se normalizo documentacion quirurgica de endpoints sensibles v2 con schemas y errores especificos.
+- Se removio autenticacion obligatoria en GET /api/v2/security/transport-key para habilitar bootstrap publico de clave de transporte.
+- Se agrego rate limit dedicado para transport-key con QV2_TRANSPORT_KEY_RATE_LIMIT.
+- Se reforzo contrato de transporte cifrado con invalid_crypto_version en endpoints sensibles v2.
+- Se actualizaron descripciones/seguridad en OpenAPI para reflejar comportamiento real del runtime.

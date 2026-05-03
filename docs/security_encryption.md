@@ -29,6 +29,20 @@ TLS/HTTPS remains mandatory in production.
 - `questionnaire_session_result_domains.result_summary`
 - `questionnaire_session_result_comorbidity.domains_json`
 - `questionnaire_session_result_comorbidity.summary`
+- `questionnaire_session_pdf_exports.metadata_json`
+- `qr_evaluation_response.answer_raw`
+- `qr_evaluation_response.answer_normalized`
+- `qr_domain_result.recommendation_text`
+- `qr_domain_result.explanation_short`
+- `qr_domain_result.contributors_json`
+- `qr_domain_result.caveats_json`
+- `qr_notification.title`
+- `qr_notification.body`
+- `qr_notification.payload_json`
+- `problem_reports.description`
+- `problem_reports.admin_notes`
+- `problem_reports.metadata_json`
+- `problem_report_attachments.metadata_json`
 
 ## Encrypted transport (application layer)
 
@@ -42,14 +56,21 @@ TLS/HTTPS remains mandatory in production.
 
 ### Service and algorithm
 - Service: `api/services/transport_crypto_service.py`
-- Key bootstrap endpoint: `GET /api/v2/security/transport-key`
+- Key bootstrap endpoint: `GET /api/v2/security/transport-key` (public, no JWT required)
+- Transport key bootstrap rate limit: `QV2_TRANSPORT_KEY_RATE_LIMIT` (default `60 per minute`)
 - Envelope version: `transport_envelope_v1`
 - Key exchange: `RSA-OAEP-256`
 - Payload encryption: `AES-256-GCM`
+- Public bootstrap response only contains: `key_id`, `algorithm`, `public_key_jwk`, `expires_at`, `version`.
+- Private key material is never exposed.
 
 ### Headers for encrypted requests
 - `X-CognIA-Encrypted: 1`
 - `X-CognIA-Crypto-Version: transport_envelope_v1`
+- Header validation is strict in sensitive endpoints:
+  - invalid `X-CognIA-Encrypted` -> `encrypted_payload_invalid`
+  - missing/invalid `X-CognIA-Crypto-Version` in encrypted mode -> `invalid_crypto_version`
+  - encrypted payload without `X-CognIA-Encrypted: 1` -> `encrypted_payload_invalid`
 
 ## Sensitive endpoint matrix
 
@@ -59,6 +80,7 @@ TLS/HTTPS remains mandatory in production.
 - notable errors:
   - `plaintext_not_allowed`
   - `encrypted_payload_invalid`
+  - `invalid_crypto_version`
   - `validation_error`
 
 ### `PATCH /api/v2/questionnaires/sessions/{session_id}/answers`
@@ -68,6 +90,7 @@ TLS/HTTPS remains mandatory in production.
   - `invalid_session_id`
   - `plaintext_not_allowed`
   - `encrypted_payload_invalid`
+  - `invalid_crypto_version`
   - `validation_error`
 
 ### `POST /api/v2/questionnaires/sessions/{session_id}/submit`
@@ -77,6 +100,7 @@ TLS/HTTPS remains mandatory in production.
   - `runtime_artifact_unavailable` (503)
   - `plaintext_not_allowed`
   - `encrypted_payload_invalid`
+  - `invalid_crypto_version`
 
 ### `POST /api/v2/questionnaires/history/{session_id}/results-secure`
 - request: `{}` or encrypted envelope (policy dependent).
@@ -85,6 +109,7 @@ TLS/HTTPS remains mandatory in production.
   - `invalid_session_id`
   - `plaintext_not_allowed`
   - `encrypted_payload_invalid`
+  - `invalid_crypto_version`
 
 ### `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`
 - request: `{}` or encrypted envelope (policy dependent).
@@ -94,13 +119,39 @@ TLS/HTTPS remains mandatory in production.
   - `runtime_artifact_unavailable` (503)
   - `plaintext_not_allowed`
   - `encrypted_payload_invalid`
+  - `invalid_crypto_version`
 
 ## Legacy compatibility
 - Legacy plaintext endpoint remains:
   - `GET /api/v2/questionnaires/history/{session_id}/results`
+- It is JWT-protected and returns:
+  - `X-CognIA-Endpoint-Status: legacy_plaintext`
+  - `X-CognIA-Replacement: /api/v2/questionnaires/history/{session_id}/results-secure`
+  - `Cache-Control: no-store`
 - It should be treated as compatibility path, while secure endpoints are preferred.
 
 ## Operational safety
 - Never commit `.env`.
 - Never log private keys or plaintext clinical payloads.
 - Avoid persisting decrypted frontend payloads to browser storage.
+
+## Deployment profiles (cookies + CORS)
+
+### Render backend + Vercel frontend
+- `FRONTEND_URL=https://cogn-ia-frontend.vercel.app`
+- `CORS_ORIGINS=https://cogn-ia-frontend.vercel.app,http://localhost:3000,http://localhost:5000`
+- `JWT_COOKIE_SAMESITE=None`
+- `JWT_COOKIE_SECURE=true`
+- `JWT_COOKIE_DOMAIN=`
+
+### Custom integrated domain
+- `FRONTEND_URL=https://www.cognia.lat`
+- `CORS_ORIGINS=https://www.cognia.lat,https://cognia.lat,http://localhost:3000,http://localhost:5000`
+- `JWT_COOKIE_SAMESITE=Lax`
+- `JWT_COOKIE_SECURE=true`
+- `JWT_COOKIE_DOMAIN=.cognia.lat`
+
+## Key generation quick notes
+- `COGNIA_FIELD_ENCRYPTION_KEY`: generate a URL-safe 32-byte base64 key.
+- `COGNIA_TRANSPORT_PRIVATE_KEY_PEM`: backend-only RSA private key for transport envelope bootstrap.
+- Do not expose `COGNIA_TRANSPORT_PRIVATE_KEY_PEM` in frontend, logs, or source control.
