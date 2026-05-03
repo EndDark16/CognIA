@@ -93,7 +93,7 @@ try {
         }
 
         & $pythonExe -m coverage erase
-        & $pythonExe -m coverage run -m pytest `
+        & $pythonExe -m coverage run --source=api,app,config -m pytest `
             tests/test_auth.py `
             tests/test_problem_reports.py `
             tests/test_email_unsubscribe.py `
@@ -106,7 +106,8 @@ try {
         }
 
         $coverageXmlPath = Join-Path $qualityOutDir "coverage.xml"
-        & $pythonExe -m coverage xml -o $coverageXmlPath
+        # Ignore stale/unresolvable traced files so Sonar always gets a report.
+        & $pythonExe -m coverage xml -i -o $coverageXmlPath
         if ($LASTEXITCODE -ne 0) {
             throw "No se pudo generar coverage.xml"
         }

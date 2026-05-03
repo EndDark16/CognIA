@@ -1,16 +1,16 @@
-method,path,jwt_or_roles_required,cache_control_no_store_applied,replacement_endpoint
-GET,/api/v1/questionnaire-runtime/evaluations/history,yes,yes,por confirmar
-GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/export,yes,yes,por confirmar
-GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/responses,yes,yes,por confirmar
-GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results,yes,yes,por confirmar
-GET,/api/v1/questionnaire-runtime/notifications,yes,yes,por confirmar
-GET,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/responses,yes,yes,por confirmar
-GET,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/results,yes,yes,por confirmar
-GET,/api/v2/questionnaires/history,yes,yes,/api/v2/questionnaires/history/{session_id}/results-secure
-GET,/api/v2/questionnaires/history/{session_id},yes,yes,/api/v2/questionnaires/history/{session_id}/results-secure
-GET,/api/v2/questionnaires/history/{session_id}/pdf,yes,yes,/api/v2/questionnaires/history/{session_id}/pdf/generate
-GET,/api/v2/questionnaires/history/{session_id}/pdf/download,yes,yes,/api/v2/questionnaires/history/{session_id}/pdf/generate
-GET,/api/v2/questionnaires/history/{session_id}/results,yes,yes,/api/v2/questionnaires/history/{session_id}/results-secure
-GET,/api/v2/questionnaires/sessions/{session_id},yes,yes,/api/v2/questionnaires/history/{session_id}/results-secure
-GET,/api/v2/questionnaires/sessions/{session_id}/page,yes,yes,/api/v2/questionnaires/history/{session_id}/results-secure
-GET,/api/v2/questionnaires/shared/{questionnaire_id}/{share_code},no,yes,/api/v2/questionnaires/history/{session_id}/results-secure
+method,path,jwt_or_roles_required,cache_control_no_store_applied,legacy_headers_applied,replacement_endpoint
+GET,/api/v1/questionnaire-runtime/evaluations/history,yes,yes,yes,/api/v1/questionnaire-runtime/evaluations/history/secure
+GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/export,yes,yes,yes,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/export/secure
+GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/responses,yes,yes,yes,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/responses/secure
+GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results,yes,yes,yes,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results/secure
+GET,/api/v1/questionnaire-runtime/notifications,yes,yes,yes,/api/v1/questionnaire-runtime/notifications/secure
+GET,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/responses,yes,yes,yes,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/responses/secure
+GET,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/results,yes,yes,yes,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/results/secure
+GET,/api/v2/questionnaires/history,yes,yes,yes,/api/v2/questionnaires/history/secure
+GET,/api/v2/questionnaires/history/{session_id},yes,yes,yes,/api/v2/questionnaires/sessions/{session_id}/secure
+GET,/api/v2/questionnaires/history/{session_id}/pdf,yes,yes,yes,/api/v2/questionnaires/history/{session_id}/pdf/secure
+GET,/api/v2/questionnaires/history/{session_id}/pdf/download,yes,yes,yes,/api/v2/questionnaires/history/{session_id}/pdf/secure
+GET,/api/v2/questionnaires/history/{session_id}/results,yes,yes,yes,/api/v2/questionnaires/history/{session_id}/results-secure
+GET,/api/v2/questionnaires/sessions/{session_id},yes,yes,yes,/api/v2/questionnaires/sessions/{session_id}/secure
+GET,/api/v2/questionnaires/sessions/{session_id}/page,yes,yes,yes,/api/v2/questionnaires/sessions/{session_id}/page-secure
+GET,/api/v2/questionnaires/shared/{questionnaire_id}/{share_code},no,yes,yes,/api/v2/questionnaires/shared/access-secure

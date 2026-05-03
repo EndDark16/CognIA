@@ -20266,6 +20266,686 @@ paths:
                     msg: service unavailable while processing readyz
                     error: service_unavailable
       x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/evaluations/history/secure:
+    post:
+      tags:
+      - QuestionnaireRuntime
+      summary: Listar historial runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeEvaluationsHistorySecure
+      parameters:
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Historial devuelto correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+        '400':
+          description: Error de validacion o cifrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/export/secure:
+    post:
+      tags:
+      - QuestionnaireRuntime
+      summary: Exportar evaluacion runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeEvaluationsEvaluationIdExportSecure
+      parameters:
+      - in: path
+        name: evaluation_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Export generado correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/responses/secure:
+    post:
+      tags:
+      - QuestionnaireRuntime
+      summary: Obtener respuestas runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeEvaluationsEvaluationIdResponsesSecure
+      parameters:
+      - in: path
+        name: evaluation_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Respuestas devueltas correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results/secure:
+    post:
+      tags:
+      - QuestionnaireRuntime
+      summary: Obtener resultados runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeEvaluationsEvaluationIdResultsSecure
+      parameters:
+      - in: path
+        name: evaluation_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Resultados devueltos correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/notifications/secure:
+    post:
+      tags:
+      - QuestionnaireRuntime
+      summary: Listar notificaciones runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeNotificationsSecure
+      parameters:
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Notificaciones devueltas correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/responses/secure:
+    post:
+      tags:
+      - QuestionnaireRuntimeAdmin
+      summary: Obtener respuestas profesionales runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeProfessionalEvaluationsEvaluationIdResponsesSecure
+      parameters:
+      - in: path
+        name: evaluation_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Respuestas profesionales devueltas correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/results/secure:
+    post:
+      tags:
+      - QuestionnaireRuntimeAdmin
+      summary: Obtener resultados profesionales runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeProfessionalEvaluationsEvaluationIdResultsSecure
+      parameters:
+      - in: path
+        name: evaluation_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Resultados profesionales devueltos correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/history/secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Listar historial v2 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV2QuestionnairesHistorySecure
+      parameters:
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Historial v2 devuelto correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/history/{session_id}/pdf/secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener metadata PDF v2 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV2QuestionnairesHistorySessionIdPdfSecure
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Metadata PDF devuelta correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/sessions/{session_id}/page-secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener pagina de sesion v2 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV2QuestionnairesSessionsSessionIdPageSecure
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Pagina de sesion devuelta correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/sessions/{session_id}/secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener sesion v2 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV2QuestionnairesSessionsSessionIdSecure
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Sesion devuelta correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/shared/access-secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Acceso compartido v2 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV2QuestionnairesSharedAccessSecure
+      parameters:
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      responses:
+        '200':
+          description: Resultados compartidos devueltos correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
 components:
   parameters:
     CsrfHeader:
