@@ -1,0 +1,20 @@
+< 8b4f983 sync: align dev.enddark with development approved state (#108)
+> 23b1ded release: promote development to main (backend ci + encryption audit close) (#101) (#105)
+> 80bfb42 chore(sonar): align project version and close worktree cleanup audit (#103)
+> 249c5ef Merge pull request #102 from EndDark16/fix/reconcile-development-main-release
+> ad6f5b2 merge(main): reconcile main into development release branch
+> 58f2040 Merge pull request #100 from EndDark16/fix/ci-close-backend-final
+> efdfe03 fix(ci): close backend encryption audit and secure legacy replacements
+> a855a2a Release: final security encryption audit and sonar evidence (#99)
+> eb6844e Merge pull request #98 from EndDark16/fix/final-security-sonar-release-main-v1
+> dded489 Merge origin/development into security audit branch
+> 930ca39 Refresh final Sonar evidence artifacts
+> c188cc5 Finalize security audit artifacts and documentation
+> 2555d4f Hardening transport and at-rest encryption contracts
+> 500a30a Merge remote-tracking branch 'origin/main' into fix/final-security-sonar-release-main-v1
+> 19c5bfe fix(security): make transport-key public and harden encrypted transport contract (#97)
+> e82616d chore: reconcile main history into development for release flow
+> a18b2da Merge pull request #94 from EndDark16/fix/security-transport-openapi-release-hardening
+> 5a5a958 fix(security): make transport-key public and harden encrypted transport contract
+> 4be55ca Release final CognIA v17 · Primera promoción integral a producción · development -> main (#93)
+> c127dc4 Merge pull request #92 from EndDark16/dev.enddark
