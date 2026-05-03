@@ -1261,3 +1261,23 @@ Pendiente:
 - Resultado de pruebas:
   - `pytest -q` -> `170 passed, 3 skipped`.
   - pruebas focales de cifrado/runtime/openapi/predict/problem-reports en verde.
+
+## Actualizacion de sesion (2026-05-03) - ci_close_backend_encryption_release_fix
+- CI backend corregido para falla en GitHub Actions:
+  - `tests/api/test_encrypted_payload_transport.py::test_legacy_results_endpoint_sets_no_store_and_replacement`
+  - fix aplicado: `monkeypatch` de `_model_probability` para eliminar dependencia de artefactos locales (`503 -> 200` esperado en flujo test).
+- Endpoints legacy plaintext sensibles quedaron con replacement seguro operativo:
+  - `questionnaire_v2`: nuevas rutas `POST .../secure` para `sessions/{id}`, `sessions/{id}/page`, `history`, `shared/access`, `history/{id}/pdf`.
+  - `questionnaire_runtime`: nuevas rutas `POST .../secure` para `responses`, `results`, `history`, `export`, `professional responses/results`, `notifications`.
+  - respuestas legacy marcan deprecacion con headers:
+    - `X-CognIA-Endpoint-Status: legacy_plaintext`
+    - `X-CognIA-Replacement: <ruta-segura>`
+    - `Cache-Control: no-store`
+- OpenAPI actualizado para cubrir replacements seguros y contrato de seguridad de endpoints sensibles.
+- Sonar re-ejecutado con coverage exportable:
+  - ajuste tecnico en `scripts/run_sonar.ps1` (`coverage --source=api,app,config` y `coverage xml -i`).
+  - estado gate: `ERROR` por metricas globales (`new_coverage=51.6`, `new_duplicated_lines_density=4.8`).
+  - estado de issues: `open_issues_total=0`, `sonar_blocking_issues_remaining=0`.
+- Resultado final de tests locales:
+  - `pytest -q` => `172 passed, 3 skipped`.
+  - comandos minimos de cierre de cifrado/openapi/policy en verde.

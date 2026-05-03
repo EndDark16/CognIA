@@ -1,28 +1,27 @@
 table_or_model,field,sensitivity_reason,encryption_required,encryption_currently_applied,legacy_plaintext_compatible,required_fix,fix_applied,final_status
-QuestionnaireSession,metadata_json,session metadata clinica y de progreso,yes,yes,yes,none,yes,ok
-QuestionnaireSessionAnswer,answer_raw,respuesta clinica raw,yes,yes,yes,none,yes,ok
-QuestionnaireSessionAnswer,answer_normalized,respuesta normalizada clinica,yes,yes,yes,none,yes,ok
-QuestionnaireSessionFeature,feature_value,feature interna derivada,yes,yes,yes,none,yes,ok
-QuestionnaireSessionResult,summary_text,resumen clinico agregado,yes,yes,yes,none,yes,ok
-QuestionnaireSessionResult,operational_recommendation,recomendacion operativa clinica,yes,yes,yes,none,yes,ok
-QuestionnaireSessionResult,metadata_json,metadata de resultado sensible,yes,yes,yes,none,yes,ok
-QuestionnaireSessionResultDomain,result_summary,resumen por dominio sensible,yes,yes,yes,none,yes,ok
-QuestionnaireSessionResultDomain,metadata_json,metadata por dominio sensible,yes,yes,yes,none,yes,ok
-QuestionnaireSessionResultComorbidity,domains_json,comorbilidad por dominios,yes,yes,yes,none,yes,ok
-QuestionnaireSessionResultComorbidity,summary,resumen comorbido,yes,yes,yes,none,yes,ok
-QuestionnaireSessionPdfExport,metadata_json,metadata de export/PDF sensible,yes,yes,yes,none,yes,ok
-QREvaluationResponse,answer_raw,respuesta runtime raw,yes,yes,yes,none,yes,ok
-QREvaluationResponse,answer_normalized,respuesta runtime normalizada,yes,yes,yes,none,yes,ok
-QRDomainResult,recommendation_text,recomendacion por dominio runtime,yes,yes,yes,none,yes,ok
-QRDomainResult,explanation_short,explicacion clinica breve runtime,yes,yes,yes,none,yes,ok
-QRDomainResult,contributors_json,factores contribuyentes clinicos,yes,yes,yes,none,yes,ok
-QRDomainResult,caveats_json,caveats clinicos por dominio,yes,yes,yes,none,yes,ok
-QRNotification,title,titulo de notificacion clinica,yes,yes,yes,none,yes,ok
-QRNotification,body,contenido notificacion clinica,yes,yes,yes,none,yes,ok
-QRNotification,payload_json,payload notificacion clinica,yes,yes,yes,none,yes,ok
-ProblemReport,description,texto libre potencialmente clinico/PII,yes,yes,yes,none,yes,ok
-ProblemReport,metadata_json,metadata contextual de incidente,yes,yes,yes,none,yes,ok
-ProblemReport,admin_notes,notas administrativas sensibles,yes,yes,yes,none,yes,ok
-ProblemReportAttachment,metadata_json,metadata adjunto sensible,yes,yes,yes,none,yes,ok
-AppUser,password,credencial de acceso,no (hash irrevers.),yes (hash),n/a,none,yes,ok
-UserMFA,secret_encrypted,secreto MFA,yes,yes,n/a,none,yes,ok
+questionnaire_sessions,metadata_json,session metadata clinica,yes,yes,yes,,yes,ok
+questionnaire_session_answers,answer_raw,respuestas crudas,yes,yes,yes,,yes,ok
+questionnaire_session_answers,answer_normalized,respuestas normalizadas,yes,yes,yes,,yes,ok
+questionnaire_session_internal_features,feature_value_json,features internas,yes,yes,yes,,yes,ok
+questionnaire_session_results,summary_text,resumen clinico,yes,yes,yes,,yes,ok
+questionnaire_session_results,operational_recommendation,recomendacion operativa,yes,yes,yes,,yes,ok
+questionnaire_session_results,metadata_json,"resultados, domains, clinical summary",yes,yes,yes,,yes,ok
+questionnaire_session_result_domains,result_summary,resumen por dominio,yes,yes,yes,,yes,ok
+questionnaire_session_result_domains,metadata_json,indicadores por dominio,yes,yes,yes,,yes,ok
+questionnaire_session_result_comorbidity,domains_json,comorbilidad dominios,yes,yes,yes,,yes,ok
+questionnaire_session_result_comorbidity,summary,comorbilidad resumen,yes,yes,yes,,yes,ok
+questionnaire_session_pdf_exports,metadata_json,metadata de reporte,yes,yes,yes,,yes,ok
+qr_evaluations,pin_hash,PIN profesional,yes,yes(hash),n/a,,yes,ok
+qr_evaluation_responses,answer_raw,respuestas runtime raw,yes,yes,yes,,yes,ok
+qr_evaluation_responses,answer_normalized,respuestas runtime normalized,yes,yes,yes,,yes,ok
+qr_domain_results,recommendation_text,recomendacion clinica runtime,yes,yes,yes,,yes,ok
+qr_domain_results,explanation_short,explicacion clinica runtime,yes,yes,yes,,yes,ok
+qr_domain_results,contributors_json,contribuidores modelo,yes,yes,yes,,yes,ok
+qr_domain_results,caveats_json,caveats clinicos,yes,yes,yes,,yes,ok
+qr_notifications,title,notificaciones clinicas,yes,yes,yes,,yes,ok
+qr_notifications,body,notificaciones clinicas,yes,yes,yes,,yes,ok
+qr_notifications,payload_json,payload clinico de notificacion,yes,yes,yes,,yes,ok
+problem_reports,description,texto potencialmente sensible,yes,yes,yes,,yes,ok
+problem_reports,metadata_json,metadata potencialmente sensible,yes,yes,yes,,yes,ok
+problem_reports,admin_notes,notas admin sensibles,yes,yes,yes,,yes,ok
+problem_report_attachments,metadata_json,metadata adjuntos,yes,yes,yes,,yes,ok
