@@ -1315,3 +1315,11 @@ Pendiente:
     - corrida posterior sobre `origin/main` restablecio estado final `QUALITY GATE STATUS: PASSED` en SonarCloud.
 - Claim metodologico sin cambios:
   - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de sesion (2026-05-03) - sonar_docs_branch_cleanup_close
+- Se completo limpieza de ramas temporales post-merge de evidencia Sonar.
+- Ramas temporales cerradas:
+  - `docs/sonar-historical-quality-evidence`
+  - `sync/development-main-sonar`
+- Se confirmo preservacion de ramas principales (`main`, `development`, `dev.enddark`).
+- Se genero `data/branch_cleanup_audit/sonar_docs_branch_cleanup_report.md` con trazabilidad de ramas creadas/mergeadas/eliminadas/preservadas.
