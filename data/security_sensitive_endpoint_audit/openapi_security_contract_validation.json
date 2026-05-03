@@ -1,11 +1,6 @@
 {
-  "generated_at_utc": "2026-05-03T03:23:26.535729+00:00",
-  "yaml_parse_ok": true,
-  "duplicate_keys_detected": 0,
-  "broken_refs_count": 0,
-  "duplicate_operation_id_count": 0,
-  "transport_key_public_security_empty": true,
-  "transport_key_has_200": true,
-  "predict_requires_bearer": true,
-  "openapi_valid": true
+  "openapi_yaml_parseable": true,
+  "missing_paths_count": 0,
+  "missing_paths_sample": [],
+  "transport_key_public_security_empty": true
 }
