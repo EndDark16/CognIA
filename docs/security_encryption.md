@@ -134,3 +134,24 @@ TLS/HTTPS remains mandatory in production.
 - Never commit `.env`.
 - Never log private keys or plaintext clinical payloads.
 - Avoid persisting decrypted frontend payloads to browser storage.
+
+## Deployment profiles (cookies + CORS)
+
+### Render backend + Vercel frontend
+- `FRONTEND_URL=https://cogn-ia-frontend.vercel.app`
+- `CORS_ORIGINS=https://cogn-ia-frontend.vercel.app,http://localhost:3000,http://localhost:5000`
+- `JWT_COOKIE_SAMESITE=None`
+- `JWT_COOKIE_SECURE=true`
+- `JWT_COOKIE_DOMAIN=`
+
+### Custom integrated domain
+- `FRONTEND_URL=https://www.cognia.lat`
+- `CORS_ORIGINS=https://www.cognia.lat,https://cognia.lat,http://localhost:3000,http://localhost:5000`
+- `JWT_COOKIE_SAMESITE=Lax`
+- `JWT_COOKIE_SECURE=true`
+- `JWT_COOKIE_DOMAIN=.cognia.lat`
+
+## Key generation quick notes
+- `COGNIA_FIELD_ENCRYPTION_KEY`: generate a URL-safe 32-byte base64 key.
+- `COGNIA_TRANSPORT_PRIVATE_KEY_PEM`: backend-only RSA private key for transport envelope bootstrap.
+- Do not expose `COGNIA_TRANSPORT_PRIVATE_KEY_PEM` in frontend, logs, or source control.

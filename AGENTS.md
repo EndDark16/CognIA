@@ -786,3 +786,38 @@ Contexto metodolÃ³gico:
   - Suite completa: `164 passed, 3 skipped`.
 - Claim metodologico sin cambios:
   - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-05-03) - final_security_encryption_sonar_audit_v1
+- Se ejecuto auditoria final de cifrado sensible + contratos de transporte sobre rutas activas del backend (v1 runtime, v2 questionnaire, predict, auth/mfa, admin y soporte).
+- Endpoints sensibles reforzados en codigo:
+  - `api/routes/questionnaire_v2.py`: `Cache-Control: no-store` consolidado para respuestas sensibles/legacy (`sessions`, `history`, `results legacy`, `pdf`, `shared`).
+  - `api/routes/questionnaire_runtime.py`: decode/encode envelope en writes sensibles + `no-store` en lecturas sensibles.
+  - `api/routes/predict.py`: ahora requiere JWT y soporta envelope sensible con respuesta no-cacheable.
+- Cifrado en reposo consolidado:
+  - `api/services/questionnaire_runtime_service.py`: cifrado/descifrado para `QREvaluationResponse`, `QRDomainResult`, `QRNotification`.
+  - `api/services/problem_report_service.py`: cifrado/descifrado para `description/admin_notes/metadata_json` y metadata de adjuntos.
+  - `api/services/questionnaire_v2_service.py`: cifrado de `questionnaire_session_pdf_export.metadata_json`.
+- Sonar:
+  - corrida ejecutada con evidencia en `data/sonar_main_audit/`.
+  - issues abiertas: `0`.
+  - hotspots `TO_REVIEW`: `0`.
+  - `quality_gate_status=ERROR` por umbrales globales de `new_coverage` y `new_duplicated_lines_density` de baseline del proyecto (no por issues abiertas de seguridad/reliability/maintainability).
+- Artefactos de auditoria generados:
+  - `data/security_sensitive_endpoint_audit/endpoint_sensitivity_matrix.csv`
+  - `data/security_sensitive_endpoint_audit/field_encryption_audit.csv`
+  - `data/security_sensitive_endpoint_audit/legacy_plaintext_endpoint_audit.csv`
+  - `data/security_sensitive_endpoint_audit/encrypted_transport_endpoint_validator.json`
+  - `data/security_sensitive_endpoint_audit/field_encryption_validator.json`
+  - `data/security_sensitive_endpoint_audit/openapi_security_contract_validation.json`
+  - `data/security_sensitive_endpoint_audit/security_transport_encryption_audit_report.md`
+  - `data/security_sensitive_endpoint_audit/sonar_main_audit_report.md`
+  - `data/sonar_main_audit/sonar_run_summary.md`
+  - `data/sonar_main_audit/sonar_issues_summary.csv`
+  - `data/sonar_main_audit/sonar_quality_gate.json`
+  - `data/sonar_main_audit/sonar_audit_report.md`
+- Validaciones locales ejecutadas:
+  - `pytest -q` -> `170 passed, 3 skipped`.
+  - suites focales de cifrado/runtime/openapi/predict/problem-reports en verde.
+  - `python scripts/validate_hybrid_classification_policy_v1.py` sin violaciones.
+- Continuidad metodologica:
+  - claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.

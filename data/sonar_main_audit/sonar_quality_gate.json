@@ -1,0 +1,84 @@
+{
+  "retrieved_at_utc": "2026-05-03T03:22:31.123090+00:00",
+  "ce_task": {
+    "id": "AZ3r1Ngam96WbL33ZPyN",
+    "type": "REPORT",
+    "componentId": "AZ2y3DNjX_ilrZOEYhQ8",
+    "componentKey": "EndDark16_CognIA",
+    "componentName": "CognIA",
+    "componentQualifier": "TRK",
+    "analysisId": "e50f85aa-ba5a-4484-a5bf-6f2cc0ff3b51",
+    "status": "SUCCESS",
+    "submittedAt": "2026-05-03T03:14:48+0000",
+    "submitterLogin": "EndDark16-lCjhz@github",
+    "startedAt": "2026-05-03T03:14:49+0000",
+    "executedAt": "2026-05-03T03:14:51+0000",
+    "executionTimeMs": 1996,
+    "logs": false,
+    "hasScannerContext": true,
+    "organization": "enddark16",
+    "warningCount": 0,
+    "warnings": []
+  },
+  "project_status": {
+    "status": "ERROR",
+    "conditions": [
+      {
+        "status": "OK",
+        "metricKey": "new_reliability_rating",
+        "comparator": "GT",
+        "periodIndex": 1,
+        "errorThreshold": "1",
+        "actualValue": "1"
+      },
+      {
+        "status": "OK",
+        "metricKey": "new_security_rating",
+        "comparator": "GT",
+        "periodIndex": 1,
+        "errorThreshold": "1",
+        "actualValue": "1"
+      },
+      {
+        "status": "OK",
+        "metricKey": "new_maintainability_rating",
+        "comparator": "GT",
+        "periodIndex": 1,
+        "errorThreshold": "1",
+        "actualValue": "1"
+      },
+      {
+        "status": "ERROR",
+        "metricKey": "new_coverage",
+        "comparator": "LT",
+        "periodIndex": 1,
+        "errorThreshold": "80",
+        "actualValue": "69.0"
+      },
+      {
+        "status": "ERROR",
+        "metricKey": "new_duplicated_lines_density",
+        "comparator": "GT",
+        "periodIndex": 1,
+        "errorThreshold": "3",
+        "actualValue": "3.6"
+      },
+      {
+        "status": "OK",
+        "metricKey": "new_security_hotspots_reviewed",
+        "comparator": "LT",
+        "periodIndex": 1,
+        "errorThreshold": "100",
+        "actualValue": "100.0"
+      }
+    ],
+    "periods": [
+      {
+        "index": 1,
+        "mode": "previous_version",
+        "date": "2026-04-22T02:07:27+0000"
+      }
+    ],
+    "ignoredConditions": false
+  }
+}

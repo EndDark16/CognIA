@@ -126,3 +126,4 @@ Response envelope:
 - no loggear payload sensible en consola.
 - mantener decrypted payload en memoria volatil.
 - esta capa no reemplaza TLS ni controles de autorizacion backend.
+- no usar endpoints `legacy_plaintext` en frontend de produccion salvo ventana de compatibilidad explicitamente autorizada.

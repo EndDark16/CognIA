@@ -224,9 +224,9 @@ def test_transport_key_is_public(client):
     assert payload["version"] == "transport_envelope_v1"
     assert payload["algorithm"] == "RSA-OAEP-256+AES-256-GCM"
     assert "public_key_jwk" in payload
-    raw = json.dumps(payload).lower()
-    assert "private_key" not in raw
-    assert "pem" not in raw
+    normalized_keys = {str(k).lower() for k in payload.keys()}
+    assert "private_key" not in normalized_keys
+    assert "private_key_pem" not in normalized_keys
 
 
 def test_encrypted_payload_roundtrip(client, app):

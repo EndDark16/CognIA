@@ -188,7 +188,10 @@ def get_session(session_id: str):
 
     payload = service.get_session_payload(session)
     payload["tags"] = service.list_session_tags(session.id)
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @questionnaire_v2_bp.get("/questionnaires/sessions/<session_id>/page")
@@ -215,7 +218,10 @@ def get_session_page(session_id: str):
     except PermissionError as exc:
         return _error("forbidden", str(exc), 403)
 
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @questionnaire_v2_bp.patch("/questionnaires/sessions/<session_id>/answers")
@@ -310,7 +316,10 @@ def history():
         page=params["page"],
         page_size=params["page_size"],
     )
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @questionnaire_v2_bp.get("/questionnaires/history/<session_id>")
