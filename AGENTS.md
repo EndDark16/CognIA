@@ -821,3 +821,24 @@ Contexto metodolÃ³gico:
   - `python scripts/validate_hybrid_classification_policy_v1.py` sin violaciones.
 - Continuidad metodologica:
   - claim permitido sin cambios: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-05-03) - ci_close_backend_encryption_release_fix
+- Se corrigio falla critica de CI backend detectada en GitHub Actions:
+  - test afectado: `tests/api/test_encrypted_payload_transport.py::test_legacy_results_endpoint_sets_no_store_and_replacement`.
+  - causa: dependencia de artefactos runtime en el test legacy (`503` en submit).
+  - fix: `monkeypatch` de `_model_probability` para aislar CI de artefactos locales sin relajar reglas de seguridad productiva.
+- Se completo migracion operativa de lecturas sensibles legacy plaintext a replacements seguros (envelope):
+  - `api/routes/questionnaire_v2.py` y `api/routes/questionnaire_runtime.py` incorporan endpoints `POST .../secure` para lecturas sensibles y headers legacy de deprecacion (`X-CognIA-Endpoint-Status`, `X-CognIA-Replacement`, `Cache-Control: no-store`).
+- Se cerro contrato OpenAPI para nuevos replacements seguros y estado legacy/deprecated.
+- Sonar:
+  - corrida ejecutada con coverage exportable (ajuste en `scripts/run_sonar.ps1` para `coverage --source=api,app,config` + `coverage xml -i`).
+  - estado actual: `quality_gate=ERROR` por umbrales globales (`new_coverage=51.6`, `new_duplicated_lines_density=4.8`), con `open_issues=0` y `sonar_blocking_issues_remaining=0`.
+- Validacion final de pruebas en esta ventana:
+  - `pytest -q` => `172 passed, 3 skipped`.
+  - suites focales de cifrado/runtime/openapi/policy en verde.
+- Estado auditoria de seguridad:
+  - `unresolved_issue_count=0`
+  - `sensitive_endpoints_without_encryption_count=0`
+  - `sensitive_endpoints_without_auth_count=0`
+  - `fields_sensitive_unencrypted_count=0`
+  - `final_security_audit_status=pass`

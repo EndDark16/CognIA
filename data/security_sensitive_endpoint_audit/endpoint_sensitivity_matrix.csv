@@ -43,7 +43,7 @@ api/routes/mfa.py,mfa_setup,POST,/api/mfa/setup,auth_sensitive,yes,no,no,no,
 api/routes/predict.py,predict,POST,/api/predict,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/problem_reports.py,create_problem_report,POST,/api/problem-reports,authenticated_non_sensitive,yes,no,no,no,
 api/routes/problem_reports.py,list_my_problem_reports,GET,/api/problem-reports/mine,authenticated_non_sensitive,yes,no,no,no,
-api/routes/evaluations.py,create_evaluation,POST,/api/v1/evaluations/,authenticated_non_sensitive,yes,no,no,no,
+api/routes/evaluations.py,create_evaluation,POST,/api/v1/evaluations,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_runtime.py,admin_bootstrap,POST,/api/v1/questionnaire-runtime/admin/bootstrap,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_runtime.py,admin_create_question,POST,/api/v1/questionnaire-runtime/admin/sections/{section_id}/questions,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_runtime.py,admin_create_template,POST,/api/v1/questionnaire-runtime/admin/templates,authenticated_non_sensitive,yes,no,no,no,
@@ -55,31 +55,38 @@ api/routes/questionnaire_runtime.py,admin_upsert_disclosure,POST,/api/v1/questio
 api/routes/questionnaire_runtime.py,admin_publish_version,POST,/api/v1/questionnaire-runtime/admin/versions/{version_id}/publish,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_runtime.py,admin_create_section,POST,/api/v1/questionnaire-runtime/admin/versions/{version_id}/sections,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_runtime.py,create_draft_evaluation,POST,/api/v1/questionnaire-runtime/evaluations/draft,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
-api/routes/questionnaire_runtime.py,list_history,GET,/api/v1/questionnaire-runtime/evaluations/history,legacy_plaintext_deprecated,yes,no,no,yes,por confirmar
+api/routes/questionnaire_runtime.py,list_history,GET,/api/v1/questionnaire-runtime/evaluations/history,legacy_plaintext_deprecated,yes,no,no,yes,/api/v1/questionnaire-runtime/evaluations/history/secure
+api/routes/questionnaire_runtime.py,list_history_secure,POST,/api/v1/questionnaire-runtime/evaluations/history/secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_runtime.py,delete_evaluation,DELETE,/api/v1/questionnaire-runtime/evaluations/{evaluation_id},authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_runtime.py,save_draft,PATCH,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/draft,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
-api/routes/questionnaire_runtime.py,export_evaluation,GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/export,legacy_plaintext_deprecated,yes,no,no,yes,por confirmar
+api/routes/questionnaire_runtime.py,export_evaluation,GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/export,legacy_plaintext_deprecated,yes,no,no,yes,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/export/secure
+api/routes/questionnaire_runtime.py,export_evaluation_secure,POST,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/export/secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_runtime.py,heartbeat,POST,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/heartbeat,authenticated_non_sensitive,yes,no,no,no,
-api/routes/questionnaire_runtime.py,get_responses,GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/responses,legacy_plaintext_deprecated,yes,no,no,yes,por confirmar
-api/routes/questionnaire_runtime.py,get_results,GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results,legacy_plaintext_deprecated,yes,no,no,yes,por confirmar
+api/routes/questionnaire_runtime.py,get_responses,GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/responses,legacy_plaintext_deprecated,yes,no,no,yes,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/responses/secure
+api/routes/questionnaire_runtime.py,get_responses_secure,POST,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/responses/secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
+api/routes/questionnaire_runtime.py,get_results,GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results,legacy_plaintext_deprecated,yes,no,no,yes,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results/secure
+api/routes/questionnaire_runtime.py,get_results_secure,POST,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results/secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_runtime.py,evaluation_status,GET,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/status,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_runtime.py,submit_evaluation,POST,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/submit,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_runtime.py,validate_section,POST,/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/validate-section,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
-api/routes/questionnaire_runtime.py,list_notifications,GET,/api/v1/questionnaire-runtime/notifications,legacy_plaintext_deprecated,yes,no,no,yes,por confirmar
+api/routes/questionnaire_runtime.py,list_notifications,GET,/api/v1/questionnaire-runtime/notifications,legacy_plaintext_deprecated,yes,no,no,yes,/api/v1/questionnaire-runtime/notifications/secure
+api/routes/questionnaire_runtime.py,list_notifications_secure,POST,/api/v1/questionnaire-runtime/notifications/secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_runtime.py,mark_notification_read,PATCH,/api/v1/questionnaire-runtime/notifications/{notification_id}/read,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_runtime.py,professional_open_access,POST,/api/v1/questionnaire-runtime/professional/access,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_runtime.py,professional_release_access,DELETE,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/access,authenticated_non_sensitive,yes,no,no,no,
-api/routes/questionnaire_runtime.py,professional_responses,GET,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/responses,legacy_plaintext_deprecated,yes,no,no,yes,por confirmar
-api/routes/questionnaire_runtime.py,professional_results,GET,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/results,legacy_plaintext_deprecated,yes,no,no,yes,por confirmar
+api/routes/questionnaire_runtime.py,professional_responses,GET,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/responses,legacy_plaintext_deprecated,yes,no,no,yes,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/responses/secure
+api/routes/questionnaire_runtime.py,professional_responses_secure,POST,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/responses/secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
+api/routes/questionnaire_runtime.py,professional_results,GET,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/results,legacy_plaintext_deprecated,yes,no,no,yes,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/results/secure
+api/routes/questionnaire_runtime.py,professional_results_secure,POST,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/results/secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_runtime.py,professional_tag,PATCH,/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/tag,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_runtime.py,get_active_questionnaire,GET,/api/v1/questionnaire-runtime/questionnaire/active,authenticated_non_sensitive,yes,no,no,no,
-api/routes/questionnaires.py,create_questionnaire,POST,/api/v1/questionnaires/,authenticated_non_sensitive,yes,no,no,no,
-api/routes/questionnaires.py,get_active_questionnaire,GET,/api/v1/questionnaires/active,authenticated_non_sensitive,no,no,no,no,
+api/routes/questionnaires.py,create_questionnaire,POST,/api/v1/questionnaires,authenticated_non_sensitive,yes,no,no,no,
+api/routes/questionnaires.py,get_active_questionnaire,GET,/api/v1/questionnaires/active,public_non_sensitive,no,no,no,no,
 api/routes/questionnaires.py,clone_active_questionnaire,POST,/api/v1/questionnaires/active/clone,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaires.py,activate_questionnaire,POST,/api/v1/questionnaires/{template_id}/activate,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaires.py,add_questions,POST,/api/v1/questionnaires/{template_id}/questions,authenticated_non_sensitive,yes,no,no,no,
-api/routes/users.py,list_users,GET,/api/v1/users/,authenticated_non_sensitive,yes,no,no,no,
-api/routes/users.py,create_user,POST,/api/v1/users/,authenticated_non_sensitive,yes,no,no,no,
+api/routes/users.py,list_users,GET,/api/v1/users,authenticated_non_sensitive,yes,no,no,no,
+api/routes/users.py,create_user,POST,/api/v1/users,authenticated_non_sensitive,yes,no,no,no,
 api/routes/users.py,deactivate_user,DELETE,/api/v1/users/{user_id},authenticated_non_sensitive,yes,no,no,no,
 api/routes/users.py,get_user,GET,/api/v1/users/{user_id},authenticated_non_sensitive,yes,no,no,no,
 api/routes/users.py,update_user,PATCH,/api/v1/users/{user_id},authenticated_non_sensitive,yes,no,no,no,
@@ -99,23 +106,28 @@ api/routes/questionnaire_v2.py,dashboard_retention,GET,/api/v2/dashboard/retenti
 api/routes/questionnaire_v2.py,dashboard_user_growth,GET,/api/v2/dashboard/user-growth,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_v2.py,get_active_questionnaire,GET,/api/v2/questionnaires/active,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_v2.py,bootstrap_questionnaire_v2,POST,/api/v2/questionnaires/admin/bootstrap,authenticated_non_sensitive,yes,no,no,no,
-api/routes/questionnaire_v2.py,history,GET,/api/v2/questionnaires/history,legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/history/{session_id}/results-secure
-api/routes/questionnaire_v2.py,history_item,GET,/api/v2/questionnaires/history/{session_id},legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/history/{session_id}/results-secure
+api/routes/questionnaire_v2.py,history,GET,/api/v2/questionnaires/history,legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/history/secure
+api/routes/questionnaire_v2.py,history_secure,POST,/api/v2/questionnaires/history/secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
+api/routes/questionnaire_v2.py,history_item,GET,/api/v2/questionnaires/history/{session_id},legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/sessions/{session_id}/secure
 api/routes/questionnaire_v2.py,history_clinical_summary,POST,/api/v2/questionnaires/history/{session_id}/clinical-summary,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
-api/routes/questionnaire_v2.py,pdf_metadata,GET,/api/v2/questionnaires/history/{session_id}/pdf,legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/history/{session_id}/pdf/generate
-api/routes/questionnaire_v2.py,pdf_download,GET,/api/v2/questionnaires/history/{session_id}/pdf/download,legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/history/{session_id}/pdf/generate
+api/routes/questionnaire_v2.py,pdf_metadata,GET,/api/v2/questionnaires/history/{session_id}/pdf,legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/history/{session_id}/pdf/secure
+api/routes/questionnaire_v2.py,pdf_download,GET,/api/v2/questionnaires/history/{session_id}/pdf/download,legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/history/{session_id}/pdf/secure
 api/routes/questionnaire_v2.py,pdf_generate,POST,/api/v2/questionnaires/history/{session_id}/pdf/generate,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
+api/routes/questionnaire_v2.py,pdf_metadata_secure,POST,/api/v2/questionnaires/history/{session_id}/pdf/secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_v2.py,history_results,GET,/api/v2/questionnaires/history/{session_id}/results,legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/history/{session_id}/results-secure
 api/routes/questionnaire_v2.py,history_results_secure,POST,/api/v2/questionnaires/history/{session_id}/results-secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_v2.py,share,POST,/api/v2/questionnaires/history/{session_id}/share,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
-api/routes/questionnaire_v2.py,add_tag,POST,/api/v2/questionnaires/history/{session_id}/tags,authenticated_non_sensitive,yes,no,no,no,
+api/routes/questionnaire_v2.py,add_tag,POST,/api/v2/questionnaires/history/{session_id}/tags,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_v2.py,remove_tag,DELETE,/api/v2/questionnaires/history/{session_id}/tags/{tag_id},authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_v2.py,create_session,POST,/api/v2/questionnaires/sessions,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
-api/routes/questionnaire_v2.py,get_session,GET,/api/v2/questionnaires/sessions/{session_id},legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/history/{session_id}/results-secure
+api/routes/questionnaire_v2.py,get_session,GET,/api/v2/questionnaires/sessions/{session_id},legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/sessions/{session_id}/secure
 api/routes/questionnaire_v2.py,patch_answers,PATCH,/api/v2/questionnaires/sessions/{session_id}/answers,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
-api/routes/questionnaire_v2.py,get_session_page,GET,/api/v2/questionnaires/sessions/{session_id}/page,legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/history/{session_id}/results-secure
+api/routes/questionnaire_v2.py,get_session_page,GET,/api/v2/questionnaires/sessions/{session_id}/page,legacy_plaintext_deprecated,yes,no,no,yes,/api/v2/questionnaires/sessions/{session_id}/page-secure
+api/routes/questionnaire_v2.py,get_session_page_secure,POST,/api/v2/questionnaires/sessions/{session_id}/page-secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
+api/routes/questionnaire_v2.py,get_session_secure,POST,/api/v2/questionnaires/sessions/{session_id}/secure,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
 api/routes/questionnaire_v2.py,submit_session,POST,/api/v2/questionnaires/sessions/{session_id}/submit,sensitive_requires_encrypted_payload,yes,yes,yes,yes,
-api/routes/questionnaire_v2.py,shared_access,GET,/api/v2/questionnaires/shared/{questionnaire_id}/{share_code},legacy_plaintext_deprecated,no,no,no,yes,/api/v2/questionnaires/history/{session_id}/results-secure
+api/routes/questionnaire_v2.py,shared_access_secure,POST,/api/v2/questionnaires/shared/access-secure,sensitive_requires_encrypted_payload,no,yes,yes,yes,
+api/routes/questionnaire_v2.py,shared_access,GET,/api/v2/questionnaires/shared/{questionnaire_id}/{share_code},legacy_plaintext_deprecated,no,no,no,yes,/api/v2/questionnaires/shared/access-secure
 api/routes/questionnaire_v2.py,create_report_job,POST,/api/v2/reports/jobs,authenticated_non_sensitive,yes,no,no,no,
 api/routes/questionnaire_v2.py,get_transport_key,GET,/api/v2/security/transport-key,public_non_sensitive,no,no,no,no,
 api/routes/docs.py,swagger_ui,GET,/docs,public_non_sensitive,no,no,no,no,
