@@ -1,0 +1,16 @@
+{
+  "sonar_api_queried": true,
+  "sonar_token_exposed": false,
+  "project_key": "EndDark16_CognIA",
+  "quality_gate_final_status": "OK",
+  "open_issues_total": 0,
+  "blocking_issues_remaining": 0,
+  "security_reliability_maintainability_open_issues": 0,
+  "metrics_evolution_generated": true,
+  "pre_post_comparison_generated": true,
+  "resolved_issues_detail_generated": true,
+  "current_open_issues_generated": true,
+  "hotspots_summary_generated": true,
+  "unavailable_data_documented": true,
+  "final_sonar_historical_audit_status": "pass"
+}

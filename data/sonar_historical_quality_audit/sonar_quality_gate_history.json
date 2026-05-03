@@ -1,0 +1,1316 @@
+{
+  "project_key": "EndDark16_CognIA",
+  "organization": "enddark16",
+  "host": "https://sonarcloud.io",
+  "generated_at_utc": "2026-05-03T22:09:40.597417Z",
+  "latest_project_status": {
+    "status": "OK",
+    "conditions": [
+      {
+        "status": "OK",
+        "metricKey": "new_reliability_rating",
+        "comparator": "GT",
+        "periodIndex": 1,
+        "errorThreshold": "1",
+        "actualValue": "1"
+      },
+      {
+        "status": "OK",
+        "metricKey": "new_security_rating",
+        "comparator": "GT",
+        "periodIndex": 1,
+        "errorThreshold": "1",
+        "actualValue": "1"
+      },
+      {
+        "status": "OK",
+        "metricKey": "new_maintainability_rating",
+        "comparator": "GT",
+        "periodIndex": 1,
+        "errorThreshold": "1",
+        "actualValue": "1"
+      },
+      {
+        "status": "OK",
+        "metricKey": "new_security_hotspots_reviewed",
+        "comparator": "LT",
+        "periodIndex": 1,
+        "errorThreshold": "100",
+        "actualValue": "100.0"
+      }
+    ],
+    "periods": [
+      {
+        "index": 1,
+        "mode": "previous_version",
+        "date": "2026-05-03T15:52:47+0000",
+        "parameter": "not provided"
+      }
+    ],
+    "ignoredConditions": false
+  },
+  "history": [
+    {
+      "analysis_key": "76151ed8-2ecf-43c4-85cc-30c26cc23341",
+      "analysis_date": "2026-04-22T02:07:27+0000",
+      "revision": "0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "NONE",
+        "conditions": [],
+        "periods": []
+      }
+    },
+    {
+      "analysis_key": "bb8533cc-b128-4069-88a3-98cb79b2a734",
+      "analysis_date": "2026-05-03T02:15:53+0000",
+      "revision": "500a30aec14d8a50295961a7541e128e84c88b9d",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "56.4"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "2.7"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "0.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "8a4e7e26-6bf2-48d5-bdff-5c927e0fd6ed",
+      "analysis_date": "2026-05-03T02:22:23+0000",
+      "revision": "500a30aec14d8a50295961a7541e128e84c88b9d",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "56.4"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "2.7"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "0.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "08a85ec0-34bc-4961-9b5f-4bad6f43f019",
+      "analysis_date": "2026-05-03T02:27:43+0000",
+      "revision": "500a30aec14d8a50295961a7541e128e84c88b9d",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "56.4"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "2.7"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "0.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "939644e5-8831-4158-a8eb-dabae6a57f9e",
+      "analysis_date": "2026-05-03T03:09:59+0000",
+      "revision": "500a30aec14d8a50295961a7541e128e84c88b9d",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "73.7"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "2.7"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "e50f85aa-ba5a-4484-a5bf-6f2cc0ff3b51",
+      "analysis_date": "2026-05-03T03:13:31+0000",
+      "revision": "2555d4fce5705e70058d4da89211fc3f70939ebd",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "69.0"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "3.6"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "6728b0cc-30be-4f84-81fb-6e47ba3426be",
+      "analysis_date": "2026-05-03T03:32:12+0000",
+      "revision": "2555d4fce5705e70058d4da89211fc3f70939ebd",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "69.0"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "3.6"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "81dceeb4-4400-4f7c-a08c-47c144d9790b",
+      "analysis_date": "2026-05-03T03:34:45+0000",
+      "revision": "c188cc5fc40a4a377d7aa579ab084573479e10ca",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "69.0"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "3.6"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "d364a581-be65-4781-8f80-3fbd9cf25e22",
+      "analysis_date": "2026-05-03T13:33:49+0000",
+      "revision": "eb6844e311ce6621c2bef18b4747a099a163994e",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "0.0"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "4.9"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "9210aef8-f05c-4063-b22f-819484d7a906",
+      "analysis_date": "2026-05-03T13:44:56+0000",
+      "revision": "eb6844e311ce6621c2bef18b4747a099a163994e",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "0.0"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "4.8"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "350fbc24-549b-4ba0-b9c0-3138a8f09ec7",
+      "analysis_date": "2026-05-03T13:58:46+0000",
+      "revision": "eb6844e311ce6621c2bef18b4747a099a163994e",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "51.6"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "4.8"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "311794c2-2b9a-4ebf-b1d3-9f76e9af0f70",
+      "analysis_date": "2026-05-03T15:42:08+0000",
+      "revision": "e2cd4996083d4918562f7206c0d32c6b12f7a450",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "59.3"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "1.4"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "008027f5-bbb8-4e89-8698-38ba56fcf2b2",
+      "analysis_date": "2026-05-03T15:52:47+0000",
+      "revision": "e2cd4996083d4918562f7206c0d32c6b12f7a450",
+      "project_version": "not provided",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "73.8"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "1.4"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "c4588c54-1624-467a-a405-c8dd94a65fe7",
+      "analysis_date": "2026-05-03T15:55:54+0000",
+      "revision": "e2cd4996083d4918562f7206c0d32c6b12f7a450",
+      "project_version": "2026.05.03-main-e2cd499",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "73.8"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "1.4"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-04-22T02:07:27+0000"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "d0af85b8-f9d1-45db-b527-c833be434017",
+      "analysis_date": "2026-05-03T15:57:45+0000",
+      "revision": "e2cd4996083d4918562f7206c0d32c6b12f7a450",
+      "project_version": "2026.05.03-main-e2cd499",
+      "project_status": {
+        "status": "OK",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-05-03T15:52:47+0000",
+            "parameter": "not provided"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "a0ec49fd-daf0-4884-8fc6-6d96ad035e92",
+      "analysis_date": "2026-05-03T16:45:23+0000",
+      "revision": "249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee",
+      "project_version": "2026.05.03-main-e2cd499",
+      "project_status": {
+        "status": "OK",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-05-03T15:52:47+0000",
+            "parameter": "not provided"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "a555fe1f-c0bb-4cce-a134-5e2af70dd3a7",
+      "analysis_date": "2026-05-03T17:13:37+0000",
+      "revision": "b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8",
+      "project_version": "2026.05.03-main-e2cd499",
+      "project_status": {
+        "status": "OK",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-05-03T15:52:47+0000",
+            "parameter": "not provided"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "a6ae75db-b21d-4ffa-9801-6aa5423a5603",
+      "analysis_date": "2026-05-03T17:21:22+0000",
+      "revision": "bdafd5d077b5bee365da087589b5dccff15a8b84",
+      "project_version": "2026.05.03-main-e2cd499",
+      "project_status": {
+        "status": "OK",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-05-03T15:52:47+0000",
+            "parameter": "not provided"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "3110105e-fdd4-491c-8a2e-72722f2789e8",
+      "analysis_date": "2026-05-03T17:32:09+0000",
+      "revision": "bdafd5d077b5bee365da087589b5dccff15a8b84",
+      "project_version": "2026.05.03-main-e2cd499",
+      "project_status": {
+        "status": "OK",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-05-03T15:52:47+0000",
+            "parameter": "not provided"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "d1b3eb5e-77b6-43d5-b903-56436503288c",
+      "analysis_date": "2026-05-03T22:02:54+0000",
+      "revision": "8b4f983d6174d96b8b77ec7650f36bc67cf0d402",
+      "project_version": "2026.05.03-main-e2cd499",
+      "project_status": {
+        "status": "ERROR",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_coverage",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "80",
+            "actualValue": "36.2"
+          },
+          {
+            "status": "ERROR",
+            "metricKey": "new_duplicated_lines_density",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "3",
+            "actualValue": "9.8"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-05-03T15:52:47+0000",
+            "parameter": "not provided"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    },
+    {
+      "analysis_key": "b70be74c-0e62-43a9-9a7c-7f68cf623b00",
+      "analysis_date": "2026-05-03T22:05:40+0000",
+      "revision": "bdafd5d077b5bee365da087589b5dccff15a8b84",
+      "project_version": "2026.05.03-main-e2cd499",
+      "project_status": {
+        "status": "OK",
+        "conditions": [
+          {
+            "status": "OK",
+            "metricKey": "new_reliability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_maintainability_rating",
+            "comparator": "GT",
+            "periodIndex": 1,
+            "errorThreshold": "1",
+            "actualValue": "1"
+          },
+          {
+            "status": "OK",
+            "metricKey": "new_security_hotspots_reviewed",
+            "comparator": "LT",
+            "periodIndex": 1,
+            "errorThreshold": "100",
+            "actualValue": "100.0"
+          }
+        ],
+        "periods": [
+          {
+            "index": 1,
+            "mode": "previous_version",
+            "date": "2026-05-03T15:52:47+0000",
+            "parameter": "not provided"
+          }
+        ],
+        "ignoredConditions": false
+      }
+    }
+  ]
+}
