@@ -1,0 +1,5 @@
+﻿a855a2a (HEAD -> main) Release: final security encryption audit and sonar evidence (#99)
+19c5bfe fix(security): make transport-key public and harden encrypted transport contract (#97)
+4be55ca Release final CognIA v17 · Primera promoción integral a producción · development -> main (#93)
+ae519c8 Update README.md
+d4c97b0 Initial commit

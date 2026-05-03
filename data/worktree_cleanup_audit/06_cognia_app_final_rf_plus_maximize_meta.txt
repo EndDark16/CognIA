@@ -1,0 +1,2 @@
+﻿PATH=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_rf_plus_maximize
+PREFIX=06_cognia_app_final_rf_plus_maximize

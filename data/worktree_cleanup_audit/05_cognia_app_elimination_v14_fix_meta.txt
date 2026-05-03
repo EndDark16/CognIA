@@ -1,0 +1,2 @@
+﻿PATH=C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_elimination_v14_fix
+PREFIX=05_cognia_app_elimination_v14_fix

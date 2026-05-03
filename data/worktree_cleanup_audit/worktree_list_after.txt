@@ -1,0 +1,8 @@
+﻿worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app
+HEAD e2cd4996083d4918562f7206c0d32c6b12f7a450
+branch refs/heads/main
+
+worktree C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_sonar_fix_clean
+HEAD 249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee
+branch refs/heads/fix/final-sonar-quality-gate-cleanup
+
