@@ -1033,14 +1033,18 @@ def get_results_payload(session: QuestionnaireSession) -> dict[str, Any]:
     ).all()
     comorbidity = QuestionnaireSessionResultComorbidity.query.filter_by(session_id=session.id).all()
 
-    result_summary = _decrypt_text(
-        result.summary_text if result else None,
-        "questionnaire_session_result.summary_text",
-    ) if result else None
-    result_recommendation = _decrypt_text(
-        result.operational_recommendation if result else None,
-        "questionnaire_session_result.operational_recommendation",
-    ) if result else None
+    if result:
+        result_summary = _decrypt_text(
+            result.summary_text,
+            "questionnaire_session_result.summary_text",
+        )
+        result_recommendation = _decrypt_text(
+            result.operational_recommendation,
+            "questionnaire_session_result.operational_recommendation",
+        )
+    else:
+        result_summary = None
+        result_recommendation = None
 
     return {
         "session": get_session_payload(session),
@@ -1576,10 +1580,13 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
         file_name=file_name,
         status="generated",
         generated_by_user_id=user_id,
-        metadata_json={
-            "questionnaire_version": session.questionnaire_version_label,
-            "model_bundle": session.model_pipeline_version,
-        },
+        metadata_json=_encrypt_json(
+            {
+                "questionnaire_version": session.questionnaire_version_label,
+                "model_bundle": session.model_pipeline_version,
+            },
+            "questionnaire_session_pdf_export.metadata_json",
+        ),
     )
     db.session.add(export)
     _audit(session.id, user_id, "pdf_generated", {"file_path": str(file_path)})

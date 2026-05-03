@@ -396,6 +396,28 @@ Variables avanzadas adicionales: `config/settings.py`, `migrations/env.py`, `api
 |---|---|---|---|
 | `SONAR_HOST_URL`, `SONAR_TOKEN`, `SONAR_PROJECT_KEY`, `SONAR_ORGANIZATION` | Ejecucion `scripts/run_sonar.ps1` | Alta para sonar | El script falla si faltan. |
 
+### 10.13 Perfiles de despliegue y cifrado sensible
+- Perfil A (`Render backend + Vercel frontend`):
+  - `FRONTEND_URL=https://cogn-ia-frontend.vercel.app`
+  - `CORS_ORIGINS=https://cogn-ia-frontend.vercel.app,http://localhost:3000,http://localhost:5000`
+  - `JWT_COOKIE_SAMESITE=None`
+  - `JWT_COOKIE_SECURE=true`
+  - `JWT_COOKIE_DOMAIN=`
+- Perfil B (`dominio propio integrado`):
+  - `FRONTEND_URL=https://www.cognia.lat`
+  - `CORS_ORIGINS=https://www.cognia.lat,https://cognia.lat,http://localhost:3000,http://localhost:5000`
+  - `JWT_COOKIE_SAMESITE=Lax`
+  - `JWT_COOKIE_SECURE=true`
+  - `JWT_COOKIE_DOMAIN=.cognia.lat`
+- Cifrado de transporte sensible:
+  - endpoint publico de bootstrap: `GET /api/v2/security/transport-key` (rate limit aplicado, sin JWT).
+  - nunca expone private key ni PEM privada.
+  - endpoints sensibles v2/runtime/predict usan envelope `transport_envelope_v1` cuando la politica lo exige.
+- Cifrado en reposo:
+  - habilitar con `COGNIA_ENABLE_FIELD_ENCRYPTION=true`.
+  - `COGNIA_FIELD_ENCRYPTION_KEY` debe ser llave URL-safe de 32 bytes.
+  - `COGNIA_TRANSPORT_PRIVATE_KEY_PEM` solo en backend; no versionar ni loggear.
+
 ## 11. Ejecucion local
 ### Arranque estandar
 ```bash
