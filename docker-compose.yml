@@ -1,30 +1,35 @@
-version: "3.9"
-
 services:
-  db:
+  postgres:
+    profiles: ["local-db"]
     image: postgres:16
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
-      POSTGRES_DB: ${DB_NAME:-cognia_db}
+      POSTGRES_USER: ${POSTGRES_USER:-cognia_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-cognia_db}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cognia_app} -d ${POSTGRES_DB:-cognia_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  app:
+  backend:
     build: .
     restart: unless-stopped
     environment:
-      APP_CONFIG_CLASS: ${APP_CONFIG_CLASS:-config.settings.DevelopmentConfig}
-      DB_USER: ${DB_USER:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      DB_HOST: ${DB_HOST:-host.docker.internal}
+      APP_CONFIG_CLASS: ${APP_CONFIG_CLASS:-config.settings.ProductionConfig}
+      DB_USER: ${DB_USER:-cognia_app}
+      DB_PASSWORD: ${DB_PASSWORD:-changeme}
+      DB_HOST: ${DB_HOST:-supabase-host-required}
       DB_PORT: ${DB_PORT:-5432}
-      DB_NAME: ${DB_NAME:-cognia_db}
-      SECRET_KEY: ${SECRET_KEY:-dev-secret-key}
-      MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:?set_MFA_ENCRYPTION_KEY}
+      DB_NAME: ${DB_NAME:-postgres}
+      DB_SSL_MODE: ${DB_SSL_MODE:-require}
+      SECRET_KEY: ${SECRET_KEY:-change-this-secret}
+      MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:-replace-with-base64-urlsafe-32bytes-key}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:5000}
     ports:
       - "5000:5000"
