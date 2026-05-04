@@ -67,6 +67,7 @@ desktop.ini
 .env
 .env.*
 !.env.example
+AGENTS.md
 AGENTS_CONTEXT.md
 
 # -----------------------------
