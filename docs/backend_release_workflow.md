@@ -34,8 +34,9 @@ Referencia base: `CONTRIBUTING.md`.
   - Validaciones: Ruff F-check, compile sanity, import sanity, `pytest -q`, docker build sanity
 - Deploy backend Ubuntu (best effort): `.github/workflows/deploy-backend.yml`
   - Runner: `[self-hosted, linux, x64, cognia-backend]`
-  - Trigger: push a `development` + `workflow_dispatch`
+  - Trigger: push a `main` + `workflow_dispatch`
   - Comportamiento: update verificado de repo en `/opt/cognia/backend` contra `github.sha`, `docker compose up -d --build backend`, recreacion forzada de `gateway`, verificacion `http://localhost/readyz`, rollback automatico basico si falla el post-deploy healthcheck.
+  - Politica de base de datos: produccion conecta a Supabase via `DB_*`; Postgres local solo puede levantarse en entorno local con `docker compose --profile local-db`.
 
 Regla operativa obligatoria:
 - `deploy-backend` NO debe configurarse como required check en branch protection.

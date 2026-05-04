@@ -316,7 +316,7 @@ Variables avanzadas adicionales: `config/settings.py`, `migrations/env.py`, `api
 ### 10.2 Base de datos
 | Variables | Proposito | Criticas | Notas |
 |---|---|---|---|
-| `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_SSL_MODE` | Construccion URI SQLAlchemy | Alta | Base de runtime. |
+| `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_SSL_MODE` | Construccion URI SQLAlchemy | Alta | Base de runtime. En produccion con Supabase usar `DB_SSL_MODE=require`. |
 | `SQLALCHEMY_DATABASE_URI` | Override completo de URI | Alta | Si se define, prioriza sobre armado por partes. |
 
 ### 10.3 Migraciones
@@ -419,6 +419,36 @@ Variables avanzadas adicionales: `config/settings.py`, `migrations/env.py`, `api
   - `COGNIA_TRANSPORT_PRIVATE_KEY_PEM` solo en backend; no versionar ni loggear.
 
 ## 11. Ejecucion local
+### 11.0 Docker Compose: produccion con Supabase vs local opcional
+- Produccion Ubuntu (Supabase como DB oficial):
+  - no levantar Postgres local por defecto.
+  - servicio de backend usa `DB_*` para conectar a Supabase.
+  - en stack integrado (backend + frontend + gateway), levantar servicios explicitos:
+```bash
+docker compose up -d --build backend frontend gateway
+```
+  - en este repo backend standalone, levantar solo backend:
+```bash
+docker compose up -d --build backend
+```
+- Desarrollo local opcional con Postgres Docker:
+  - activar profile local:
+```bash
+docker compose --profile local-db up -d --build backend
+```
+  - usar `POSTGRES_*` para inicializar el contenedor local y `DB_HOST=postgres`.
+  - usar `DB_SSL_MODE=disable` solo en local.
+- Verificacion minima:
+```bash
+curl http://localhost:5000/healthz
+curl http://localhost:5000/readyz
+curl http://localhost:5000/api/v2/security/transport-key
+```
+- Advertencias operativas:
+  - no ejecutar `docker compose up -d` ciegamente en produccion; declarar servicios objetivo.
+  - no exponer Postgres local en `0.0.0.0:5432`.
+  - no usar credenciales Supabase como `POSTGRES_USER` local.
+
 ### Arranque estandar
 ```bash
 python run.py

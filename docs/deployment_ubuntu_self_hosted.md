@@ -8,10 +8,22 @@ Documentar el flujo operativo real de despliegue del backend CognIA hacia Ubuntu
 - Repo backend en servidor: `/opt/cognia/backend`.
 - Compose global en servidor: `/opt/cognia`.
 - Servicios compose involucrados en deploy: `backend` y `gateway`.
+- Base de datos productiva oficial: Supabase externa (via `DB_*` + `DB_SSL_MODE=require`).
+- Postgres local (`docker-compose.yml` del backend) solo existe como opcion de desarrollo con `--profile local-db`.
 - Runner self-hosted esperado para deploy: `cognia-backend`.
 - Health/readiness del backend:
   - `GET /healthz`
   - `GET /readyz`
+
+## Regla de base de datos en produccion
+- En Ubuntu productivo no se debe levantar Postgres local del backend por defecto.
+- Las credenciales `DB_*` pertenecen a la conexion de aplicacion contra Supabase.
+- Las variables `POSTGRES_*` son exclusivas para inicializacion de Postgres local de desarrollo.
+- Si necesitas Postgres local para pruebas en workstation/local:
+```bash
+docker compose --profile local-db up -d --build backend
+```
+- No usar `docker compose up -d` sin declarar servicios objetivo en despliegue productivo.
 
 ## Workflows versionados
 
@@ -106,6 +118,7 @@ docker compose ps
 docker compose logs --tail=200 backend
 curl -fsS http://localhost/healthz
 curl -fsS http://localhost/readyz
+curl -fsS http://localhost/api/v2/security/transport-key
 cd /opt/cognia/backend
 git rev-parse HEAD
 ```

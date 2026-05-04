@@ -1323,3 +1323,21 @@ Pendiente:
   - `sync/development-main-sonar`
 - Se confirmo preservacion de ramas principales (`main`, `development`, `dev.enddark`).
 - Se genero `data/branch_cleanup_audit/sonar_docs_branch_cleanup_report.md` con trazabilidad de ramas creadas/mergeadas/eliminadas/preservadas.
+
+## Actualizacion de sesion (2026-05-04) - docker_compose_supabase_production_profile_fix
+- Problema corregido:
+  - `docker-compose.yml` mezclaba `DB_*` (conexion de aplicacion) con inicializacion de Postgres local, permitiendo intentos errados de login en DB local usando credenciales de Supabase.
+- Cambios aplicados:
+  - Postgres local movido a `profiles: ["local-db"]` con `POSTGRES_*` dedicadas y puerto local `127.0.0.1:5432:5432`.
+  - Servicio de backend normalizado como `backend` y conexion real via `DB_*` + `DB_SSL_MODE` (default `require` para perfil productivo).
+  - Sin dependencia obligatoria de Postgres local en flujo por defecto.
+  - `.env.example` reorganizado en dos bloques: produccion Supabase y desarrollo local opcional con `--profile local-db`.
+  - Documentacion operativa alineada en `README.md`, `docs/deployment_ubuntu_self_hosted.md` y `docs/backend_release_workflow.md`.
+- Evidencia creada:
+  - `data/deployment_config_audit/docker_compose_supabase_profile_report.md`
+  - `data/deployment_config_audit/docker_compose_supabase_profile_validator.json`
+- Validaciones de esta ventana:
+  - `docker compose config`
+  - `docker compose config --services`
+  - `python -m py_compile config/settings.py`
+  - `python -m py_compile api/app.py`

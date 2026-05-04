@@ -884,3 +884,22 @@ Contexto metodolÃ³gico:
   - `sync/development-main-sonar`
 - Se confirmo preservacion de ramas principales (`main`, `development`, `dev.enddark`).
 - Se genero `data/branch_cleanup_audit/sonar_docs_branch_cleanup_report.md` con trazabilidad de ramas creadas/mergeadas/eliminadas/preservadas.
+
+## Actualizacion de estado (2026-05-04) - docker_compose_supabase_production_profile_fix
+- Se corrigio `docker-compose.yml` para separar responsabilidades DB de aplicacion vs Postgres local:
+  - `backend` usa `DB_*` + `DB_SSL_MODE` para conexion real (Supabase en produccion).
+  - Postgres local queda opcional con `profiles: ["local-db"]` y variables `POSTGRES_*` dedicadas.
+  - Se elimino el default productivo `host.docker.internal` y se removio dependencia obligatoria a DB local.
+  - Puerto local de Postgres endurecido a `127.0.0.1:5432:5432`.
+- Se actualizo `.env.example` con dos bloques explicitos:
+  - produccion con Supabase (fuente oficial de DB productiva),
+  - desarrollo local opcional con `docker compose --profile local-db`.
+- Se actualizaron guias operativas:
+  - `README.md`
+  - `docs/deployment_ubuntu_self_hosted.md`
+  - `docs/backend_release_workflow.md`
+- Evidencia de auditoria/configuracion creada en:
+  - `data/deployment_config_audit/docker_compose_supabase_profile_report.md`
+  - `data/deployment_config_audit/docker_compose_supabase_profile_validator.json`
+- Claim metodologico sin cambios:
+  - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
