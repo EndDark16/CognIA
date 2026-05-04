@@ -1,0 +1,14 @@
+{
+  "production_database": "supabase",
+  "local_postgres_default_enabled": false,
+  "local_postgres_profile": "local-db",
+  "db_env_separated_from_postgres_env": true,
+  "postgres_public_port_exposed": false,
+  "backend_depends_on_local_postgres_by_default": false,
+  "supabase_ssl_mode_documented": true,
+  "local_db_mode_documented": true,
+  "env_example_updated": true,
+  "docker_compose_config_valid": true,
+  "secrets_committed": false,
+  "final_deployment_config_status": "pass"
+}
