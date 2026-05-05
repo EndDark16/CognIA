@@ -1323,3 +1323,26 @@ Pendiente:
   - `sync/development-main-sonar`
 - Se confirmo preservacion de ramas principales (`main`, `development`, `dev.enddark`).
 - Se genero `data/branch_cleanup_audit/sonar_docs_branch_cleanup_report.md` con trazabilidad de ramas creadas/mergeadas/eliminadas/preservadas.
+
+## Actualizacion de sesion (2026-05-04) - performance_capacity_hardening_iteration2
+- Se ejecuto una iteracion de hardening de capacidad enfocada en latencia/timeout bajo concurrencia.
+- Cambios aplicados:
+  - `docker/entrypoint.sh`: Gunicorn parametrizado con baseline conservador (`gthread`, `workers/threads`, timeout, keepalive, max-requests+jitter).
+  - `config/settings.py`: tuning de pool SQLAlchemy por `DB_POOL_*` para produccion.
+  - `api/routes/health.py`: `/readyz` con `SELECT 1` real + cache corta (`READINESS_CACHE_TTL_SECONDS`) + timeout corto DB (`READINESS_DB_TIMEOUT_MS`).
+  - `api/services/transport_crypto_service.py`: cache de payload publico en `transport-key` (`QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS`), sin exponer private key.
+  - `docker-compose.yml` + `.env.example`: nuevas variables de capacidad/runtime.
+  - `docs/gateway/default.conf.production.example`: baseline recomendado de Nginx con timeouts/buffers/gzip y bloqueo de `/openapi.yaml`/`/docs`.
+  - `performance/k6/diagnostic-operational-api.js` y `performance/k6/load-user-public-api.js`.
+- Validacion local:
+  - `py_compile` sobre archivos de config/runtime: pass.
+  - `pytest` focal de health/docs/v2/encrypted transport: `29 passed`.
+  - `pytest -q` completo: `1 failed` preexistente en `tests/test_email_service.py::test_build_message_includes_headers`.
+  - `docker compose config`: pass.
+  - `docker compose config --services`: `backend`.
+  - `docker compose --profile local-db config --services`: `backend`, `postgres`.
+- Evidencia pre-deploy consolidada:
+  - `data/performance_audit/performance_final_evidence.md`
+  - `data/performance_audit/performance_final_evidence.json`
+  - `data/performance_audit/performance_optimization_file_index.txt`
+- Estado de cierre de esta etapa: `pending_post_deploy` hasta completar promotion a `main`, deploy real y bateria k6 post-deploy contra `https://www.cognia.lat`.
