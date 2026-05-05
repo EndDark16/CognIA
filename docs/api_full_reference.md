@@ -97,13 +97,13 @@ Details and payloads:
 - `/healthz`
 - `/readyz`
 - `/metrics`
-- `/docs`
-- `/openapi.yaml`
+- `/docs` (solo local/dev o entornos internos con `OPENAPI_PUBLIC_ENABLED=true`)
+- `/openapi.yaml` (solo local/dev o entornos internos con `OPENAPI_PUBLIC_ENABLED=true`)
 
 ## Permissions matrix (high-level)
 
 - Anonymous:
-  - health/readiness/docs/openapi
+  - health/readiness (docs/openapi solo cuando se habilitan explicitamente fuera de produccion)
 - Authenticated users:
   - profile/auth lifecycle
   - own questionnaire flows
