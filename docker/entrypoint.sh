@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-# Opcional: configura Gunicorn
 CPU_CORES=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
-
 MEM_LIMIT_MB=""
+
 if [ -f /sys/fs/cgroup/memory.max ]; then
   MEM_RAW=$(cat /sys/fs/cgroup/memory.max)
   if [ "$MEM_RAW" != "max" ]; then
@@ -20,20 +19,28 @@ if [ -n "$MEM_LIMIT_MB" ] && [ "$MEM_LIMIT_MB" -gt 200000 ]; then
   MEM_LIMIT_MB=""
 fi
 
+DEFAULT_WORKERS=3
+DEFAULT_THREADS=2
+
+# Conservative fallback for constrained containers.
 if [ -n "$MEM_LIMIT_MB" ] && [ "$MEM_LIMIT_MB" -le 1024 ]; then
-  DEFAULT_WORKERS=1
-  DEFAULT_THREADS=2
-elif [ -n "$MEM_LIMIT_MB" ] && [ "$MEM_LIMIT_MB" -le 2048 ]; then
   DEFAULT_WORKERS=2
   DEFAULT_THREADS=2
-else
-  DEFAULT_WORKERS=$((2 * CPU_CORES + 1))
-  DEFAULT_THREADS=4
 fi
 
+if [ "$CPU_CORES" -le 1 ] && [ "$DEFAULT_WORKERS" -gt 2 ]; then
+  DEFAULT_WORKERS=2
+fi
+
+BIND="0.0.0.0:${PORT:-5000}"
 WORKERS=${GUNICORN_WORKERS:-${WEB_CONCURRENCY:-$DEFAULT_WORKERS}}
 THREADS=${GUNICORN_THREADS:-$DEFAULT_THREADS}
-BIND="0.0.0.0:${PORT:-5000}"
+WORKER_CLASS=${GUNICORN_WORKER_CLASS:-gthread}
+TIMEOUT=${GUNICORN_TIMEOUT:-60}
+GRACEFUL_TIMEOUT=${GUNICORN_GRACEFUL_TIMEOUT:-30}
+KEEPALIVE=${GUNICORN_KEEPALIVE:-5}
+MAX_REQUESTS=${GUNICORN_MAX_REQUESTS:-1000}
+MAX_REQUESTS_JITTER=${GUNICORN_MAX_REQUESTS_JITTER:-100}
 
 should_run_migrations() {
   local run_flag="${RUN_MIGRATIONS:-1}"
@@ -67,5 +74,16 @@ else
   echo "==> Migraciones deshabilitadas (RUN_MIGRATIONS=false o SKIP_MIGRATIONS=true)."
 fi
 
-echo "==> Iniciando Gunicorn en ${BIND} con ${WORKERS} workers y ${THREADS} threads"
-exec gunicorn -w "$WORKERS" --threads "$THREADS" -b "$BIND" run:app
+echo "==> Iniciando Gunicorn bind=${BIND} workers=${WORKERS} threads=${THREADS} class=${WORKER_CLASS} timeout=${TIMEOUT}s keepalive=${KEEPALIVE}s"
+exec gunicorn run:app \
+  --bind "$BIND" \
+  --worker-class "$WORKER_CLASS" \
+  --workers "$WORKERS" \
+  --threads "$THREADS" \
+  --timeout "$TIMEOUT" \
+  --graceful-timeout "$GRACEFUL_TIMEOUT" \
+  --keep-alive "$KEEPALIVE" \
+  --max-requests "$MAX_REQUESTS" \
+  --max-requests-jitter "$MAX_REQUESTS_JITTER" \
+  --access-logfile - \
+  --error-logfile -
