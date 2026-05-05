@@ -190,7 +190,7 @@ Separacion: **implementado en codigo** vs **configurable**.
   - `Flask-CORS` con `supports_credentials=True`.
 - Health/readiness:
   - `/healthz` (liveness basico);
-  - `/readyz` (SELECT 1 real a DB).
+  - `/readyz` (SELECT 1 real a DB, con cache corta configurable para evitar tormenta de checks concurrentes).
 - Hardening de archivos:
   - descarga PDF v2 restringida a `artifacts/runtime_reports`;
   - adjuntos problem report con validacion de firma binaria PNG/JPEG/WEBP.
@@ -235,13 +235,14 @@ Separacion: **implementado en codigo** vs **configurable**.
   - Frontend/cookies/CORS: `FRONTEND_URL`, `CORS_ORIGINS`, `AUTH_CROSS_SITE_COOKIES`, `JWT_COOKIE_SAMESITE`, `JWT_COOKIE_SECURE`, `JWT_COOKIE_DOMAIN`.
   - Migraciones/startup: `RUN_MIGRATIONS`, `SKIP_MIGRATIONS`, `DB_RETRIES`, `DB_RETRY_SLEEP`, `AUTO_CREATE_REFRESH_TOKEN_TABLE`.
   - Seguridad/proxy/headers: `TRUST_PROXY_HEADERS`, `PROXY_FIX_*`, `SECURITY_HEADERS_ENABLED`, `SECURITY_HSTS_*`, `SECURITY_FRAME_OPTIONS`, `SECURITY_CONTENT_TYPE_OPTIONS`, `SECURITY_REFERRER_POLICY`, `SECURITY_CSP`, `SECURITY_PERMISSIONS_POLICY`.
-  - Runtime/blueprints/rate limits: `QR_*`, `QV2_SHARED_ACCESS_RATE_LIMIT`, `PREDICT_RATE_LIMIT`, `OPTIONAL_BLUEPRINTS_STRICT`, `OPTIONAL_BLUEPRINTS_REQUIRED`.
+  - Runtime/blueprints/rate limits: `QR_*`, `QV2_SHARED_ACCESS_RATE_LIMIT`, `QV2_TRANSPORT_KEY_RATE_LIMIT`, `QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS`, `PREDICT_RATE_LIMIT`, `OPTIONAL_BLUEPRINTS_STRICT`, `OPTIONAL_BLUEPRINTS_REQUIRED`.
+  - Capacidad/conexion: `GUNICORN_*`, `DB_POOL_SIZE`, `DB_MAX_OVERFLOW`, `DB_POOL_TIMEOUT`, `DB_POOL_RECYCLE`, `DB_POOL_PRE_PING`, `READINESS_CACHE_TTL_SECONDS`, `READINESS_DB_TIMEOUT_MS`.
   - Documentacion: `SWAGGER_ENABLED`.
 - Dependencia formal de base de datos:
   - `SQLALCHEMY_DATABASE_URI` se construye en formato `postgresql+psycopg://...` salvo override.
   - readiness (`/readyz`) ejecuta `SELECT 1`; por tanto, PostgreSQL disponible es condicion de preparacion operativa.
 - Dependencia de DB operativa:
-  - readiness (`/readyz`) depende de `SELECT 1` contra DB.
+  - readiness (`/readyz`) depende de `SELECT 1` contra DB y aplica TTL corto para control de costo bajo concurrencia.
 - Migraciones:
   - flujo recomendado `alembic upgrade head`.
   - existe migracion `20251210_01_fix_user_session_defaults.py` que asume tabla `user_session` preexistente.

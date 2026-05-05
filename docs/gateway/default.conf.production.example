@@ -1,0 +1,71 @@
+server {
+    listen 80;
+    server_name _;
+
+    client_max_body_size 20m;
+
+    gzip on;
+    gzip_min_length 1024;
+    gzip_types text/plain application/json application/javascript text/css application/xml;
+
+    location /api/ {
+        proxy_pass http://backend:5000/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_connect_timeout 10s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+        send_timeout 60s;
+
+        proxy_buffering on;
+        proxy_buffers 16 16k;
+        proxy_buffer_size 32k;
+    }
+
+    location = /healthz {
+        proxy_pass http://backend:5000/healthz;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 5s;
+        proxy_send_timeout 15s;
+        proxy_read_timeout 15s;
+    }
+
+    location = /readyz {
+        proxy_pass http://backend:5000/readyz;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 5s;
+        proxy_send_timeout 20s;
+        proxy_read_timeout 20s;
+    }
+
+    location = /openapi.yaml {
+        return 404;
+    }
+
+    location = /api/openapi.yaml {
+        return 404;
+    }
+
+    location /docs {
+        return 404;
+    }
+
+    location / {
+        proxy_pass http://frontend:80/;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

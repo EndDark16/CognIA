@@ -229,6 +229,18 @@ def test_transport_key_is_public(client):
     assert "private_key_pem" not in normalized_keys
 
 
+def test_transport_key_payload_cached_within_window(client, app):
+    with app.app_context():
+        app.config["QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS"] = 120
+
+    first = _get_transport_key(client)
+    second = _get_transport_key(client)
+
+    assert first["key_id"] == second["key_id"]
+    assert first["public_key_jwk"] == second["public_key_jwk"]
+    assert first["expires_at"] == second["expires_at"]
+
+
 def test_encrypted_payload_roundtrip(client, app):
     headers = _user_headers(app)
     key_payload = _get_transport_key(client, headers)
