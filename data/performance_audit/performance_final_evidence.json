@@ -1,0 +1,52 @@
+{
+  "previous_status": "needs_attention",
+  "optimization_iteration": 2,
+  "openapi_public_exposure_removed": true,
+  "postgres_local_default_disabled": true,
+  "gunicorn_tuned": true,
+  "db_pool_tuned": true,
+  "readiness_optimized": true,
+  "transport_key_reviewed": true,
+  "gateway_tuned_or_documented": true,
+  "local_validations": {
+    "py_compile": {
+      "config_settings": "pass",
+      "api_app": "pass",
+      "api_routes_health": "pass",
+      "transport_crypto_service": "pass"
+    },
+    "pytest_targeted": {
+      "status": "pass",
+      "summary": "29 passed"
+    },
+    "pytest_full": {
+      "status": "needs_attention",
+      "summary": "1 failed, 174 passed, 3 skipped",
+      "known_unrelated_failure": "tests/test_email_service.py::test_build_message_includes_headers"
+    },
+    "docker_compose": {
+      "config": "pass",
+      "services_default": ["backend"],
+      "services_with_local_db_profile": ["backend", "postgres"]
+    }
+  },
+  "k6_suite": {
+    "openapi_excluded_from_operational_load": true,
+    "scripts": [
+      "performance/k6/smoke-operational-api.js",
+      "performance/k6/diagnostic-operational-api.js",
+      "performance/k6/load-operational-api.js",
+      "performance/k6/load-user-public-api.js",
+      "performance/k6/stress-operational-api.js",
+      "performance/k6/spike-operational-api.js",
+      "performance/k6/soak-operational-api.js"
+    ]
+  },
+  "post_deploy_required": true,
+  "deploy_flow_required": [
+    "fix/performance-capacity-hardening-final -> dev.enddark",
+    "dev.enddark -> development",
+    "development -> main"
+  ],
+  "final_status": "pending_post_deploy"
+}
