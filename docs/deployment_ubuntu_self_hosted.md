@@ -24,6 +24,7 @@ Documentar el flujo operativo real de despliegue del backend CognIA hacia Ubuntu
 docker compose --profile local-db up -d --build backend
 ```
 - No usar `docker compose up -d` sin declarar servicios objetivo en despliegue productivo.
+- Hardening de superficie publica: mantener `OPENAPI_PUBLIC_ENABLED=false` en produccion para no exponer `/openapi.yaml` ni `/docs`.
 
 ## Workflows versionados
 
