@@ -1,7 +1,9 @@
 import os
 import socket
+import importlib
 
 from api.app import create_app
+from config.settings import DevelopmentConfig
 
 try:
     from werkzeug.debug import DebuggedApplication
@@ -70,7 +72,17 @@ def _run_dualstack(app, port: int, use_reloader: bool) -> bool:
     return True
 
 
-app = create_app()
+def _resolve_config_class():
+    config_path = os.getenv("APP_CONFIG_CLASS", "config.settings.DevelopmentConfig")
+    try:
+        module_name, class_name = config_path.rsplit(".", 1)
+        module = importlib.import_module(module_name)
+        return getattr(module, class_name)
+    except Exception:
+        return DevelopmentConfig
+
+
+app = create_app(_resolve_config_class())
 
 if __name__ == "__main__":
     host = os.getenv("APP_HOST", "0.0.0.0")

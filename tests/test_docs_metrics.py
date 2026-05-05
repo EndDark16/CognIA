@@ -1,7 +1,7 @@
 import os
 import sys
 
-from config.settings import TestingConfig
+from config.settings import TestingConfig, ProductionConfig
 
 # Garantiza que la raiz del proyecto este en el sys.path al ejecutar pytest
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -63,6 +63,15 @@ def test_swagger_disabled_returns_404():
         assert resp_docs.status_code == 404
     finally:
         _teardown(app)
+
+
+def test_openapi_public_disabled_by_default_in_production():
+    app = create_app(ProductionConfig)
+    client = app.test_client()
+    resp_openapi = client.get("/openapi.yaml")
+    resp_docs = client.get("/docs")
+    assert resp_openapi.status_code == 404
+    assert resp_docs.status_code == 404
 
 
 def test_swagger_openapi_source_of_truth_is_docs_openapi_yaml():
