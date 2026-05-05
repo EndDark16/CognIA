@@ -253,8 +253,8 @@ cd CognIA
 ```
 
 ## API y contratos
-- Swagger UI: `GET /docs`
-- OpenAPI: `GET /openapi.yaml`
+- Swagger UI (solo local/dev o entornos internos): `GET /docs`
+- OpenAPI endpoint (solo local/dev o entornos internos): `GET /openapi.yaml`
 - Fuente activa de contrato: `docs/openapi.yaml` (snapshots historicos en `docs/archive/openapi/`)
 - Manual tecnico consolidado backend: `docs/backend_technical_manual.md`
 - Matriz tecnica de endpoints (runtime real): `docs/backend_endpoint_matrix.csv`
@@ -297,7 +297,7 @@ python run.py
 ```bash
 curl http://localhost:5000/healthz
 curl http://localhost:5000/readyz
-curl http://localhost:5000/openapi.yaml
+curl http://localhost:5000/api/v2/security/transport-key
 ```
 
 ## 10. Configuracion por variables de entorno
@@ -307,7 +307,7 @@ Variables avanzadas adicionales: `config/settings.py`, `migrations/env.py`, `api
 ### 10.1 Nucleo/app
 | Variables | Proposito | Criticas | Notas |
 |---|---|---|---|
-| `APP_CONFIG_CLASS` | Clase de config para scripts/migraciones | Media | No controla `run.py`/`gunicorn run:app` directamente. |
+| `APP_CONFIG_CLASS` | Clase de config para app/scripts/migraciones | Media | Controla el arranque de `run.py`/`gunicorn run:app`. |
 | `PORT`, `APP_HOST`, `DUALSTACK`, `FLASK_RUN_RELOAD` | Arranque local | Baja | Usadas en `run.py`. |
 | `DEV_DEBUG` | Debug en `DevelopmentConfig` | Media | Default recomendado local: `false`. |
 | `SECRET_KEY` | JWT/seguridad app | Alta | Nunca usar valor por defecto fuera de local. |
@@ -538,9 +538,9 @@ python scripts/bootstrap_questionnaire_backend_v2.py regenerate-report-snapshot 
 - Historicos: `docs/archive/openapi/`.
 
 ### Exposicion Swagger/OpenAPI
-- `GET /openapi.yaml` sirve exactamente `docs/openapi.yaml`.
-- `GET /docs` renderiza Swagger UI consumiendo `/openapi.yaml`.
-- Ambos se pueden deshabilitar con `SWAGGER_ENABLED=false`.
+- `GET /openapi.yaml` sirve exactamente `docs/openapi.yaml` solo cuando `SWAGGER_ENABLED=true` y `OPENAPI_PUBLIC_ENABLED=true`.
+- `GET /docs` renderiza Swagger UI consumiendo `/openapi.yaml` solo cuando `SWAGGER_ENABLED=true` y `OPENAPI_PUBLIC_ENABLED=true`.
+- Hardening recomendado en produccion: `OPENAPI_PUBLIC_ENABLED=false`.
 
 ### Gobierno y guardrails
 - Guia: `docs/OPENAPI_GUIDE.md`.
@@ -570,7 +570,7 @@ No se lista cada endpoint aqui; se resume por familias y estado.
 | Questionnaire v2 | `/api/v2/questionnaires/*` | Activo principal | `docs/questionnaire_api_contract.md` |
 | Problem reports | `/api/problem-reports*`, `/api/admin/problem-reports*` | Activo | `docs/problem_reporting_backend.md` |
 | Dashboard/reporting | `/api/v2/dashboard/*`, `/api/v2/reports/jobs` | Activo | `docs/reporting_and_dashboards.md` |
-| Health/docs/email | `/healthz`, `/readyz`, `/metrics`, `/docs`, `/openapi.yaml`, `/api/email/unsubscribe` | Activo | `docs/api_full_reference.md` |
+| Health/docs/email | `/healthz`, `/readyz`, `/metrics`, `/api/email/unsubscribe` | Activo | `docs/api_full_reference.md` |
 | Predict legacy | `/api/predict` | Deprecado publico | `docs/openapi.yaml` |
 
 ## 16. Flujos operativos principales
@@ -597,7 +597,7 @@ python scripts/bootstrap_questionnaire_backend_v2.py load-questionnaire
 python scripts/bootstrap_questionnaire_backend_v2.py load-models
 ```
 
-### D. Abrir OpenAPI/Swagger
+### D. Abrir OpenAPI/Swagger (local/dev)
 ```bash
 curl http://localhost:5000/openapi.yaml
 ```
@@ -928,7 +928,7 @@ Fuente de verdad: `docs/repository_artifact_policy.md`.
 | Sintoma | Causa probable | Accion recomendada |
 |---|---|---|
 | `503 db_unavailable` en endpoints | DB no disponible o credenciales invalidas | Verificar `DB_*`/URI y estado PostgreSQL; reintentar migraciones. |
-| `/docs` o `/openapi.yaml` responde 404 | `SWAGGER_ENABLED=false` | Habilitar `SWAGGER_ENABLED=true`. |
+| `/docs` o `/openapi.yaml` responde 404 | `SWAGGER_ENABLED=false` o `OPENAPI_PUBLIC_ENABLED=false` | En local/dev: habilitar `SWAGGER_ENABLED=true` y `OPENAPI_PUBLIC_ENABLED=true`. En produccion mantener `OPENAPI_PUBLIC_ENABLED=false`. |
 | Runtime no arranca por blueprint opcional | Falla import de `questionnaire_runtime` o `questionnaire_v2` con strict activo | Revisar modulos y `OPTIONAL_BLUEPRINTS_*`; usar non-strict solo de forma controlada. |
 | `401` en `/metrics` | Token no enviado o invalido | Configurar `METRICS_TOKEN` y enviar `Authorization: Bearer <token>`. |
 | `403` en rutas admin | JWT sin rol `ADMIN` | Usar credenciales admin y validar claims. |
@@ -986,7 +986,7 @@ Si quieres entender X, lee Y:
 | Levantar backend | `python run.py` |
 | Health check | `curl http://localhost:5000/healthz` |
 | Readiness check | `curl http://localhost:5000/readyz` |
-| Descargar OpenAPI | `curl http://localhost:5000/openapi.yaml` |
+| Descargar OpenAPI (local/dev) | `curl http://localhost:5000/openapi.yaml` |
 | Bootstrap v2 completo | `python scripts/bootstrap_questionnaire_backend_v2.py load-all` |
 | Bootstrap solo catalogo | `python scripts/bootstrap_questionnaire_backend_v2.py load-questionnaire` |
 | Bootstrap solo modelos | `python scripts/bootstrap_questionnaire_backend_v2.py load-models` |

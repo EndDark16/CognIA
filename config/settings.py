@@ -204,7 +204,8 @@ class Config:
     SMTP_DEBUG = os.getenv("SMTP_DEBUG", "false").lower() == "true"
     SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", "10"))
 
-    SWAGGER_ENABLED = os.getenv("SWAGGER_ENABLED", "true").lower() == "true"
+    SWAGGER_ENABLED = _bool_env("SWAGGER_ENABLED", True)
+    OPENAPI_PUBLIC_ENABLED = _bool_env("OPENAPI_PUBLIC_ENABLED", True)
 
     # Startup behavior
     AUTO_CREATE_REFRESH_TOKEN_TABLE = os.getenv(
@@ -220,6 +221,7 @@ class ProductionConfig(Config):
     AUTH_CROSS_SITE_COOKIES = _bool_env("AUTH_CROSS_SITE_COOKIES", True)
     TRUST_PROXY_HEADERS = _bool_env("TRUST_PROXY_HEADERS", True)
     JWT_COOKIE_SECURE = True if Config.JWT_COOKIE_SECURE is None else Config.JWT_COOKIE_SECURE
+    OPENAPI_PUBLIC_ENABLED = _bool_env("OPENAPI_PUBLIC_ENABLED", False)
     # Ajustes de pool para concurrencia
     SQLALCHEMY_ENGINE_OPTIONS = {
         # Ajustado para no competir con poolers externos (ej. pgbouncer en free tier)
