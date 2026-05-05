@@ -317,6 +317,7 @@ Variables avanzadas adicionales: `config/settings.py`, `migrations/env.py`, `api
 | Variables | Proposito | Criticas | Notas |
 |---|---|---|---|
 | `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_SSL_MODE` | Construccion URI SQLAlchemy | Alta | Base de runtime. En produccion con Supabase usar `DB_SSL_MODE=require`. |
+| `DB_POOL_SIZE`, `DB_MAX_OVERFLOW`, `DB_POOL_TIMEOUT`, `DB_POOL_RECYCLE`, `DB_POOL_PRE_PING` | Ajuste de pool SQLAlchemy en produccion | Alta | Balancear concurrencia sin saturar pooler de Supabase. |
 | `SQLALCHEMY_DATABASE_URI` | Override completo de URI | Alta | Si se define, prioriza sobre armado por partes. |
 
 ### 10.3 Migraciones
@@ -423,6 +424,14 @@ Variables avanzadas adicionales: `config/settings.py`, `migrations/env.py`, `api
 - Produccion Ubuntu (Supabase como DB oficial):
   - no levantar Postgres local por defecto.
   - servicio de backend usa `DB_*` para conectar a Supabase.
+  - baseline recomendado para backend:
+    - `GUNICORN_WORKER_CLASS=gthread`
+    - `GUNICORN_WORKERS=3` (`2` si hay presion de RAM)
+    - `GUNICORN_THREADS=2`
+    - `GUNICORN_TIMEOUT=60`
+    - `READINESS_CACHE_TTL_SECONDS=3`
+    - `READINESS_DB_TIMEOUT_MS=2000`
+    - `DB_POOL_SIZE=5`, `DB_MAX_OVERFLOW=10`, `DB_POOL_TIMEOUT=10`, `DB_POOL_RECYCLE=1800`, `DB_POOL_PRE_PING=true`
   - en stack integrado (backend + frontend + gateway), levantar servicios explicitos:
 ```bash
 docker compose up -d --build backend frontend gateway
@@ -448,6 +457,7 @@ curl http://localhost:5000/api/v2/security/transport-key
   - no ejecutar `docker compose up -d` ciegamente en produccion; declarar servicios objetivo.
   - no exponer Postgres local en `0.0.0.0:5432`.
   - no usar credenciales Supabase como `POSTGRES_USER` local.
+  - gateway/Nginx recomendado para produccion: `docs/gateway/default.conf.production.example`.
 
 ### Arranque estandar
 ```bash

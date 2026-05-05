@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 from config.settings import TestingConfig
 
@@ -55,6 +56,41 @@ def test_openapi_and_docs():
 
     resp_docs = client.get("/docs")
     assert resp_docs.status_code == 200
+
+    with app.app_context():
+        db.session.remove()
+        db.drop_all()
+
+
+def test_readyz_uses_short_cache_window(monkeypatch):
+    from api.routes import health as health_module
+
+    client, app = _client()
+    app.config["READINESS_CACHE_TTL_SECONDS"] = 1
+    health_module._READINESS_CACHE["expires_at"] = 0.0
+
+    execute_count = {"value": 0}
+    original_execute = db.session.execute
+
+    def _counted_execute(*args, **kwargs):
+        execute_count["value"] += 1
+        return original_execute(*args, **kwargs)
+
+    monkeypatch.setattr(db.session, "execute", _counted_execute)
+
+    first = client.get("/readyz")
+    second = client.get("/readyz")
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert first.get_json().get("cached") is False
+    assert second.get_json().get("cached") is True
+    assert execute_count["value"] == 1
+
+    time.sleep(1.1)
+    third = client.get("/readyz")
+    assert third.status_code == 200
+    assert third.get_json().get("cached") is False
+    assert execute_count["value"] == 2
 
     with app.app_context():
         db.session.remove()

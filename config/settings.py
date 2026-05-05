@@ -20,6 +20,16 @@ def _optional_bool_env(name: str):
         return None
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
+
+def _int_env(name: str, default: int) -> int:
+    raw = os.getenv(name)
+    if raw is None or raw.strip() == "":
+        return default
+    try:
+        return int(raw.strip())
+    except ValueError:
+        return default
+
 class Config:
     DEBUG = False
     TESTING = False
@@ -34,6 +44,11 @@ class Config:
     DB_NAME = os.getenv("DB_NAME", "cognia_db")
     DB_SSL_MODE = os.getenv("DB_SSL_MODE", "")
     _ssl_suffix = f"?sslmode={DB_SSL_MODE}" if DB_SSL_MODE else ""
+    DB_POOL_SIZE = _int_env("DB_POOL_SIZE", 5)
+    DB_MAX_OVERFLOW = _int_env("DB_MAX_OVERFLOW", 10)
+    DB_POOL_TIMEOUT = _int_env("DB_POOL_TIMEOUT", 10)
+    DB_POOL_RECYCLE = _int_env("DB_POOL_RECYCLE", 1800)
+    DB_POOL_PRE_PING = _bool_env("DB_POOL_PRE_PING", True)
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "SQLALCHEMY_DATABASE_URI",
         f"postgresql+psycopg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}{_ssl_suffix}",
@@ -111,7 +126,10 @@ class Config:
     QR_PIN_LOCK_MINUTES = int(os.getenv("QR_PIN_LOCK_MINUTES", "10"))
     QV2_SHARED_ACCESS_RATE_LIMIT = os.getenv("QV2_SHARED_ACCESS_RATE_LIMIT", "30 per minute")
     QV2_TRANSPORT_KEY_RATE_LIMIT = os.getenv("QV2_TRANSPORT_KEY_RATE_LIMIT", "60 per minute")
+    QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS = _int_env("QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS", 60)
     PREDICT_RATE_LIMIT = os.getenv("PREDICT_RATE_LIMIT", "30 per minute")
+    READINESS_CACHE_TTL_SECONDS = _int_env("READINESS_CACHE_TTL_SECONDS", 3)
+    READINESS_DB_TIMEOUT_MS = _int_env("READINESS_DB_TIMEOUT_MS", 2000)
 
     # Problem reports
     PROBLEM_REPORT_UPLOAD_DIR = os.getenv("PROBLEM_REPORT_UPLOAD_DIR", "artifacts/problem_reports/uploads")
@@ -187,16 +205,10 @@ class Config:
     except ValueError:
         EMAIL_UNSUBSCRIBE_TOKEN_TTL_DAYS = None
     EMAIL_UNSUBSCRIBE_RATE_LIMIT = os.getenv("EMAIL_UNSUBSCRIBE_RATE_LIMIT", "10 per 10 minutes")
-    def _int_env(name: str, default: int | None) -> int | None:
-        value = os.getenv(name)
-        if value is None or value == "":
-            return default
-        return int(value) if str(value).isdigit() else default
-
     SMTP_HOST = os.getenv("SMTP_HOST")
     SMTP_PORT = _int_env("SMTP_PORT", 587)
-    SMTP_PORT_SSL = _int_env("SMTP_PORT__SSL", None)
-    SMTP_PORT_TLS = _int_env("SMTP_PORT__TLS", None)
+    SMTP_PORT_SSL = _int_env("SMTP_PORT__SSL", 0) or None
+    SMTP_PORT_TLS = _int_env("SMTP_PORT__TLS", 0) or None
     SMTP_USER = os.getenv("SMTP_USER")
     SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
     SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() == "true"
@@ -222,14 +234,14 @@ class ProductionConfig(Config):
     TRUST_PROXY_HEADERS = _bool_env("TRUST_PROXY_HEADERS", True)
     JWT_COOKIE_SECURE = True if Config.JWT_COOKIE_SECURE is None else Config.JWT_COOKIE_SECURE
     OPENAPI_PUBLIC_ENABLED = _bool_env("OPENAPI_PUBLIC_ENABLED", False)
-    # Ajustes de pool para concurrencia
+    # Ajustes de pool para concurrencia en runtime productivo.
     SQLALCHEMY_ENGINE_OPTIONS = {
-        # Ajustado para no competir con poolers externos (ej. pgbouncer en free tier)
-        "pool_size": 3,
-        "max_overflow": 2,
-        "pool_timeout": 30,
-        "pool_pre_ping": True,
-        "pool_recycle": 1800,
+        "pool_size": max(1, Config.DB_POOL_SIZE),
+        "max_overflow": max(0, Config.DB_MAX_OVERFLOW),
+        "pool_timeout": max(1, Config.DB_POOL_TIMEOUT),
+        "pool_pre_ping": bool(Config.DB_POOL_PRE_PING),
+        "pool_recycle": max(60, Config.DB_POOL_RECYCLE),
+        "pool_use_lifo": True,
     }
 
 class TestingConfig(Config):

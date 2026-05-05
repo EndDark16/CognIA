@@ -26,6 +26,39 @@ docker compose --profile local-db up -d --build backend
 - No usar `docker compose up -d` sin declarar servicios objetivo en despliegue productivo.
 - Hardening de superficie publica: mantener `OPENAPI_PUBLIC_ENABLED=false` en produccion para no exponer `/openapi.yaml` ni `/docs`.
 
+## Baseline de tuning recomendado (produccion)
+- Gunicorn:
+  - `GUNICORN_WORKER_CLASS=gthread`
+  - `GUNICORN_WORKERS=3` (usar `2` si hay presion de RAM; subir a `4` solo con CPU/RAM holgada)
+  - `GUNICORN_THREADS=2` (subir a `3` solo si el perfil es I/O-bound estable)
+  - `GUNICORN_TIMEOUT=60`
+  - `GUNICORN_GRACEFUL_TIMEOUT=30`
+  - `GUNICORN_KEEPALIVE=5`
+  - `GUNICORN_MAX_REQUESTS=1000`
+  - `GUNICORN_MAX_REQUESTS_JITTER=100`
+- SQLAlchemy/Supabase pool:
+  - `DB_POOL_SIZE=5`
+  - `DB_MAX_OVERFLOW=10`
+  - `DB_POOL_TIMEOUT=10`
+  - `DB_POOL_RECYCLE=1800`
+  - `DB_POOL_PRE_PING=true`
+- Readiness:
+  - `READINESS_CACHE_TTL_SECONDS=3`
+  - `READINESS_DB_TIMEOUT_MS=2000`
+  - `/healthz` se mantiene liviano; `/readyz` valida dependencia DB con costo controlado.
+- Transport key:
+  - `QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS=60`
+  - Mantener `QV2_TRANSPORT_KEY_RATE_LIMIT` activo.
+
+## Gateway/Nginx recomendado
+- Este repo backend no versiona el compose global de `/opt/cognia` ni el `default.conf` activo del gateway del servidor.
+- Archivo recomendado para baseline productiva:
+  - `docs/gateway/default.conf.production.example`
+- Aplicar ese baseline en el host real y recrear gateway:
+```bash
+cd /opt/cognia
+docker compose up -d --force-recreate gateway
+```
 ## Workflows versionados
 
 ### 1) CI normal (GitHub-hosted)
