@@ -26,6 +26,20 @@ Referencia base: `CONTRIBUTING.md`.
 7. Abrir PR de promocion `dev.enddark -> development`.
 8. Merge de promocion hacia `development`.
 9. Solo para cierre productivo aprobado: PR `development -> main`.
+10. Tras merge en `main`, esperar `Deploy Backend (Best Effort)` en verde y ejecutar validacion post-deploy real:
+   - `GET /healthz` = 200
+   - `GET /readyz` = 200
+   - `GET /api/v2/security/transport-key` = 200
+   - `GET /openapi.yaml` y `GET /api/openapi.yaml` = 404/403
+   - `GET /docs` = 404/403
+11. Ejecutar bateria k6 post-deploy en orden de gate:
+   - `smoke-operational-api`
+   - `diagnostic-operational-api`
+   - `load-operational-api`
+   - `load-user-public-api`
+   - `stress-operational-api`
+   - `spike-operational-api`
+   - `soak-operational-api`
 
 ## Automatizacion CI/deploy en GitHub Actions
 - CI principal (siempre disponible): `.github/workflows/ci-backend.yml`
