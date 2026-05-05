@@ -3,9 +3,11 @@
 import base64
 import json
 import os
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
+from threading import Lock
 from typing import Any
 
 from cryptography.hazmat.primitives import hashes, serialization
@@ -15,6 +17,12 @@ from flask import current_app, request
 
 TRANSPORT_ENVELOPE_VERSION = "transport_envelope_v1"
 TRANSPORT_ALGORITHM = "RSA-OAEP-256+AES-256-GCM"
+_TRANSPORT_KEY_CACHE_LOCK = Lock()
+_TRANSPORT_KEY_CACHE = {
+    "payload": None,
+    "cache_until_monotonic": 0.0,
+    "key_id": None,
+}
 
 
 class TransportCryptoError(Exception):
@@ -113,6 +121,25 @@ def _transport_key_ttl_seconds() -> int:
         return 3600
 
 
+def _transport_key_cache_ttl_seconds(default_ttl: int) -> int:
+    try:
+        configured = current_app.config.get("QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS")
+    except RuntimeError:
+        configured = None
+    raw = (
+        configured
+        if configured is not None
+        else os.getenv("QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS", "")
+    )
+    if raw is None or str(raw).strip() == "":
+        return default_ttl
+    try:
+        value = int(str(raw).strip())
+        return max(1, min(value, default_ttl))
+    except Exception:
+        return default_ttl
+
+
 def _normalize_pem(raw: str) -> str:
     return raw.replace("\\n", "\n").strip()
 
@@ -147,17 +174,36 @@ def _public_key_to_jwk(public_key: rsa.RSAPublicKey) -> dict[str, str]:
 
 
 def transport_key_payload() -> dict[str, Any]:
-    private_key = _load_or_generate_private_key()
-    public_key = private_key.public_key()
-    now = datetime.now(timezone.utc)
-    expires_at = now + timedelta(seconds=_transport_key_ttl_seconds())
-    return {
-        "key_id": _transport_key_id(),
-        "algorithm": TRANSPORT_ALGORITHM,
-        "public_key_jwk": _public_key_to_jwk(public_key),
-        "expires_at": expires_at.isoformat(),
-        "version": TRANSPORT_ENVELOPE_VERSION,
-    }
+    key_id = _transport_key_id()
+    now_monotonic = time.monotonic()
+
+    with _TRANSPORT_KEY_CACHE_LOCK:
+        cached_payload = _TRANSPORT_KEY_CACHE.get("payload")
+        if (
+            isinstance(cached_payload, dict)
+            and _TRANSPORT_KEY_CACHE.get("key_id") == key_id
+            and now_monotonic < float(_TRANSPORT_KEY_CACHE.get("cache_until_monotonic", 0.0))
+        ):
+            return dict(cached_payload)
+
+        private_key = _load_or_generate_private_key()
+        public_key = private_key.public_key()
+        now = datetime.now(timezone.utc)
+        key_ttl_seconds = _transport_key_ttl_seconds()
+        expires_at = now + timedelta(seconds=key_ttl_seconds)
+        payload = {
+            "key_id": key_id,
+            "algorithm": TRANSPORT_ALGORITHM,
+            "public_key_jwk": _public_key_to_jwk(public_key),
+            "expires_at": expires_at.isoformat(),
+            "version": TRANSPORT_ENVELOPE_VERSION,
+        }
+
+        cache_ttl = _transport_key_cache_ttl_seconds(key_ttl_seconds)
+        _TRANSPORT_KEY_CACHE["payload"] = dict(payload)
+        _TRANSPORT_KEY_CACHE["key_id"] = key_id
+        _TRANSPORT_KEY_CACHE["cache_until_monotonic"] = now_monotonic + cache_ttl
+        return payload
 
 
 def _validate_envelope(envelope: dict[str, Any]) -> None:
