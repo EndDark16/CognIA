@@ -251,3 +251,86 @@ export function syntheticAnswerForQuestion(question) {
   }
   return 1;
 }
+
+function metricValue(data, metricName, statName, defaultValue = null) {
+  const metric = data && data.metrics ? data.metrics[metricName] : null;
+  if (!metric || !metric.values) {
+    return defaultValue;
+  }
+  const value = metric.values[statName];
+  return value === undefined ? defaultValue : value;
+}
+
+function toPercent(value) {
+  if (value === null || value === undefined) {
+    return "N/A";
+  }
+  return `${(Number(value) * 100).toFixed(2)}%`;
+}
+
+function formatNumber(value, digits = 2) {
+  if (value === null || value === undefined) {
+    return "N/A";
+  }
+  return Number(value).toFixed(digits);
+}
+
+function outputBasePath(config, scenarioName) {
+  const outputDir = String(__ENV.K6_OUTPUT_DIR || "").trim();
+  const runId = String(config.testRunId || "k6_default")
+    .replace(/[^A-Za-z0-9._-]+/g, "_")
+    .slice(0, 80);
+  const ts = new Date().toISOString().replace(/[:.]/g, "-");
+  const fileBase = `${ts}_${scenarioName}_${runId}`;
+  if (!outputDir) {
+    return fileBase;
+  }
+  const normalized = outputDir.replace(/[\\/]+$/, "");
+  return `${normalized}/${fileBase}`;
+}
+
+export function buildSummaryOutputs(scenarioName, data, config) {
+  const base = outputBasePath(config, scenarioName);
+  const httpFailed = metricValue(data, "http_req_failed", "rate");
+  const reqRate = metricValue(data, "http_reqs", "rate");
+  const reqCount = metricValue(data, "http_reqs", "count");
+  const p50 = metricValue(data, "http_req_duration", "p(50)");
+  const p90 = metricValue(data, "http_req_duration", "p(90)");
+  const p95 = metricValue(data, "http_req_duration", "p(95)");
+  const p99 = metricValue(data, "http_req_duration", "p(99)");
+  const max = metricValue(data, "http_req_duration", "max");
+
+  const markdown = [
+    `# k6 ${scenarioName} summary`,
+    "",
+    `- test_run_id: ${config.testRunId}`,
+    `- base_url: ${config.baseUrl}`,
+    `- api_prefix: ${config.apiPrefix || "(empty)"}`,
+    `- safe_mode: ${config.safeMode}`,
+    `- skip_write_heavy: ${config.skipWriteHeavy}`,
+    `- skip_pdf: ${config.skipPdf}`,
+    `- skip_submit: ${config.skipSubmit}`,
+    `- http_reqs_count: ${reqCount === null ? "N/A" : reqCount}`,
+    `- rps: ${formatNumber(reqRate, 4)}`,
+    `- http_req_failed: ${toPercent(httpFailed)}`,
+    `- latency_ms_p50: ${formatNumber(p50)}`,
+    `- latency_ms_p90: ${formatNumber(p90)}`,
+    `- latency_ms_p95: ${formatNumber(p95)}`,
+    `- latency_ms_p99: ${formatNumber(p99)}`,
+    `- latency_ms_max: ${formatNumber(max)}`,
+    "",
+    "## Checks",
+    ...(data.root_group && data.root_group.checks
+      ? data.root_group.checks.map(
+          (checkItem) => `- ${checkItem.name}: pass=${checkItem.passes} fail=${checkItem.fails}`
+        )
+      : ["- N/A"]),
+    "",
+  ].join("\n");
+
+  return {
+    stdout: `${markdown}\n`,
+    [`${base}_summary.json`]: JSON.stringify(data, null, 2),
+    [`${base}_summary.md`]: markdown,
+  };
+}

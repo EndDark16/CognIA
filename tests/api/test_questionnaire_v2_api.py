@@ -13,6 +13,7 @@ if PROJECT_ROOT not in sys.path:
 
 from api.app import create_app
 from api.services import questionnaire_v2_loader_service as loader_service
+from api.services import questionnaire_v2_service as runtime_service
 from app.models import AppUser, QuestionnaireQuestion, QuestionnaireSession, db
 from config.settings import TestingConfig
 
@@ -312,6 +313,47 @@ def test_questionnaire_v2_session_flow(client, app):
 
     domain_keys = {item["domain"] for item in submitted.json["domains"]}
     assert domain_keys == {"adhd", "conduct", "elimination", "anxiety", "depression"}
+
+
+def test_questionnaire_v2_active_payload_cache_and_invalidation(client, app, monkeypatch):
+    _, token = _user_token(app, "cache_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    runtime_service.invalidate_active_questionnaire_cache()
+    original = runtime_service.loader.get_active_activation
+    call_counter = {"count": 0}
+
+    def wrapped_get_active_activation(*args, **kwargs):
+        call_counter["count"] += 1
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(
+        runtime_service.loader,
+        "get_active_activation",
+        wrapped_get_active_activation,
+    )
+
+    first = client.get(
+        "/api/v2/questionnaires/active?mode=short&role=guardian&page=1&page_size=5",
+        headers=headers,
+    )
+    assert first.status_code == 200
+
+    second = client.get(
+        "/api/v2/questionnaires/active?mode=short&role=guardian&page=1&page_size=5",
+        headers=headers,
+    )
+    assert second.status_code == 200
+    assert first.get_json() == second.get_json()
+    assert call_counter["count"] == 5
+
+    runtime_service.invalidate_active_questionnaire_cache()
+    third = client.get(
+        "/api/v2/questionnaires/active?mode=short&role=guardian&page=1&page_size=5",
+        headers=headers,
+    )
+    assert third.status_code == 200
+    assert call_counter["count"] == 10
 
 
 def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):

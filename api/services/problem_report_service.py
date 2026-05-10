@@ -6,6 +6,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from collections import defaultdict
 
 from flask import current_app
 from sqlalchemy import or_
@@ -171,12 +172,38 @@ def _save_attachment(report: ProblemReport, attachment: FileStorage, actor_user_
     return row
 
 
-def serialize_problem_report(report: ProblemReport, include_private: bool = True) -> dict[str, Any]:
-    attachments = (
-        ProblemReportAttachment.query.filter_by(report_id=report.id)
-        .order_by(ProblemReportAttachment.created_at.asc())
+def preload_attachments_by_report_ids(
+    report_ids: list[uuid.UUID],
+) -> dict[uuid.UUID, list[ProblemReportAttachment]]:
+    if not report_ids:
+        return {}
+    rows = (
+        ProblemReportAttachment.query.filter(
+            ProblemReportAttachment.report_id.in_(report_ids)
+        )
+        .order_by(
+            ProblemReportAttachment.report_id.asc(),
+            ProblemReportAttachment.created_at.asc(),
+        )
         .all()
     )
+    grouped: dict[uuid.UUID, list[ProblemReportAttachment]] = defaultdict(list)
+    for row in rows:
+        grouped[row.report_id].append(row)
+    return grouped
+
+
+def serialize_problem_report(
+    report: ProblemReport,
+    include_private: bool = True,
+    attachments: list[ProblemReportAttachment] | None = None,
+) -> dict[str, Any]:
+    if attachments is None:
+        attachments = (
+            ProblemReportAttachment.query.filter_by(report_id=report.id)
+            .order_by(ProblemReportAttachment.created_at.asc())
+            .all()
+        )
     payload = {
         "id": str(report.id),
         "report_code": report.report_code,
