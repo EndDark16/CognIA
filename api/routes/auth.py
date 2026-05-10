@@ -54,7 +54,11 @@ from app.models import (
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
 
-from api.cache import invalidate_user_security_cache, roles_cache
+from api.cache import (
+    invalidate_user_auth_caches,
+    auth_me_cache,
+    roles_cache,
+)
 
 
 def _get_roles(user: AppUser) -> list[str]:
@@ -78,6 +82,35 @@ def _access_expires() -> int:
     if hasattr(expires_cfg, "total_seconds"):
         return int(expires_cfg.total_seconds())
     return int(expires_cfg)
+
+
+def _auth_me_cache_ttl_seconds() -> int:
+    try:
+        return max(0, int(current_app.config.get("AUTH_ME_CACHE_TTL_SECONDS", 60)))
+    except Exception:
+        return 60
+
+
+def _build_me_payload(user: AppUser) -> dict:
+    def _fmt(dt):
+        return dt.isoformat() if dt else None
+
+    return {
+        "id": str(user.id),
+        "username": user.username,
+        "email": user.email,
+        "full_name": user.full_name,
+        "user_type": user.user_type,
+        "professional_card_number": user.professional_card_number,
+        "colpsic_verified": user.colpsic_verified,
+        "is_active": user.is_active,
+        "roles": _get_roles(user),
+        "mfa_enabled": user.mfa_enabled,
+        "mfa_confirmed_at": _fmt(user.mfa_confirmed_at),
+        "mfa_method": user.mfa_method,
+        "created_at": _fmt(user.created_at),
+        "updated_at": _fmt(user.updated_at),
+    }
 
 
 def _build_auth_response(access_token: str):
@@ -744,34 +777,19 @@ def me():
     if not identity:
         return _error_response("Invalid user", "invalid_user", 401)
 
+    cache_ttl = _auth_me_cache_ttl_seconds()
+    if cache_ttl > 0:
+        cached_payload = auth_me_cache.get(str(identity))
+        if isinstance(cached_payload, dict):
+            return jsonify(cached_payload), 200
+
     user = db.session.get(AppUser, identity)
     if not user:
         return _error_response("User not found", "user_not_found", 404)
-
-    def _fmt(dt):
-        return dt.isoformat() if dt else None
-
-    return (
-        jsonify(
-            {
-                "id": str(user.id),
-                "username": user.username,
-                "email": user.email,
-                "full_name": user.full_name,
-                "user_type": user.user_type,
-                "professional_card_number": user.professional_card_number,
-                "colpsic_verified": user.colpsic_verified,
-                "is_active": user.is_active,
-                "roles": _get_roles(user),
-                "mfa_enabled": user.mfa_enabled,
-                "mfa_confirmed_at": _fmt(user.mfa_confirmed_at),
-                "mfa_method": user.mfa_method,
-                "created_at": _fmt(user.created_at),
-                "updated_at": _fmt(user.updated_at),
-            }
-        ),
-        200,
-    )
+    payload = _build_me_payload(user)
+    if cache_ttl > 0:
+        auth_me_cache.set(str(identity), payload, ttl_seconds=cache_ttl)
+    return jsonify(payload), 200
 
 
 @auth_bp.post("/password/change")
@@ -823,7 +841,7 @@ def change_password():
         _revoke_refresh_tokens(user.id)
         db.session.add(user)
         db.session.commit()
-        invalidate_user_security_cache(user.id)
+        invalidate_user_auth_caches(user.id)
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Database error on password change for %s: %s", user.id, e, exc_info=True)
@@ -932,7 +950,7 @@ def reset_password():
         _revoke_refresh_tokens(user.id)
         db.session.add(user)
         db.session.commit()
-        invalidate_user_security_cache(user.id)
+        invalidate_user_auth_caches(user.id)
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Password reset failed for %s: %s", user.id, e, exc_info=True)
