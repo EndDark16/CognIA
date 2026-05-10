@@ -4,6 +4,7 @@ import {
   authHeaders,
   authenticate,
   buildConfig,
+  buildSummaryOutputs,
   buildUrl,
   buildWriteSafeSessionPayload,
   hitHealth,
@@ -135,4 +136,8 @@ export default function (setupData) {
   }
 
   think(config);
+}
+
+export function handleSummary(data) {
+  return buildSummaryOutputs("questionnaire_v2_flow", data, config);
 }
