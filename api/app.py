@@ -4,8 +4,11 @@ import os
 import sys
 import time
 import importlib
+import re
+import uuid
 from datetime import timedelta, datetime, timezone
 from sqlalchemy import inspect
+from urllib.parse import urlparse, urlunparse
 
 # Ensure project root is on path when running this file directly
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -29,7 +32,8 @@ from api.routes.users import users_bp
 from api.routes.problem_reports import problem_reports_bp
 from api.extensions import limiter
 from app.models import db, RefreshToken, AppUser
-from api.metrics import metrics_bp, record_request_metrics
+from api.cache import user_security_cache
+from api.metrics import metrics_bp, record_request_metrics, record_error_metric
 import logging
 from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import SQLAlchemyError, OperationalError, DBAPIError
@@ -45,6 +49,45 @@ def create_app(config_class=DevelopmentConfig):
         static_folder=os.path.join(PROJECT_ROOT, "static"),
     )
     app.config.from_object(config_class)
+
+    request_id_re = re.compile(r"^[A-Za-z0-9._:-]{8,128}$")
+
+    def _normalize_dt(dt_value):
+        if dt_value is None:
+            return None
+        if dt_value.tzinfo is None:
+            return dt_value.replace(tzinfo=timezone.utc)
+        return dt_value
+
+    def _get_request_id() -> str:
+        incoming = (request.headers.get("X-Request-ID") or "").strip()
+        if incoming and request_id_re.fullmatch(incoming):
+            return incoming
+        return uuid.uuid4().hex
+
+    def _mask_uri_credentials(raw_uri: str | None) -> str:
+        if not raw_uri:
+            return "memory://"
+        try:
+            parsed = urlparse(raw_uri)
+            if parsed.username or parsed.password:
+                host = parsed.hostname or ""
+                if parsed.port:
+                    host = f"{host}:{parsed.port}"
+                netloc = f"***:***@{host}" if host else "***:***"
+                return urlunparse(
+                    (
+                        parsed.scheme,
+                        netloc,
+                        parsed.path,
+                        parsed.params,
+                        parsed.query,
+                        parsed.fragment,
+                    )
+                )
+            return raw_uri
+        except Exception:
+            return "<invalid_rate_limit_uri>"
     if app.config.get("TRUST_PROXY_HEADERS", False):
         app.wsgi_app = ProxyFix(
             app.wsgi_app,
@@ -105,6 +148,10 @@ def create_app(config_class=DevelopmentConfig):
     db.init_app(app)
     jwt = JWTManager(app)
     limiter.init_app(app)
+    app.logger.info(
+        "rate_limit storage_uri=%s",
+        _mask_uri_credentials(app.config.get("RATELIMIT_STORAGE_URI")),
+    )
     
     @jwt.unauthorized_loader
     def handle_missing_or_bad_token(reason):
@@ -234,32 +281,49 @@ def create_app(config_class=DevelopmentConfig):
     # Token Blocklist Callback
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
-        jti = jwt_payload["jti"]
-        token = db.session.query(RefreshToken).filter_by(jti=jti).scalar()
-        if token is not None and token.revoked:
-            return True
+        token_type = str(jwt_payload.get("type") or "").lower()
+        if token_type == "refresh":
+            jti = jwt_payload.get("jti")
+            if jti:
+                token = db.session.query(RefreshToken).filter_by(jti=jti).scalar()
+                if token is not None and token.revoked:
+                    return True
 
         try:
             identity = jwt_payload.get("sub")
-            user = db.session.get(AppUser, identity)
-            if user and user.password_changed_at:
-                iat = jwt_payload.get("iat")
-                if iat:
-                    issued_at = datetime.fromtimestamp(iat, timezone.utc)
-                    pwd_changed = user.password_changed_at
-                    if pwd_changed.tzinfo is None:
-                        pwd_changed = pwd_changed.replace(tzinfo=timezone.utc)
-                    if issued_at <= pwd_changed:
-                        return True
-            if user and user.sessions_revoked_at:
-                iat = jwt_payload.get("iat")
-                if iat:
-                    issued_at = datetime.fromtimestamp(iat, timezone.utc)
-                    revoked_at = user.sessions_revoked_at
-                    if revoked_at.tzinfo is None:
-                        revoked_at = revoked_at.replace(tzinfo=timezone.utc)
-                    if issued_at <= revoked_at:
-                        return True
+            iat = jwt_payload.get("iat")
+            if not identity or not iat:
+                return False
+
+            cache_ttl_raw = app.config.get("JWT_SECURITY_STATE_CACHE_TTL_SECONDS", 45)
+            cache_ttl = int(cache_ttl_raw or 0)
+            if cache_ttl < 0:
+                cache_ttl = 0
+            identity_key = str(identity)
+            user_state = (
+                user_security_cache.get(identity_key)
+                if cache_ttl > 0
+                else None
+            )
+
+            if user_state is None:
+                user = db.session.get(AppUser, identity)
+                if not user:
+                    return False
+                user_state = {
+                    "password_changed_at": _normalize_dt(user.password_changed_at),
+                    "sessions_revoked_at": _normalize_dt(user.sessions_revoked_at),
+                }
+                if cache_ttl > 0:
+                    user_security_cache.set(identity_key, user_state, ttl_seconds=cache_ttl)
+
+            issued_at = datetime.fromtimestamp(iat, timezone.utc)
+            pwd_changed = user_state.get("password_changed_at")
+            if pwd_changed and issued_at <= pwd_changed:
+                return True
+            revoked_at = user_state.get("sessions_revoked_at")
+            if revoked_at and issued_at <= revoked_at:
+                return True
         except Exception:
             return False
         return False
@@ -294,22 +358,45 @@ def create_app(config_class=DevelopmentConfig):
     @app.before_request
     def _start_timer():
         g._start_time = time.monotonic()
+        g.request_id = _get_request_id()
 
     @app.after_request
     def _log_and_metrics(response):
+        request_id = getattr(g, "request_id", None)
+        if request_id:
+            response.headers.setdefault("X-Request-ID", request_id)
+
         start = getattr(g, "_start_time", None)
         if start is not None:
             duration_ms = (time.monotonic() - start) * 1000.0
             if app.config.get("METRICS_ENABLED", True):
-                record_request_metrics(duration_ms, response.status_code)
+                endpoint = request.endpoint or "unknown"
+                record_request_metrics(duration_ms, response.status_code, endpoint=endpoint)
+                error_code = None
+                if response.status_code >= 400 and response.is_json:
+                    payload = response.get_json(silent=True) or {}
+                    error_code = payload.get("error")
+
+                if response.status_code == 429:
+                    record_error_metric("rate_limited")
+                elif error_code == "db_unavailable":
+                    record_error_metric("db_unavailable")
+                elif error_code == "runtime_artifact_unavailable":
+                    record_error_metric("runtime_artifact_unavailable")
+                elif error_code == "validation_error":
+                    record_error_metric("validation_error")
+                elif response.status_code >= 500:
+                    record_error_metric("server_error")
             if app.config.get("LOG_REQUESTS", False):
                 if request.path not in app.config.get("LOG_EXCLUDE_PATHS", set()):
                     app.logger.info(
-                        "request method=%s path=%s status=%s duration_ms=%.2f ip=%s",
+                        "request method=%s path=%s endpoint=%s status=%s duration_ms=%.2f request_id=%s ip=%s",
                         request.method,
                         request.path,
+                        request.endpoint or "unknown",
                         response.status_code,
                         duration_ms,
+                        request_id,
                         request.remote_addr,
                     )
 
