@@ -45,8 +45,8 @@ class Config:
     DB_NAME = os.getenv("DB_NAME", "cognia_db")
     DB_SSL_MODE = os.getenv("DB_SSL_MODE", "")
     _ssl_suffix = f"?sslmode={DB_SSL_MODE}" if DB_SSL_MODE else ""
-    DB_POOL_SIZE = _int_env("DB_POOL_SIZE", 5)
-    DB_MAX_OVERFLOW = _int_env("DB_MAX_OVERFLOW", 10)
+    DB_POOL_SIZE = _int_env("DB_POOL_SIZE", 3)
+    DB_MAX_OVERFLOW = _int_env("DB_MAX_OVERFLOW", 2)
     DB_POOL_TIMEOUT = _int_env("DB_POOL_TIMEOUT", 10)
     DB_POOL_RECYCLE = _int_env("DB_POOL_RECYCLE", 1800)
     DB_POOL_PRE_PING = _bool_env("DB_POOL_PRE_PING", True)
@@ -128,6 +128,8 @@ class Config:
     QV2_SHARED_ACCESS_RATE_LIMIT = os.getenv("QV2_SHARED_ACCESS_RATE_LIMIT", "30 per minute")
     QV2_TRANSPORT_KEY_RATE_LIMIT = os.getenv("QV2_TRANSPORT_KEY_RATE_LIMIT", "60 per minute")
     QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS = _int_env("QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS", 60)
+    QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS = _int_env("QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS", 20)
+    JWT_SECURITY_STATE_CACHE_TTL_SECONDS = _int_env("JWT_SECURITY_STATE_CACHE_TTL_SECONDS", 45)
     PREDICT_RATE_LIMIT = os.getenv("PREDICT_RATE_LIMIT", "30 per minute")
     READINESS_CACHE_TTL_SECONDS = _int_env("READINESS_CACHE_TTL_SECONDS", 3)
     READINESS_DB_TIMEOUT_MS = _int_env("READINESS_DB_TIMEOUT_MS", 2000)
@@ -240,9 +242,9 @@ class ProductionConfig(Config):
     # Ajustes de pool para concurrencia en runtime productivo.
     SQLALCHEMY_ENGINE_OPTIONS = {
         # Ajustado para no competir con poolers externos (ej. pgbouncer en free tier)
-        "pool_size": _int_env("DB_POOL_SIZE", 3),
-        "max_overflow": _int_env("DB_MAX_OVERFLOW", 2),
-        "pool_timeout": _int_env("DB_POOL_TIMEOUT", 30),
+        "pool_size": _int_env("DB_POOL_SIZE", 2),
+        "max_overflow": _int_env("DB_MAX_OVERFLOW", 1),
+        "pool_timeout": _int_env("DB_POOL_TIMEOUT", 15),
         "pool_pre_ping": _bool_env("DB_POOL_PRE_PING", True),
         "pool_recycle": _int_env("DB_POOL_RECYCLE", 1800),
     }
@@ -254,7 +256,11 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     LOG_REQUESTS = False
     RATELIMIT_ENABLED = False
+    METRICS_TOKEN = None
+    METRICS_TOKEN_REQUIRED = False
     EMAIL_ENABLED = False
+    EMAIL_UNSUBSCRIBE_URL = None
+    EMAIL_UNSUBSCRIBE_SECRET = None
     SECURITY_HEADERS_ENABLED = False
     QR_PROCESS_ASYNC = False
     # Aisla la suite de tests del .env local para evitar falsos negativos.

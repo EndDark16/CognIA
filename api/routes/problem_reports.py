@@ -115,9 +115,17 @@ def list_my_problem_reports():
         page=params["page"],
         page_size=params["page_size"],
     )
+    attachments_map = service.preload_attachments_by_report_ids([row.id for row in rows])
     return jsonify(
         {
-            "items": [service.serialize_problem_report(item, include_private=False) for item in rows],
+            "items": [
+                service.serialize_problem_report(
+                    item,
+                    include_private=False,
+                    attachments=attachments_map.get(item.id, []),
+                )
+                for item in rows
+            ],
             "pagination": pagination,
         }
     ), 200
@@ -133,9 +141,17 @@ def list_problem_reports_admin():
         return _error("Validation error", "validation_error", 400, exc.messages)
 
     rows, pagination = service.list_problem_reports(params)
+    attachments_map = service.preload_attachments_by_report_ids([row.id for row in rows])
     return jsonify(
         {
-            "items": [service.serialize_problem_report(item, include_private=True) for item in rows],
+            "items": [
+                service.serialize_problem_report(
+                    item,
+                    include_private=True,
+                    attachments=attachments_map.get(item.id, []),
+                )
+                for item in rows
+            ],
             "pagination": pagination,
         }
     ), 200
