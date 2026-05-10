@@ -63,7 +63,11 @@ No se tocaron ni se incluyeron en commits estos archivos protegidos:
 - PR #139: `perf/a1-backend-internal-optimization -> dev.enddark` (merged).
 - PR #140: `dev.enddark -> development` (merged).
 - PR #141: `development -> main` (merged con `squash` por politica del repo).
-- SHA final desplegado en `main`: `bae532e0495aa62459a5278bf1a2a3858c11e595`.
+- PR #142: `perf/a1-backend-internal-optimization -> dev.enddark` (merged, reportes postopt).
+- PR #143: `dev.enddark -> development` (merged, reportes postopt).
+- PR #144: `development -> main` (merged con `squash`, reportes postopt).
+- SHA probado en carga (runtime optimizado): `bae532e0495aa62459a5278bf1a2a3858c11e595`.
+- SHA final desplegado actual en `main`: `fea7db686ee23c0e2f483574ce79c28588d0ced1` (promocion de reportes, sin cambios de runtime).
 - Workflows main:
   - `CI Backend` -> success.
   - `Deploy Backend (Best Effort)` -> success.
