@@ -4,6 +4,7 @@ import base64
 import hashlib
 import json
 import os
+from functools import lru_cache
 from typing import Any
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -40,6 +41,7 @@ def is_field_encryption_enabled() -> bool:
     return _bool_env("COGNIA_ENABLE_FIELD_ENCRYPTION", False)
 
 
+@lru_cache(maxsize=1)
 def _load_field_key_bytes() -> bytes:
     raw = os.getenv("COGNIA_FIELD_ENCRYPTION_KEY", "").strip()
     if raw:
