@@ -60,6 +60,16 @@ def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _invalidate_runtime_active_cache() -> None:
+    # Import local para evitar ciclos en inicializacion de modulos.
+    try:
+        from api.services import questionnaire_v2_service as runtime_service
+
+        runtime_service.invalidate_active_questionnaire_cache()
+    except Exception:
+        return
+
+
 def _to_bool(value: Any) -> bool:
     if isinstance(value, bool):
         return value
@@ -653,6 +663,7 @@ def sync_active_models() -> dict[str, Any]:
         }
         db.session.add(artifact)
 
+    _invalidate_runtime_active_cache()
     return {
         "models_synced": int(active_df.shape[0]),
         "activations_created": activation_count,
@@ -673,6 +684,7 @@ def sync_questionnaire_catalog(created_by: uuid.UUID | None = None, source_dir: 
     scales = _upsert_scales(version.id, scales_df)
     questions = _upsert_questions(version.id, master_df)
 
+    _invalidate_runtime_active_cache()
     return {
         "definition_id": str(definition.id),
         "version_id": str(version.id),
@@ -688,6 +700,7 @@ def bootstrap_questionnaire_backend_v2(created_by: uuid.UUID | None = None, sour
     model_stats = sync_active_models()
 
     db.session.commit()
+    _invalidate_runtime_active_cache()
 
     return {
         "questionnaire": questionnaire_stats,

@@ -1,3 +1,4 @@
+import copy
 import json
 import secrets
 import uuid
@@ -5,13 +6,12 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
+from threading import Lock
 from typing import Any
 
 import joblib
 import pandas as pd
 from flask import current_app
-from matplotlib import pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
 from sqlalchemy import case, func, or_
 
 from api.security import check_password, hash_password
@@ -71,6 +71,12 @@ SESSION_STATUSES = {
     "archived",
 }
 
+_QV2_ACTIVE_PAYLOAD_CACHE_LOCK = Lock()
+_QV2_ACTIVE_PAYLOAD_CACHE: dict[
+    tuple[str, str, str, str, bool, int, int],
+    tuple[dict[str, Any], float],
+] = {}
+
 CLINICAL_SUMMARY_DISCLAIMER = (
     "Este resultado no constituye un diagnostico clinico ni reemplaza una evaluacion psicologica o medica formal. "
     "Se trata de una simulacion automatizada de apoyo al tamizaje y alerta temprana, basada en la informacion "
@@ -101,6 +107,14 @@ def _decrypt_text(value: str | None, purpose: str) -> str | None:
 
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
+
+
+@lru_cache(maxsize=1)
+def _pdf_plot_backend():
+    from matplotlib import pyplot as plt
+    from matplotlib.backends.backend_pdf import PdfPages
+
+    return plt, PdfPages
 
 
 def _new_public_id() -> str:
@@ -188,6 +202,18 @@ def _active_model_pipeline_version() -> str:
         return Path(loader.DEFAULT_ACTIVE_MODELS).parent.parent.name
     except Exception:
         return "hybrid_active_modes_freeze_v16"
+
+
+def _active_payload_cache_ttl_seconds() -> int:
+    try:
+        return max(0, int(current_app.config.get("QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS", 20)))
+    except Exception:
+        return 20
+
+
+def invalidate_active_questionnaire_cache() -> None:
+    with _QV2_ACTIVE_PAYLOAD_CACHE_LOCK:
+        _QV2_ACTIVE_PAYLOAD_CACHE.clear()
 
 
 def _access_grant_for_user(session_id: uuid.UUID, user_id: uuid.UUID) -> QuestionnaireAccessGrant | None:
@@ -433,6 +459,24 @@ def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = 
     version = _active_version()
     canonical_role = _normalize_role(role)
     mode_key = _get_mode_key(canonical_role, mode)
+    pipeline_version = _active_model_pipeline_version()
+
+    cache_key = (
+        str(version.id),
+        pipeline_version,
+        mode,
+        canonical_role,
+        bool(include_full),
+        int(page),
+        int(page_size),
+    )
+    cache_ttl = _active_payload_cache_ttl_seconds()
+    if cache_ttl > 0:
+        now = _utcnow().timestamp()
+        with _QV2_ACTIVE_PAYLOAD_CACHE_LOCK:
+            cached = _QV2_ACTIVE_PAYLOAD_CACHE.get(cache_key)
+            if cached and now < cached[1]:
+                return copy.deepcopy(cached[0])
 
     repeated_ids = {
         row.repeated_question_id
@@ -452,10 +496,41 @@ def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = 
 
     visible = [q for q in rows if q.id not in repeated_ids]
 
+    activations = {
+        domain: loader.get_active_activation(
+            domain=domain,
+            mode_key=mode_key,
+            role=canonical_role,
+        )
+        for domain in DOMAIN_ORDER
+    }
+    activation_ids = [activation.id for activation in activations.values()]
+
+    confidence_latest: dict[uuid.UUID, ModelConfidenceRegistry] = {}
+    confidence_rows = (
+        ModelConfidenceRegistry.query.filter(
+            ModelConfidenceRegistry.activation_id.in_(activation_ids)
+        )
+        .order_by(
+            ModelConfidenceRegistry.activation_id.asc(),
+            ModelConfidenceRegistry.created_at.desc(),
+        )
+        .all()
+    )
+    for row in confidence_rows:
+        if row.activation_id not in confidence_latest:
+            confidence_latest[row.activation_id] = row
+
     confidence_by_domain: dict[str, dict[str, Any]] = {}
     for domain in DOMAIN_ORDER:
-        activation = loader.get_active_activation(domain=domain, mode_key=mode_key, role=canonical_role)
-        confidence_pct, band, operational_class = _confidence_for_activation(activation.id)
+        activation = activations[domain]
+        confidence_row = confidence_latest.get(activation.id)
+        if confidence_row:
+            confidence_pct = float(confidence_row.confidence_pct or 50.0)
+            band = confidence_row.confidence_band or "moderate"
+            operational_class = confidence_row.operational_class
+        else:
+            confidence_pct, band, operational_class = 50.0, "moderate", None
         confidence_by_domain[domain] = {
             "confidence_pct": confidence_pct,
             "confidence_band": band,
@@ -490,7 +565,7 @@ def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = 
         start = (page - 1) * page_size
         paged = questions_payload[start : start + page_size]
 
-    return {
+    payload = {
         "questionnaire": {
             "definition_slug": loader.DEFAULT_DEFINITION_SLUG,
             "version_label": version.version_label,
@@ -511,6 +586,12 @@ def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = 
             "pages": max(1, (total + page_size - 1) // page_size),
         },
     }
+
+    if cache_ttl > 0:
+        expires_at = _utcnow().timestamp() + cache_ttl
+        with _QV2_ACTIVE_PAYLOAD_CACHE_LOCK:
+            _QV2_ACTIVE_PAYLOAD_CACHE[cache_key] = (copy.deepcopy(payload), expires_at)
+    return payload
 
 
 def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> QuestionnaireSession:
@@ -609,12 +690,77 @@ def get_session_payload(session: QuestionnaireSession) -> dict[str, Any]:
 
 
 def get_session_page_payload(session: QuestionnaireSession, page: int, page_size: int) -> dict[str, Any]:
-    sections = _session_sections(session.id)
-    total = len(sections)
-    start = (page - 1) * page_size
+    base_query = QuestionnaireSessionItem.query.filter(
+        QuestionnaireSessionItem.session_id == session.id,
+        QuestionnaireSessionItem.is_visible.is_(True),
+    )
+    total = (
+        db.session.query(func.count(func.distinct(QuestionnaireSessionItem.page_number)))
+        .filter(
+            QuestionnaireSessionItem.session_id == session.id,
+            QuestionnaireSessionItem.is_visible.is_(True),
+        )
+        .scalar()
+        or 0
+    )
+
+    page_numbers = [
+        row[0]
+        for row in base_query.with_entities(QuestionnaireSessionItem.page_number)
+        .group_by(QuestionnaireSessionItem.page_number)
+        .order_by(QuestionnaireSessionItem.page_number.asc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    ]
+
+    grouped: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    if page_numbers:
+        rows = (
+            db.session.query(QuestionnaireSessionItem, QuestionnaireQuestion)
+            .join(
+                QuestionnaireQuestion,
+                QuestionnaireSessionItem.question_id == QuestionnaireQuestion.id,
+            )
+            .filter(QuestionnaireSessionItem.session_id == session.id)
+            .filter(QuestionnaireSessionItem.is_visible.is_(True))
+            .filter(QuestionnaireSessionItem.page_number.in_(page_numbers))
+            .order_by(
+                QuestionnaireSessionItem.page_number.asc(),
+                QuestionnaireSessionItem.display_order.asc(),
+            )
+            .all()
+        )
+        for item, question in rows:
+            grouped[item.page_number].append(
+                {
+                    "session_item_id": str(item.id),
+                    "question_id": str(question.id),
+                    "question_code": question.question_code,
+                    "feature": question.feature_key,
+                    "prompt": question.caregiver_question
+                    or question.psychologist_question
+                    or question.question_text_primary,
+                    "help_text": question.help_text,
+                    "response_type": question.response_type,
+                    "scale_id": question.scale_id,
+                    "response_options": question.response_options_json,
+                    "min_value": question.min_value,
+                    "max_value": question.max_value,
+                    "answered": bool(item.answered),
+                }
+            )
+
+    sections = [
+        {
+            "page_number": page_number,
+            "questions": grouped.get(page_number, []),
+        }
+        for page_number in page_numbers
+    ]
     return {
         "session": get_session_payload(session),
-        "pages": sections[start : start + page_size],
+        "pages": sections,
         "pagination": {
             "page": page,
             "page_size": page_size,
@@ -1610,6 +1756,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
 
     probabilities = [float(item["probability"]) * 100.0 for item in domains]
     labels = [item["domain"].upper() for item in domains]
+    plt, PdfPages = _pdf_plot_backend()
 
     with PdfPages(file_path) as pdf:
         fig, ax = plt.subplots(figsize=(11, 8.5))
@@ -1749,6 +1896,7 @@ def build_report(report_type: str, months: int, requested_by_user_id: uuid.UUID)
     output_dir = _pdf_output_dir()
     file_name = f"report_{report_type}_{int(_utcnow().timestamp())}.pdf"
     file_path = (output_dir / file_name).resolve()
+    plt, PdfPages = _pdf_plot_backend()
 
     with PdfPages(file_path) as pdf:
         fig, ax = plt.subplots(figsize=(11, 8.5))
