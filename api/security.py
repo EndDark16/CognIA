@@ -68,9 +68,9 @@ def revoke_user_sessions(user: AppUser) -> None:
         db.session.add(user)
         db.session.commit()
         # Import local para evitar ciclos durante inicializacion.
-        from api.cache import invalidate_user_security_cache
+        from api.cache import invalidate_user_auth_caches
 
-        invalidate_user_security_cache(user.id)
+        invalidate_user_auth_caches(user.id)
     except Exception:
         db.session.rollback()
         raise

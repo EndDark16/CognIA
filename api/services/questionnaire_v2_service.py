@@ -1,4 +1,3 @@
-import copy
 import json
 import secrets
 import uuid
@@ -6,7 +5,6 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
-from threading import Lock
 from typing import Any
 
 import joblib
@@ -14,6 +12,11 @@ import pandas as pd
 from flask import current_app
 from sqlalchemy import case, func, or_
 
+from api.cache import (
+    qv2_activation_snapshot_cache,
+    qv2_active_payload_cache,
+    qv2_question_bank_cache,
+)
 from api.security import check_password, hash_password
 from api.services import crypto_service
 from api.services import questionnaire_v2_loader_service as loader
@@ -70,12 +73,6 @@ SESSION_STATUSES = {
     "failed",
     "archived",
 }
-
-_QV2_ACTIVE_PAYLOAD_CACHE_LOCK = Lock()
-_QV2_ACTIVE_PAYLOAD_CACHE: dict[
-    tuple[str, str, str, str, bool, int, int],
-    tuple[dict[str, Any], float],
-] = {}
 
 CLINICAL_SUMMARY_DISCLAIMER = (
     "Este resultado no constituye un diagnostico clinico ni reemplaza una evaluacion psicologica o medica formal. "
@@ -193,6 +190,10 @@ def _get_mode_key(role: str, mode: str) -> str:
     return key
 
 
+def _active_version_snapshot() -> dict[str, Any]:
+    return loader.get_active_version_snapshot(force_refresh=False)
+
+
 def _active_version() -> QuestionnaireVersion:
     return loader.ensure_catalog_loaded()
 
@@ -206,14 +207,24 @@ def _active_model_pipeline_version() -> str:
 
 def _active_payload_cache_ttl_seconds() -> int:
     try:
-        return max(0, int(current_app.config.get("QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS", 20)))
+        return max(0, int(current_app.config.get("QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS", 300)))
     except Exception:
-        return 20
+        return 300
+
+
+def _active_activation_cache_ttl_seconds() -> int:
+    try:
+        return max(0, int(current_app.config.get("QV2_ACTIVE_ACTIVATION_CACHE_TTL_SECONDS", 300)))
+    except Exception:
+        return 300
 
 
 def invalidate_active_questionnaire_cache() -> None:
-    with _QV2_ACTIVE_PAYLOAD_CACHE_LOCK:
-        _QV2_ACTIVE_PAYLOAD_CACHE.clear()
+    qv2_active_payload_cache.clear()
+    qv2_activation_snapshot_cache.clear()
+    qv2_question_bank_cache.clear()
+    _load_feature_contract_cached.cache_clear()
+    _load_model_artifact.cache_clear()
 
 
 def _access_grant_for_user(session_id: uuid.UUID, user_id: uuid.UUID) -> QuestionnaireAccessGrant | None:
@@ -317,11 +328,20 @@ def _load_model_artifact(artifact_path: str):
     return joblib.load(artifact_path)
 
 
-def _load_feature_contract(model_version: ModelVersion) -> tuple[list[str], dict[str, Any]]:
-    metadata = model_version.metadata_json or {}
+@lru_cache(maxsize=256)
+def _load_feature_contract_cached(
+    model_version_id: str,
+    artifact_path: str | None,
+    metadata_signature: str,
+) -> tuple[list[str], dict[str, Any]]:
+    metadata = {}
+    if metadata_signature:
+        try:
+            metadata = json.loads(metadata_signature)
+        except Exception:
+            metadata = {}
     feature_columns = metadata.get("feature_columns") or []
 
-    artifact_path = model_version.artifact_path or model_version.fallback_artifact_path
     if artifact_path:
         meta_path = Path(artifact_path).parent / "metadata.json"
         if meta_path.exists():
@@ -334,6 +354,20 @@ def _load_feature_contract(model_version: ModelVersion) -> tuple[list[str], dict
                 pass
 
     return list(feature_columns), metadata
+
+
+def _load_feature_contract(model_version: ModelVersion) -> tuple[list[str], dict[str, Any]]:
+    metadata = model_version.metadata_json or {}
+    artifact_path = model_version.artifact_path or model_version.fallback_artifact_path
+    try:
+        metadata_signature = json.dumps(metadata, sort_keys=True, ensure_ascii=True)
+    except Exception:
+        metadata_signature = "{}"
+    return _load_feature_contract_cached(
+        str(model_version.id),
+        artifact_path,
+        metadata_signature,
+    )
 
 
 def _normalize_answer(question: QuestionnaireQuestion, answer: Any) -> tuple[Any, str]:
@@ -455,38 +489,23 @@ def _session_sections(session_id: uuid.UUID) -> list[dict[str, Any]]:
     return out
 
 
-def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = False, page: int = 1, page_size: int = 20) -> dict[str, Any]:
-    version = _active_version()
-    canonical_role = _normalize_role(role)
-    mode_key = _get_mode_key(canonical_role, mode)
-    pipeline_version = _active_model_pipeline_version()
-
-    cache_key = (
-        str(version.id),
-        pipeline_version,
-        mode,
-        canonical_role,
-        bool(include_full),
-        int(page),
-        int(page_size),
-    )
+def _load_mode_question_bank(version_id: uuid.UUID, mode_key: str) -> list[dict[str, Any]]:
     cache_ttl = _active_payload_cache_ttl_seconds()
+    cache_key = f"{version_id}:{mode_key}"
     if cache_ttl > 0:
-        now = _utcnow().timestamp()
-        with _QV2_ACTIVE_PAYLOAD_CACHE_LOCK:
-            cached = _QV2_ACTIVE_PAYLOAD_CACHE.get(cache_key)
-            if cached and now < cached[1]:
-                return copy.deepcopy(cached[0])
+        cached = qv2_question_bank_cache.get(cache_key)
+        if isinstance(cached, list):
+            return cached
 
     repeated_ids = {
         row.repeated_question_id
-        for row in QuestionnaireRepeatMapping.query.filter_by(version_id=version.id, reuse_answer=True).all()
+        for row in QuestionnaireRepeatMapping.query.filter_by(version_id=version_id, reuse_answer=True).all()
     }
 
     rows = (
         db.session.query(QuestionnaireQuestion)
         .join(QuestionnaireQuestionMode, QuestionnaireQuestionMode.question_id == QuestionnaireQuestion.id)
-        .filter(QuestionnaireQuestion.version_id == version.id)
+        .filter(QuestionnaireQuestion.version_id == version_id)
         .filter(QuestionnaireQuestion.visible_question.is_(True))
         .filter(QuestionnaireQuestionMode.mode_key == mode_key)
         .filter(QuestionnaireQuestionMode.is_included.is_(True))
@@ -495,6 +514,45 @@ def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = 
     )
 
     visible = [q for q in rows if q.id not in repeated_ids]
+    questions_payload = []
+    for question in visible:
+        questions_payload.append(
+            {
+                "question_id": str(question.id),
+                "question_code": question.question_code,
+                "feature": question.feature_key,
+                "prompt": question.caregiver_question or question.psychologist_question or question.question_text_primary,
+                "help_text": question.help_text,
+                "response_type": question.response_type,
+                "scale_id": question.scale_id,
+                "response_options": question.response_options_json,
+                "min_value": question.min_value,
+                "max_value": question.max_value,
+                "requires_internal_scoring": bool(question.requires_internal_scoring),
+                "requires_exact_item_wording": bool(question.requires_exact_item_wording),
+                "requires_clinician_administration": bool(question.requires_clinician_administration),
+                "requires_child_self_report": bool(question.requires_child_self_report),
+            }
+        )
+
+    if cache_ttl > 0:
+        qv2_question_bank_cache.set(cache_key, questions_payload, ttl_seconds=cache_ttl)
+    return questions_payload
+
+
+def _load_confidence_by_domain(
+    *,
+    version_id: str,
+    pipeline_version: str,
+    mode_key: str,
+    canonical_role: str,
+) -> dict[str, dict[str, Any]]:
+    cache_key = (version_id, pipeline_version, mode_key, canonical_role)
+    cache_ttl = _active_activation_cache_ttl_seconds()
+    if cache_ttl > 0:
+        cached = qv2_activation_snapshot_cache.get(cache_key)
+        if isinstance(cached, dict):
+            return cached
 
     activations = {
         domain: loader.get_active_activation(
@@ -537,26 +595,52 @@ def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = 
             "operational_class": operational_class,
         }
 
-    questions_payload = []
-    for question in visible:
-        questions_payload.append(
-            {
-                "question_id": str(question.id),
-                "question_code": question.question_code,
-                "feature": question.feature_key,
-                "prompt": question.caregiver_question or question.psychologist_question or question.question_text_primary,
-                "help_text": question.help_text,
-                "response_type": question.response_type,
-                "scale_id": question.scale_id,
-                "response_options": question.response_options_json,
-                "min_value": question.min_value,
-                "max_value": question.max_value,
-                "requires_internal_scoring": bool(question.requires_internal_scoring),
-                "requires_exact_item_wording": bool(question.requires_exact_item_wording),
-                "requires_clinician_administration": bool(question.requires_clinician_administration),
-                "requires_child_self_report": bool(question.requires_child_self_report),
-            }
-        )
+    if cache_ttl > 0:
+        qv2_activation_snapshot_cache.set(cache_key, confidence_by_domain, ttl_seconds=cache_ttl)
+    return confidence_by_domain
+
+
+def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = False, page: int = 1, page_size: int = 20) -> dict[str, Any]:
+    version_snapshot = _active_version_snapshot()
+    version_id = str(version_snapshot.get("id") or "")
+    if not version_id:
+        version = _active_version()
+        version_id = str(version.id)
+        version_snapshot = {
+            "id": version_id,
+            "version_label": version.version_label,
+            "questionnaire_version_final": version.questionnaire_version_final,
+            "scales_version_label": version.scales_version_label,
+            "definition_slug": loader.DEFAULT_DEFINITION_SLUG,
+        }
+
+    canonical_role = _normalize_role(role)
+    mode_key = _get_mode_key(canonical_role, mode)
+    pipeline_version = _active_model_pipeline_version()
+
+    cache_key = (
+        version_id,
+        pipeline_version,
+        mode,
+        canonical_role,
+        bool(include_full),
+        int(page),
+        int(page_size),
+    )
+    cache_ttl = _active_payload_cache_ttl_seconds()
+    if cache_ttl > 0:
+        cached = qv2_active_payload_cache.get(cache_key)
+        if isinstance(cached, dict):
+            return cached
+
+    version = _active_version()
+    questions_payload = _load_mode_question_bank(version.id, mode_key)
+    confidence_by_domain = _load_confidence_by_domain(
+        version_id=version_id,
+        pipeline_version=pipeline_version,
+        mode_key=mode_key,
+        canonical_role=canonical_role,
+    )
 
     total = len(questions_payload)
     if include_full:
@@ -567,10 +651,10 @@ def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = 
 
     payload = {
         "questionnaire": {
-            "definition_slug": loader.DEFAULT_DEFINITION_SLUG,
-            "version_label": version.version_label,
-            "questionnaire_version_final": version.questionnaire_version_final,
-            "scales_version_label": version.scales_version_label,
+            "definition_slug": version_snapshot.get("definition_slug") or loader.DEFAULT_DEFINITION_SLUG,
+            "version_label": version_snapshot.get("version_label") or version.version_label,
+            "questionnaire_version_final": version_snapshot.get("questionnaire_version_final") or version.questionnaire_version_final,
+            "scales_version_label": version_snapshot.get("scales_version_label") or version.scales_version_label,
             "mode": mode,
             "role": canonical_role,
             "mode_key": mode_key,
@@ -588,9 +672,7 @@ def get_active_questionnaire_payload(mode: str, role: str, include_full: bool = 
     }
 
     if cache_ttl > 0:
-        expires_at = _utcnow().timestamp() + cache_ttl
-        with _QV2_ACTIVE_PAYLOAD_CACHE_LOCK:
-            _QV2_ACTIVE_PAYLOAD_CACHE[cache_key] = (copy.deepcopy(payload), expires_at)
+        qv2_active_payload_cache.set(cache_key, payload, ttl_seconds=cache_ttl)
     return payload
 
 
@@ -641,6 +723,7 @@ def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> Questio
 
     page_tracker: dict[uuid.UUID | None, int] = {}
     next_page = 1
+    session_items: list[QuestionnaireSessionItem] = []
     for order, (question, _) in enumerate(rows, start=1):
         if question.id in repeated_ids:
             continue
@@ -649,7 +732,7 @@ def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> Questio
             page_tracker[section_id] = next_page
             next_page += 1
         page_number = page_tracker[section_id]
-        db.session.add(
+        session_items.append(
             QuestionnaireSessionItem(
                 session_id=session.id,
                 section_id=section_id,
@@ -661,6 +744,8 @@ def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> Questio
                 answered=False,
             )
         )
+    if session_items:
+        db.session.add_all(session_items)
 
     _audit(session.id, owner_user_id, "session_created", {"mode": mode, "role": role, "mode_key": mode_key})
     db.session.commit()

@@ -33,8 +33,22 @@ Use conservative defaults and override by environment only when measured evidenc
 ### Readiness and runtime cache
 - `READINESS_CACHE_TTL_SECONDS=5`
 - `READINESS_DB_TIMEOUT_MS=1200`
-- `QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS=20`
-- `JWT_SECURITY_STATE_CACHE_TTL_SECONDS=45`
+- `QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS=300`
+- `QV2_ACTIVE_VERSION_CACHE_TTL_SECONDS=120`
+- `QV2_ACTIVE_ACTIVATION_CACHE_TTL_SECONDS=300`
+- `JWT_SECURITY_STATE_CACHE_TTL_SECONDS=60`
+- `AUTH_ME_CACHE_TTL_SECONDS=60`
+
+### Cache backend (A2)
+- Default (compatible): `CACHE_BACKEND_URI=` (memory backend)
+- Optional distributed cache: `CACHE_BACKEND_URI=redis://<host>:<port>/<db>`
+- Key namespace: `CACHE_KEY_PREFIX=cognia`
+- Fallback behavior: if Redis is unavailable, service falls back to memory cache.
+
+### Metrics detail controls (A2)
+- `METRICS_ENDPOINT_SAMPLE_SIZE=512`
+- `METRICS_EXCLUDE_ENDPOINT_DETAILS=/healthz,/readyz`
+- Totals are always preserved; only endpoint-level detail can be excluded.
 
 ### Rate limiting backend
 - Default fallback: `RATE_LIMIT_STORAGE_URI=memory://`
@@ -54,3 +68,17 @@ Calibration process:
 - Prefer controlled load ramps with stop criteria.
 - Keep rollback SHA ready before production stress runs.
 - Treat queue migration (PDF/email/report jobs) as controlled non-breaking future phase.
+
+## Warmup Workflow (A2)
+Run warmup after deploy and before k6:
+
+```bash
+BASE_URL=https://www.cognia.lat \
+API_PREFIX=/api \
+USERNAME=<test_user> \
+PASSWORD=<test_password> \
+SAFE_MODE=true \
+WARMUP_ROLES=guardian,psychologist \
+WARMUP_MODES=short,medium \
+python scripts/warmup_backend.py
+```
