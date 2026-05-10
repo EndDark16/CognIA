@@ -118,6 +118,36 @@ Regla de continuidad:
 - Se creo `reports/questionnaire_design_inputs_v2/` con artefactos de inputs, requerimientos, terminologia, escalas, blueprint, cobertura por modo y readiness summary.
 - Se genero `questionnaire_master_final_corrected.csv` desnormalizado y validado para uso en BD/runtime/API.
 - Se publicaron `reports/questionnaire_master_final_audit_fix.md` y `reports/questionnaire_master_final_validation.csv`.
+
+## Actualizacion de sesion (2026-05-10) - A2 capacity/reliability optimization
+- Se completo una intervencion interna A2 orientada a subir capacidad real en homelab sin romper contratos API existentes.
+- Rama aplicada: `perf/a2-capacity-reliability-optimization`.
+- Mejoras tecnicas integradas:
+  - cache backend extensible: memory default + Redis opcional con fallback.
+  - cache de `/api/auth/me` con TTL corto e invalidaciones consistentes.
+  - cache multi-capa de `GET /api/v2/questionnaires/active` (version/activacion/question-bank/payload).
+  - invalidaciones centralizadas en sync/bootstrap de cuestionario/modelos.
+  - optimizacion de metricas (lock reduction + sample size configurable + exclusion opcional de detalle en health/ready).
+  - script operativo `scripts/warmup_backend.py` para precalentar rutas no destructivas.
+  - suite k6 A2 agregada para separar infraestructura vs flujo de usuario:
+    - `k6_infra_smoke.js`
+    - `k6_auth_read.js`
+    - `k6_qv2_active_read.js`
+    - `k6_user_journey_read.js`
+    - `k6_capacity_ladder.js`
+    - `k6_constant_rps.js`
+  - cache LRU para `feature contract` y clave de cifrado de campos.
+  - `create_session` optimizado con insercion batch de session items.
+- Validacion local A2:
+  - `ruff check --select F api tests`: OK
+  - `python -m compileall -q api app config core scripts run.py`: OK
+  - `python -c "from api.app import create_app; app = create_app(); print(app.name)"`: OK
+  - `pytest -q`: `188 passed, 3 skipped`
+  - `k6 inspect` de suite previa y A2: OK
+- Restricciones respetadas:
+  - frontend sin cambios,
+  - contratos API existentes sin ruptura,
+  - logica clinica/metodologica sin alteraciones.
 - Se aplico alcance final-only: `final_hardening_v10` (ADHD/Conduct/Anxiety/Depression) y `elimination_clean_rebuild_v12` (KEEP_V12 sobre v14).
 
 
