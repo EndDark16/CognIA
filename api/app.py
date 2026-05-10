@@ -32,8 +32,13 @@ from api.routes.users import users_bp
 from api.routes.problem_reports import problem_reports_bp
 from api.extensions import limiter
 from app.models import db, RefreshToken, AppUser
-from api.cache import user_security_cache
-from api.metrics import metrics_bp, record_request_metrics, record_error_metric
+from api.cache import user_security_cache, init_cache_backend, cache_backend_info
+from api.metrics import (
+    metrics_bp,
+    record_request_metrics,
+    record_error_metric,
+    configure_metrics,
+)
 import logging
 from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import SQLAlchemyError, OperationalError, DBAPIError
@@ -148,6 +153,21 @@ def create_app(config_class=DevelopmentConfig):
     db.init_app(app)
     jwt = JWTManager(app)
     limiter.init_app(app)
+    init_cache_backend(
+        cache_backend_uri=app.config.get("CACHE_BACKEND_URI"),
+        cache_key_prefix=app.config.get("CACHE_KEY_PREFIX"),
+        logger=app.logger,
+    )
+    backend_info = cache_backend_info()
+    app.logger.info(
+        "cache backend=%s prefix=%s",
+        backend_info.get("backend"),
+        backend_info.get("prefix"),
+    )
+    configure_metrics(
+        sample_size=app.config.get("METRICS_ENDPOINT_SAMPLE_SIZE"),
+        exclude_endpoint_details=app.config.get("METRICS_EXCLUDE_ENDPOINT_DETAILS"),
+    )
     app.logger.info(
         "rate_limit storage_uri=%s",
         _mask_uri_credentials(app.config.get("RATELIMIT_STORAGE_URI")),
@@ -371,7 +391,12 @@ def create_app(config_class=DevelopmentConfig):
             duration_ms = (time.monotonic() - start) * 1000.0
             if app.config.get("METRICS_ENABLED", True):
                 endpoint = request.endpoint or "unknown"
-                record_request_metrics(duration_ms, response.status_code, endpoint=endpoint)
+                record_request_metrics(
+                    duration_ms,
+                    response.status_code,
+                    endpoint=endpoint,
+                    path=request.path,
+                )
                 error_code = None
                 if response.status_code >= 400 and response.is_json:
                     payload = response.get_json(silent=True) or {}

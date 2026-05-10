@@ -12,6 +12,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from api.app import create_app
+from api.cache import qv2_active_version_cache
 from api.services import questionnaire_v2_loader_service as loader_service
 from api.services import questionnaire_v2_service as runtime_service
 from app.models import AppUser, QuestionnaireQuestion, QuestionnaireSession, db
@@ -354,6 +355,43 @@ def test_questionnaire_v2_active_payload_cache_and_invalidation(client, app, mon
     )
     assert third.status_code == 200
     assert call_counter["count"] == 10
+
+
+def test_questionnaire_v2_active_payload_cache_hit_skips_catalog_lookup(client, app, monkeypatch):
+    _, token = _user_token(app, "cache_lookup_skip_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    runtime_service.invalidate_active_questionnaire_cache()
+    qv2_active_version_cache.clear()
+
+    first = client.get(
+        "/api/v2/questionnaires/active?mode=short&role=guardian&page=1&page_size=5",
+        headers=headers,
+    )
+    assert first.status_code == 200
+
+    def _fail_catalog_lookup():
+        raise AssertionError("cache hit should not call ensure_catalog_loaded")
+
+    monkeypatch.setattr(runtime_service.loader, "ensure_catalog_loaded", _fail_catalog_lookup)
+    second = client.get(
+        "/api/v2/questionnaires/active?mode=short&role=guardian&page=1&page_size=5",
+        headers=headers,
+    )
+    assert second.status_code == 200
+    assert first.get_json() == second.get_json()
+
+
+def test_questionnaire_v2_feature_contract_cache_hits(app):
+    with app.app_context():
+        runtime_service._load_feature_contract_cached.cache_clear()
+        info_before = runtime_service._load_feature_contract_cached.cache_info()
+        version = runtime_service.ModelVersion.query.order_by(runtime_service.ModelVersion.created_at.desc()).first()
+        assert version is not None
+        runtime_service._load_feature_contract(version)
+        runtime_service._load_feature_contract(version)
+        info_after = runtime_service._load_feature_contract_cached.cache_info()
+        assert info_after.hits >= info_before.hits + 1
 
 
 def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
