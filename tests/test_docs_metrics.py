@@ -9,13 +9,19 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from api.app import create_app
+from api.metrics import configure_metrics, reset_metrics_state
 from app.models import db
 
 
 def _client_with_config(overrides=None):
+    reset_metrics_state()
     app = create_app(TestingConfig)
     if overrides:
         app.config.update(overrides)
+        configure_metrics(
+            sample_size=app.config.get("METRICS_ENDPOINT_SAMPLE_SIZE"),
+            exclude_endpoint_details=app.config.get("METRICS_EXCLUDE_ENDPOINT_DETAILS"),
+        )
     with app.app_context():
         db.create_all()
     return app.test_client(), app
@@ -83,6 +89,31 @@ def test_metrics_keeps_legacy_fields_and_adds_endpoint_breakdown():
         assert "endpoint_latency_ms_max" in body
         assert "endpoint_latency_ms_p95_approx" in body
         assert "error_counts" in body
+    finally:
+        _teardown(app)
+
+
+def test_metrics_can_exclude_health_endpoint_details_without_losing_totals():
+    client, app = _client_with_config(
+        {
+            "METRICS_ENABLED": True,
+            "METRICS_TOKEN": None,
+            "METRICS_TOKEN_REQUIRED": False,
+            "METRICS_EXCLUDE_ENDPOINT_DETAILS": {"/healthz", "/readyz", "healthz", "readyz"},
+            "METRICS_ENDPOINT_SAMPLE_SIZE": 32,
+        }
+    )
+    try:
+        assert client.get("/healthz").status_code == 200
+        assert client.get("/readyz").status_code == 200
+
+        metrics_resp = client.get("/metrics")
+        assert metrics_resp.status_code == 200
+        body = metrics_resp.get_json()
+        assert body["requests_total"] >= 2
+        endpoint_counts = body.get("endpoint_counts", {})
+        assert all("health" not in str(key) for key in endpoint_counts.keys())
+        assert all("ready" not in str(key) for key in endpoint_counts.keys())
     finally:
         _teardown(app)
 

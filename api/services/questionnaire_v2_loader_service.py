@@ -8,6 +8,14 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+from flask import current_app
+
+from api.cache import (
+    qv2_activation_snapshot_cache,
+    qv2_active_payload_cache,
+    qv2_active_version_cache,
+    qv2_question_bank_cache,
+)
 
 from app.models import (
     ModelArtifactRegistry,
@@ -60,7 +68,70 @@ def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _active_version_cache_ttl_seconds() -> int:
+    try:
+        return max(0, int(current_app.config.get("QV2_ACTIVE_VERSION_CACHE_TTL_SECONDS", 120)))
+    except Exception:
+        return 120
+
+
+def _active_activation_cache_ttl_seconds() -> int:
+    try:
+        return max(0, int(current_app.config.get("QV2_ACTIVE_ACTIVATION_CACHE_TTL_SECONDS", 300)))
+    except Exception:
+        return 300
+
+
+def _version_snapshot_from_row(version: QuestionnaireVersion) -> dict[str, Any]:
+    return {
+        "id": str(version.id),
+        "definition_id": str(version.definition_id),
+        "version_label": version.version_label,
+        "questionnaire_version_final": version.questionnaire_version_final,
+        "scales_version_label": version.scales_version_label,
+        "is_active": bool(version.is_active),
+        "published_at": version.published_at.isoformat() if version.published_at else None,
+        "updated_at": version.updated_at.isoformat() if version.updated_at else None,
+        "definition_slug": DEFAULT_DEFINITION_SLUG,
+    }
+
+
+def get_active_version_snapshot(force_refresh: bool = False) -> dict[str, Any]:
+    cache_key = "active_version"
+    ttl = _active_version_cache_ttl_seconds()
+    if ttl > 0 and not force_refresh:
+        cached = qv2_active_version_cache.get(cache_key)
+        if isinstance(cached, dict) and cached.get("id"):
+            return cached
+
+    version = (
+        QuestionnaireVersion.query.join(
+            QuestionnaireDefinition,
+            QuestionnaireVersion.definition_id == QuestionnaireDefinition.id,
+        )
+        .filter(QuestionnaireDefinition.slug == DEFAULT_DEFINITION_SLUG)
+        .filter(QuestionnaireVersion.is_active.is_(True))
+        .order_by(QuestionnaireVersion.published_at.desc(), QuestionnaireVersion.created_at.desc())
+        .first()
+    )
+    if not version:
+        result = bootstrap_questionnaire_backend_v2()
+        version_id = result["questionnaire"]["version_id"]
+        version = db.session.get(QuestionnaireVersion, uuid.UUID(version_id))
+        if not version:
+            raise RuntimeError("failed_to_bootstrap_questionnaire_catalog")
+
+    snapshot = _version_snapshot_from_row(version)
+    if ttl > 0:
+        qv2_active_version_cache.set(cache_key, snapshot, ttl_seconds=ttl)
+    return snapshot
+
+
 def _invalidate_runtime_active_cache() -> None:
+    qv2_active_payload_cache.clear()
+    qv2_active_version_cache.clear()
+    qv2_activation_snapshot_cache.clear()
+    qv2_question_bank_cache.clear()
     # Import local para evitar ciclos en inicializacion de modulos.
     try:
         from api.services import questionnaire_v2_service as runtime_service
@@ -709,22 +780,21 @@ def bootstrap_questionnaire_backend_v2(created_by: uuid.UUID | None = None, sour
 
 
 def ensure_catalog_loaded() -> QuestionnaireVersion:
-    version = (
-        QuestionnaireVersion.query.join(
-            QuestionnaireDefinition,
-            QuestionnaireVersion.definition_id == QuestionnaireDefinition.id,
-        )
-        .filter(QuestionnaireDefinition.slug == DEFAULT_DEFINITION_SLUG)
-        .filter(QuestionnaireVersion.is_active.is_(True))
-        .order_by(QuestionnaireVersion.published_at.desc(), QuestionnaireVersion.created_at.desc())
-        .first()
-    )
-    if version:
-        return version
+    snapshot = get_active_version_snapshot(force_refresh=False)
+    version_id = snapshot.get("id")
+    if not version_id:
+        raise RuntimeError("active_questionnaire_version_missing")
 
-    result = bootstrap_questionnaire_backend_v2()
-    version_id = result["questionnaire"]["version_id"]
-    row = db.session.get(QuestionnaireVersion, uuid.UUID(version_id))
+    row = db.session.get(QuestionnaireVersion, uuid.UUID(str(version_id)))
+    if row:
+        return row
+
+    refreshed = get_active_version_snapshot(force_refresh=True)
+    refreshed_id = refreshed.get("id")
+    if not refreshed_id:
+        raise RuntimeError("active_questionnaire_version_missing")
+
+    row = db.session.get(QuestionnaireVersion, uuid.UUID(str(refreshed_id)))
     if not row:
         raise RuntimeError("failed_to_bootstrap_questionnaire_catalog")
     return row

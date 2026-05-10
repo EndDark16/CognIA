@@ -27,7 +27,7 @@ from app.models import (
     UserRole,
     db,
 )
-from api.cache import roles_cache
+from api.cache import invalidate_user_auth_caches
 from api.routes.auth import _normalize_professional_card, _normalize_user_type, _USER_TYPE_ROLE
 
 
@@ -141,7 +141,6 @@ def update_user(user: AppUser, payload: dict, acting_admin_id: uuid.UUID):
         for ur in UserRole.query.filter_by(user_id=user.id).all():
             if ur.role_id not in {r.id for r in desired}:
                 db.session.delete(ur)
-        roles_cache.set(user.id, [r.name for r in desired])
         changed_roles = True
     elif required_role:
         # Ensure base role for new user_type
@@ -152,12 +151,12 @@ def update_user(user: AppUser, payload: dict, acting_admin_id: uuid.UUID):
             db.session.flush()
         if not UserRole.query.filter_by(user_id=user.id, role_id=role.id).first():
             db.session.add(UserRole(user_id=user.id, role_id=role.id))
-            roles_cache.set(user.id, [r.name for r in user.roles] + [role.name])
             changed_roles = True
 
     user.updated_at = _now()
     db.session.add(user)
     db.session.commit()
+    invalidate_user_auth_caches(user.id)
 
     if changed_roles or changed_status:
         revoke_user_sessions(user)
@@ -300,6 +299,7 @@ def approve_psychologist(user: AppUser, *, admin_id: uuid.UUID):
     user.updated_at = now
     db.session.add(user)
     db.session.commit()
+    invalidate_user_auth_caches(user.id)
     log_audit(admin_id, "COLPSIC_APPROVED", "admin", {"user_id": str(user.id)})
     return user
 
@@ -408,8 +408,8 @@ def assign_roles(user: AppUser, roles: list[str], admin_id: uuid.UUID):
     for ur in UserRole.query.filter_by(user_id=user.id).all():
         if ur.role_id not in {r.id for r in desired}:
             db.session.delete(ur)
-    roles_cache.set(user.id, [r.name for r in desired])
     db.session.commit()
+    invalidate_user_auth_caches(user.id)
     revoke_user_sessions(user)
     log_audit(admin_id, "ROLES_ASSIGNED", "admin", {"user_id": str(user.id), "roles": roles_norm})
 
