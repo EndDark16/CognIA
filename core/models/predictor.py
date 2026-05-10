@@ -2,7 +2,10 @@ import joblib
 import os
 import numpy as np
 import pandas as pd
+from functools import lru_cache
 
+
+@lru_cache(maxsize=16)
 def load_model(model_name: str):
     model_path = os.path.join("models", f"{model_name}_model.pkl")
     return joblib.load(model_path)
