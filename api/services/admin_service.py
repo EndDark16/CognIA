@@ -3,6 +3,7 @@ from datetime import datetime, timezone, timedelta
 
 from flask import current_app
 from sqlalchemy import or_
+from sqlalchemy.orm import selectinload
 
 from api.repositories.admin_repository import apply_pagination, apply_sort
 from api.security import log_audit, revoke_user_sessions
@@ -42,7 +43,7 @@ def _now():
 
 
 def list_users(filters: dict):
-    query = AppUser.query
+    query = AppUser.query.options(selectinload(AppUser.roles))
 
     q = (filters.get("q") or "").strip()
     if q:
