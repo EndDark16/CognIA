@@ -810,3 +810,35 @@ Validacion local en esta ventana:
 
 Pendiente operativo:
 - carga/estres real contra `https://www.cognia.lat/api` queda `por confirmar` hasta contar con credenciales de prueba dedicadas y ventana controlada.
+
+Actualizacion operativa (2026-05-10) - ejecucion real en produccion:
+- Flujo de ramas completado:
+  - `perf/safe-backend-optimization-audit` -> `dev.enddark` -> `development` -> `main`.
+- PRs:
+  - `#133` merged (perf -> dev.enddark)
+  - `#134` merged (dev.enddark -> development)
+  - `#135` merged (development -> main)
+- SHA en `main`: `193de2ab1b71a79f2d60b9e3b131852220ca178c`.
+- Workflows en ese SHA:
+  - `CI Backend`: success
+  - `Deploy Backend (Best Effort)`: success
+- Patron health/readiness confirmado:
+  - root (`/healthz`, `/readyz`) responde `200`
+  - bajo `/api` para health/readiness responde `404`
+- Configuracion efectiva usada en k6:
+  - `BASE_URL=https://www.cognia.lat`
+  - `API_PREFIX=/api`
+- Usuario de prueba sintetico creado con prefijo `perf_loadtest_` (sin uso de usuarios reales).
+- Escenarios ejecutados:
+  - `smoke`: ejecutado, disponibilidad mantenida; `http_req_failed=2.74%`; p95 global ~`6377 ms`.
+  - `baseline`: ejecutado; `http_req_failed=32.70%`; p95 global ~`7615 ms`; degradacion severa sostenida.
+- Criterio de parada obligatorio activado en baseline:
+  - `error rate > 5%` por mas de 60s.
+- Escenarios no ejecutados por seguridad operativa:
+  - `load`, `stress`, `spike`, `soak`, `questionnaire_v2_flow`.
+- Reportes versionables agregados:
+  - `reports/load_tests/2026-05-10_prod_smoke_summary.md`
+  - `reports/load_tests/2026-05-10_prod_baseline_summary.md`
+  - `reports/load_tests/2026-05-10_prod_load_summary.md`
+  - `reports/load_tests/2026-05-10_prod_stress_summary.md`
+  - `reports/load_tests/2026-05-10_backend_perf_final_report.md`

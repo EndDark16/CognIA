@@ -672,3 +672,48 @@ Estado de ejecucion de carga/estres real contra produccion:
 
 Claim metodologico sin cambios:
 - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-05-10) - backend_perf_operational_execution_prod
+- Se completo flujo de ramas y promocion:
+  - `perf/safe-backend-optimization-audit` -> `dev.enddark` -> `development` -> `main`.
+- PRs de promocion ejecutados:
+  - `#133` (perf -> dev.enddark) merged
+  - `#134` (dev.enddark -> development) merged
+  - `#135` (development -> main) merged
+- SHA en `main` validado para despliegue: `193de2ab1b71a79f2d60b9e3b131852220ca178c`.
+- GitHub Actions en ese SHA:
+  - `CI Backend`: success
+  - `Deploy Backend (Best Effort)`: success
+- Patron real de health/readiness en produccion:
+  - `https://www.cognia.lat/healthz` -> `200`
+  - `https://www.cognia.lat/readyz` -> `200`
+  - `https://www.cognia.lat/api/healthz` -> `404`
+  - `https://www.cognia.lat/api/readyz` -> `404`
+- Configuracion efectiva de k6:
+  - `BASE_URL=https://www.cognia.lat`
+  - `API_PREFIX=/api`
+- Usuario sintetico creado para pruebas (sin usuarios reales):
+  - prefijo `perf_loadtest_`.
+- Ejecucion k6 real contra produccion:
+  - `smoke` ejecutado (`scripts/load/k6_smoke.js`):
+    - `http_req_failed=2.74%`
+    - p95 global `~6377 ms`
+    - servicio disponible, `readyz` pre/post en `ready`.
+  - `baseline` ejecutado (`scripts/load/k6_baseline.js`):
+    - `http_req_failed=32.70%`
+    - p95 global `~7615 ms`
+    - degradacion severa sostenida con `readyz` aun respondiendo.
+- Criterio de parada obligatorio activado:
+  - `error rate > 5%` sostenido por mas de 60 segundos en baseline.
+- Por seguridad operativa no se ejecutaron:
+  - `load`
+  - `stress`
+  - `spike`
+  - `soak`
+  - `questionnaire_v2_flow`
+- Evidencia versionable generada:
+  - `reports/load_tests/2026-05-10_prod_smoke_summary.md`
+  - `reports/load_tests/2026-05-10_prod_baseline_summary.md`
+  - `reports/load_tests/2026-05-10_prod_load_summary.md`
+  - `reports/load_tests/2026-05-10_prod_stress_summary.md`
+  - `reports/load_tests/2026-05-10_backend_perf_final_report.md`
