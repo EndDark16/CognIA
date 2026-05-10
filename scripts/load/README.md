@@ -35,6 +35,7 @@ Reusable load/stress suite for CognIA backend with safe defaults for limited hom
 - `K6_DURATION`
 - `K6_VUS`
 - `K6_RAMP_TARGET`
+- `K6_OUTPUT_DIR` (optional path for `handleSummary` files)
 - `TEST_RUN_ID`
 - `SAFE_MODE`
 - `SKIP_WRITE_HEAVY`
@@ -138,6 +139,10 @@ k6 run --summary-export artifacts/load_tests/qv2_flow/summary.json scripts/load/
 Raw artifacts (if not ignored):
 - `artifacts/load_tests/<timestamp>_<scenario>/summary.json`
 - `artifacts/load_tests/<timestamp>_<scenario>/raw-output.json` (optional)
+
+Automatic per-run outputs from `handleSummary`:
+- `<K6_OUTPUT_DIR>/<timestamp>_<scenario>_<test_run_id>_summary.json`
+- `<K6_OUTPUT_DIR>/<timestamp>_<scenario>_<test_run_id>_summary.md`
 
 Versioned summary:
 - `reports/load_tests/<timestamp>_<scenario>_summary.md`

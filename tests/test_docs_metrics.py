@@ -53,6 +53,40 @@ def test_metrics_disabled_returns_404():
         _teardown(app)
 
 
+def test_metrics_keeps_legacy_fields_and_adds_endpoint_breakdown():
+    client, app = _client_with_config(
+        {
+            "METRICS_ENABLED": True,
+            "METRICS_TOKEN": None,
+            "METRICS_TOKEN_REQUIRED": False,
+        }
+    )
+    try:
+        warm = client.get("/healthz")
+        assert warm.status_code == 200
+
+        resp = client.get("/metrics")
+        assert resp.status_code == 200
+        body = resp.get_json()
+
+        # Legacy fields (contract compatibility)
+        assert "uptime_seconds" in body
+        assert "requests_total" in body
+        assert "latency_ms_avg" in body
+        assert "latency_ms_max" in body
+        assert "status_counts" in body
+
+        # New backward-compatible fields
+        assert "endpoint_counts" in body
+        assert "endpoint_status_counts" in body
+        assert "endpoint_latency_ms_avg" in body
+        assert "endpoint_latency_ms_max" in body
+        assert "endpoint_latency_ms_p95_approx" in body
+        assert "error_counts" in body
+    finally:
+        _teardown(app)
+
+
 def test_swagger_disabled_returns_404():
     client, app = _client_with_config({"SWAGGER_ENABLED": False})
     try:

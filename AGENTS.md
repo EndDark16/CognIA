@@ -717,3 +717,28 @@ Claim metodologico sin cambios:
   - `reports/load_tests/2026-05-10_prod_load_summary.md`
   - `reports/load_tests/2026-05-10_prod_stress_summary.md`
   - `reports/load_tests/2026-05-10_backend_perf_final_report.md`
+
+## Actualizacion de estado (2026-05-10) - a1_backend_internal_optimization
+- Se ejecuto intervencion A1 interna de optimizacion/observabilidad/estabilidad sin cambios destructivos ni ruptura de contratos API publicos.
+- Rama de trabajo aislada: `perf/a1-backend-internal-optimization`.
+- Se mantuvo politica de no cambiar frontend, no alterar logica clinica/metodologica, no tocar modelos/thresholds/artefactos ML.
+- Mejoras internas aplicadas:
+  - hot-path JWT: acceso evita query a `refresh_token` para access tokens; cache TTL corto para estado de revocacion.
+  - request-id (`X-Request-ID`) y logging estructurado por request.
+  - metricas in-memory extendidas por endpoint/status/latencia (backward-compatible).
+  - cache TTL para `GET /api/v2/questionnaires/active` con invalidacion en sync/bootstrap v2.
+  - optimizacion paginada de `get_session_page_payload` para no cargar todas las paginas.
+  - reduccion N+1 en listados de usuarios (roles eager load) y problem reports (attachments batch preload).
+  - lazy import de matplotlib para PDF/reportes.
+  - ajuste conservador de defaults homelab (DB pool y gunicorn) + soporte completo en entrypoint para worker class/graceful timeout.
+  - migracion de indices compuestos hot-path: `20260510_01_add_perf_hotpath_indexes.py`.
+- Evidencia de validacion local en esta ventana:
+  - `ruff check --select F api tests`: OK
+  - `python -m compileall -q api app config core scripts run.py`: OK
+  - `python -c "from api.app import create_app; app = create_app(); print(app.name)"`: OK
+  - `pytest -q`: 179 passed, 3 skipped
+  - `k6 inspect` de la suite completa en `scripts/load/`: OK
+- Estado de carga real preopt conocido (referencia): baseline 10 VUs degrado severamente; se requiere medir postopt en despliegue main.
+- Artefactos de auditoria creados:
+  - `reports/performance/2026-05-10_a1_backend_internal_optimization_audit.md`
+  - `docs/deployment_performance.md`

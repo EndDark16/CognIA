@@ -35,8 +35,9 @@ fi
 BIND="0.0.0.0:${PORT:-5000}"
 WORKERS=${GUNICORN_WORKERS:-${WEB_CONCURRENCY:-$DEFAULT_WORKERS}}
 THREADS=${GUNICORN_THREADS:-$DEFAULT_THREADS}
-BIND="0.0.0.0:${PORT:-5000}"
+WORKER_CLASS=${GUNICORN_WORKER_CLASS:-gthread}
 TIMEOUT=${GUNICORN_TIMEOUT:-}
+GRACEFUL_TIMEOUT=${GUNICORN_GRACEFUL_TIMEOUT:-}
 KEEPALIVE=${GUNICORN_KEEPALIVE:-}
 MAX_REQUESTS=${GUNICORN_MAX_REQUESTS:-}
 MAX_REQUESTS_JITTER=${GUNICORN_MAX_REQUESTS_JITTER:-}
@@ -73,10 +74,13 @@ else
   echo "==> Migraciones deshabilitadas (RUN_MIGRATIONS=false o SKIP_MIGRATIONS=true)."
 fi
 
-echo "==> Iniciando Gunicorn en ${BIND} con ${WORKERS} workers y ${THREADS} threads"
-ARGS=(-w "$WORKERS" --threads "$THREADS" -b "$BIND")
+echo "==> Iniciando Gunicorn bind=${BIND} worker_class=${WORKER_CLASS} workers=${WORKERS} threads=${THREADS} timeout=${TIMEOUT:-default} graceful_timeout=${GRACEFUL_TIMEOUT:-default} keepalive=${KEEPALIVE:-default}"
+ARGS=(-k "$WORKER_CLASS" -w "$WORKERS" --threads "$THREADS" -b "$BIND")
 if [ -n "$TIMEOUT" ]; then
   ARGS+=(--timeout "$TIMEOUT")
+fi
+if [ -n "$GRACEFUL_TIMEOUT" ]; then
+  ARGS+=(--graceful-timeout "$GRACEFUL_TIMEOUT")
 fi
 if [ -n "$KEEPALIVE" ]; then
   ARGS+=(--keep-alive "$KEEPALIVE")

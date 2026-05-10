@@ -1,4 +1,13 @@
-import { hitHealth, hitMe, hitQuestionnaireActive, authenticate, buildConfig, resolveHealthPaths, think } from "./helpers.js";
+import {
+  hitHealth,
+  hitMe,
+  hitQuestionnaireActive,
+  authenticate,
+  buildConfig,
+  buildSummaryOutputs,
+  resolveHealthPaths,
+  think,
+} from "./helpers.js";
 
 const config = buildConfig();
 const vus = Number(__ENV.K6_VUS || 5);
@@ -26,4 +35,8 @@ export default function (setupData) {
   hitMe(config, setupData.token);
   hitQuestionnaireActive(config, setupData.token);
   think(config);
+}
+
+export function handleSummary(data) {
+  return buildSummaryOutputs("smoke", data, config);
 }
