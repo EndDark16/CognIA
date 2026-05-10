@@ -842,3 +842,19 @@ Actualizacion operativa (2026-05-10) - ejecucion real en produccion:
   - `reports/load_tests/2026-05-10_prod_load_summary.md`
   - `reports/load_tests/2026-05-10_prod_stress_summary.md`
   - `reports/load_tests/2026-05-10_backend_perf_final_report.md`
+
+## Actualizacion de sesion (2026-05-10) - A1 backend internal optimization
+- Se completo una intervencion interna A1 enfocada en performance, observabilidad y estabilidad operativa sin romper contratos API publicos.
+- Cambios internos relevantes:
+  - JWT hot path optimizado (sin query refresh_token para access tokens) y cache TTL corta de estado de revocacion.
+  - `X-Request-ID` propagado en responses + logging estructurado por request.
+  - metricas extendidas por endpoint/status/latencia manteniendo campos legacy.
+  - cache TTL e invalidacion explicita para `/api/v2/questionnaires/active`.
+  - optimizacion de paginado en session page v2 (query solo de paginas solicitadas).
+  - mitigacion N+1 en listados de usuarios y problem reports.
+  - lazy import de matplotlib para PDF/reportes.
+  - ajuste conservador de defaults homelab y entrypoint gunicorn.
+  - migracion de indices compuestos hot-path: `migrations/versions/20260510_01_add_perf_hotpath_indexes.py`.
+- Validacion local completada: ruff, compileall, import sanity, pytest completo y k6 inspect (suite completa).
+- Referencia preopt confirmada: baseline 10 VUs en produccion con degradacion severa (error rate ~32.70%, p95 ~7615 ms).
+- Pendiente operativo para cierre total: ejecutar postopt en main (smoke, micro-baseline y baseline) con credenciales de usuario de prueba y evidencia versionada.
