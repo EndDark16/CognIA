@@ -888,3 +888,18 @@ Actualizacion operativa (2026-05-10) - ejecucion real en produccion:
 - Validacion local completada: ruff, compileall, import sanity, pytest completo y k6 inspect (suite completa).
 - Referencia preopt confirmada: baseline 10 VUs en produccion con degradacion severa (error rate ~32.70%, p95 ~7615 ms).
 - Pendiente operativo para cierre total: ejecutar postopt en main (smoke, micro-baseline y baseline) con credenciales de usuario de prueba y evidencia versionada.
+
+## Update 2026-05-10 - A2 Post-Deploy Capacity Validation
+- Runtime in main validated at SHA `9d2a4f9f9898940af2a6b32d398b90832ea4efbc` after PR chain `#150 -> #151 -> #152`.
+- Health checks post-deploy:
+  - `/healthz` and `/readyz` on root domain: `200`
+  - `/api/healthz` and `/api/readyz`: `404` expected
+- `scripts/warmup_backend.py` hit CDN/WAF block (`403`, error code `1010`) from this client; manual safe warmup executed via curl for login/me/transport-key/qv2_active and health/ready with `200` responses.
+- k6 postopt execution against production completed:
+  - `auth_read` 10 VUs: `0.0000%` errors, p95 `1032.80 ms`
+  - `qv2_active_read` 10 VUs: `0.0000%` errors, p95 `1212.13 ms`
+  - `user_journey_read` 10 VUs: `0.0000%` errors, p95 `1104.68 ms`
+  - `user_journey_read` 15 VUs: `0.0000%` errors, p95 `754.89 ms`
+  - `user_journey_read` 20 VUs: `0.0000%` errors, p95 `836.62 ms`
+  - `capacity_ladder` (10->30 VUs): degraded at high stage, abort triggered by `http_req_failed=5.10%`
+- Conclusion of operational window: stable user-journey capacity observed through 20 VUs; high-stage degradation appears near top ladder range in current homelab constraints.
