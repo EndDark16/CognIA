@@ -1,6 +1,7 @@
 import {
   authenticate,
   buildConfig,
+  buildSummaryOutputs,
   hitHealth,
   hitMe,
   hitQuestionnaireActive,
@@ -34,4 +35,8 @@ export default function (setupData) {
   hitMe(config, setupData.token);
   hitQuestionnaireActive(config, setupData.token);
   think(config);
+}
+
+export function handleSummary(data) {
+  return buildSummaryOutputs("soak", data, config);
 }
