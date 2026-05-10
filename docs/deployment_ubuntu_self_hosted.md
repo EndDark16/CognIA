@@ -59,6 +59,7 @@ docker compose --profile local-db up -d --build backend
 cd /opt/cognia
 docker compose up -d --force-recreate gateway
 ```
+
 ## Workflows versionados
 
 ### 1) CI normal (GitHub-hosted)
