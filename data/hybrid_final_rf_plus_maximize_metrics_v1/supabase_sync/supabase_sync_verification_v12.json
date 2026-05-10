@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "line": "v12",
+  "active_csv": "C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_rf_plus_maximize/data/hybrid_active_modes_freeze_v12/tables/hybrid_active_models_30_modes.csv",
+  "inputs_csv": "C:/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app_final_rf_plus_maximize/data/hybrid_active_modes_freeze_v12/tables/hybrid_questionnaire_inputs_master.csv",
+  "active_activations_db": 30,
+  "expected_activations_csv": 30,
+  "active_model_versions_non_rf": 0,
+  "non_rf_model_keys": [],
+  "missing_expected_models": 0,
+  "missing_expected_model_rows": [],
+  "extra_active_models": 0,
+  "extra_active_model_rows": [],
+  "mismatched_feature_columns": 0,
+  "mismatched_feature_column_models": [],
+  "visible_questions_db": 146,
+  "question_mode_inclusion_counts": {
+    "guardian_short": 67,
+    "guardian_medium": 104,
+    "guardian_complete": 125,
+    "psychologist_short": 60,
+    "psychologist_medium": 110,
+    "psychologist_complete": 146
+  }
+}

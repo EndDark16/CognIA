@@ -1,0 +1,13 @@
+metric,before_value,after_value,target_or_gate,final_status,source,notes
+quality_gate_status,NONE,OK,OK,pass,sonar_api:/api/qualitygates/project_status + /api/project_analyses/search,before=earliest analysis in retained history; after=latest status
+coverage,0.0,59.3,>= gate policy,pass,sonar_api:/api/measures/search_history + /api/measures/component,before=earliest known history value; after=current component value when available
+duplicated_lines_density,1.6,1.4,<= gate policy,pass,sonar_api:/api/measures/search_history + /api/measures/component,before=earliest known history value; after=current component value when available
+bugs,2,0,0 preferred,pass,sonar_api:/api/measures/search_history + /api/measures/component,before=earliest known history value; after=current component value when available
+vulnerabilities,16,0,0 preferred,pass,sonar_api:/api/measures/search_history + /api/measures/component,before=earliest known history value; after=current component value when available
+code_smells,464,0,lower preferred,pass,sonar_api:/api/measures/search_history + /api/measures/component,before=earliest known history value; after=current component value when available
+security_hotspots,14,0,review required,pass,sonar_api:/api/measures/search_history + /api/measures/component,before=earliest known history value; after=current component value when available
+reliability_rating,3.0,1.0,1.0 expected,pass,sonar_api:/api/measures/search_history + /api/measures/component,before=earliest known history value; after=current component value when available
+security_rating,3.0,1.0,1.0 expected,pass,sonar_api:/api/measures/search_history + /api/measures/component,before=earliest known history value; after=current component value when available
+sqale_rating,1.0,1.0,1.0 expected,pass,sonar_api:/api/measures/search_history + /api/measures/component,before=earliest known history value; after=current component value when available
+open_issues_total,not_available,0,0 preferred,pass,sonar_api:/api/issues/search?resolved=false,historical open count timeline not directly exposed as single metric in this extraction
+blocking_issues_remaining,not_available,0,0 required,pass,sonar_api:/api/issues/search?resolved=false,derived from current open issues severities

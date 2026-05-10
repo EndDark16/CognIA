@@ -1,0 +1,32 @@
+{
+  "model_key": "anxiety__psychologist_1_3__hybrid_domain_specialized_rf_v17__rf__domain_strict_v17",
+  "line": "hybrid_domain_specialized_rf_v17",
+  "domain": "anxiety",
+  "role": "psychologist",
+  "mode": "psychologist_1_3",
+  "model_family": "rf",
+  "feature_columns": [
+    "gad_difficulty_controlling_worry",
+    "sep_anx_04_refuses_leaving_home_school",
+    "sep_anx_07_separation_nightmares",
+    "sep_anx_03_worry_event_causing_separation",
+    "sep_anx_02_worry_losing_attachment_figures",
+    "sep_anx_05_fear_being_alone_without_attachment",
+    "gad_excessive_worry_multiple_areas",
+    "sep_anx_01_distress_on_separation",
+    "sep_anx_08_physical_complaints_on_separation",
+    "social_anxiety_almost_always_triggered",
+    "sep_anx_06_refuses_sleep_away_or_alone",
+    "social_anxiety_fear_interactions"
+  ],
+  "n_features": 12,
+  "recommended_threshold": 0.10999999999999999,
+  "threshold_policy": "balanced_recall_specificity",
+  "calibration": "sigmoid",
+  "config_id": "rf_high_recall_push",
+  "seed": 20270511,
+  "generated_at_utc": "2026-05-02T05:40:16.871884+00:00",
+  "feature_set_type": "domain_strict_1_3",
+  "same_inputs_outputs_contract": true,
+  "questionnaire_changed": false
+}

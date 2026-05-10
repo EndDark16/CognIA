@@ -1,0 +1,10 @@
+﻿7ed7068 (HEAD -> fix/elimination-structural-audit-rescue-v1, origin/fix/elimination-structural-audit-rescue-v1) Fix elimination structural rescue and OpenAPI spec
+f073a23 Merge structural mode rescue v8 to development
+f273c25 Merge structural mode champions v8
+17e7c1e (origin/fix/structural-mode-model-rescue-v1, fix/structural-mode-model-rescue-v1) Fix structural mode champions v8
+9de7be2 test: trigger backend workflows after cleanup
+899134c Merge pull request #63 from EndDark16/fix/final-active-line-audit
+496f570 Merge branch 'development' into fix/final-active-line-audit
+2494392 chore(ops): reconcile development workflows
+0d4cefd fix(hybrid): align active confidence communication
+3202d66 fix(hybrid): close champion guardrail with v6_hotfix_v1 validation alignment

@@ -1,0 +1,2 @@
+key,rule,type,severity,component,line,status,creation_date,update_date,message_resumido,source
+none,,,,,,OPEN_ISSUES_TOTAL_0,,,open issues total = 0,sonar_api:/api/issues/search?resolved=false

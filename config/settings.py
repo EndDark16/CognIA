@@ -45,6 +45,11 @@ class Config:
     DB_NAME = os.getenv("DB_NAME", "cognia_db")
     DB_SSL_MODE = os.getenv("DB_SSL_MODE", "")
     _ssl_suffix = f"?sslmode={DB_SSL_MODE}" if DB_SSL_MODE else ""
+    DB_POOL_SIZE = _int_env("DB_POOL_SIZE", 5)
+    DB_MAX_OVERFLOW = _int_env("DB_MAX_OVERFLOW", 10)
+    DB_POOL_TIMEOUT = _int_env("DB_POOL_TIMEOUT", 10)
+    DB_POOL_RECYCLE = _int_env("DB_POOL_RECYCLE", 1800)
+    DB_POOL_PRE_PING = _bool_env("DB_POOL_PRE_PING", True)
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "SQLALCHEMY_DATABASE_URI",
         f"postgresql+psycopg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}{_ssl_suffix}",
@@ -121,7 +126,11 @@ class Config:
     QR_PIN_MAX_ATTEMPTS = int(os.getenv("QR_PIN_MAX_ATTEMPTS", "5"))
     QR_PIN_LOCK_MINUTES = int(os.getenv("QR_PIN_LOCK_MINUTES", "10"))
     QV2_SHARED_ACCESS_RATE_LIMIT = os.getenv("QV2_SHARED_ACCESS_RATE_LIMIT", "30 per minute")
+    QV2_TRANSPORT_KEY_RATE_LIMIT = os.getenv("QV2_TRANSPORT_KEY_RATE_LIMIT", "60 per minute")
+    QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS = _int_env("QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS", 60)
     PREDICT_RATE_LIMIT = os.getenv("PREDICT_RATE_LIMIT", "30 per minute")
+    READINESS_CACHE_TTL_SECONDS = _int_env("READINESS_CACHE_TTL_SECONDS", 3)
+    READINESS_DB_TIMEOUT_MS = _int_env("READINESS_DB_TIMEOUT_MS", 2000)
 
     # Problem reports
     PROBLEM_REPORT_UPLOAD_DIR = os.getenv("PROBLEM_REPORT_UPLOAD_DIR", "artifacts/problem_reports/uploads")
@@ -173,6 +182,15 @@ class Config:
     SECURITY_CSP = os.getenv("SECURITY_CSP")
     SECURITY_PERMISSIONS_POLICY = os.getenv("SECURITY_PERMISSIONS_POLICY")
 
+    # CognIA security hardening
+    COGNIA_ENABLE_FIELD_ENCRYPTION = _bool_env("COGNIA_ENABLE_FIELD_ENCRYPTION", False)
+    COGNIA_FIELD_ENCRYPTION_KEY_ID = os.getenv("COGNIA_FIELD_ENCRYPTION_KEY_ID", "field-key-v1")
+    COGNIA_TRANSPORT_PAYLOAD_ENCRYPTION = _bool_env("COGNIA_TRANSPORT_PAYLOAD_ENCRYPTION", False)
+    COGNIA_TRANSPORT_REQUIRE_ENCRYPTION_PROD = _bool_env("COGNIA_TRANSPORT_REQUIRE_ENCRYPTION_PROD", True)
+    COGNIA_TRANSPORT_ALLOW_PLAINTEXT_IN_DEV = _bool_env("COGNIA_TRANSPORT_ALLOW_PLAINTEXT_IN_DEV", True)
+    COGNIA_TRANSPORT_KEY_ID = os.getenv("COGNIA_TRANSPORT_KEY_ID", "transport-key-v1")
+    COGNIA_TRANSPORT_KEY_TTL_SECONDS = int(os.getenv("COGNIA_TRANSPORT_KEY_TTL_SECONDS", "3600"))
+
     # Email (SMTP)
     EMAIL_ENABLED = os.getenv("EMAIL_ENABLED", "false").lower() == "true"
     EMAIL_SEND_ASYNC = os.getenv("EMAIL_SEND_ASYNC", "true").lower() == "true"
@@ -192,8 +210,8 @@ class Config:
 
     SMTP_HOST = os.getenv("SMTP_HOST")
     SMTP_PORT = _int_env("SMTP_PORT", 587)
-    SMTP_PORT_SSL = _int_env("SMTP_PORT__SSL", None)
-    SMTP_PORT_TLS = _int_env("SMTP_PORT__TLS", None)
+    SMTP_PORT_SSL = _int_env("SMTP_PORT__SSL", 0) or None
+    SMTP_PORT_TLS = _int_env("SMTP_PORT__TLS", 0) or None
     SMTP_USER = os.getenv("SMTP_USER")
     SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
     SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() == "true"
@@ -201,7 +219,8 @@ class Config:
     SMTP_DEBUG = os.getenv("SMTP_DEBUG", "false").lower() == "true"
     SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", "10"))
 
-    SWAGGER_ENABLED = os.getenv("SWAGGER_ENABLED", "true").lower() == "true"
+    SWAGGER_ENABLED = _bool_env("SWAGGER_ENABLED", True)
+    OPENAPI_PUBLIC_ENABLED = _bool_env("OPENAPI_PUBLIC_ENABLED", True)
 
     # Startup behavior
     AUTO_CREATE_REFRESH_TOKEN_TABLE = os.getenv(
@@ -217,7 +236,8 @@ class ProductionConfig(Config):
     AUTH_CROSS_SITE_COOKIES = _bool_env("AUTH_CROSS_SITE_COOKIES", True)
     TRUST_PROXY_HEADERS = _bool_env("TRUST_PROXY_HEADERS", True)
     JWT_COOKIE_SECURE = True if Config.JWT_COOKIE_SECURE is None else Config.JWT_COOKIE_SECURE
-    # Ajustes de pool para concurrencia
+    OPENAPI_PUBLIC_ENABLED = _bool_env("OPENAPI_PUBLIC_ENABLED", False)
+    # Ajustes de pool para concurrencia en runtime productivo.
     SQLALCHEMY_ENGINE_OPTIONS = {
         # Ajustado para no competir con poolers externos (ej. pgbouncer en free tier)
         "pool_size": _int_env("DB_POOL_SIZE", 3),
@@ -237,3 +257,8 @@ class TestingConfig(Config):
     EMAIL_ENABLED = False
     SECURITY_HEADERS_ENABLED = False
     QR_PROCESS_ASYNC = False
+    # Aisla la suite de tests del .env local para evitar falsos negativos.
+    COGNIA_ENABLE_FIELD_ENCRYPTION = False
+    COGNIA_TRANSPORT_PAYLOAD_ENCRYPTION = False
+    COGNIA_TRANSPORT_REQUIRE_ENCRYPTION_PROD = True
+    COGNIA_TRANSPORT_ALLOW_PLAINTEXT_IN_DEV = True

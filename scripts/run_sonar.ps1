@@ -33,6 +33,8 @@ function Import-DotEnvFile {
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 Import-DotEnvFile -Path (Join-Path $repoRoot ".env")
+$qualityOutDir = Join-Path $repoRoot "artifacts\quality\sonar\latest"
+New-Item -ItemType Directory -Path $qualityOutDir -Force | Out-Null
 
 $required = @(
     "SONAR_HOST_URL",
@@ -91,7 +93,7 @@ try {
         }
 
         & $pythonExe -m coverage erase
-        & $pythonExe -m coverage run -m pytest `
+        & $pythonExe -m coverage run --source=api,app,config -m pytest `
             tests/test_auth.py `
             tests/test_problem_reports.py `
             tests/test_email_unsubscribe.py `
@@ -103,7 +105,9 @@ try {
             throw "pytest bajo coverage fallo con codigo $LASTEXITCODE"
         }
 
-        & $pythonExe -m coverage xml -o coverage.xml
+        $coverageXmlPath = Join-Path $qualityOutDir "coverage.xml"
+        # Ignore stale/unresolvable traced files so Sonar always gets a report.
+        & $pythonExe -m coverage xml -i -o $coverageXmlPath
         if ($LASTEXITCODE -ne 0) {
             throw "No se pudo generar coverage.xml"
         }
@@ -112,6 +116,18 @@ try {
     & $scanner.Source @args
     if ($LASTEXITCODE -ne 0) {
         throw "pysonar finalizo con codigo $LASTEXITCODE"
+    }
+
+    $postRunArtifacts = @(
+        ".coverage",
+        "sonar_issues.csv",
+        "sonar_issues.json"
+    )
+    foreach ($name in $postRunArtifacts) {
+        $sourcePath = Join-Path $repoRoot $name
+        if (Test-Path -LiteralPath $sourcePath) {
+            Move-Item -LiteralPath $sourcePath -Destination (Join-Path $qualityOutDir $name) -Force
+        }
     }
 } finally {
     Pop-Location

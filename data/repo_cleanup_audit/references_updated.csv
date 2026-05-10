@@ -1,0 +1,4 @@
+path,change_type,details
+scripts/run_sonar.ps1,updated,coverage.xml output moved to artifacts/quality/sonar/latest; post-run root artifacts moved automatically
+sonar-project.properties,updated,sonar.python.coverage.reportPaths now points to artifacts/quality/sonar/latest/coverage.xml
+README.md,updated,Sonar section now references artifacts/quality/sonar/latest/coverage.xml instead of root coverage.xml

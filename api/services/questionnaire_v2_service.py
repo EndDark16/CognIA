@@ -15,6 +15,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from sqlalchemy import case, func, or_
 
 from api.security import check_password, hash_password
+from api.services import crypto_service
 from api.services import questionnaire_v2_loader_service as loader
 from app.models import (
     AppUser,
@@ -69,6 +70,33 @@ SESSION_STATUSES = {
     "failed",
     "archived",
 }
+
+CLINICAL_SUMMARY_DISCLAIMER = (
+    "Este resultado no constituye un diagnostico clinico ni reemplaza una evaluacion psicologica o medica formal. "
+    "Se trata de una simulacion automatizada de apoyo al tamizaje y alerta temprana, basada en la informacion "
+    "registrada en el cuestionario y en modelos estadisticos. Los resultados deben ser revisados por un profesional "
+    "calificado antes de tomar decisiones clinicas, educativas o terapeuticas."
+)
+
+
+class RuntimeArtifactResolutionError(RuntimeError):
+    """Raised when an active champion artifact cannot be resolved/executed."""
+
+
+def _encrypt_json(value: Any, purpose: str) -> Any:
+    return crypto_service.encrypt_json(value, purpose=purpose)
+
+
+def _decrypt_json(value: Any, purpose: str) -> Any:
+    return crypto_service.decrypt_json(value, purpose=purpose)
+
+
+def _encrypt_text(value: str | None, purpose: str) -> str | None:
+    return crypto_service.encrypt_text(value, purpose=purpose)
+
+
+def _decrypt_text(value: str | None, purpose: str) -> str | None:
+    return crypto_service.decrypt_text(value, purpose=purpose)
 
 
 def _utcnow() -> datetime:
@@ -153,6 +181,13 @@ def _get_mode_key(role: str, mode: str) -> str:
 
 def _active_version() -> QuestionnaireVersion:
     return loader.ensure_catalog_loaded()
+
+
+def _active_model_pipeline_version() -> str:
+    try:
+        return Path(loader.DEFAULT_ACTIVE_MODELS).parent.parent.name
+    except Exception:
+        return "hybrid_active_modes_freeze_v16"
 
 
 def _access_grant_for_user(session_id: uuid.UUID, user_id: uuid.UUID) -> QuestionnaireAccessGrant | None:
@@ -484,6 +519,12 @@ def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> Questio
     mode_key = _get_mode_key(role, mode)
     version = _active_version()
 
+    session_metadata = {
+        "child_age_years": payload.get("child_age_years"),
+        "child_sex_assigned_at_birth": payload.get("child_sex_assigned_at_birth"),
+        "metadata": payload.get("metadata") or {},
+    }
+
     session = QuestionnaireSession(
         questionnaire_public_id=_new_public_id(),
         version_id=version.id,
@@ -495,12 +536,8 @@ def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> Questio
         progress_pct=0,
         questionnaire_version_label=version.version_label,
         scales_version_label=version.scales_version_label,
-        model_pipeline_version="hybrid_active_modes_freeze_v1",
-        metadata_json={
-            "child_age_years": payload.get("child_age_years"),
-            "child_sex_assigned_at_birth": payload.get("child_sex_assigned_at_birth"),
-            "metadata": payload.get("metadata") or {},
-        },
+        model_pipeline_version=_active_model_pipeline_version(),
+        metadata_json=_encrypt_json(session_metadata, "questionnaire_session.metadata_json"),
     )
     db.session.add(session)
     db.session.flush()
@@ -649,8 +686,14 @@ def save_answers(session: QuestionnaireSession, user_id: uuid.UUID, answers: lis
             answer_row = QuestionnaireSessionAnswer(session_id=session.id, question_id=question_id)
             answers_by_question_id[question_id] = answer_row
         answer_row.canonical_question_id = question_id
-        answer_row.answer_raw = _json(raw)
-        answer_row.answer_normalized = normalized
+        answer_row.answer_raw = _encrypt_json(
+            _json(raw),
+            "questionnaire_session_answer.answer_raw",
+        )
+        answer_row.answer_normalized = _encrypt_text(
+            normalized,
+            "questionnaire_session_answer.answer_normalized",
+        ) or ""
         answer_row.answered_by_user_id = user_id
         answer_row.is_final = bool(mark_final)
         answer_row.source = "user"
@@ -673,8 +716,14 @@ def save_answers(session: QuestionnaireSession, user_id: uuid.UUID, answers: lis
                 )
                 existing_repeated_answers[repeated_question_id] = hidden
             hidden.canonical_question_id = question_id
-            hidden.answer_raw = _json(raw)
-            hidden.answer_normalized = normalized
+            hidden.answer_raw = _encrypt_json(
+                _json(raw),
+                "questionnaire_session_answer.answer_raw",
+            )
+            hidden.answer_normalized = _encrypt_text(
+                normalized,
+                "questionnaire_session_answer.answer_normalized",
+            ) or ""
             hidden.answered_by_user_id = user_id
             hidden.is_final = bool(mark_final)
             hidden.source = "repeat_mapping"
@@ -701,9 +750,12 @@ def _answers_to_feature_map(session: QuestionnaireSession) -> dict[str, Any]:
 
     feature_map: dict[str, Any] = {}
     for answer, question in rows:
-        feature_map[question.feature_key] = answer.answer_raw
+        feature_map[question.feature_key] = _decrypt_json(
+            answer.answer_raw,
+            "questionnaire_session_answer.answer_raw",
+        )
 
-    meta = session.metadata_json or {}
+    meta = _decrypt_json(session.metadata_json, "questionnaire_session.metadata_json") or {}
     if meta.get("child_age_years") is not None:
         feature_map.setdefault("age_years", float(meta["child_age_years"]))
     if meta.get("child_sex_assigned_at_birth"):
@@ -739,15 +791,30 @@ def _derive_internal_features(session: QuestionnaireSession, feature_map: dict[s
 
         derived[internal.feature_key] = value
 
+        numeric_value = _to_float(value)
+        text_value = None if numeric_value is not None else str(value)
+        encrypted_feature_payload = _encrypt_json(
+            {"numeric": numeric_value, "text": text_value},
+            "questionnaire_session_internal_feature.feature_value",
+        )
+        encrypted_feature_text = _encrypt_text(
+            json.dumps({"numeric": numeric_value, "text": text_value}, ensure_ascii=False),
+            "questionnaire_session_internal_feature.feature_value_text",
+        )
+
         db.session.add(
             QuestionnaireSessionInternalFeature(
                 session_id=session.id,
                 feature_key=internal.feature_key,
-                feature_value_numeric=_to_float(value),
-                feature_value_text=None if _to_float(value) is not None else str(value),
+                feature_value_numeric=None if crypto_service.is_field_encryption_enabled() else numeric_value,
+                feature_value_text=encrypted_feature_text if crypto_service.is_field_encryption_enabled() else text_value,
                 source_type=source_type,
                 source_question_id=internal.source_question_id,
-                metadata_json={"formula": internal.internal_scoring_formula_summary, "sources": sources},
+                metadata_json={
+                    "formula": internal.internal_scoring_formula_summary,
+                    "sources": sources,
+                    "encrypted_feature_payload": encrypted_feature_payload if crypto_service.is_field_encryption_enabled() else None,
+                },
             )
         )
 
@@ -768,12 +835,25 @@ def _heuristic_domain_probability(domain: str, feature_map: dict[str, Any]) -> f
 
 def _model_probability(model_version: ModelVersion, feature_map: dict[str, Any], domain: str) -> float:
     artifact_path = model_version.artifact_path or model_version.fallback_artifact_path
-    if not artifact_path or not Path(artifact_path).exists():
-        return _heuristic_domain_probability(domain, feature_map)
+    allow_testing_heuristic = bool(current_app.config.get("TESTING"))
+    if not artifact_path:
+        if allow_testing_heuristic:
+            return _heuristic_domain_probability(domain, feature_map)
+        raise RuntimeArtifactResolutionError(
+            f"active_artifact_missing_path:{domain}:{model_version.model_registry_id}"
+        )
+    if not Path(artifact_path).exists():
+        if allow_testing_heuristic:
+            return _heuristic_domain_probability(domain, feature_map)
+        raise RuntimeArtifactResolutionError(
+            f"active_artifact_not_found:{domain}:{artifact_path}"
+        )
 
     feature_columns, _ = _load_feature_contract(model_version)
     if not feature_columns:
-        feature_columns = [key for key in feature_map.keys() if key != "_meta"]
+        raise RuntimeArtifactResolutionError(
+            f"active_feature_contract_missing:{domain}:{model_version.model_registry_id}"
+        )
 
     vector = {}
     for col in feature_columns:
@@ -786,13 +866,20 @@ def _model_probability(model_version: ModelVersion, feature_map: dict[str, Any],
     try:
         model = _load_model_artifact(artifact_path)
         X = pd.DataFrame([vector], columns=feature_columns)
-        if hasattr(model, "predict_proba"):
-            probability = float(model.predict_proba(X)[0][1])
-            return max(0.0, min(1.0, probability))
-    except Exception:
-        pass
-
-    return _heuristic_domain_probability(domain, feature_map)
+        if not hasattr(model, "predict_proba"):
+            raise RuntimeArtifactResolutionError(
+                f"active_artifact_without_predict_proba:{domain}:{artifact_path}"
+            )
+        probability = float(model.predict_proba(X)[0][1])
+        return max(0.0, min(1.0, probability))
+    except RuntimeArtifactResolutionError:
+        raise
+    except Exception as exc:
+        if allow_testing_heuristic:
+            return _heuristic_domain_probability(domain, feature_map)
+        raise RuntimeArtifactResolutionError(
+            f"active_artifact_inference_failed:{domain}:{artifact_path}:{type(exc).__name__}"
+        ) from exc
 
 
 def _comorbidity_rows(domain_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -913,21 +1000,30 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
 
     overall_summary, recommendation, needs_review = _summary_from_domains(domain_rows)
 
-    result.summary_text = overall_summary
-    result.operational_recommendation = recommendation
+    result.summary_text = _encrypt_text(
+        overall_summary,
+        "questionnaire_session_result.summary_text",
+    ) or ""
+    result.operational_recommendation = _encrypt_text(
+        recommendation,
+        "questionnaire_session_result.operational_recommendation",
+    ) or ""
     result.completion_quality_score = round(float(session.progress_pct or 0) / 100.0, 4)
     result.missingness_score = round(1.0 - float(result.completion_quality_score or 0.0), 4)
     result.inconsistency_flags_json = {}
     result.needs_professional_review = needs_review
     result.runtime_ms = None
-    result.model_bundle_version = "hybrid_active_modes_freeze_v1"
+    result.model_bundle_version = _active_model_pipeline_version()
     result.questionnaire_version_label = session.questionnaire_version_label
     result.scales_version_label = session.scales_version_label
-    result.metadata_json = {
-        "mode": session.mode,
-        "mode_key": session.mode_key,
-        "role": role_for_lookup,
-    }
+    result.metadata_json = _encrypt_json(
+        {
+            "mode": session.mode,
+            "mode_key": session.mode_key,
+            "role": role_for_lookup,
+        },
+        "questionnaire_session_result.metadata_json",
+    )
     result.processed_at = _utcnow()
     result.updated_at = _utcnow()
     db.session.add(result)
@@ -948,9 +1044,15 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
                 mode=domain_row["mode"],
                 operational_class=domain_row["operational_class"],
                 operational_caveat=domain_row["operational_caveat"],
-                result_summary=domain_row["result_summary"],
+                result_summary=_encrypt_text(
+                    domain_row["result_summary"],
+                    "questionnaire_session_result_domain.result_summary",
+                ) or "",
                 needs_professional_review=domain_row["needs_professional_review"],
-                metadata_json={"source": "runtime_v2"},
+                metadata_json=_encrypt_json(
+                    {"source": "runtime_v2"},
+                    "questionnaire_session_result_domain.metadata_json",
+                ),
             )
         )
 
@@ -960,10 +1062,16 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
                 result_id=result.id,
                 session_id=session.id,
                 coexistence_key=item["coexistence_key"],
-                domains_json=item["domains"],
+                domains_json=_encrypt_json(
+                    item["domains"],
+                    "questionnaire_session_result_comorbidity.domains_json",
+                ),
                 combined_risk_score=item["combined_risk_score"],
                 coexistence_level=item["coexistence_level"],
-                summary=item["summary"],
+                summary=_encrypt_text(
+                    item["summary"],
+                    "questionnaire_session_result_comorbidity.summary",
+                ) or "",
             )
         )
 
@@ -988,11 +1096,24 @@ def get_results_payload(session: QuestionnaireSession) -> dict[str, Any]:
     ).all()
     comorbidity = QuestionnaireSessionResultComorbidity.query.filter_by(session_id=session.id).all()
 
+    if result:
+        result_summary = _decrypt_text(
+            result.summary_text,
+            "questionnaire_session_result.summary_text",
+        )
+        result_recommendation = _decrypt_text(
+            result.operational_recommendation,
+            "questionnaire_session_result.operational_recommendation",
+        )
+    else:
+        result_summary = None
+        result_recommendation = None
+
     return {
         "session": get_session_payload(session),
         "result": {
-            "summary": result.summary_text if result else None,
-            "operational_recommendation": result.operational_recommendation if result else None,
+            "summary": result_summary,
+            "operational_recommendation": result_recommendation,
             "completion_quality_score": result.completion_quality_score if result else None,
             "missingness_score": result.missingness_score if result else None,
             "needs_professional_review": result.needs_professional_review if result else None,
@@ -1009,7 +1130,10 @@ def get_results_payload(session: QuestionnaireSession) -> dict[str, Any]:
                 "mode": row.mode,
                 "operational_class": row.operational_class,
                 "operational_caveat": row.operational_caveat,
-                "result_summary": row.result_summary,
+                "result_summary": _decrypt_text(
+                    row.result_summary,
+                    "questionnaire_session_result_domain.result_summary",
+                ),
                 "needs_professional_review": row.needs_professional_review,
             }
             for row in domains
@@ -1017,14 +1141,245 @@ def get_results_payload(session: QuestionnaireSession) -> dict[str, Any]:
         "comorbidity": [
             {
                 "coexistence_key": row.coexistence_key,
-                "domains": row.domains_json,
+                "domains": _decrypt_json(
+                    row.domains_json,
+                    "questionnaire_session_result_comorbidity.domains_json",
+                ),
                 "combined_risk_score": row.combined_risk_score,
                 "coexistence_level": row.coexistence_level,
-                "summary": row.summary,
+                "summary": _decrypt_text(
+                    row.summary,
+                    "questionnaire_session_result_comorbidity.summary",
+                ),
             }
             for row in comorbidity
         ],
     }
+
+
+def _risk_level_from_probability(probability: float) -> str:
+    if probability >= 0.75:
+        return "alta"
+    if probability >= 0.55:
+        return "relevante"
+    if probability >= 0.35:
+        return "intermedia"
+    return "baja"
+
+
+def _overall_risk_level(domains: list[dict[str, Any]]) -> str:
+    if not domains:
+        return "intermedia"
+    max_probability = max(float(item.get("probability") or 0.0) for item in domains)
+    elevated_count = sum(
+        1 for item in domains if str(item.get("risk_level")) in {"relevante", "alta"}
+    )
+    if max_probability >= 0.75 and elevated_count >= 2:
+        return "alta"
+    if max_probability >= 0.55 or elevated_count >= 1:
+        return "relevante"
+    if max_probability >= 0.35:
+        return "intermedia"
+    return "baja"
+
+
+def _format_indicator_value(value: Any) -> str:
+    if value is None:
+        return "sin valor"
+    numeric = _to_float(value)
+    if numeric is not None:
+        return f"{numeric:.2f}"
+    text = str(value).strip()
+    return text[:120] if text else "sin valor"
+
+
+def _domain_main_indicators(session_id: uuid.UUID, domain: str, limit: int = 5) -> list[str]:
+    rows = (
+        db.session.query(QuestionnaireSessionAnswer, QuestionnaireQuestion)
+        .join(QuestionnaireQuestion, QuestionnaireSessionAnswer.question_id == QuestionnaireQuestion.id)
+        .filter(QuestionnaireSessionAnswer.session_id == session_id)
+        .filter(QuestionnaireQuestion.domain == domain)
+        .all()
+    )
+    candidates: list[tuple[float, str]] = []
+    for answer, question in rows:
+        raw_value = _decrypt_json(
+            answer.answer_raw,
+            "questionnaire_session_answer.answer_raw",
+        )
+        numeric = _to_float(raw_value)
+        score = abs(float(numeric)) if numeric is not None else 0.0
+        label = f"{question.feature_key}: {_format_indicator_value(raw_value)}"
+        candidates.append((score, label))
+
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    out = [label for _, label in candidates[:limit] if label]
+    if out:
+        return out
+    return ["Evidencia directa insuficiente en respuestas visibles para este dominio."]
+
+
+def get_clinical_summary_payload(session: QuestionnaireSession) -> dict[str, Any]:
+    results_payload = get_results_payload(session)
+    raw_domains = results_payload.get("domains") or []
+    domains: list[dict[str, Any]] = []
+
+    for raw in raw_domains:
+        probability = float(raw.get("probability") or 0.0)
+        risk_level = _risk_level_from_probability(probability)
+        main_indicators = _domain_main_indicators(session.id, raw.get("domain"), limit=5)
+        domains.append(
+            {
+                "domain": str(raw.get("domain")),
+                "probability": probability,
+                "compatibility_level": risk_level,
+                "risk_level": risk_level,
+                "confidence_pct": raw.get("confidence_pct"),
+                "confidence_band": raw.get("confidence_band"),
+                "operational_class": raw.get("operational_class"),
+                "caveat": raw.get("operational_caveat"),
+                "main_indicators": main_indicators,
+            }
+        )
+
+    domain_lookup = {item["domain"]: item for item in domains}
+    ordered_domains = []
+    for key in DOMAIN_ORDER:
+        if key in domain_lookup:
+            ordered_domains.append(domain_lookup[key])
+    for item in domains:
+        if item["domain"] not in DOMAIN_ORDER:
+            ordered_domains.append(item)
+
+    top_domains = sorted(ordered_domains, key=lambda item: item["probability"], reverse=True)
+    elevated_domains = [item for item in top_domains if item["risk_level"] in {"relevante", "alta"}]
+    monitor_domains = [item for item in top_domains if item["risk_level"] in {"intermedia", "relevante", "alta"}]
+    overall_risk = _overall_risk_level(ordered_domains)
+
+    if top_domains:
+        top_phrase = ", ".join(
+            f"{item['domain'].upper()} ({item['risk_level']})"
+            for item in top_domains[:3]
+        )
+    else:
+        top_phrase = "sin dominios procesados"
+
+    has_comorbidity_signal = len(elevated_domains) >= 2 or (
+        overall_risk in {"relevante", "alta"} and len(monitor_domains) >= 2
+    )
+    if elevated_domains:
+        comorbidity_domains = [item["domain"] for item in elevated_domains]
+    else:
+        comorbidity_domains = [item["domain"] for item in monitor_domains[:3]]
+    if has_comorbidity_signal:
+        comorbidity_summary = (
+            "Se observan senales concurrentes en multiples dominios, compatibles con posible comorbilidad "
+            "en tamizaje. Se recomienda priorizar evaluacion profesional integral."
+        )
+    else:
+        comorbidity_summary = (
+            "No se observan senales concurrentes fuertes de comorbilidad en esta corrida de tamizaje."
+        )
+
+    sintesis_general = (
+        f"Patron general de tamizaje con mayor compatibilidad en {top_phrase}. "
+        f"Nivel global estimado: {overall_risk}. "
+        + (
+            "Existe coexistencia posible de senales entre dominios y requiere revision profesional."
+            if has_comorbidity_signal
+            else "No se detecta coexistencia dominante de senales elevadas."
+        )
+    )
+
+    niveles_text = "; ".join(
+        f"{item['domain'].upper()}: prob={item['probability']:.3f}, riesgo={item['risk_level']}"
+        for item in ordered_domains
+    ) or "Sin dominios disponibles."
+
+    indicator_lines = []
+    for item in ordered_domains:
+        if item["risk_level"] in {"intermedia", "relevante", "alta"}:
+            indicator_lines.append(
+                f"{item['domain'].upper()}: " + ", ".join(item["main_indicators"][:3])
+            )
+    if not indicator_lines:
+        indicator_lines.append(
+            "No se identifican indicadores dominantes en nivel intermedio o superior dentro de la sesion."
+        )
+    indicadores_text = " | ".join(indicator_lines)
+
+    if overall_risk in {"alta", "relevante"}:
+        impacto_funcional = (
+            "El patron observado puede asociarse con impacto funcional en contextos escolar, familiar, social o "
+            "emocional. Esta salida es de tamizaje y requiere correlacion profesional."
+        )
+    elif overall_risk == "intermedia":
+        impacto_funcional = (
+            "Se observan senales moderadas que podrian afectar funcionamiento cotidiano si persisten en el tiempo. "
+            "Se recomienda monitoreo estructurado."
+        )
+    else:
+        impacto_funcional = (
+            "No se observan senales fuertes de impacto funcional en esta corrida. Mantener observacion preventiva."
+        )
+
+    if overall_risk == "alta":
+        recomendacion = (
+            "Recomendacion prioritaria: evaluacion profesional integral en el corto plazo."
+        )
+    elif overall_risk == "relevante":
+        recomendacion = (
+            "Recomendacion: valoracion profesional pronta y plan de seguimiento."
+        )
+    elif overall_risk == "intermedia":
+        recomendacion = (
+            "Recomendacion: seguimiento cercano y valoracion profesional si las senales persisten."
+        )
+    else:
+        recomendacion = (
+            "Recomendacion: observacion preventiva y reevaluacion ante cambios relevantes."
+        )
+
+    payload = {
+        "session_id": str(session.id),
+        "report_version": "clinical_summary_v1",
+        "generated_at": _utcnow().isoformat(),
+        "overall_risk_level": overall_risk,
+        "simulated_diagnostic_text": {
+            "sintesis_general": sintesis_general,
+            "niveles_de_compatibilidad": niveles_text,
+            "indicadores_principales_observados": indicadores_text,
+            "impacto_funcional": impacto_funcional,
+            "recomendacion_profesional": recomendacion,
+            "aclaracion_importante": CLINICAL_SUMMARY_DISCLAIMER,
+        },
+        "domains": ordered_domains,
+        "comorbidity": {
+            "has_comorbidity_signal": has_comorbidity_signal,
+            "domains": comorbidity_domains,
+            "summary": comorbidity_summary,
+        },
+        "disclaimer": CLINICAL_SUMMARY_DISCLAIMER,
+    }
+    return payload
+
+
+def persist_clinical_summary_payload(session: QuestionnaireSession, clinical_payload: dict[str, Any]) -> None:
+    result = QuestionnaireSessionResult.query.filter_by(session_id=session.id).first()
+    if not result:
+        return
+    meta = _decrypt_json(
+        result.metadata_json,
+        "questionnaire_session_result.metadata_json",
+    ) or {}
+    meta["clinical_summary_v1"] = clinical_payload
+    result.metadata_json = _encrypt_json(
+        meta,
+        "questionnaire_session_result.metadata_json",
+    )
+    result.updated_at = _utcnow()
+    db.session.add(result)
+    db.session.commit()
 
 
 def list_history(user_id: uuid.UUID, status: str | None = None, page: int = 1, page_size: int = 20) -> dict[str, Any]:
@@ -1295,10 +1650,13 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
         file_name=file_name,
         status="generated",
         generated_by_user_id=user_id,
-        metadata_json={
-            "questionnaire_version": session.questionnaire_version_label,
-            "model_bundle": session.model_pipeline_version,
-        },
+        metadata_json=_encrypt_json(
+            {
+                "questionnaire_version": session.questionnaire_version_label,
+                "model_bundle": session.model_pipeline_version,
+            },
+            "questionnaire_session_pdf_export.metadata_json",
+        ),
     )
     db.session.add(export)
     _audit(session.id, user_id, "pdf_generated", {"file_path": str(file_path)})

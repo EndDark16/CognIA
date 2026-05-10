@@ -1,0 +1,7 @@
+domain,mode,shortcut_dominance_flag,dominant_engineered_shortcut_removed,top_feature
+elimination,caregiver_1_3,no,yes,enuresis_event_frequency_per_week
+elimination,caregiver_2_3,no,yes,enuresis_distress_impairment
+elimination,caregiver_full,no,yes,enuresis_duration_months_consecutive
+elimination,psychologist_1_3,no,yes,enuresis_duration_months_consecutive
+elimination,psychologist_2_3,no,yes,enuresis_duration_months_consecutive
+elimination,psychologist_full,no,yes,enuresis_duration_months_consecutive

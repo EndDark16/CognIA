@@ -1,0 +1,47 @@
+{
+  "line": "hybrid_domain_specialized_rf_v17",
+  "freeze_label": "v17",
+  "generated_at_utc": "2026-05-02T05:41:44.646117+00:00",
+  "source_truth_initial": {
+    "active_v16": "data/hybrid_active_modes_freeze_v16/tables/hybrid_active_models_30_modes.csv",
+    "operational_v16": "data/hybrid_operational_freeze_v16/tables/hybrid_operational_final_champions.csv",
+    "inputs_master_v16": "data/hybrid_active_modes_freeze_v16/tables/hybrid_questionnaire_inputs_master.csv"
+  },
+  "source_truth_final": {
+    "active_v17": "data/hybrid_active_modes_freeze_v17/tables/hybrid_active_models_30_modes.csv",
+    "operational_v17": "data/hybrid_operational_freeze_v17/tables/hybrid_operational_final_champions.csv",
+    "inputs_master_v17": "data/hybrid_active_modes_freeze_v17/tables/hybrid_questionnaire_inputs_master.csv"
+  },
+  "rules": {
+    "rf_only": true,
+    "domain_specialized": true,
+    "cross_domain_features_as_primary": false,
+    "eng_shortcuts_default_excluded": true,
+    "guardrail_max": 0.98,
+    "questionnaire_changed": false
+  },
+  "stats": {
+    "line": "hybrid_domain_specialized_rf_v17",
+    "generated_at_utc": "2026-05-02T05:41:37.287931+00:00",
+    "prediction_recomputed_slots": 30,
+    "active_champions": 30,
+    "rf_based_slots": 30,
+    "metrics_match_registered_yes_count": 300,
+    "metrics_match_registered_no_count": 0,
+    "guardrail_violations": 0,
+    "high_separability_alert_count": 25,
+    "hard_fail_unresolved_count": 3,
+    "unresolved_issue_count": 3,
+    "split_contamination_status": "pass",
+    "all_domains_real_clone_count": 0,
+    "elimination_real_clone_count": 0,
+    "all_domains_near_clone_warning_count": 50,
+    "artifact_duplicate_hash_count": 0,
+    "same_inputs_outputs_contract_yes_count": 30,
+    "domain_purity_yes_count": 30,
+    "no_eng_shortcut_yes_count": 30,
+    "questionnaire_changed": "no",
+    "final_audit_status": "fail"
+  },
+  "artifact": "hybrid_active_modes_freeze_v17"
+}

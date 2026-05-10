@@ -1,0 +1,6 @@
+{
+  "fields_audited": 26,
+  "fields_sensitive_unencrypted_count": 0,
+  "legacy_plaintext_compatible_count": 25,
+  "final_status": "pass"
+}

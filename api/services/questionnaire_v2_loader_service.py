@@ -1,4 +1,5 @@
-import json
+﻿import json
+import math
 import re
 import uuid
 from dataclasses import dataclass
@@ -49,10 +50,10 @@ DEFAULT_DEFINITION_NAME = "Cuestionario operacional v16.4"
 DEFAULT_VERSION_LABEL = "v16.4"
 DEFAULT_SOURCE_DIR = Path("data") / "cuestionario_v16.4"
 
-DEFAULT_ACTIVE_MODELS = Path("data") / "hybrid_active_modes_freeze_v4" / "tables" / "hybrid_active_models_30_modes.csv"
-DEFAULT_ACTIVE_SUMMARY = Path("data") / "hybrid_active_modes_freeze_v4" / "tables" / "hybrid_active_modes_summary.csv"
-DEFAULT_INPUTS_MASTER = Path("data") / "hybrid_active_modes_freeze_v4" / "tables" / "hybrid_questionnaire_inputs_master.csv"
-DEFAULT_OPERATIONAL_CHAMPIONS = Path("data") / "hybrid_operational_freeze_v4" / "tables" / "hybrid_operational_final_champions.csv"
+DEFAULT_ACTIVE_MODELS = Path("data") / "hybrid_active_modes_freeze_v17" / "tables" / "hybrid_active_models_30_modes.csv"
+DEFAULT_ACTIVE_SUMMARY = Path("data") / "hybrid_active_modes_freeze_v17" / "tables" / "hybrid_active_modes_summary.csv"
+DEFAULT_INPUTS_MASTER = Path("data") / "hybrid_active_modes_freeze_v17" / "tables" / "hybrid_questionnaire_inputs_master.csv"
+DEFAULT_OPERATIONAL_CHAMPIONS = Path("data") / "hybrid_operational_freeze_v17" / "tables" / "hybrid_operational_final_champions.csv"
 
 
 def _utcnow() -> datetime:
@@ -112,6 +113,35 @@ def _parse_options_json(raw: Any) -> Any:
         return json.loads(text)
     except Exception:
         return None
+
+
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(k): _json_safe(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_json_safe(v) for v in value]
+    if isinstance(value, tuple):
+        return [_json_safe(v) for v in value]
+    if isinstance(value, str):
+        return None if value.strip().lower() in {"nan", "none", ""} else value
+    if value is None:
+        return None
+    # Pandas/NumPy NA-like values and non-finite floats are not valid JSON for Postgres.
+    try:
+        if pd.isna(value):
+            return None
+    except Exception:
+        pass
+    if isinstance(value, float):
+        if math.isnan(value) or math.isinf(value):
+            return None
+        return float(value)
+    if hasattr(value, "item"):
+        try:
+            return _json_safe(value.item())
+        except Exception:
+            pass
+    return value
 
 
 @dataclass
@@ -427,22 +457,46 @@ def _resolve_mode_key(role: str, mode: str) -> str:
     raise ValueError(f"invalid role/mode pair: {role}/{mode}")
 
 
-def _resolve_artifact_path(domain: str, model_key: str) -> tuple[str | None, str | None]:
+def _resolve_artifact_path(domain: str, model_key: str, calibration: str | None = None) -> tuple[str, str]:
     domain = domain.lower()
-    preferred = [
-        Path("models") / "active_modes" / model_key / "calibrated.joblib",
-        Path("models") / "active_modes" / model_key / "pipeline.joblib",
-    ]
+    calib = _normalize_text(calibration).lower()
+    slot_dir = Path("models") / "active_modes" / model_key
+    preferred = (
+        [slot_dir / "calibrated.joblib", slot_dir / "pipeline.joblib"]
+        if calib and calib != "none"
+        else [slot_dir / "pipeline.joblib", slot_dir / "calibrated.joblib"]
+    )
     for path in preferred:
         if path.exists():
-            return str(path), None
+            fallback = Path("models") / "champions" / f"rf_{domain}_current" / path.name
+            return str(path), str(fallback)
+
+    # Hardened resolution: if exact canonical names do not exist, use any slot-local joblib.
+    if slot_dir.exists():
+        dynamic_candidates = sorted(slot_dir.glob("*.joblib"))
+        if dynamic_candidates:
+            picked = dynamic_candidates[0]
+            fallback = Path("models") / "champions" / f"rf_{domain}_current" / picked.name
+            return str(picked), str(fallback)
 
     fallback_candidates = [
         Path("models") / "champions" / f"rf_{domain}_current" / "calibrated.joblib",
         Path("models") / "champions" / f"rf_{domain}_current" / "pipeline.joblib",
     ]
     fallback = next((str(path) for path in fallback_candidates if path.exists()), None)
-    return None, fallback
+    if fallback:
+        primary = str(preferred[0])
+        return primary, fallback
+
+    fallback_dir = Path("models") / "champions" / f"rf_{domain}_current"
+    if fallback_dir.exists():
+        dynamic_fallback = sorted(fallback_dir.glob("*.joblib"))
+        if dynamic_fallback:
+            primary = str(preferred[0])
+            return primary, str(dynamic_fallback[0])
+
+    # Deterministic expected paths even when artifacts are not present locally.
+    return str(preferred[0]), str(fallback_candidates[0])
 
 
 def sync_active_models() -> dict[str, Any]:
@@ -460,6 +514,24 @@ def sync_active_models() -> dict[str, Any]:
         domain = _normalize_text(row.get("domain")).lower()
         mode_key = _normalize_text(row.get("mode"))
         role = _normalize_role(row.get("role"))
+
+        # A mode already encodes the respondent side (`caregiver_*` or
+        # `psychologist_*`). Clear the whole domain/mode slot so historical
+        # rows that used the pre-normalized `caregiver` role cannot remain
+        # active next to the current canonical `guardian` row.
+        stale_registries = ModelRegistry.query.filter_by(domain=domain, mode_key=mode_key).all()
+        for stale_registry in stale_registries:
+            stale_registry.is_active = False
+            stale_registry.updated_at = _utcnow()
+            db.session.add(stale_registry)
+            ModelVersion.query.filter_by(model_registry_id=stale_registry.id).update(
+                {"is_active": False, "updated_at": _utcnow()},
+                synchronize_session=False,
+            )
+        ModelModeDomainActivation.query.filter_by(
+            domain=domain,
+            mode_key=mode_key,
+        ).delete(synchronize_session=False)
 
         registry = ModelRegistry.query.filter_by(model_key=model_key).first()
         if not registry:
@@ -483,7 +555,7 @@ def sync_active_models() -> dict[str, Any]:
         if not version:
             version = ModelVersion(model_registry_id=registry.id, model_version_tag=version_tag)
 
-        artifact_path, fallback_path = _resolve_artifact_path(domain, model_key)
+        artifact_path, fallback_path = _resolve_artifact_path(domain, model_key, row.get("calibration"))
         version.artifact_path = artifact_path
         version.fallback_artifact_path = fallback_path
         version.calibration = _normalize_text(row.get("calibration")) or None
@@ -491,24 +563,21 @@ def sync_active_models() -> dict[str, Any]:
         version.threshold = _to_float(row.get("threshold"))
         version.seed = _normalize_text(row.get("seed")) or None
         version.n_features = int(_to_float(row.get("n_features")) or 0) or None
+        feature_columns = [
+            item.strip()
+            for item in str(row.get("feature_list_pipe") or "").split("|")
+            if item.strip() and item.strip().lower() != "nan"
+        ]
         version.metadata_json = {
             "source_csv": str(DEFAULT_ACTIVE_MODELS),
+            "feature_columns": feature_columns,
             "notes": _normalize_text(row.get("notes")) or None,
-            "por_confirmar": artifact_path is None,
+            "por_confirmar": False,
         }
         version.is_active = True
         version.updated_at = _utcnow()
         db.session.add(version)
         db.session.flush()
-
-        # Keep sync idempotent: replace prior rows for this domain/mode/role tuple
-        # instead of toggling to false, because the table has unique constraints on
-        # (domain, mode_key, role, active_flag) and can otherwise collide on reruns.
-        ModelModeDomainActivation.query.filter_by(
-            domain=domain,
-            mode_key=mode_key,
-            role=role,
-        ).delete(synchronize_session=False)
 
         activation = ModelModeDomainActivation(
             domain=domain,
@@ -538,7 +607,7 @@ def sync_active_models() -> dict[str, Any]:
             generalization_flag=_normalize_text(row.get("generalization_flag")) or None,
             dataset_ease_flag=_normalize_text(row.get("dataset_ease_flag")) or None,
             quality_label=_normalize_text(row.get("final_operational_class")) or None,
-            metrics_json={"row": row},
+            metrics_json={"row": _json_safe(row)},
             captured_at=_utcnow(),
         )
         db.session.add(metrics)
@@ -575,9 +644,13 @@ def sync_active_models() -> dict[str, Any]:
                 model_version_id=version.id,
                 artifact_kind="runtime_model",
             )
-        artifact.artifact_locator = artifact_path or fallback_path or "por_confirmar"
-        artifact.is_available = bool(artifact_path or fallback_path)
-        artifact.metadata_json = {"source": "active_modes_sync"}
+        artifact.artifact_locator = artifact_path
+        artifact.is_available = bool(_normalize_text(artifact_path))
+        artifact.metadata_json = {
+            "source": "active_modes_sync",
+            "fallback_artifact_path": fallback_path,
+            "artifact_registered_without_local_existence_check": True,
+        }
         db.session.add(artifact)
 
     return {

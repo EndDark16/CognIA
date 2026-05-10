@@ -1,0 +1,190 @@
+﻿# status --short -- reports/training
+ M reports/training/dataset_anxiety_combined__research_extended/feature_importance_permutation.csv
+ M reports/training/dataset_anxiety_combined__research_extended/local_explanations.json
+ M reports/training/dataset_anxiety_combined__research_extended/result.json
+ M reports/training/dataset_anxiety_combined__research_extended/subgroup_metrics.csv
+ M reports/training/dataset_anxiety_combined__research_extended/threshold_metrics_test.csv
+ M reports/training/dataset_anxiety_combined__research_extended/threshold_metrics_val.csv
+ M reports/training/dataset_anxiety_combined__strict_no_leakage/feature_importance_impurity.csv
+ M reports/training/dataset_anxiety_combined__strict_no_leakage/feature_importance_permutation.csv
+ M reports/training/dataset_anxiety_combined__strict_no_leakage/local_explanations.json
+ M reports/training/dataset_anxiety_combined__strict_no_leakage/result.json
+ M reports/training/dataset_anxiety_combined__strict_no_leakage/subgroup_metrics.csv
+ M reports/training/dataset_anxiety_combined__strict_no_leakage/threshold_metrics_test.csv
+ M reports/training/dataset_anxiety_combined__strict_no_leakage/threshold_metrics_val.csv
+ M reports/training/dataset_anxiety_items__research_extended/feature_importance_impurity.csv
+ M reports/training/dataset_anxiety_items__research_extended/feature_importance_permutation.csv
+ M reports/training/dataset_anxiety_items__research_extended/local_explanations.json
+ M reports/training/dataset_anxiety_items__research_extended/result.json
+ M reports/training/dataset_anxiety_items__research_extended/subgroup_metrics.csv
+ M reports/training/dataset_anxiety_items__research_extended/threshold_metrics_test.csv
+ M reports/training/dataset_anxiety_items__research_extended/threshold_metrics_val.csv
+ M reports/training/dataset_anxiety_items__strict_no_leakage/feature_importance_impurity.csv
+ M reports/training/dataset_anxiety_items__strict_no_leakage/feature_importance_permutation.csv
+ M reports/training/dataset_anxiety_items__strict_no_leakage/local_explanations.json
+ M reports/training/dataset_anxiety_items__strict_no_leakage/result.json
+ M reports/training/dataset_anxiety_items__strict_no_leakage/subgroup_metrics.csv
+ M reports/training/dataset_anxiety_items__strict_no_leakage/threshold_metrics_test.csv
+ M reports/training/dataset_anxiety_items__strict_no_leakage/threshold_metrics_val.csv
+ M reports/training/dataset_anxiety_parent__research_extended/feature_importance_impurity.csv
+ M reports/training/dataset_anxiety_parent__research_extended/feature_importance_permutation.csv
+ M reports/training/dataset_anxiety_parent__research_extended/local_explanations.json
+ M reports/training/dataset_anxiety_parent__research_extended/result.json
+ M reports/training/dataset_anxiety_parent__research_extended/subgroup_metrics.csv
+ M reports/training/dataset_anxiety_parent__research_extended/threshold_metrics_test.csv
+ M reports/training/dataset_anxiety_parent__research_extended/threshold_metrics_val.csv
+ M reports/training/dataset_anxiety_parent__strict_no_leakage/feature_importance_impurity.csv
+ M reports/training/dataset_anxiety_parent__strict_no_leakage/feature_importance_permutation.csv
+ M reports/training/dataset_anxiety_parent__strict_no_leakage/local_explanations.json
+ M reports/training/dataset_anxiety_parent__strict_no_leakage/result.json
+ M reports/training/dataset_anxiety_parent__strict_no_leakage/subgroup_metrics.csv
+ M reports/training/dataset_anxiety_parent__strict_no_leakage/threshold_metrics_test.csv
+ M reports/training/dataset_anxiety_parent__strict_no_leakage/threshold_metrics_val.csv
+ M reports/training/dataset_conduct_clinical__research_extended/feature_importance_impurity.csv
+ M reports/training/dataset_conduct_clinical__research_extended/feature_importance_permutation.csv
+ M reports/training/dataset_conduct_clinical__research_extended/local_explanations.json
+ M reports/training/dataset_conduct_clinical__research_extended/result.json
+ M reports/training/dataset_conduct_clinical__research_extended/subgroup_metrics.csv
+ M reports/training/dataset_conduct_clinical__research_extended/threshold_metrics_test.csv
+ M reports/training/dataset_conduct_clinical__research_extended/threshold_metrics_val.csv
+ M reports/training/dataset_conduct_clinical__strict_no_leakage/feature_importance_impurity.csv
+ M reports/training/dataset_conduct_clinical__strict_no_leakage/feature_importance_permutation.csv
+ M reports/training/dataset_conduct_clinical__strict_no_leakage/local_explanations.json
+ M reports/training/dataset_conduct_clinical__strict_no_leakage/result.json
+ M reports/training/dataset_conduct_clinical__strict_no_leakage/subgroup_metrics.csv
+ M reports/training/dataset_conduct_clinical__strict_no_leakage/threshold_metrics_test.csv
+ M reports/training/dataset_conduct_clinical__strict_no_leakage/threshold_metrics_val.csv
+ M reports/training/dataset_conduct_items__research_extended/feature_importance_impurity.csv
+ M reports/training/dataset_conduct_items__research_extended/feature_importance_permutation.csv
+ M reports/training/dataset_conduct_items__research_extended/local_explanations.json
+ M reports/training/dataset_conduct_items__research_extended/result.json
+ M reports/training/dataset_conduct_items__research_extended/subgroup_metrics.csv
+ M reports/training/dataset_conduct_items__research_extended/threshold_metrics_test.csv
+ M reports/training/dataset_conduct_items__research_extended/threshold_metrics_val.csv
+ M reports/training/dataset_conduct_items__strict_no_leakage/feature_importance_impurity.csv
+ M reports/training/dataset_conduct_items__strict_no_leakage/feature_importance_permutation.csv
+ M reports/training/dataset_conduct_items__strict_no_leakage/local_explanations.json
+ M reports/training/dataset_conduct_items__strict_no_leakage/result.json
+ M reports/training/dataset_conduct_items__strict_no_leakage/subgroup_metrics.csv
+ M reports/training/dataset_conduct_items__strict_no_leakage/threshold_metrics_test.csv
+ M reports/training/dataset_conduct_items__strict_no_leakage/threshold_metrics_val.csv
+ M reports/training/dataset_conduct_minimal__research_extended/feature_importance_impurity.csv
+ M reports/training/dataset_conduct_minimal__research_extended/feature_importance_permutation.csv
+ M reports/training/dataset_conduct_minimal__research_extended/local_explanations.json
+ M reports/training/dataset_conduct_minimal__research_extended/result.json
+ M reports/training/dataset_conduct_minimal__research_extended/subgroup_metrics.csv
+ M reports/training/dataset_conduct_minimal__research_extended/threshold_metrics_test.csv
+ M reports/training/dataset_conduct_minimal__research_extended/threshold_metrics_val.csv
+ M reports/training/dataset_conduct_minimal__strict_no_leakage/feature_importance_impurity.csv
+ M reports/training/dataset_conduct_minimal__strict_no_leakage/feature_importance_permutation.csv
+ M reports/training/dataset_conduct_minimal__strict_no_leakage/local_explanations.json
+ M reports/training/dataset_conduct_minimal__strict_no_leakage/result.json
+ M reports/training/dataset_conduct_minimal__strict_no_leakage/subgroup_metrics.csv
+ M reports/training/dataset_conduct_minimal__strict_no_leakage/threshold_metrics_test.csv
+ M reports/training/dataset_conduct_minimal__strict_no_leakage/threshold_metrics_val.csv
+ M reports/training/dataset_depression_combined__research_extended/feature_importance_impurity.csv
+ M reports/training/dataset_depression_combined__research_extended/feature_importance_permutation.csv
+ M reports/training/dataset_depression_combined__research_extended/local_explanations.json
+ M reports/training/dataset_depression_combined__research_extended/result.json
+ M reports/training/dataset_depression_combined__research_extended/subgroup_metrics.csv
+ M reports/training/dataset_depression_combined__research_extended/threshold_metrics_test.csv
+ M reports/training/dataset_depression_combined__research_extended/threshold_metrics_val.csv
+ M reports/training/dataset_depression_combined__strict_no_leakage/feature_importance_impurity.csv
+ M reports/training/dataset_depression_combined__strict_no_leakage/feature_importance_permutation.csv
+ M reports/training/dataset_depression_combined__strict_no_leakage/local_explanations.json
+
+# diff --stat -- reports/training
+ .../feature_importance_permutation.csv             |  74 +-
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 806 ++++++++++-----------
+ .../subgroup_metrics.csv                           |  16 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                |  82 +--
+ .../feature_importance_permutation.csv             |  72 +-
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 800 ++++++++++----------
+ .../subgroup_metrics.csv                           |  10 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                | 534 +++++++-------
+ .../feature_importance_permutation.csv             | 524 +++++++-------
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 806 ++++++++++-----------
+ .../subgroup_metrics.csv                           |  16 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                | 532 +++++++-------
+ .../feature_importance_permutation.csv             | 522 ++++++-------
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 800 ++++++++++----------
+ .../subgroup_metrics.csv                           |  10 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                |  68 +-
+ .../feature_importance_permutation.csv             |  58 +-
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 806 ++++++++++-----------
+ .../subgroup_metrics.csv                           |  16 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                |  66 +-
+ .../feature_importance_permutation.csv             |  56 +-
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 800 ++++++++++----------
+ .../subgroup_metrics.csv                           |  10 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                |  88 +--
+ .../feature_importance_permutation.csv             |  78 +-
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 806 ++++++++++-----------
+ .../subgroup_metrics.csv                           |  16 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                |  86 +--
+ .../feature_importance_permutation.csv             |  76 +-
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 800 ++++++++++----------
+ .../subgroup_metrics.csv                           |  10 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                | 674 ++++++++---------
+ .../feature_importance_permutation.csv             | 664 ++++++++---------
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 806 ++++++++++-----------
+ .../subgroup_metrics.csv                           |  16 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                | 672 ++++++++---------
+ .../feature_importance_permutation.csv             | 662 ++++++++---------
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 800 ++++++++++----------
+ .../subgroup_metrics.csv                           |  10 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                |  60 +-
+ .../feature_importance_permutation.csv             |  50 +-
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 806 ++++++++++-----------
+ .../subgroup_metrics.csv                           |  16 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                |  58 +-
+ .../feature_importance_permutation.csv             |  48 +-
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 800 ++++++++++----------
+ .../subgroup_metrics.csv                           |  10 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                |  64 +-
+ .../feature_importance_permutation.csv             |  54 +-
+ .../local_explanations.json                        | 518 ++++++-------
+ .../result.json                                    | 806 ++++++++++-----------
+ .../subgroup_metrics.csv                           |  16 +-
+ .../threshold_metrics_test.csv                     |  10 +-
+ .../threshold_metrics_val.csv                      |  10 +-
+ .../feature_importance_impurity.csv                |  62 +-
+ .../feature_importance_permutation.csv             |  52 +-
+ .../local_explanations.json                        | 518 ++++++-------
+ 93 files changed, 12081 insertions(+), 12081 deletions(-)

@@ -1,0 +1,38 @@
+{
+  "line": "hybrid_rf_max_real_metrics_v1",
+  "freeze_label": "v11",
+  "generated_at_utc": "2026-04-27T05:19:18.089151+00:00",
+  "source_truth_initial": {
+    "active": "data/hybrid_active_modes_freeze_v10/tables/hybrid_active_models_30_modes.csv",
+    "operational": "data/hybrid_operational_freeze_v10/tables/hybrid_operational_final_champions.csv",
+    "inputs_master": "data/hybrid_active_modes_freeze_v10/tables/hybrid_questionnaire_inputs_master.csv"
+  },
+  "source_truth_final": {
+    "active": "data/hybrid_active_modes_freeze_v11/tables/hybrid_active_models_30_modes.csv",
+    "operational": "data/hybrid_operational_freeze_v11/tables/hybrid_operational_final_champions.csv",
+    "inputs_master": "data/hybrid_active_modes_freeze_v11/tables/hybrid_questionnaire_inputs_master.csv",
+    "normalization": "data/hybrid_classification_normalization_v2/tables/hybrid_operational_classification_normalized_v11.csv"
+  },
+  "rules": {
+    "model_family_allowed": "RandomForestClassifier only",
+    "same_inputs_functional": true,
+    "same_outputs_functional": true,
+    "no_question_rewrite": true,
+    "guardrail_metrics_max": 0.98,
+    "threshold_source": "validation_only",
+    "holdout_use": "final_evaluation_only"
+  },
+  "stats": {
+    "active_rows": 30,
+    "trials": 2160,
+    "rf_only_ok": "yes",
+    "remaining_guardrail_violations": 0,
+    "policy_violations": 0,
+    "feature_contract_mismatches": 0,
+    "questionnaire_changed": "no",
+    "f1_improved_or_equal_slots": 17,
+    "f1_regressed_slots": 13,
+    "elimination_identical_prediction_pairs": 0
+  },
+  "artifact": "hybrid_operational_freeze_v11"
+}
