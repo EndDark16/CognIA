@@ -133,7 +133,6 @@ _USER_TYPE_ROLE = {
 }
 
 _USERNAME_RE = re.compile(r"^[A-Za-z0-9._-]{3,32}$")
-_EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 _FULL_NAME_MAX = 120
 _EMAIL_MAX = 254
 _PASSWORD_MIN = 8
@@ -178,7 +177,23 @@ def _is_valid_username(username: str) -> bool:
 def _is_valid_email(email: str) -> bool:
     if not email or len(email) > _EMAIL_MAX:
         return False
-    return bool(_EMAIL_RE.fullmatch(email))
+    if any(char.isspace() for char in email):
+        return False
+    parts = email.split("@")
+    if len(parts) != 2:
+        return False
+    local_part, domain_part = parts
+    if not local_part or not domain_part:
+        return False
+    domain_labels = domain_part.split(".")
+    if len(domain_labels) < 2:
+        return False
+    for label in domain_labels:
+        if not label:
+            return False
+        if label.startswith("-") or label.endswith("-"):
+            return False
+    return True
 
 
 def _login_rate_key() -> str:

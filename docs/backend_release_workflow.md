@@ -26,6 +26,38 @@ Referencia base: `CONTRIBUTING.md`.
 7. Abrir PR de promocion `dev.enddark -> development`.
 8. Merge de promocion hacia `development`.
 9. Solo para cierre productivo aprobado: PR `development -> main`.
+10. Tras merge en `main`, esperar `Deploy Backend (Best Effort)` en verde y ejecutar validacion post-deploy real:
+   - `GET /healthz` = 200
+   - `GET /readyz` = 200
+   - `GET /api/v2/security/transport-key` = 200
+   - `GET /openapi.yaml` y `GET /api/openapi.yaml` = 404/403
+   - `GET /docs` = 404/403
+11. Ejecutar bateria k6 post-deploy en orden de gate:
+   - `smoke-operational-api`
+   - `diagnostic-operational-api`
+   - `load-operational-api`
+   - `load-user-public-api`
+   - `stress-operational-api`
+   - `spike-operational-api`
+   - `soak-operational-api`
+
+## Automatizacion CI/deploy en GitHub Actions
+- CI principal (siempre disponible): `.github/workflows/ci-backend.yml`
+  - Runner: `ubuntu-latest` (GitHub-hosted)
+  - Trigger: pushes/PR sobre `development` y `main`
+  - Validaciones: Ruff F-check, compile sanity, import sanity, `pytest -q`, docker build sanity
+- Deploy backend Ubuntu (best effort): `.github/workflows/deploy-backend.yml`
+  - Runner: `[self-hosted, linux, x64, cognia-backend]`
+  - Trigger: push a `main` + `workflow_dispatch`
+  - Comportamiento: update verificado de repo en `/opt/cognia/backend` contra `github.sha`, `docker compose up -d --build backend`, recreacion forzada de `gateway`, verificacion `http://localhost/readyz`, rollback automatico basico si falla el post-deploy healthcheck.
+  - Politica de base de datos: produccion conecta a Supabase via `DB_*`; Postgres local solo puede levantarse en entorno local con `docker compose --profile local-db`.
+
+Regla operativa obligatoria:
+- `deploy-backend` NO debe configurarse como required check en branch protection.
+- La senal de integracion para desarrollo continuo debe ser `ci-backend`.
+- Si el runner self-hosted esta offline, el flujo de desarrollo continua con CI normal en GitHub-hosted.
+- Check recomendado como required: `CI Backend / backend-ci`.
+- Check de deploy NO requerido: `Deploy Backend (Best Effort) / backend-deploy-best-effort`.
 
 ## Buenas practicas obligatorias
 - No subir secretos ni `.env`.

@@ -1,0 +1,20 @@
+{
+  "line": "hybrid_v6_quick_champion_guard_hotfix_v1",
+  "generated_at_utc": "2026-04-24T03:19:05.990231+00:00",
+  "source_truth_previous": {
+    "operational": "data\\hybrid_operational_freeze_v6\\tables\\hybrid_operational_final_champions.csv",
+    "active": "data\\hybrid_active_modes_freeze_v6\\tables\\hybrid_active_models_30_modes.csv"
+  },
+  "source_truth_new": {
+    "operational": "data\\hybrid_operational_freeze_v6_hotfix_v1\\tables\\hybrid_operational_final_champions.csv",
+    "active": "data\\hybrid_active_modes_freeze_v6_hotfix_v1\\tables\\hybrid_active_models_30_modes.csv"
+  },
+  "stats": {
+    "violating_slots_before": 16,
+    "corrected_slots_total": 16,
+    "replacements_existing": 5,
+    "replacements_retrained": 11,
+    "remaining_guard_violations": 0,
+    "policy_violations": 0
+  }
+}

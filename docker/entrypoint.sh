@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-# Opcional: configura Gunicorn
 CPU_CORES=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)
-
 MEM_LIMIT_MB=""
+
 if [ -f /sys/fs/cgroup/memory.max ]; then
   MEM_RAW=$(cat /sys/fs/cgroup/memory.max)
   if [ "$MEM_RAW" != "max" ]; then
@@ -20,17 +19,20 @@ if [ -n "$MEM_LIMIT_MB" ] && [ "$MEM_LIMIT_MB" -gt 200000 ]; then
   MEM_LIMIT_MB=""
 fi
 
+DEFAULT_WORKERS=3
+DEFAULT_THREADS=2
+
+# Conservative fallback for constrained containers.
 if [ -n "$MEM_LIMIT_MB" ] && [ "$MEM_LIMIT_MB" -le 1024 ]; then
-  DEFAULT_WORKERS=1
-  DEFAULT_THREADS=2
-elif [ -n "$MEM_LIMIT_MB" ] && [ "$MEM_LIMIT_MB" -le 2048 ]; then
   DEFAULT_WORKERS=2
   DEFAULT_THREADS=2
-else
-  DEFAULT_WORKERS=$((2 * CPU_CORES + 1))
-  DEFAULT_THREADS=4
 fi
 
+if [ "$CPU_CORES" -le 1 ] && [ "$DEFAULT_WORKERS" -gt 2 ]; then
+  DEFAULT_WORKERS=2
+fi
+
+BIND="0.0.0.0:${PORT:-5000}"
 WORKERS=${GUNICORN_WORKERS:-${WEB_CONCURRENCY:-$DEFAULT_WORKERS}}
 THREADS=${GUNICORN_THREADS:-$DEFAULT_THREADS}
 BIND="0.0.0.0:${PORT:-5000}"

@@ -1,0 +1,17 @@
+domain,mode,role
+adhd,psychologist_full,psychologist
+anxiety,caregiver_2_3,caregiver
+anxiety,caregiver_full,caregiver
+anxiety,psychologist_1_3,psychologist
+anxiety,psychologist_2_3,psychologist
+anxiety,psychologist_full,psychologist
+conduct,caregiver_full,caregiver
+conduct,psychologist_full,psychologist
+depression,caregiver_full,caregiver
+depression,psychologist_full,psychologist
+elimination,caregiver_1_3,caregiver
+elimination,caregiver_2_3,caregiver
+elimination,caregiver_full,caregiver
+elimination,psychologist_1_3,psychologist
+elimination,psychologist_2_3,psychologist
+elimination,psychologist_full,psychologist

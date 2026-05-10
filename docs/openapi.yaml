@@ -70,6 +70,449 @@ tags:
 - name: Misc
   description: Endpoints no clasificados explicitamente.
 paths:
+  /api/admin/users/{id}:
+    patch:
+      tags:
+      - Admin
+      summary: Actualizar atributos administrativos de un usuario existente
+      description: |
+        **Objetivo funcional**
+        Actualizar atributos administrativos de un usuario existente.
+
+        **Cuando debe usarse**
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `PATCH /api/admin/users/{id}`.
+
+        **Actor que lo consume**
+        Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
+
+        **Seguridad aplicable**
+        Requiere: JWT bearer.
+
+        **Entrada esperada**
+        Request body obligatorio. Formatos admitidos: application/json. Schema principal: AdminUserPatchRequest.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: id. El body debe cumplir el schema `AdminUserPatchRequest` y sus restricciones de tipos, obligatoriedad, enums, rangos y formatos. La cuenta autenticada debe tener privilegios administrativos suficientes para operar el recurso.
+
+        **Resultado exitoso**
+        Actualiza el recurso solicitado y devuelve confirmación o la representación actualizada del estado.
+
+        **Errores posibles y causa funcional**
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 409, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La operación puede dejar trazabilidad administrativa o de auditoría según la implementación de servicios y modelos.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `PATCH /api/admin/users/{id}`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 409, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: updateAdminUser
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUserPatchRequest'
+            examples:
+              deactivate:
+                summary: Deactivate user
+                value:
+                  is_active: false
+              roles:
+                summary: Update roles
+                value:
+                  roles:
+                  - ADMIN
+                  - ANALYST
+      responses:
+        '200':
+          description: Actualiza el recurso solicitado y devuelve confirmación o la representación actualizada del estado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserItem'
+              examples:
+                updated:
+                  summary: Updated
+                  value:
+                    id: b28e6f7e-2c88-4a31-9c2f-0f35e33b2c4a
+                    username: guardian_01
+                    email: guardian@example.com
+                    full_name: Maria Perez
+                    user_type: guardian
+                    professional_card_number:
+                    colpsic_verified: false
+                    is_active: false
+                    roles:
+                    - GUARDIAN
+                    - ANALYST
+                    updated_at: '2026-02-02T11:11:11Z'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_admin_users_id
+                    error: invalid_api_admin_users_id
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_admin_users_id
+                    error: forbidden_api_admin_users_id
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_admin_users_id
+                    error: api_admin_users_id_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_409:
+                  value:
+                    msg: conflict while processing api_admin_users_id
+                    error: api_admin_users_id_conflict
+          description: La operación entra en conflicto con el estado actual del recurso o con una restricción de unicidad, transición o concurrencia.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_admin_users_id
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_admin_users_id
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: KEEP_ACTIVE
+  /api/admin/users/{id}/password-reset:
+    post:
+      tags:
+      - Admin
+      summary: Forzar un flujo administrativo de restablecimiento de contraseña
+      description: |
+        **Objetivo funcional**
+        Forzar un flujo administrativo de restablecimiento de contraseña.
+
+        **Cuando debe usarse**
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/admin/users/{id}/password-reset`.
+
+        **Actor que lo consume**
+        Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
+
+        **Seguridad aplicable**
+        Requiere: JWT bearer.
+
+        **Entrada esperada**
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: id. La cuenta autenticada debe tener privilegios administrativos suficientes para operar el recurso.
+
+        **Resultado exitoso**
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        **Errores posibles y causa funcional**
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La operación puede dejar trazabilidad administrativa o de auditoría según la implementación de servicios y modelos.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/admin/users/{id}/password-reset`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: resetUserPasswordAdmin
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminPasswordResetResponse'
+              example:
+                endpoint: /api/admin/users/{id}/password-reset
+                method: POST
+                status: 200
+                msg: operacion ejecutada correctamente
+                timestamp: '2026-04-18T06:40:00Z'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_admin_users_id_password_reset
+                    error: invalid_api_admin_users_id_password_reset
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_admin_users_id_password_reset
+                    error: forbidden_api_admin_users_id_password_reset
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_admin_users_id_password_reset
+                    error: api_admin_users_id_password_reset_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_admin_users_id_password_reset
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_admin_users_id_password_reset
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: KEEP_ACTIVE
+  /api/admin/users/{id}/mfa/reset:
+    post:
+      tags:
+      - Admin
+      summary: Reiniciar MFA de una cuenta desde administración
+      description: |
+        **Objetivo funcional**
+        Reiniciar MFA de una cuenta desde administración.
+
+        **Cuando debe usarse**
+        Debe invocarse cuando el cliente necesita exactamente este paso del flujo publicado por la API en la ruta `POST /api/admin/users/{id}/mfa/reset`.
+
+        **Actor que lo consume**
+        Lo consume típicamente backoffice o frontend administrativo con rol ADMIN.
+
+        **Seguridad aplicable**
+        Requiere: JWT bearer.
+
+        **Entrada esperada**
+        No usa requestBody en el contrato auditado.
+
+        Reglas obligatorias:
+        Debe respetar los parámetros declarados en ruta o query: id. La cuenta autenticada debe tener privilegios administrativos suficientes para operar el recurso.
+
+        **Resultado exitoso**
+        Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+
+        **Errores posibles y causa funcional**
+        Este endpoint documenta explícitamente los códigos 200, 400, 401, 403, 404, 429, 500. Cada código debe interpretarse con la causa funcional descrita en la sección de respuestas, no como un fallo genérico reutilizable.
+
+        Limitaciones actuales:
+        La operación puede dejar trazabilidad administrativa o de auditoría según la implementación de servicios y modelos.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`
+
+        Marco de cumplimiento profesional:
+        - Punto de control contractual: `POST /api/admin/users/{id}/mfa/reset`.
+        - Seguridad operacional: bearerAuth. Roles declarados: ADMIN.
+        - Respuestas contractuales auditadas: 200, 400, 401, 403, 404, 429, 500.
+        - Comportamiento condicional: el consumidor debe decidir el flujo exclusivamente por codigo HTTP y por las claves del body devuelto; no por supuestos externos.
+        - Trazabilidad recomendada: registrar actor, identificador de recurso, filtros aplicados, timestamp UTC y resultado final de la operacion para auditoria reproducible.
+        - Criterio de uso profesional: este contrato es de soporte operativo y screening en entorno simulado; no reemplaza criterio clinico ni constituye diagnostico automatico.
+      operationId: resetUserMfaAdmin
+      x-roles:
+      - ADMIN
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Crea o ejecuta correctamente la acción de negocio y devuelve el estado resultante o el recurso creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMfaResetResponse'
+              example:
+                endpoint: /api/admin/users/{id}/mfa/reset
+                method: POST
+                status: 200
+                msg: operacion ejecutada correctamente
+                timestamp: '2026-04-18T06:40:00Z'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_400:
+                  value:
+                    msg: request validation failed for api_admin_users_id_mfa_reset
+                    error: invalid_api_admin_users_id_mfa_reset
+          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio del endpoint.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_401:
+                  value:
+                    msg: unauthorized
+                    error: unauthorized
+          description: No existe autenticación válida, el token expiró o la credencial enviada no es aceptada por el backend.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_403:
+                  value:
+                    msg: access denied for api_admin_users_id_mfa_reset
+                    error: forbidden_api_admin_users_id_mfa_reset
+          description: La cuenta está autenticada pero no tiene permiso suficiente, o falló una regla adicional de seguridad, ownership o acceso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_404:
+                  value:
+                    msg: resource not found for api_admin_users_id_mfa_reset
+                    error: api_admin_users_id_mfa_reset_not_found
+          description: El recurso objetivo no existe, no está habilitado en este entorno o no es visible para el actor actual.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_429:
+                  value:
+                    msg: rate limit exceeded for api_admin_users_id_mfa_reset
+                    error: rate_limited
+          description: Se superó el límite de solicitudes permitido por la política de protección del backend.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error_500:
+                  value:
+                    msg: internal failure while processing api_admin_users_id_mfa_reset
+                    error: server_error
+          description: El backend encontró una falla interna durante consulta, persistencia, generación, inferencia o coordinación del flujo.
+      x-contract-status: KEEP_ACTIVE
   /api/admin/audit-logs:
     get:
       tags:
@@ -638,7 +1081,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: unsubscribe_id
         required: true
         schema:
           type: string
@@ -1006,7 +1449,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: evaluation_id
         required: true
         schema:
           type: string
@@ -1644,7 +2087,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: report_id
         required: true
         schema:
           type: string
@@ -1788,7 +2231,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: report_id
         required: true
         schema:
           type: string
@@ -1954,7 +2397,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: user_id
         required: true
         schema:
           type: string
@@ -2120,7 +2563,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: user_id
         required: true
         schema:
           type: string
@@ -2483,7 +2926,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: template_id
         required: true
         schema:
           type: string
@@ -2658,7 +3101,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: template_id
         required: true
         schema:
           type: string
@@ -2861,7 +3304,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: template_id
         required: true
         schema:
           type: string
@@ -3503,7 +3946,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: user_id
         required: true
         schema:
           type: string
@@ -3714,7 +4157,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: user_id
         required: true
         schema:
           type: string
@@ -3880,7 +4323,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: user_id
         required: true
         schema:
           type: string
@@ -4046,7 +4489,7 @@ paths:
       - bearerAuth: []
       parameters:
       - in: path
-        name: id
+        name: user_id
         required: true
         schema:
           type: string
@@ -6548,131 +6991,73 @@ paths:
     post:
       tags:
       - Predict
-      summary: "Ejecutar la inferencia experimental o legado del payload cl\xE1sico de predicci\xF3n"
-      description: '**Objetivo funcional**
-
-        Este endpoint permite crear el recurso de `predict_legacy`.
-
+      summary: Ejecutar inferencia de prediccion legacy protegida
+      description: |-
+        **Objetivo funcional**
+        Ejecutar inferencia legacy de prediccion para compatibilidad temporal con clientes antiguos.
 
         **Cuando debe usarse**
-
-        Usalo cuando el flujo requiera invocar `POST /api/predict` y mantener trazabilidad contractual.
-
+        Solo cuando una integracion heredada aun no migra a las rutas de cuestionario runtime/v2.
 
         **Actor que lo consume**
-
-        Integracion tecnica experimental (no contrato principal).
-
+        Integracion tecnica autenticada con token JWT valido.
 
         **Seguridad aplicable**
-
-        - Endpoint publico; no requiere token JWT.
-
+        - Requiere esquema `bearerAuth`.
+        - En produccion, cuando aplica politica estricta de transporte, debe usar envelope `transport_envelope_v1`.
 
         **Entrada esperada**
-
         - Metodo y ruta: `POST /api/predict`.
-
-        - Parametros de ruta: no aplica.
-
-        - Query params: no aplica.
-
-        - Headers adicionales: no aplica.
-
-        - Body `obligatorio` en: application/json.
-
+        - Body JSON con los campos del esquema `PredictRequest`.
+        - Si se envia cifrado: `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`.
 
         **Resultado exitoso**
-
-        - Codigos de exito documentados: 200.
-
-        - La respuesta representa el estado procesado por el backend y mantiene compatibilidad con el esquema documentado.
-
+        - `200` con objeto `PredictResponse`.
+        - Si el request llega cifrado, la respuesta sensible puede devolverse cifrada segun politica de transporte.
 
         **Errores posibles y causa funcional**
-
-        - `400`: Solicitud invalida por formato, validacion o reglas de negocio.
-
-        - `500`: Error interno del servidor sin exposicion de detalles sensibles.
-
+        - `400`: validacion invalida o sobre cifrado de payload (`plaintext_not_allowed`, `encrypted_payload_invalid`, `invalid_crypto_version`).
+        - `401`: credencial ausente, invalida o vencida.
+        - `500`: falla interna durante la inferencia.
 
         **Estado contractual**
-
         - `DEPRECATE_PUBLIC`
-
-        - Motivo: Ruta experimental heredada sin contrato estable de producto.
-
-        - Accion OpenAPI: marcar deprecated'
+        - Endpoint legado/deprecado, mantenido por compatibilidad controlada mientras clientes migran.
       operationId: postPredict
       deprecated: true
+      security:
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PredictRequest'
-            examples:
-              typical:
-                summary: Typical input
-                value:
-                  age: 10
-                  sex: 1
-                  conners_inattention_score: 12.5
-                  conners_hyperactivity: 8.1
-                  cbcl_attention_score: 14.0
-                  sleep_problems: 0
-              edge:
-                summary: Edge of valid range
-                value:
-                  age: 3
-                  sex: 0
-                  conners_inattention_score: 0.0
-                  conners_hyperactivity: 0.0
-                  cbcl_attention_score: 0.0
-                  sleep_problems: 1
       responses:
         '200':
-          description: "Crea o ejecuta correctamente la acci\xF3n de negocio y devuelve el estado resultante o el recurso\
-            \ creado."
+          description: Prediccion procesada correctamente.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PredictResponse'
-              examples:
-                typical:
-                  summary: Typical prediction
-                  value:
-                    predictions:
-                      adhd: 0.42
-                      anxiety: 0.18
         '400':
-          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio
-            del endpoint.
+          description: Solicitud invalida (`validation_error|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version`).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalid_payload:
-                  summary: Missing required fields
-                  value:
-                    msg: Validation error
-                    error: validation_error
-                    errors:
-                      age:
-                      - Missing data for required field.
+        '401':
+          description: Token ausente, invalido o expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
+          description: Falla interna durante la inferencia.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                error_500:
-                  value:
-                    msg: internal failure while processing api_predict
-                    error: server_error
-          description: "El backend encontr\xF3 una falla interna durante consulta, persistencia, generaci\xF3n, inferencia\
-            \ o coordinaci\xF3n del flujo."
       x-contract-status: DEPRECATE_PUBLIC
   /api/problem-reports:
     post:
@@ -15860,6 +16245,71 @@ paths:
           description: "El backend encontr\xF3 una falla interna durante consulta, persistencia, generaci\xF3n, inferencia\
             \ o coordinaci\xF3n del flujo."
       x-contract-status: KEEP_ACTIVE
+  /api/v2/security/transport-key:
+    get:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener clave publica de transporte cifrado v2
+      description: |-
+        **Objetivo funcional**
+        Entregar la clave publica y metadata para inicializar el cifrado de transporte `transport_envelope_v1`.
+
+        **Cuando debe usarse**
+        Al inicio de una sesion del frontend o cliente antes de enviar payloads sensibles cifrados.
+
+        **Actor que lo consume**
+        Frontend web, apps cliente o integraciones que necesiten cifrar payload sensible en transito.
+
+        **Seguridad aplicable**
+        - Endpoint publico sin JWT (`security: []`).
+        - Debe operar con HTTPS/TLS y rate limit.
+        - Nunca expone private key ni PEM.
+
+        **Entrada esperada**
+        - Metodo y ruta: `GET /api/v2/security/transport-key`.
+        - Sin body.
+        - Sin headers criptograficos previos.
+
+        **Resultado exitoso**
+        - `200` con `key_id`, `algorithm`, `public_key_jwk`, `expires_at`, `version`.
+        - Respuesta pensada para bootstrap criptografico, sin informacion sensible clinica.
+
+        **Errores posibles y causa funcional**
+        - `429`: rate limit excedido.
+        - `500`: falla interna resolviendo material criptografico.
+
+        **Estado contractual**
+        - `KEEP_ACTIVE`
+        - Endpoint publico obligatorio para bootstrap de cifrado de transporte.
+      operationId: getV2SecurityTransportKey
+      security: []
+      responses:
+        '200':
+          description: Material publico de cifrado para construir envelopes de transporte.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransportKeyResponse'
+              example:
+                key_id: transport-key-v1
+                algorithm: RSA-OAEP-256+AES-256-GCM
+                public_key_jwk:
+                  kty: RSA
+                  alg: RSA-OAEP-256
+                  use: enc
+                  n: <base64url>
+                  e: AQAB
+                expires_at: '2026-05-02T13:20:11Z'
+                version: transport_envelope_v1
+        '429':
+          description: Limite de solicitudes excedido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno al resolver el material de transporte.
+      x-contract-status: KEEP_ACTIVE
   /api/v2/questionnaires/active:
     get:
       tags:
@@ -17174,6 +17624,413 @@ paths:
       description: Identificador del recurso `session_id` en la ruta.
       schema:
         type: string
+  /api/v2/questionnaires/history/{session_id}/results-secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener resultados de sesion v2 en canal seguro
+      description: |-
+        **Objetivo funcional**
+        Obtener resultados de sesion v2 por canal seguro con soporte de envelope cifrado.
+
+        **Cuando debe usarse**
+        En lugar del endpoint plaintext legacy cuando se requiere proteger payload clinico sensible.
+
+        **Actor que lo consume**
+        Frontend autenticado del flujo de cuestionarios v2.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`. Soporta transporte cifrado por envelope.
+
+        **Entrada esperada**
+        - Metodo y ruta: `POST /api/v2/questionnaires/history/{session_id}/results-secure`.
+        - Parametros de ruta: `session_id` (obligatorio).
+        - Query params: no aplica.
+        - Headers adicionales: `X-CognIA-Encrypted`, `X-CognIA-Crypto-Version` cuando aplique.
+        - Body obligatorio: `{}` (si politica permite plaintext) o `TransportEncryptedRequestEnvelope`.
+
+        **Resultado exitoso**
+        - Codigo de exito: `200`.
+        - Respuesta: `SessionResultsResponsePlain` o `TransportEncryptedResponseEnvelope`.
+
+        **Errores posibles y causa funcional**
+        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version`.
+        - `401 invalid_user|unauthorized`.
+        - `403 forbidden`.
+        - `404 not_found`.
+        - `429 rate_limited`.
+
+        **Estado contractual**
+        - `KEEP_ACTIVE`.
+        - `secure replacement` de `GET /api/v2/questionnaires/history/{session_id}/results` (legacy plaintext).
+      operationId: postV2QuestionnairesHistorySessionIdResultsSecure
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+              - type: object
+                description: Empty/plain request when policy allows plaintext.
+                additionalProperties: true
+            examples:
+              empty_plain_request:
+                value: {}
+              encrypted_request:
+                value:
+                  encrypted: true
+                  version: transport_envelope_v1
+                  key_id: transport-key-v1
+                  alg: AES-256-GCM
+                  encrypted_key: <base64url>
+                  iv: <base64url>
+                  ciphertext: <base64url>
+                  aad: transport_envelope_v1|frontend
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Resultados de sesion.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/SessionResultsResponsePlain'
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+              examples:
+                plaintext_response:
+                  value:
+                    session:
+                      session_id: 5afc36e5-7d82-4f81-a949-87ed4f26b9ce
+                      questionnaire_id: QV2-9A12BC34DE56
+                      status: processed
+                      mode: short
+                      role: guardian
+                      mode_key: caregiver_1_3
+                      progress_pct: 100
+                    result:
+                      summary: Patrón de tamizaje compatible con riesgo relevante.
+                      operational_recommendation: Evaluacion profesional recomendada.
+                      completion_quality_score: 0.98
+                      missingness_score: 0
+                      needs_professional_review: true
+                    domains: []
+                    comorbidity: []
+                encrypted_response:
+                  value:
+                    encrypted: true
+                    version: transport_envelope_v1
+                    key_id: transport-key-v1
+                    alg: AES-256-GCM
+                    iv: <base64url>
+                    ciphertext: <base64url>
+                    aad: transport_envelope_v1|transport-key-v1
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unauthorized:
+                  value:
+                    msg: Missing Authorization Header
+                    error: unauthorized
+                invalid_user:
+                  value:
+                    msg: invalid_user
+                    error: invalid_user
+          description: Error de autenticacion o identidad invalida.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                msg: forbidden
+                error: forbidden_session_access
+          description: El actor autenticado no puede acceder a esa sesion.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_session_id:
+                  value:
+                    msg: invalid_session_id
+                    error: invalid_session_id
+                plaintext_not_allowed:
+                  value:
+                    msg: encrypted_transport_required_for_sensitive_endpoint
+                    error: plaintext_not_allowed
+                encrypted_payload_invalid:
+                  value:
+                    msg: decrypt_failed
+                    error: encrypted_payload_invalid
+                invalid_crypto_version:
+                  value:
+                    msg: invalid_crypto_version
+                    error: invalid_crypto_version
+          description: Request invalido por path o contrato criptografico.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                msg: not_found
+                error: session_not_found
+          description: Sesion no encontrada para ese actor.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                msg: rate limit exceeded
+                error: rate_limited
+          description: Limite de solicitudes excedido.
+      x-contract-status: KEEP_ACTIVE
+    parameters:
+    - name: session_id
+      in: path
+      required: true
+      description: Identificador del recurso `session_id` en la ruta.
+      schema:
+        type: string
+  /api/v2/questionnaires/history/{session_id}/clinical-summary:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Generar resumen clinico simulado v2 (canal seguro)
+      description: |-
+        **Objetivo funcional**
+        Generar un resumen clinico simulado de tamizaje (`clinical_summary_v1`) por sesion.
+
+        **Cuando debe usarse**
+        Al presentar salida narrativa profesional de apoyo luego de tener resultados de sesion.
+
+        **Actor que lo consume**
+        Frontend autenticado del flujo de cuestionarios v2.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`. Soporta transporte cifrado por envelope.
+
+        **Entrada esperada**
+        - Metodo y ruta: `POST /api/v2/questionnaires/history/{session_id}/clinical-summary`.
+        - Parametros de ruta: `session_id` (obligatorio).
+        - Query params: no aplica.
+        - Headers adicionales: `X-CognIA-Encrypted`, `X-CognIA-Crypto-Version` cuando aplique.
+        - Body obligatorio: `{}` (si politica permite plaintext) o `TransportEncryptedRequestEnvelope`.
+
+        **Resultado exitoso**
+        - Codigo de exito: `200`.
+        - Respuesta: `ClinicalSummaryResponsePlain` o `TransportEncryptedResponseEnvelope`.
+
+        **Errores posibles y causa funcional**
+        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`.
+        - `401 invalid_user|unauthorized`.
+        - `403 forbidden`.
+        - `404 not_found`.
+        - `429 rate_limited`.
+        - `500 clinical_summary_failed|db_error|server_error`.
+        - `503 runtime_artifact_unavailable|runtime_assets_unavailable|db_unavailable`.
+
+        **Estado contractual**
+        - `KEEP_ACTIVE`.
+        - Endpoint sensible activo; claim limitado a screening/apoyo profesional en entorno simulado.
+      operationId: postV2QuestionnairesHistorySessionIdClinicalSummary
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+              - type: object
+                description: Empty/plain request when policy allows plaintext.
+                additionalProperties: true
+            examples:
+              empty_plain_request:
+                value: {}
+              encrypted_request:
+                value:
+                  encrypted: true
+                  version: transport_envelope_v1
+                  key_id: transport-key-v1
+                  alg: AES-256-GCM
+                  encrypted_key: <base64url>
+                  iv: <base64url>
+                  ciphertext: <base64url>
+                  aad: transport_envelope_v1|frontend
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Resumen clinico simulado generado correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ClinicalSummaryResponsePlain'
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+              examples:
+                plaintext_response:
+                  value:
+                    session_id: 5afc36e5-7d82-4f81-a949-87ed4f26b9ce
+                    report_version: clinical_summary_v1
+                    generated_at: '2026-05-02T13:20:11Z'
+                    overall_risk_level: relevante
+                    simulated_diagnostic_text:
+                      sintesis_general: Patron general de tamizaje con mayor compatibilidad en ADHD y ANXIETY.
+                      niveles_de_compatibilidad: ADHD relevante; CONDUCT intermedia; ELIMINATION baja.
+                      indicadores_principales_observados: ADHD adhd_symptom_01 3.0
+                      impacto_funcional: El patron observado puede asociarse con impacto funcional.
+                      recomendacion_profesional: Recomendacion de valoracion profesional pronta.
+                      aclaracion_importante: Este resultado no constituye un diagnostico clinico.
+                    domains: []
+                    comorbidity:
+                      has_comorbidity_signal: true
+                      domains:
+                      - adhd
+                      - anxiety
+                      summary: Posible comorbilidad en tamizaje.
+                    disclaimer: Este resultado no constituye un diagnostico clinico.
+                encrypted_response:
+                  value:
+                    encrypted: true
+                    version: transport_envelope_v1
+                    key_id: transport-key-v1
+                    alg: AES-256-GCM
+                    iv: <base64url>
+                    ciphertext: <base64url>
+                    aad: transport_envelope_v1|transport-key-v1
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unauthorized:
+                  value:
+                    msg: Missing Authorization Header
+                    error: unauthorized
+                invalid_user:
+                  value:
+                    msg: invalid_user
+                    error: invalid_user
+          description: Error de autenticacion o identidad invalida.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                msg: forbidden
+                error: forbidden_session_access
+          description: El actor autenticado no puede acceder a esa sesion.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_session_id:
+                  value:
+                    msg: invalid_session_id
+                    error: invalid_session_id
+                plaintext_not_allowed:
+                  value:
+                    msg: encrypted_transport_required_for_sensitive_endpoint
+                    error: plaintext_not_allowed
+                encrypted_payload_invalid:
+                  value:
+                    msg: decrypt_failed
+                    error: encrypted_payload_invalid
+                invalid_crypto_version:
+                  value:
+                    msg: invalid_crypto_version
+                    error: invalid_crypto_version
+                validation_error:
+                  value:
+                    msg: validation_error
+                    error: session_not_processed
+          description: Request invalido por path, contrato criptografico o estado de sesion.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                msg: not_found
+                error: session_not_found
+          description: Sesion no encontrada para ese actor.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                msg: rate limit exceeded
+                error: rate_limited
+          description: Limite de solicitudes excedido.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                clinical_summary_failed:
+                  value:
+                    msg: clinical_summary_failed
+                    error: clinical_summary_failed
+                db_error:
+                  value:
+                    msg: Database error
+                    error: db_error
+          description: Falla interna durante generacion/persistencia del resumen.
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                runtime_artifact_unavailable:
+                  value:
+                    msg: Runtime model artifact unavailable
+                    error: runtime_artifact_unavailable
+                db_unavailable:
+                  value:
+                    msg: Service unavailable
+                    error: db_unavailable
+          description: Dependencia de runtime o base temporalmente no disponible.
+      x-contract-status: KEEP_ACTIVE
+    parameters:
+    - name: session_id
+      in: path
+      required: true
+      description: Identificador del recurso `session_id` en la ruta.
+      schema:
+        type: string
   /api/v2/questionnaires/history/{session_id}/share:
     post:
       tags:
@@ -17707,161 +18564,184 @@ paths:
     post:
       tags:
       - QuestionnaireV2
-      summary: "Crear una nueva sesi\xF3n de cuestionario v2"
-      description: '**Objetivo funcional**
-
-        Este endpoint permite crear el recurso de `questionnaire_v2`.
-
+      summary: Crear sesion v2 (soporta transporte cifrado)
+      description: |-
+        **Objetivo funcional**
+        Crear una sesion v2 para captura de respuestas de cuestionario por rol y modo.
 
         **Cuando debe usarse**
-
-        Usalo cuando el flujo requiera invocar `POST /api/v2/questionnaires/sessions` y mantener trazabilidad contractual.
-
+        Al iniciar un flujo nuevo de cuestionario para `guardian` o `psychologist`.
 
         **Actor que lo consume**
-
         Frontend autenticado del flujo de cuestionarios v2.
 
-
         **Seguridad aplicable**
-
-        - Requiere esquema(s) de seguridad: bearerAuth.
-
+        Requiere `bearerAuth`. Soporta transporte cifrado por envelope.
 
         **Entrada esperada**
-
         - Metodo y ruta: `POST /api/v2/questionnaires/sessions`.
-
         - Parametros de ruta: no aplica.
-
         - Query params: no aplica.
-
-        - Headers adicionales: no aplica.
-
-        - Body `obligatorio` en: application/json.
-
+        - Headers adicionales: `X-CognIA-Encrypted`, `X-CognIA-Crypto-Version` cuando aplique.
+        - Body obligatorio: `SessionCreateRequestPlain` o `TransportEncryptedRequestEnvelope`.
 
         **Resultado exitoso**
-
-        - Codigos de exito documentados: 201.
-
-        - La respuesta representa el estado procesado por el backend y mantiene compatibilidad con el esquema documentado.
-
+        - Codigo de exito: `201`.
+        - Respuesta: `SessionCreateResponsePlain` o `TransportEncryptedResponseEnvelope`.
 
         **Errores posibles y causa funcional**
-
-        - `400`: Solicitud invalida por formato, validacion o reglas de negocio.
-
-        - `401`: No autenticado o token invalido/expirado.
-
-        - `403`: Autenticado sin permisos suficientes para esta operacion.
-
-        - `404`: Recurso no encontrado o no visible para el actor autenticado.
-
-        - `429`: Limite de tasa excedido; reintentar segun politicas de rate limit.
-
-        - `500`: Error interno del servidor sin exposicion de detalles sensibles.
-
+        - `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`.
+        - `401 invalid_user|unauthorized`.
+        - `429 rate_limited`.
+        - `500 db_error|session_create_failed|server_error`.
+        - `503 db_unavailable|runtime_assets_unavailable`.
 
         **Estado contractual**
-
-        - `KEEP_ACTIVE`
-
-        - Motivo: Contrato operativo actual para sesiones, historia, reportes y dashboards.
-
-        - Accion OpenAPI: mantener visible'
+        - `KEEP_ACTIVE`.
+        - Endpoint sensible activo; puede exigir cifrado en produccion segun politica.
       operationId: postV2QuestionnairesSessions
+      parameters:
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties: true
+              oneOf:
+              - $ref: '#/components/schemas/SessionCreateRequestPlain'
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+            examples:
+              plaintext_request:
+                value:
+                  mode: short
+                  role: guardian
+                  child_age_years: 9
+                  child_sex_assigned_at_birth: male
+              encrypted_request:
+                value:
+                  encrypted: true
+                  version: transport_envelope_v1
+                  key_id: transport-key-v1
+                  alg: AES-256-GCM
+                  encrypted_key: <base64url>
+                  iv: <base64url>
+                  ciphertext: <base64url>
+                  aad: transport_envelope_v1|frontend
       security:
       - bearerAuth: []
       responses:
         '201':
-          description: "La operaci\xF3n de creaci\xF3n o bootstrap se complet\xF3 correctamente y el backend devuelve el recurso\
-            \ creado o su metadata operativa."
+          description: Sesion creada correctamente.
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
-                description: Objeto JSON de respuesta cuyo detalle depende del flujo operativo; revisar ejemplos y reglas
-                  del endpoint.
+                oneOf:
+                - $ref: '#/components/schemas/SessionCreateResponsePlain'
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+              examples:
+                plaintext_response:
+                  value:
+                    session:
+                      session_id: 5afc36e5-7d82-4f81-a949-87ed4f26b9ce
+                      questionnaire_id: QV2-9A12BC34DE56
+                      status: draft
+                      mode: short
+                      role: guardian
+                      mode_key: caregiver_1_3
+                      progress_pct: 0
+                      version: cuestionario_v16.4
+                      created_at: '2026-05-02T13:20:11Z'
+                      updated_at: '2026-05-02T13:20:11Z'
+                encrypted_response:
+                  value:
+                    encrypted: true
+                    version: transport_envelope_v1
+                    key_id: transport-key-v1
+                    alg: AES-256-GCM
+                    iv: <base64url>
+                    ciphertext: <base64url>
+                    aad: transport_envelope_v1|transport-key-v1
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_401:
+                unauthorized:
                   value:
-                    msg: unauthorized
+                    msg: Missing Authorization Header
                     error: unauthorized
-          description: "No existe autenticaci\xF3n v\xE1lida, el token expir\xF3 o la credencial enviada no es aceptada por\
-            \ el backend."
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                error_403:
+                invalid_user:
                   value:
-                    msg: access denied for api_v2_questionnaires_sessions
-                    error: forbidden_api_v2_questionnaires_sessions
-          description: "La cuenta est\xE1 autenticada pero no tiene permiso suficiente, o fall\xF3 una regla adicional de\
-            \ seguridad, ownership o acceso."
+                    msg: invalid_user
+                    error: invalid_user
+          description: Error de autenticacion o identidad invalida.
         '400':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_400:
+                plaintext_not_allowed:
                   value:
-                    msg: request validation failed for api_v2_questionnaires_sessions
-                    error: invalid_api_v2_questionnaires_sessions
-          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio
-            del endpoint.
-        '404':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                error_404:
+                    msg: encrypted_transport_required_for_sensitive_endpoint
+                    error: plaintext_not_allowed
+                encrypted_payload_invalid:
                   value:
-                    msg: resource not found for api_v2_questionnaires_sessions
-                    error: api_v2_questionnaires_sessions_not_found
-          description: "El recurso objetivo no existe, no est\xE1 habilitado en este entorno o no es visible para el actor\
-            \ actual."
+                    msg: decrypt_failed
+                    error: encrypted_payload_invalid
+                invalid_crypto_version:
+                  value:
+                    msg: invalid_crypto_version
+                    error: invalid_crypto_version
+                validation_error:
+                  value:
+                    msg: validation_error
+                    error: validation_error
+                    details:
+                      mode:
+                      - Missing data for required field.
+          description: Error de validacion o contrato criptografico.
         '429':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                error_429:
-                  value:
-                    msg: rate limit exceeded for api_v2_questionnaires_sessions
-                    error: rate_limited
-          description: "Se super\xF3 el l\xEDmite de solicitudes permitido por la pol\xEDtica de protecci\xF3n del backend."
+              example:
+                msg: rate limit exceeded
+                error: rate_limited
+          description: Limite de solicitudes excedido.
         '500':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_500:
+                db_error:
                   value:
-                    msg: internal failure while processing api_v2_questionnaires_sessions
+                    msg: Database error
+                    error: db_error
+                session_create_failed:
+                  value:
+                    msg: session_create_failed
                     error: server_error
-          description: "El backend encontr\xF3 una falla interna durante consulta, persistencia, generaci\xF3n, inferencia\
-            \ o coordinaci\xF3n del flujo."
+          description: Falla interna durante creacion de sesion.
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                db_unavailable:
+                  value:
+                    msg: Service unavailable
+                    error: db_unavailable
+                runtime_assets_unavailable:
+                  value:
+                    msg: Service unavailable
+                    error: runtime_assets_unavailable
+          description: Dependencia temporalmente no disponible.
       x-contract-status: KEEP_ACTIVE
   /api/v2/questionnaires/sessions/{session_id}:
     get:
@@ -18034,70 +18914,43 @@ paths:
     patch:
       tags:
       - QuestionnaireV2
-      summary: "Guardar o actualizar respuestas parciales de una sesi\xF3n v2"
-      description: '**Objetivo funcional**
-
-        Este endpoint permite actualizar el recurso de `questionnaire_v2`.
-
+      summary: Guardar respuestas de sesion v2 (soporta transporte cifrado)
+      description: |-
+        **Objetivo funcional**
+        Guardar o actualizar respuestas de una sesion v2 existente.
 
         **Cuando debe usarse**
-
-        Usalo cuando el flujo requiera invocar `PATCH /api/v2/questionnaires/sessions/{session_id}/answers` y mantener trazabilidad
-        contractual.
-
+        En guardado parcial/final de respuestas durante el flujo de cuestionario.
 
         **Actor que lo consume**
-
         Frontend autenticado del flujo de cuestionarios v2.
 
-
         **Seguridad aplicable**
-
-        - Requiere esquema(s) de seguridad: bearerAuth.
-
+        Requiere `bearerAuth`. Soporta transporte cifrado por envelope.
 
         **Entrada esperada**
-
         - Metodo y ruta: `PATCH /api/v2/questionnaires/sessions/{session_id}/answers`.
-
-        - Parametros de ruta: session_id (obligatorio).
-
+        - Parametros de ruta: `session_id` (obligatorio).
         - Query params: no aplica.
-
-        - Headers adicionales: no aplica.
-
-        - Body `obligatorio` en: application/json.
-
+        - Headers adicionales: `X-CognIA-Encrypted`, `X-CognIA-Crypto-Version` cuando aplique.
+        - Body obligatorio: `SessionAnswersPatchRequestPlain` o `TransportEncryptedRequestEnvelope`.
 
         **Resultado exitoso**
-
-        - Codigos de exito documentados: 200.
-
-        - La respuesta representa el estado procesado por el backend y mantiene compatibilidad con el esquema documentado.
-
+        - Codigo de exito: `200`.
+        - Respuesta: `SessionAnswersSaveResponsePlain` o `TransportEncryptedResponseEnvelope`.
 
         **Errores posibles y causa funcional**
-
-        - `400`: Solicitud invalida por formato, validacion o reglas de negocio.
-
-        - `401`: No autenticado o token invalido/expirado.
-
-        - `403`: Autenticado sin permisos suficientes para esta operacion.
-
-        - `404`: Recurso no encontrado o no visible para el actor autenticado.
-
-        - `429`: Limite de tasa excedido; reintentar segun politicas de rate limit.
-
-        - `500`: Error interno del servidor sin exposicion de detalles sensibles.
-
+        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`.
+        - `401 invalid_user|unauthorized`.
+        - `403 forbidden`.
+        - `404 not_found`.
+        - `429 rate_limited`.
+        - `500 db_error|save_failed|server_error`.
+        - `503 db_unavailable|runtime_assets_unavailable`.
 
         **Estado contractual**
-
-        - `KEEP_ACTIVE`
-
-        - Motivo: Contrato operativo actual para sesiones, historia, reportes y dashboards.
-
-        - Accion OpenAPI: mantener visible'
+        - `KEEP_ACTIVE`.
+        - Endpoint sensible activo para persistencia de respuestas.
       operationId: patchV2QuestionnairesSessionsSessionIdAnswers
       parameters:
       - in: path
@@ -18106,97 +18959,168 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties: true
+              oneOf:
+              - $ref: '#/components/schemas/SessionAnswersPatchRequestPlain'
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+            examples:
+              plaintext_request:
+                value:
+                  answers:
+                  - question_id: 6c90d6f5-84fd-4a3b-8a52-6ec642ca8f2a
+                    answer: 3
+                  mark_final: true
+              encrypted_request:
+                value:
+                  encrypted: true
+                  version: transport_envelope_v1
+                  key_id: transport-key-v1
+                  alg: AES-256-GCM
+                  encrypted_key: <base64url>
+                  iv: <base64url>
+                  ciphertext: <base64url>
+                  aad: transport_envelope_v1|frontend
       security:
       - bearerAuth: []
       responses:
         '200':
-          description: "Actualiza el recurso solicitado y devuelve confirmaci\xF3n o la representaci\xF3n actualizada del\
-            \ estado."
+          description: Respuestas guardadas correctamente.
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
-                description: Objeto JSON de respuesta cuyo detalle depende del flujo operativo; revisar ejemplos y reglas
-                  del endpoint.
+                oneOf:
+                - $ref: '#/components/schemas/SessionAnswersSaveResponsePlain'
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+              examples:
+                plaintext_response:
+                  value:
+                    session:
+                      session_id: 5afc36e5-7d82-4f81-a949-87ed4f26b9ce
+                      questionnaire_id: QV2-9A12BC34DE56
+                      status: in_progress
+                      mode: short
+                      role: guardian
+                      mode_key: caregiver_1_3
+                      progress_pct: 72.5
+                    saved_answers: 8
+                encrypted_response:
+                  value:
+                    encrypted: true
+                    version: transport_envelope_v1
+                    key_id: transport-key-v1
+                    alg: AES-256-GCM
+                    iv: <base64url>
+                    ciphertext: <base64url>
+                    aad: transport_envelope_v1|transport-key-v1
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_401:
+                unauthorized:
                   value:
-                    msg: unauthorized
+                    msg: Missing Authorization Header
                     error: unauthorized
-          description: "No existe autenticaci\xF3n v\xE1lida, el token expir\xF3 o la credencial enviada no es aceptada por\
-            \ el backend."
+                invalid_user:
+                  value:
+                    msg: invalid_user
+                    error: invalid_user
+          description: Error de autenticacion o identidad invalida.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_403:
+                forbidden:
                   value:
-                    msg: access denied for api_v2_questionnaires_sessions_session_id_answers
-                    error: forbidden_api_v2_questionnaires_sessions_session_id_answers
-          description: "La cuenta est\xE1 autenticada pero no tiene permiso suficiente, o fall\xF3 una regla adicional de\
-            \ seguridad, ownership o acceso."
+                    msg: forbidden
+                    error: forbidden_session_access
+          description: El actor autenticado no puede modificar esa sesion.
         '400':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_400:
+                invalid_session_id:
                   value:
-                    msg: request validation failed for api_v2_questionnaires_sessions_session_id_answers
-                    error: invalid_api_v2_questionnaires_sessions_session_id_answers
-          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio
-            del endpoint.
+                    msg: invalid_session_id
+                    error: invalid_session_id
+                plaintext_not_allowed:
+                  value:
+                    msg: encrypted_transport_required_for_sensitive_endpoint
+                    error: plaintext_not_allowed
+                encrypted_payload_invalid:
+                  value:
+                    msg: decrypt_failed
+                    error: encrypted_payload_invalid
+                invalid_crypto_version:
+                  value:
+                    msg: invalid_crypto_version
+                    error: invalid_crypto_version
+                validation_error:
+                  value:
+                    msg: validation_error
+                    error: validation_error
+          description: Request invalido por path, contrato criptografico o validacion de payload.
         '404':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_404:
+                not_found:
                   value:
-                    msg: resource not found for api_v2_questionnaires_sessions_session_id_answers
-                    error: api_v2_questionnaires_sessions_session_id_answers_not_found
-          description: "El recurso objetivo no existe, no est\xE1 habilitado en este entorno o no es visible para el actor\
-            \ actual."
+                    msg: not_found
+                    error: session_not_found
+          description: Sesion no encontrada para ese actor.
         '429':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                error_429:
-                  value:
-                    msg: rate limit exceeded for api_v2_questionnaires_sessions_session_id_answers
-                    error: rate_limited
-          description: "Se super\xF3 el l\xEDmite de solicitudes permitido por la pol\xEDtica de protecci\xF3n del backend."
+              example:
+                msg: rate limit exceeded
+                error: rate_limited
+          description: Limite de solicitudes excedido.
         '500':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_500:
+                db_error:
                   value:
-                    msg: internal failure while processing api_v2_questionnaires_sessions_session_id_answers
+                    msg: Database error
+                    error: db_error
+                save_failed:
+                  value:
+                    msg: save_failed
                     error: server_error
-          description: "El backend encontr\xF3 una falla interna durante consulta, persistencia, generaci\xF3n, inferencia\
-            \ o coordinaci\xF3n del flujo."
+          description: Falla interna durante guardado de respuestas.
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                db_unavailable:
+                  value:
+                    msg: Service unavailable
+                    error: db_unavailable
+                runtime_assets_unavailable:
+                  value:
+                    msg: Service unavailable
+                    error: runtime_assets_unavailable
+          description: Dependencia temporalmente no disponible.
       x-contract-status: KEEP_ACTIVE
     parameters:
     - name: session_id
@@ -18378,70 +19302,43 @@ paths:
     post:
       tags:
       - QuestionnaireV2
-      summary: "Enviar una sesi\xF3n v2 para procesamiento de resultados y persistencia final"
-      description: '**Objetivo funcional**
-
-        Este endpoint permite ejecutar el recurso de `questionnaire_v2`.
-
+      summary: Enviar sesion v2 para inferencia final (soporta transporte cifrado)
+      description: |-
+        **Objetivo funcional**
+        Cerrar la sesion y ejecutar inferencia final por dominio con persistencia de resultados.
 
         **Cuando debe usarse**
-
-        Usalo cuando el flujo requiera invocar `POST /api/v2/questionnaires/sessions/{session_id}/submit` y mantener trazabilidad
-        contractual.
-
+        Cuando ya se guardaron respuestas y se requiere resultado final de la sesion.
 
         **Actor que lo consume**
-
         Frontend autenticado del flujo de cuestionarios v2.
 
-
         **Seguridad aplicable**
-
-        - Requiere esquema(s) de seguridad: bearerAuth.
-
+        Requiere `bearerAuth`. Soporta transporte cifrado por envelope.
 
         **Entrada esperada**
-
         - Metodo y ruta: `POST /api/v2/questionnaires/sessions/{session_id}/submit`.
-
-        - Parametros de ruta: session_id (obligatorio).
-
+        - Parametros de ruta: `session_id` (obligatorio).
         - Query params: no aplica.
-
-        - Headers adicionales: no aplica.
-
-        - Body `obligatorio` en: application/json.
-
+        - Headers adicionales: `X-CognIA-Encrypted`, `X-CognIA-Crypto-Version` cuando aplique.
+        - Body obligatorio: `SessionSubmitRequestPlain` o `TransportEncryptedRequestEnvelope`.
 
         **Resultado exitoso**
-
-        - Codigos de exito documentados: 200.
-
-        - La respuesta representa el estado procesado por el backend y mantiene compatibilidad con el esquema documentado.
-
+        - Codigo de exito: `200`.
+        - Respuesta: `SessionResultsResponsePlain` o `TransportEncryptedResponseEnvelope`.
 
         **Errores posibles y causa funcional**
-
-        - `400`: Solicitud invalida por formato, validacion o reglas de negocio.
-
-        - `401`: No autenticado o token invalido/expirado.
-
-        - `403`: Autenticado sin permisos suficientes para esta operacion.
-
-        - `404`: Recurso no encontrado o no visible para el actor autenticado.
-
-        - `429`: Limite de tasa excedido; reintentar segun politicas de rate limit.
-
-        - `500`: Error interno del servidor sin exposicion de detalles sensibles.
-
+        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`.
+        - `401 invalid_user|unauthorized`.
+        - `403 forbidden`.
+        - `404 not_found`.
+        - `429 rate_limited`.
+        - `500 db_error|submit_failed|server_error`.
+        - `503 runtime_artifact_unavailable|runtime_assets_unavailable|db_unavailable`.
 
         **Estado contractual**
-
-        - `KEEP_ACTIVE`
-
-        - Motivo: Contrato operativo actual para sesiones, historia, reportes y dashboards.
-
-        - Accion OpenAPI: mantener visible'
+        - `KEEP_ACTIVE`.
+        - Endpoint sensible activo; salida apta para screening/apoyo profesional, no diagnostico automatico.
       operationId: postV2QuestionnairesSessionsSessionIdSubmit
       parameters:
       - in: path
@@ -18450,96 +19347,172 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties: true
+              oneOf:
+              - $ref: '#/components/schemas/SessionSubmitRequestPlain'
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+            examples:
+              plaintext_request:
+                value:
+                  force_reprocess: false
+              encrypted_request:
+                value:
+                  encrypted: true
+                  version: transport_envelope_v1
+                  key_id: transport-key-v1
+                  alg: AES-256-GCM
+                  encrypted_key: <base64url>
+                  iv: <base64url>
+                  ciphertext: <base64url>
+                  aad: transport_envelope_v1|frontend
       security:
       - bearerAuth: []
       responses:
         '200':
-          description: "Ejecuta la transici\xF3n o proceso principal y devuelve el nuevo estado operativo o el resultado disponible."
+          description: Sesion enviada y resultados disponibles.
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
-                description: Objeto JSON de respuesta cuyo detalle depende del flujo operativo; revisar ejemplos y reglas
-                  del endpoint.
+                oneOf:
+                - $ref: '#/components/schemas/SessionResultsResponsePlain'
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+              examples:
+                plaintext_response:
+                  value:
+                    session:
+                      session_id: 5afc36e5-7d82-4f81-a949-87ed4f26b9ce
+                      questionnaire_id: QV2-9A12BC34DE56
+                      status: processed
+                      mode: short
+                      role: guardian
+                      mode_key: caregiver_1_3
+                      progress_pct: 100
+                    result:
+                      summary: Patrón de tamizaje compatible con riesgo relevante.
+                      operational_recommendation: Evaluacion profesional recomendada.
+                      completion_quality_score: 0.98
+                      missingness_score: 0
+                      needs_professional_review: true
+                    domains: []
+                    comorbidity: []
+                encrypted_response:
+                  value:
+                    encrypted: true
+                    version: transport_envelope_v1
+                    key_id: transport-key-v1
+                    alg: AES-256-GCM
+                    iv: <base64url>
+                    ciphertext: <base64url>
+                    aad: transport_envelope_v1|transport-key-v1
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_401:
+                unauthorized:
                   value:
-                    msg: unauthorized
+                    msg: Missing Authorization Header
                     error: unauthorized
-          description: "No existe autenticaci\xF3n v\xE1lida, el token expir\xF3 o la credencial enviada no es aceptada por\
-            \ el backend."
+                invalid_user:
+                  value:
+                    msg: invalid_user
+                    error: invalid_user
+          description: Error de autenticacion o identidad invalida.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_403:
+                forbidden:
                   value:
-                    msg: access denied for api_v2_questionnaires_sessions_session_id_submit
-                    error: forbidden_api_v2_questionnaires_sessions_session_id_submit
-          description: "La cuenta est\xE1 autenticada pero no tiene permiso suficiente, o fall\xF3 una regla adicional de\
-            \ seguridad, ownership o acceso."
+                    msg: forbidden
+                    error: forbidden_session_access
+          description: El actor autenticado no puede enviar esa sesion.
         '400':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_400:
+                invalid_session_id:
                   value:
-                    msg: request validation failed for api_v2_questionnaires_sessions_session_id_submit
-                    error: invalid_api_v2_questionnaires_sessions_session_id_submit
-          description: La solicitud no cumple validaciones de formato, campos obligatorios, enums, rangos o reglas de negocio
-            del endpoint.
+                    msg: invalid_session_id
+                    error: invalid_session_id
+                plaintext_not_allowed:
+                  value:
+                    msg: encrypted_transport_required_for_sensitive_endpoint
+                    error: plaintext_not_allowed
+                encrypted_payload_invalid:
+                  value:
+                    msg: decrypt_failed
+                    error: encrypted_payload_invalid
+                invalid_crypto_version:
+                  value:
+                    msg: invalid_crypto_version
+                    error: invalid_crypto_version
+                validation_error:
+                  value:
+                    msg: validation_error
+                    error: validation_error
+          description: Request invalido por path, contrato criptografico o validacion.
         '404':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_404:
+                not_found:
                   value:
-                    msg: resource not found for api_v2_questionnaires_sessions_session_id_submit
-                    error: api_v2_questionnaires_sessions_session_id_submit_not_found
-          description: "El recurso objetivo no existe, no est\xE1 habilitado en este entorno o no es visible para el actor\
-            \ actual."
+                    msg: not_found
+                    error: session_not_found
+          description: Sesion no encontrada para ese actor.
         '429':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                error_429:
-                  value:
-                    msg: rate limit exceeded for api_v2_questionnaires_sessions_session_id_submit
-                    error: rate_limited
-          description: "Se super\xF3 el l\xEDmite de solicitudes permitido por la pol\xEDtica de protecci\xF3n del backend."
+              example:
+                msg: rate limit exceeded
+                error: rate_limited
+          description: Limite de solicitudes excedido.
         '500':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                error_500:
+                submit_failed:
                   value:
-                    msg: internal failure while processing api_v2_questionnaires_sessions_session_id_submit
+                    msg: submit_failed
                     error: server_error
-          description: "El backend encontr\xF3 una falla interna durante consulta, persistencia, generaci\xF3n, inferencia\
-            \ o coordinaci\xF3n del flujo."
+                db_error:
+                  value:
+                    msg: Database error
+                    error: db_error
+          description: Falla interna durante envio/procesamiento de sesion.
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                runtime_artifact_unavailable:
+                  value:
+                    msg: Runtime model artifact unavailable
+                    error: runtime_artifact_unavailable
+                db_unavailable:
+                  value:
+                    msg: Service unavailable
+                    error: db_unavailable
+          description: Dependencia de runtime o base temporalmente no disponible.
       x-contract-status: KEEP_ACTIVE
     parameters:
     - name: session_id
@@ -19293,6 +20266,686 @@ paths:
                     msg: service unavailable while processing readyz
                     error: service_unavailable
       x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/evaluations/history/secure:
+    post:
+      tags:
+      - QuestionnaireRuntime
+      summary: Listar historial runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeEvaluationsHistorySecure
+      parameters:
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Historial devuelto correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+        '400':
+          description: Error de validacion o cifrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/export/secure:
+    post:
+      tags:
+      - QuestionnaireRuntime
+      summary: Exportar evaluacion runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeEvaluationsEvaluationIdExportSecure
+      parameters:
+      - in: path
+        name: evaluation_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Export generado correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/responses/secure:
+    post:
+      tags:
+      - QuestionnaireRuntime
+      summary: Obtener respuestas runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeEvaluationsEvaluationIdResponsesSecure
+      parameters:
+      - in: path
+        name: evaluation_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Respuestas devueltas correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results/secure:
+    post:
+      tags:
+      - QuestionnaireRuntime
+      summary: Obtener resultados runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeEvaluationsEvaluationIdResultsSecure
+      parameters:
+      - in: path
+        name: evaluation_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Resultados devueltos correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/notifications/secure:
+    post:
+      tags:
+      - QuestionnaireRuntime
+      summary: Listar notificaciones runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeNotificationsSecure
+      parameters:
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Notificaciones devueltas correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/responses/secure:
+    post:
+      tags:
+      - QuestionnaireRuntimeAdmin
+      summary: Obtener respuestas profesionales runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeProfessionalEvaluationsEvaluationIdResponsesSecure
+      parameters:
+      - in: path
+        name: evaluation_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Respuestas profesionales devueltas correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/results/secure:
+    post:
+      tags:
+      - QuestionnaireRuntimeAdmin
+      summary: Obtener resultados profesionales runtime v1 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV1QuestionnaireRuntimeProfessionalEvaluationsEvaluationIdResultsSecure
+      parameters:
+      - in: path
+        name: evaluation_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Resultados profesionales devueltos correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/history/secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Listar historial v2 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV2QuestionnairesHistorySecure
+      parameters:
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Historial v2 devuelto correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/history/{session_id}/pdf/secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener metadata PDF v2 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV2QuestionnairesHistorySessionIdPdfSecure
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Metadata PDF devuelta correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/sessions/{session_id}/page-secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener pagina de sesion v2 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV2QuestionnairesSessionsSessionIdPageSecure
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Pagina de sesion devuelta correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/sessions/{session_id}/secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener sesion v2 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV2QuestionnairesSessionsSessionIdSecure
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Sesion devuelta correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/shared/access-secure:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Acceso compartido v2 en canal cifrado
+      description: |-
+        **Objetivo funcional**
+        Entregar el recurso sensible mediante transporte cifrado tipo envelope.
+
+        **Cuando debe usarse**
+        Usar este endpoint como reemplazo seguro del endpoint legacy plaintext equivalente.
+
+        **Actor que lo consume**
+        Frontend y clientes backend autenticados (o publico tokenizado cuando aplique) que consumen datos sensibles.
+
+        **Seguridad aplicable**
+        Requiere headers `X-CognIA-Encrypted: 1` y `X-CognIA-Crypto-Version: transport_envelope_v1`; JWT bearer segun el endpoint.
+
+        **Entrada esperada**
+        Metodo `POST`, body `{}` o envelope cifrado, y parametros de ruta cuando corresponda.
+
+        **Resultado exitoso**
+        Respuesta `200` cifrada (o plaintext controlado por politica), siempre con `Cache-Control: no-store` en flujos sensibles.
+
+        **Errores posibles y causa funcional**
+        `400 plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`, `401 unauthorized`, `403 forbidden`, `404 not_found`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE` como endpoint seguro recomendado para produccion.
+      operationId: postV2QuestionnairesSharedAccessSecure
+      parameters:
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      responses:
+        '200':
+          description: Resultados compartidos devueltos correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+      x-contract-status: KEEP_ACTIVE
 components:
   parameters:
     CsrfHeader:
@@ -19396,6 +21049,24 @@ components:
         - processed
         - failed
         - archived
+    CognIAEncryptedHeader:
+      in: header
+      name: X-CognIA-Encrypted
+      required: false
+      description: "Set `1` when request body is sent as encrypted transport envelope. If payload is encrypted, this header is mandatory."
+      schema:
+        type: string
+        enum:
+        - '1'
+    CognIACryptoVersionHeader:
+      in: header
+      name: X-CognIA-Crypto-Version
+      required: false
+      description: "Transport crypto envelope version expected by backend. Mandatory when `X-CognIA-Encrypted: 1`."
+      schema:
+        type: string
+        enum:
+        - transport_envelope_v1
   securitySchemes:
     bearerAuth:
       type: http
@@ -19423,51 +21094,61 @@ components:
       name: Authorization
   responses:
     BadRequest:
+      description: Request payload is invalid for this operation.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     Unauthorized:
+      description: Missing or invalid authentication.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     Forbidden:
+      description: Authenticated actor is not allowed to execute this operation.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     NotFound:
+      description: Requested resource is not available for this actor/context.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     Conflict:
+      description: Request conflicts with current resource state.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     CsrfFailed:
+      description: CSRF validation failed.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     RateLimited:
+      description: Too many requests according to active rate-limit policy.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     Locked:
+      description: Endpoint is temporarily locked for this actor/request.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     ServerError:
+      description: Internal server error while processing request.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     ServiceUnavailable:
+      description: Service or dependency unavailable.
       content:
         application/json:
           schema:
@@ -19507,6 +21188,475 @@ components:
           email:
           - Invalid email format
         trace_id: f3c7c6f1c1a34c6a
+    TransportPublicKeyJwk:
+      type: object
+      required:
+      - kty
+      - alg
+      - use
+      - n
+      - e
+      properties:
+        kty:
+          type: string
+          enum:
+          - RSA
+        alg:
+          type: string
+          enum:
+          - RSA-OAEP-256
+        use:
+          type: string
+          enum:
+          - enc
+        n:
+          type: string
+          description: Base64url modulus.
+        e:
+          type: string
+          description: Base64url exponent.
+    TransportKeyResponse:
+      type: object
+      required:
+      - key_id
+      - algorithm
+      - public_key_jwk
+      - expires_at
+      - version
+      properties:
+        key_id:
+          type: string
+          example: transport-key-v1
+        algorithm:
+          type: string
+          example: RSA-OAEP-256+AES-256-GCM
+        public_key_jwk:
+          $ref: '#/components/schemas/TransportPublicKeyJwk'
+        expires_at:
+          type: string
+          format: date-time
+        version:
+          type: string
+          enum:
+          - transport_envelope_v1
+    TransportEncryptedRequestEnvelope:
+      type: object
+      required:
+      - encrypted
+      - version
+      - key_id
+      - alg
+      - encrypted_key
+      - iv
+      - ciphertext
+      properties:
+        encrypted:
+          type: boolean
+          enum:
+          - true
+        version:
+          type: string
+          enum:
+          - transport_envelope_v1
+        key_id:
+          type: string
+          example: transport-key-v1
+        alg:
+          type: string
+          example: AES-256-GCM
+        encrypted_key:
+          type: string
+          description: Base64url RSA-OAEP encrypted AES key.
+        iv:
+          type: string
+          description: Base64url 96-bit IV.
+        ciphertext:
+          type: string
+          description: Base64url AES-GCM ciphertext+tag.
+        aad:
+          type: string
+          nullable: true
+          description: Optional additional authenticated data.
+    TransportEncryptedResponseEnvelope:
+      type: object
+      required:
+      - encrypted
+      - version
+      - key_id
+      - alg
+      - iv
+      - ciphertext
+      properties:
+        encrypted:
+          type: boolean
+          enum:
+          - true
+        version:
+          type: string
+          enum:
+          - transport_envelope_v1
+        key_id:
+          type: string
+          example: transport-key-v1
+        alg:
+          type: string
+          example: AES-256-GCM
+        iv:
+          type: string
+          description: Base64url 96-bit IV.
+        ciphertext:
+          type: string
+          description: Base64url AES-GCM ciphertext+tag.
+        aad:
+          type: string
+          nullable: true
+          description: Optional additional authenticated data.
+    SessionCreateRequestPlain:
+      type: object
+      required:
+      - mode
+      - role
+      properties:
+        mode:
+          type: string
+          enum:
+          - short
+          - medium
+          - complete
+        role:
+          type: string
+          enum:
+          - guardian
+          - psychologist
+        child_age_years:
+          type: integer
+          minimum: 6
+          maximum: 11
+        child_sex_assigned_at_birth:
+          type: string
+          minLength: 1
+          maxLength: 40
+        metadata:
+          type: object
+          additionalProperties: true
+    SessionAnswerItem:
+      type: object
+      required:
+      - question_id
+      - answer
+      properties:
+        question_id:
+          type: string
+          format: uuid
+        answer:
+          description: Raw answer value accepted by question response type.
+    SessionAnswersPatchRequestPlain:
+      type: object
+      required:
+      - answers
+      properties:
+        answers:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/SessionAnswerItem'
+        mark_final:
+          type: boolean
+          default: false
+    SessionSubmitRequestPlain:
+      type: object
+      properties:
+        force_reprocess:
+          type: boolean
+          default: false
+    SessionPayload:
+      type: object
+      required:
+      - session_id
+      - questionnaire_id
+      - status
+      - mode
+      - role
+      - mode_key
+      - progress_pct
+      properties:
+        session_id:
+          type: string
+          format: uuid
+        questionnaire_id:
+          type: string
+        status:
+          type: string
+          enum:
+          - draft
+          - in_progress
+          - submitted
+          - processed
+          - failed
+          - archived
+        mode:
+          type: string
+          enum:
+          - short
+          - medium
+          - complete
+        role:
+          type: string
+          enum:
+          - guardian
+          - psychologist
+        mode_key:
+          type: string
+        progress_pct:
+          type: number
+        version:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    SessionCreateResponsePlain:
+      type: object
+      required:
+      - session
+      properties:
+        session:
+          $ref: '#/components/schemas/SessionPayload'
+    SessionAnswersSaveResponsePlain:
+      type: object
+      required:
+      - session
+      - saved_answers
+      properties:
+        session:
+          $ref: '#/components/schemas/SessionPayload'
+        saved_answers:
+          type: integer
+          minimum: 0
+    SessionResultSummary:
+      type: object
+      properties:
+        summary:
+          type: string
+          nullable: true
+        operational_recommendation:
+          type: string
+          nullable: true
+        completion_quality_score:
+          type: number
+          nullable: true
+        missingness_score:
+          type: number
+          nullable: true
+        needs_professional_review:
+          type: boolean
+          nullable: true
+    SessionDomainResult:
+      type: object
+      required:
+      - domain
+      - probability
+      - alert_level
+      - confidence_pct
+      - confidence_band
+      - model_id
+      - mode
+      - operational_class
+      - needs_professional_review
+      properties:
+        domain:
+          type: string
+        probability:
+          type: number
+        alert_level:
+          type: string
+        confidence_pct:
+          type: number
+        confidence_band:
+          type: string
+        model_id:
+          type: string
+        model_version:
+          type: string
+          nullable: true
+        mode:
+          type: string
+        operational_class:
+          type: string
+          nullable: true
+        operational_caveat:
+          type: string
+          nullable: true
+        result_summary:
+          type: string
+          nullable: true
+        needs_professional_review:
+          type: boolean
+    SessionComorbidityResult:
+      type: object
+      required:
+      - coexistence_key
+      - domains
+      - combined_risk_score
+      - coexistence_level
+      - summary
+      properties:
+        coexistence_key:
+          type: string
+        domains:
+          type: array
+          items:
+            type: string
+        combined_risk_score:
+          type: number
+        coexistence_level:
+          type: string
+        summary:
+          type: string
+    SessionResultsResponsePlain:
+      type: object
+      required:
+      - session
+      - result
+      - domains
+      - comorbidity
+      properties:
+        session:
+          $ref: '#/components/schemas/SessionPayload'
+        result:
+          $ref: '#/components/schemas/SessionResultSummary'
+        domains:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionDomainResult'
+        comorbidity:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionComorbidityResult'
+    ClinicalSummaryNarrative:
+      type: object
+      required:
+      - sintesis_general
+      - niveles_de_compatibilidad
+      - indicadores_principales_observados
+      - impacto_funcional
+      - recomendacion_profesional
+      - aclaracion_importante
+      properties:
+        sintesis_general:
+          type: string
+        niveles_de_compatibilidad:
+          type: string
+        indicadores_principales_observados:
+          type: string
+        impacto_funcional:
+          type: string
+        recomendacion_profesional:
+          type: string
+        aclaracion_importante:
+          type: string
+    ClinicalSummaryDomain:
+      type: object
+      required:
+      - domain
+      - probability
+      - compatibility_level
+      - risk_level
+      - main_indicators
+      properties:
+        domain:
+          type: string
+        probability:
+          type: number
+        compatibility_level:
+          type: string
+          enum:
+          - baja
+          - intermedia
+          - relevante
+          - alta
+        risk_level:
+          type: string
+          enum:
+          - baja
+          - intermedia
+          - relevante
+          - alta
+        confidence_pct:
+          type: number
+          nullable: true
+        confidence_band:
+          type: string
+          nullable: true
+        operational_class:
+          type: string
+          nullable: true
+        caveat:
+          type: string
+          nullable: true
+        main_indicators:
+          type: array
+          items:
+            type: string
+    ClinicalSummaryComorbidity:
+      type: object
+      required:
+      - has_comorbidity_signal
+      - domains
+      - summary
+      properties:
+        has_comorbidity_signal:
+          type: boolean
+        domains:
+          type: array
+          items:
+            type: string
+        summary:
+          type: string
+    ClinicalSummaryResponsePlain:
+      type: object
+      required:
+      - session_id
+      - report_version
+      - generated_at
+      - overall_risk_level
+      - simulated_diagnostic_text
+      - domains
+      - comorbidity
+      - disclaimer
+      properties:
+        session_id:
+          type: string
+          format: uuid
+        report_version:
+          type: string
+          enum:
+          - clinical_summary_v1
+        generated_at:
+          type: string
+          format: date-time
+        overall_risk_level:
+          type: string
+          enum:
+          - baja
+          - intermedia
+          - relevante
+          - alta
+        simulated_diagnostic_text:
+          $ref: '#/components/schemas/ClinicalSummaryNarrative'
+        domains:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClinicalSummaryDomain'
+        comorbidity:
+          $ref: '#/components/schemas/ClinicalSummaryComorbidity'
+        disclaimer:
+          type: string
     ValidationError:
       type: object
       deprecated: true
@@ -20799,8 +22949,8 @@ components:
       properties:
         age:
           type: integer
-          minimum: 3
-          maximum: 21
+          minimum: 6
+          maximum: 11
         sex:
           type: integer
           enum:

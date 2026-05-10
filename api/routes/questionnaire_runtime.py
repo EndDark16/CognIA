@@ -21,6 +21,7 @@ from api.schemas.questionnaire_runtime_schema import (
     RuntimeValidateSectionSchema,
 )
 from api.services import questionnaire_runtime_service as qr_service
+from api.services import transport_crypto_service as transport_crypto
 from app.models import AppUser, QRQuestionnaireVersion, db
 
 
@@ -43,6 +44,28 @@ def _error_response(message: str, error: str, code: int, details=None):
     if details is not None:
         payload["details"] = details
     return jsonify(payload), code
+
+
+def _decode_sensitive_payload() -> tuple[dict, transport_crypto.TransportContext]:
+    payload = request.get_json(silent=True) or {}
+    return transport_crypto.decode_sensitive_request_payload(payload)
+
+
+def _sensitive_json_response(payload: dict, status_code: int, context: transport_crypto.TransportContext):
+    encoded_payload, headers = transport_crypto.encode_sensitive_response_payload(payload, context)
+    response = jsonify(encoded_payload)
+    response.status_code = status_code
+    response.headers["Cache-Control"] = "no-store"
+    for key, value in headers.items():
+        response.headers[key] = value
+    return response
+
+
+def _legacy_plaintext_response(response, replacement: str):
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["X-CognIA-Endpoint-Status"] = "legacy_plaintext"
+    response.headers["X-CognIA-Replacement"] = replacement
+    return response
 
 
 def _current_user_uuid() -> tuple[uuid.UUID | None, AppUser | None]:
@@ -85,7 +108,10 @@ def create_draft_evaluation():
 
     schema = RuntimeCreateDraftSchema()
     try:
-        payload = schema.load(request.get_json(silent=True) or {})
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
     except ValidationError as exc:
         return _error_response("Validation error", "validation_error", 400, exc.messages)
     try:
@@ -94,16 +120,15 @@ def create_draft_evaluation():
         return _error_response("Validation error", str(exc), 400)
 
     log_audit(user_id, "QR_DRAFT_CREATED", "questionnaire_runtime", {"evaluation_id": str(evaluation.id)})
-    return (
-        jsonify(
-            {
-                "evaluation_id": str(evaluation.id),
-                "reference_id": evaluation.reference_id,
-                "pin": pin,
-                "status": evaluation.status,
-            }
-        ),
+    return _sensitive_json_response(
+        {
+            "evaluation_id": str(evaluation.id),
+            "reference_id": evaluation.reference_id,
+            "pin": pin,
+            "status": evaluation.status,
+        },
         201,
+        transport_context,
     )
 
 
@@ -119,7 +144,10 @@ def save_draft(evaluation_id):
 
     schema = RuntimeSaveDraftSchema()
     try:
-        payload = schema.load(request.get_json(silent=True) or {})
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
     except ValidationError as exc:
         return _error_response("Validation error", "validation_error", 400, exc.messages)
     answers = payload.get("answers") or []
@@ -140,7 +168,7 @@ def save_draft(evaluation_id):
     except ValueError as exc:
         return _error_response("Validation error", str(exc), 400)
 
-    return jsonify({"msg": "draft_saved", "evaluation_id": str(eval_uuid)}), 200
+    return _sensitive_json_response({"msg": "draft_saved", "evaluation_id": str(eval_uuid)}, 200, transport_context)
 
 
 @questionnaire_runtime_bp.post("/evaluations/<evaluation_id>/validate-section")
@@ -155,7 +183,10 @@ def validate_section(evaluation_id):
 
     schema = RuntimeValidateSectionSchema()
     try:
-        payload = schema.load(request.get_json(silent=True) or {})
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
     except ValidationError as exc:
         return _error_response("Validation error", "validation_error", 400, exc.messages)
     section_key = payload["section_key"].strip()
@@ -170,7 +201,7 @@ def validate_section(evaluation_id):
     except PermissionError as exc:
         return _error_response("Forbidden", str(exc), 403)
 
-    return jsonify(result), 200
+    return _sensitive_json_response(result, 200, transport_context)
 
 
 @questionnaire_runtime_bp.post("/evaluations/<evaluation_id>/submit")
@@ -185,7 +216,10 @@ def submit_evaluation(evaluation_id):
 
     schema = RuntimeSubmitSchema()
     try:
-        payload = schema.load(request.get_json(silent=True) or {})
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
     except ValidationError as exc:
         return _error_response("Validation error", "validation_error", 400, exc.messages)
     wait_live_result = bool(payload.get("wait_live_result", True))
@@ -202,7 +236,7 @@ def submit_evaluation(evaluation_id):
     except ValueError as exc:
         return _error_response("Validation error", str(exc), 400)
 
-    return jsonify(status_payload), 202
+    return _sensitive_json_response(status_payload, 202, transport_context)
 
 
 @questionnaire_runtime_bp.post("/evaluations/<evaluation_id>/heartbeat")
@@ -270,7 +304,38 @@ def get_responses(evaluation_id):
     except PermissionError as exc:
         return _error_response("Forbidden", str(exc), 403)
 
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    return _legacy_plaintext_response(
+        response,
+        "/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/responses/secure",
+    )
+
+
+@questionnaire_runtime_bp.post("/evaluations/<evaluation_id>/responses/secure")
+@jwt_required()
+def get_responses_secure(evaluation_id):
+    user_id, user = _current_user_uuid()
+    if not user_id or not user:
+        return _error_response("Invalid user", "invalid_user", 401)
+    eval_uuid = _parse_uuid(evaluation_id)
+    if not eval_uuid:
+        return _error_response("Invalid evaluation_id", "invalid_evaluation_id", 400)
+
+    try:
+        _, transport_context = _decode_sensitive_payload()
+        evaluation = qr_service.get_user_evaluation_or_404(eval_uuid, user_id)
+        payload = qr_service.get_responses_payload(evaluation)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
+    except FileNotFoundError as exc:
+        return _error_response("Evaluation deleted by user", str(exc), 410)
+    except LookupError as exc:
+        return _error_response("Not found", str(exc), 404)
+    except PermissionError as exc:
+        return _error_response("Forbidden", str(exc), 403)
+
+    return _sensitive_json_response(payload, 200, transport_context)
 
 
 @questionnaire_runtime_bp.get("/evaluations/<evaluation_id>/results")
@@ -293,7 +358,38 @@ def get_results(evaluation_id):
     except PermissionError as exc:
         return _error_response("Forbidden", str(exc), 403)
 
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    return _legacy_plaintext_response(
+        response,
+        "/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/results/secure",
+    )
+
+
+@questionnaire_runtime_bp.post("/evaluations/<evaluation_id>/results/secure")
+@jwt_required()
+def get_results_secure(evaluation_id):
+    user_id, user = _current_user_uuid()
+    if not user_id or not user:
+        return _error_response("Invalid user", "invalid_user", 401)
+    eval_uuid = _parse_uuid(evaluation_id)
+    if not eval_uuid:
+        return _error_response("Invalid evaluation_id", "invalid_evaluation_id", 400)
+
+    try:
+        _, transport_context = _decode_sensitive_payload()
+        evaluation = qr_service.get_user_evaluation_or_404(eval_uuid, user_id)
+        payload = qr_service.get_results_payload(evaluation, audience="user")
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
+    except FileNotFoundError as exc:
+        return _error_response("Evaluation deleted by user", str(exc), 410)
+    except LookupError as exc:
+        return _error_response("Not found", str(exc), 404)
+    except PermissionError as exc:
+        return _error_response("Forbidden", str(exc), 403)
+
+    return _sensitive_json_response(payload, 200, transport_context)
 
 
 @questionnaire_runtime_bp.get("/evaluations/history")
@@ -304,7 +400,28 @@ def list_history():
         return _error_response("Invalid user", "invalid_user", 401)
     include_deleted = request.args.get("include_deleted", "false").lower() == "true"
     items = qr_service.list_user_evaluations(user_id, include_deleted=include_deleted)
-    return jsonify({"items": items, "count": len(items)}), 200
+    response = jsonify({"items": items, "count": len(items)})
+    response.status_code = 200
+    return _legacy_plaintext_response(
+        response,
+        "/api/v1/questionnaire-runtime/evaluations/history/secure",
+    )
+
+
+@questionnaire_runtime_bp.post("/evaluations/history/secure")
+@jwt_required()
+def list_history_secure():
+    user_id, user = _current_user_uuid()
+    if not user_id or not user:
+        return _error_response("Invalid user", "invalid_user", 401)
+    try:
+        payload, transport_context = _decode_sensitive_payload()
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
+
+    include_deleted = bool(payload.get("include_deleted", False))
+    items = qr_service.list_user_evaluations(user_id, include_deleted=include_deleted)
+    return _sensitive_json_response({"items": items, "count": len(items)}, 200, transport_context)
 
 
 @questionnaire_runtime_bp.delete("/evaluations/<evaluation_id>")
@@ -356,7 +473,47 @@ def export_evaluation(evaluation_id):
     except ValueError as exc:
         return _error_response("Validation error", str(exc), 400)
 
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    return _legacy_plaintext_response(
+        response,
+        "/api/v1/questionnaire-runtime/evaluations/{evaluation_id}/export/secure",
+    )
+
+
+@questionnaire_runtime_bp.post("/evaluations/<evaluation_id>/export/secure")
+@jwt_required()
+def export_evaluation_secure(evaluation_id):
+    user_id, user = _current_user_uuid()
+    if not user_id or not user:
+        return _error_response("Invalid user", "invalid_user", 401)
+    eval_uuid = _parse_uuid(evaluation_id)
+    if not eval_uuid:
+        return _error_response("Invalid evaluation_id", "invalid_evaluation_id", 400)
+
+    try:
+        raw_payload, transport_context = _decode_sensitive_payload()
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
+    mode = (raw_payload.get("mode") or "responses_and_results")
+    try:
+        evaluation = qr_service.get_user_evaluation_or_404(eval_uuid, user_id)
+        payload = qr_service.export_evaluation_payload(
+            evaluation,
+            requested_by_user_id=user_id,
+            export_mode=mode,
+            audience="user",
+        )
+    except FileNotFoundError as exc:
+        return _error_response("Evaluation deleted by user", str(exc), 410)
+    except LookupError as exc:
+        return _error_response("Not found", str(exc), 404)
+    except PermissionError as exc:
+        return _error_response("Forbidden", str(exc), 403)
+    except ValueError as exc:
+        return _error_response("Validation error", str(exc), 400)
+
+    return _sensitive_json_response(payload, 200, transport_context)
 
 
 # -----------------------
@@ -375,7 +532,10 @@ def professional_open_access():
 
     schema = RuntimeProfessionalAccessSchema()
     try:
-        payload = schema.load(request.get_json(silent=True) or {})
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
     except ValidationError as exc:
         return _error_response("Validation error", "validation_error", 400, exc.messages)
     reference_id = payload["reference_id"].strip()
@@ -390,7 +550,11 @@ def professional_open_access():
     except PermissionError as exc:
         return _error_response("Forbidden", str(exc), 403)
 
-    return jsonify({"evaluation_id": str(evaluation.id), "reference_id": evaluation.reference_id}), 200
+    return _sensitive_json_response(
+        {"evaluation_id": str(evaluation.id), "reference_id": evaluation.reference_id},
+        200,
+        transport_context,
+    )
 
 
 @questionnaire_runtime_bp.get("/professional/evaluations/<evaluation_id>/responses")
@@ -416,7 +580,40 @@ def professional_responses(evaluation_id):
     except PermissionError as exc:
         return _error_response("Forbidden", str(exc), 403)
 
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    return _legacy_plaintext_response(
+        response,
+        "/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/responses/secure",
+    )
+
+
+@questionnaire_runtime_bp.post("/professional/evaluations/<evaluation_id>/responses/secure")
+@jwt_required()
+def professional_responses_secure(evaluation_id):
+    user_id, user = _current_user_uuid()
+    if not user_id or not user:
+        return _error_response("Invalid user", "invalid_user", 401)
+    if not _require_professional_role(user):
+        return _error_response("Forbidden", "professional_role_required", 403)
+    eval_uuid = _parse_uuid(evaluation_id)
+    if not eval_uuid:
+        return _error_response("Invalid evaluation_id", "invalid_evaluation_id", 400)
+
+    try:
+        _, transport_context = _decode_sensitive_payload()
+        evaluation = qr_service.professional_guard(eval_uuid, user_id)
+        if evaluation.deleted_by_user:
+            return _error_response("Evaluation deleted by user", "evaluation_deleted_by_user", 410)
+        payload = qr_service.get_responses_payload(evaluation)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
+    except LookupError as exc:
+        return _error_response("Not found", str(exc), 404)
+    except PermissionError as exc:
+        return _error_response("Forbidden", str(exc), 403)
+
+    return _sensitive_json_response(payload, 200, transport_context)
 
 
 @questionnaire_runtime_bp.get("/professional/evaluations/<evaluation_id>/results")
@@ -442,7 +639,40 @@ def professional_results(evaluation_id):
     except PermissionError as exc:
         return _error_response("Forbidden", str(exc), 403)
 
-    return jsonify(payload), 200
+    response = jsonify(payload)
+    response.status_code = 200
+    return _legacy_plaintext_response(
+        response,
+        "/api/v1/questionnaire-runtime/professional/evaluations/{evaluation_id}/results/secure",
+    )
+
+
+@questionnaire_runtime_bp.post("/professional/evaluations/<evaluation_id>/results/secure")
+@jwt_required()
+def professional_results_secure(evaluation_id):
+    user_id, user = _current_user_uuid()
+    if not user_id or not user:
+        return _error_response("Invalid user", "invalid_user", 401)
+    if not _require_professional_role(user):
+        return _error_response("Forbidden", "professional_role_required", 403)
+    eval_uuid = _parse_uuid(evaluation_id)
+    if not eval_uuid:
+        return _error_response("Invalid evaluation_id", "invalid_evaluation_id", 400)
+
+    try:
+        _, transport_context = _decode_sensitive_payload()
+        evaluation = qr_service.professional_guard(eval_uuid, user_id)
+        if evaluation.deleted_by_user:
+            return _error_response("Evaluation deleted by user", "evaluation_deleted_by_user", 410)
+        payload = qr_service.get_results_payload(evaluation, audience="professional")
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
+    except LookupError as exc:
+        return _error_response("Not found", str(exc), 404)
+    except PermissionError as exc:
+        return _error_response("Forbidden", str(exc), 403)
+
+    return _sensitive_json_response(payload, 200, transport_context)
 
 
 @questionnaire_runtime_bp.patch("/professional/evaluations/<evaluation_id>/tag")
@@ -459,7 +689,10 @@ def professional_tag(evaluation_id):
         return _error_response("Invalid evaluation_id", "invalid_evaluation_id", 400)
     schema = RuntimeProfessionalTagSchema()
     try:
-        payload = schema.load(request.get_json(silent=True) or {})
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
     except ValidationError as exc:
         return _error_response("Validation error", "validation_error", 400, exc.messages)
     tag = payload["tag"]
@@ -474,7 +707,11 @@ def professional_tag(evaluation_id):
     except ValueError as exc:
         return _error_response("Validation error", str(exc), 400)
 
-    return jsonify({"evaluation_id": str(updated.id), "review_tag": updated.review_tag}), 200
+    return _sensitive_json_response(
+        {"evaluation_id": str(updated.id), "review_tag": updated.review_tag},
+        200,
+        transport_context,
+    )
 
 
 @questionnaire_runtime_bp.delete("/professional/evaluations/<evaluation_id>/access")
@@ -514,7 +751,28 @@ def list_notifications():
         return _error_response("Invalid user", "invalid_user", 401)
     unread_only = request.args.get("unread_only", "false").lower() == "true"
     items = qr_service.list_notifications(user_id, unread_only=unread_only)
-    return jsonify({"items": items, "count": len(items)}), 200
+    response = jsonify({"items": items, "count": len(items)})
+    response.status_code = 200
+    return _legacy_plaintext_response(
+        response,
+        "/api/v1/questionnaire-runtime/notifications/secure",
+    )
+
+
+@questionnaire_runtime_bp.post("/notifications/secure")
+@jwt_required()
+def list_notifications_secure():
+    user_id, user = _current_user_uuid()
+    if not user_id or not user:
+        return _error_response("Invalid user", "invalid_user", 401)
+    try:
+        payload, transport_context = _decode_sensitive_payload()
+    except transport_crypto.TransportCryptoError as exc:
+        return _error_response(exc.message, exc.code, exc.status_code)
+
+    unread_only = bool(payload.get("unread_only", False))
+    items = qr_service.list_notifications(user_id, unread_only=unread_only)
+    return _sensitive_json_response({"items": items, "count": len(items)}, 200, transport_context)
 
 
 @questionnaire_runtime_bp.patch("/notifications/<notification_id>/read")

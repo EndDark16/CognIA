@@ -1,0 +1,7 @@
+{
+  "encryption_at_rest_enabled": "yes",
+  "sensitive_new_fields_encrypted": "yes",
+  "legacy_plaintext_supported": "yes",
+  "secrets_not_logged": "yes",
+  "db_plaintext_sample_check": "pass"
+}

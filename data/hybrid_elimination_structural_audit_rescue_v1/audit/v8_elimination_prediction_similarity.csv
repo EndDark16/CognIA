@@ -1,0 +1,16 @@
+slot_a,slot_b,probability_correlation,prediction_agreement,identical_predictions
+caregiver_1_3,caregiver_2_3,0.9999999999999998,1.0,yes
+caregiver_1_3,caregiver_full,0.9999999999999998,1.0,yes
+caregiver_1_3,psychologist_1_3,0.9999999999999998,1.0,yes
+caregiver_1_3,psychologist_2_3,0.9999999999999998,1.0,yes
+caregiver_1_3,psychologist_full,0.9999999999999998,1.0,yes
+caregiver_2_3,caregiver_full,0.9999999999999998,1.0,yes
+caregiver_2_3,psychologist_1_3,0.9999999999999998,1.0,yes
+caregiver_2_3,psychologist_2_3,0.9999999999999998,1.0,yes
+caregiver_2_3,psychologist_full,0.9999999999999998,1.0,yes
+caregiver_full,psychologist_1_3,0.9999999999999998,1.0,yes
+caregiver_full,psychologist_2_3,0.9999999999999998,1.0,yes
+caregiver_full,psychologist_full,0.9999999999999998,1.0,yes
+psychologist_1_3,psychologist_2_3,0.9999999999999998,1.0,yes
+psychologist_1_3,psychologist_full,0.9999999999999998,1.0,yes
+psychologist_2_3,psychologist_full,0.9999999999999998,1.0,yes

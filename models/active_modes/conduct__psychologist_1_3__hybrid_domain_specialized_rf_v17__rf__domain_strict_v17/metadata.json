@@ -1,0 +1,28 @@
+{
+  "model_key": "conduct__psychologist_1_3__hybrid_domain_specialized_rf_v17__rf__domain_strict_v17",
+  "line": "hybrid_domain_specialized_rf_v17",
+  "domain": "conduct",
+  "role": "psychologist",
+  "mode": "psychologist_1_3",
+  "model_family": "rf",
+  "feature_columns": [
+    "conduct_09_property_destruction",
+    "conduct_06_steals_confronting_victim",
+    "conduct_03_weapon_use",
+    "conduct_08_fire_setting",
+    "conduct_15_truancy_before_13",
+    "conduct_11_lies_to_obtain_or_avoid",
+    "conduct_02_initiates_fights",
+    "conduct_01_bullies_threatens_intimidates"
+  ],
+  "n_features": 8,
+  "recommended_threshold": 0.37999999999999995,
+  "threshold_policy": "recall_target_090",
+  "calibration": "none",
+  "config_id": "rf_balanced_subsample",
+  "seed": 20270529,
+  "generated_at_utc": "2026-05-02T05:40:47.235497+00:00",
+  "feature_set_type": "domain_strict_1_3",
+  "same_inputs_outputs_contract": true,
+  "questionnaire_changed": false
+}

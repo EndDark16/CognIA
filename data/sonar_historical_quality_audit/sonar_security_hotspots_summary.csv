@@ -1,0 +1,2 @@
+key,component,line,status,vulnerability_probability,message,creation_date,update_date,reviewed_status
+AZ2y9lktDn0unl7Q5H7h,EndDark16_CognIA:api/app.py,42,REVIEWED,HIGH,Make sure disabling CSRF protection is safe here.,2026-02-08T20:13:13+0000,2026-04-22T03:05:39+0000,reviewed

@@ -1,0 +1,337 @@
+analysis_date,revision,project_version,metric,value,status,source
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,bugs,2,available,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,bugs,0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,bugs,0,available,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,vulnerabilities,16,available,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,vulnerabilities,0,available,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,code_smells,464,available,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,code_smells,4,available,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,code_smells,4,available,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,code_smells,4,available,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,code_smells,0,available,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,security_hotspots,14,available,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,security_hotspots,1,available,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,security_hotspots,1,available,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,security_hotspots,1,available,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,security_hotspots,0,available,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,coverage,0.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,coverage,60.2,available,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,coverage,60.2,available,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,coverage,60.2,available,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,coverage,74.9,available,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,coverage,74.9,available,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,coverage,74.9,available,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,coverage,74.9,available,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,coverage,0.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,coverage,0.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,coverage,59.3,available,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,coverage,59.3,available,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,coverage,73.8,available,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,coverage,73.8,available,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,coverage,73.8,available,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,coverage,59.3,available,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,coverage,59.3,available,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,coverage,59.3,available,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,coverage,59.0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,coverage,59.3,available,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,coverage,59.3,available,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,duplicated_lines_density,1.6,available,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,duplicated_lines_density,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,duplicated_lines_density,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,duplicated_lines_density,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,duplicated_lines_density,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,duplicated_lines_density,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,duplicated_lines_density,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,duplicated_lines_density,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,duplicated_lines_density,1.4,available,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,ncloc,36910,available,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,ncloc,12399,available,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,ncloc,12399,available,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,ncloc,12399,available,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,ncloc,12417,available,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,ncloc,12417,available,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,ncloc,12426,available,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,ncloc,12426,available,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,ncloc,12703,available,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,ncloc,12739,available,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,reliability_rating,3.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,reliability_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,security_rating,3.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,security_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,sqale_rating,1.0,available,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_coverage,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_duplicated_lines_density,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_bugs,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_vulnerabilities,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_code_smells,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-04-22T02:07:27+0000,0ce74a455293f81cddcfb4a4f5f2185f22f9f0d0,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:15:53+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:22:23+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T02:27:43+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:09:59+0000,500a30aec14d8a50295961a7541e128e84c88b9d,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:13:31+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:32:12+0000,2555d4fce5705e70058d4da89211fc3f70939ebd,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T03:34:45+0000,c188cc5fc40a4a377d7aa579ab084573479e10ca,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:33:49+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:44:56+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T13:58:46+0000,eb6844e311ce6621c2bef18b4747a099a163994e,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:42:08+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:52:47+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,not provided,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:55:54+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T15:57:45+0000,e2cd4996083d4918562f7206c0d32c6b12f7a450,2026.05.03-main-e2cd499,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T16:45:23+0000,249c5ef91155c3ae3e1f9dd0c7a64d0bc5f820ee,2026.05.03-main-e2cd499,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:13:37+0000,b276462d5ded5cb6fb8e8a2c877cf32870d1c8c8,2026.05.03-main-e2cd499,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:21:22+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T17:32:09+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:02:54+0000,8b4f983d6174d96b8b77ec7650f36bc67cf0d402,2026.05.03-main-e2cd499,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history
+2026-05-03T22:05:40+0000,bdafd5d077b5bee365da087589b5dccff15a8b84,2026.05.03-main-e2cd499,new_security_hotspots,not_available,not_available_from_api_history,sonar_api:/api/measures/search_history

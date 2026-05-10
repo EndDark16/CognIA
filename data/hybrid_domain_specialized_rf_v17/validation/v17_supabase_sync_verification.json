@@ -1,0 +1,12 @@
+{
+  "line": "hybrid_domain_specialized_rf_v17",
+  "active_activations_db": 30,
+  "active_model_versions": 30,
+  "active_model_versions_non_rf": 0,
+  "missing_expected_models": 0,
+  "mismatched_feature_columns": 0,
+  "duplicate_active_domain_mode_rows": 0,
+  "runtime_artifact_path_missing_or_unavailable": 0,
+  "db_active_set_valid": "yes",
+  "active_selection_version": "v17"
+}

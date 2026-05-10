@@ -1,0 +1,26 @@
+{
+  "line": "hybrid_active_modes_freeze_v13",
+  "expected_active_rows": 30,
+  "active_activations_db": 30,
+  "active_model_versions_non_rf": 0,
+  "missing_expected_models": 0,
+  "extra_active_slots": 0,
+  "mismatched_active_model_ids": 0,
+  "mismatched_feature_columns": 0,
+  "all_active_source_csv_v13": true,
+  "questionnaire_version_id": "22f3dc1d-0083-41cf-91c9-b40ccd1d1c63",
+  "questionnaire_questions": 146,
+  "visible_questions": 146,
+  "included_question_modes_nonzero": {
+    "guardian/caregiver_1_3": 67,
+    "guardian/caregiver_2_3": 104,
+    "guardian/caregiver_full": 125,
+    "psychologist/psychologist_1_3": 60,
+    "psychologist/psychologist_2_3": 110,
+    "psychologist/psychologist_full": 146
+  },
+  "missing_slots": [],
+  "extra_slots": [],
+  "mismatched_models": [],
+  "mismatched_features": []
+}

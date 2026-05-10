@@ -1,0 +1,24 @@
+# v16 Final Clean Champion Resolution
+
+- generated_at_utc: `2026-05-01T14:46:03.418608+00:00`
+- line: `hybrid_final_clean_champion_resolution_v16`
+- selection_version_final: `v16`
+- loader_line_before_update: `active=v16`, `operational=v16`
+- active_rows: `30`
+- rf_rows: `30`
+- prediction_recomputed_slots: `30`
+- artifacts_available_slots: `30`
+- metrics_match_yes_slots: `30`
+- metrics_match_no_slots: `0`
+- all_domains_real_clone_count: `0`
+- elimination_real_clone_count: `0`
+- all_domains_near_clone_warning_count: `22`
+- unresolved_near_clone_warning_count: `0`
+- acceptable_similarity_count: `22`
+- false_positive_warning_count: `0`
+- artifact_duplicate_hash_count: `0`
+- guardrail_violation_count: `0`
+- same_inputs_outputs_contract_30_30: `yes`
+- non_elimination_unchanged_vs_v15: `yes`
+- mixed_lineage_by_design: `yes`
+- final_audit_status: `pass`

@@ -1,0 +1,17 @@
+{
+  "line": "hybrid_domain_specialized_rf_v17",
+  "generated_at_utc": "2026-05-02T16:05:25.779857+00:00",
+  "audited_extreme_slots_count": 30,
+  "threshold_sweep_completed_count": 30,
+  "high_separability_audit_completed_count": 30,
+  "ablation_completed_count": 30,
+  "leakage_confirmed_count": 0,
+  "target_proxy_confirmed_count": 0,
+  "split_contamination_confirmed_count": 0,
+  "threshold_adjustment_recommended_count": 0,
+  "threshold_adjustment_applied_count": 0,
+  "retrain_required_count": 0,
+  "retrain_completed_count": 0,
+  "unresolved_issue_count": 0,
+  "final_audit_status": "pass"
+}
