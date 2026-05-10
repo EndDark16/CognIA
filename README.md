@@ -234,16 +234,22 @@ cognia_app/
 | Testing | pytest + coverage | `8.2.2` / `7.8.0` |
 | CI backend | Ruff F-check + compile/import sanity + pytest + docker build sanity | `.github/workflows/ci-backend.yml` |
 
-## 8. Prerrequisitos
-- Python 3.12.
-- Base de datos PostgreSQL 16 (recomendado por `docker-compose.yml`).
-- `pip`.
-- Alembic (viene en `requirements.txt`).
-- Git.
-- Opcional:
-  - Docker + Docker Compose.
-  - PowerShell (para `scripts/run_sonar.ps1`).
-  - k6 (para `scripts/k6_smoke.js`).
+Variables criticas:
+- `SECRET_KEY`
+- `MFA_ENCRYPTION_KEY`
+- `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_SSL_MODE`
+- `DB_POOL_SIZE`, `DB_MAX_OVERFLOW`, `DB_POOL_TIMEOUT`, `DB_POOL_RECYCLE`, `DB_POOL_PRE_PING`
+- `CORS_ORIGINS`
+- `RATELIMIT_ENABLED`
+- `RATE_LIMIT_STORAGE_URI`
+- `OPTIONAL_BLUEPRINTS_STRICT`
+- `OPTIONAL_BLUEPRINTS_REQUIRED`
+- `QV2_SHARED_ACCESS_RATE_LIMIT`
+- `PREDICT_RATE_LIMIT`
+- `GUNICORN_WORKERS`, `GUNICORN_THREADS`, `GUNICORN_TIMEOUT`, `GUNICORN_KEEPALIVE`, `GUNICORN_MAX_REQUESTS`, `GUNICORN_MAX_REQUESTS_JITTER`
+- `PROBLEM_REPORT_UPLOAD_DIR`
+- `PROBLEM_REPORT_MAX_ATTACHMENT_BYTES`
+- `PROBLEM_REPORT_ALLOWED_MIME_TYPES`
 
 ## 9. Quickstart real
 ### 9.1 Clonado
@@ -809,13 +815,14 @@ Referencia: `docs/problem_reporting_backend.md`.
   - `generated_reports`,
   - snapshots de health/model monitoring.
 
-### Tipos de report job soportados
-- `executive_monthly`
-- `adoption_history`
-- `model_monitoring`
-- `operational_productivity`
-- `security_compliance`
-- `traceability_audit`
+## Testing
+- Ejecutar suite completa: `pytest -q`
+- Pruebas especificas de problem reports: `pytest tests/test_problem_reports.py -q`
+- Guardrail OpenAPI vs runtime: `pytest tests/contracts/test_openapi_runtime_alignment.py -q`
+- Guardrail de calidad documental OpenAPI: `pytest tests/contracts/test_openapi_documentation_quality.py -q`
+- Hardening de predict experimental: `pytest tests/test_predict.py -q`
+- Suite de carga/estres backend (k6): `scripts/load/README.md`
+- Politica de ejecucion de carga/estres: `docs/load_testing.md`
 
 Referencia: `docs/reporting_and_dashboards.md`.
 
