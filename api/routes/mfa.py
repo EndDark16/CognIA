@@ -23,6 +23,7 @@ from api.security import (
     log_audit,
     clear_auth_cookies,
 )
+from api.cache import invalidate_user_auth_caches
 from api.routes.auth import _parse_identity, _error_response
 from flask import current_app
 from api.extensions import limiter
@@ -158,6 +159,7 @@ def mfa_confirm():
         db.session.rollback()
         current_app.logger.error("Database error on MFA confirm for %s: %s", identity, e, exc_info=True)
         return _error_response("Database error", "db_error", 500)
+    invalidate_user_auth_caches(identity)
     log_audit(identity, "MFA_ENABLED", "auth", "MFA enabled")
     return jsonify({"recovery_codes": codes_plain}), 200
 
@@ -215,6 +217,7 @@ def mfa_disable():
         db.session.rollback()
         current_app.logger.error("Database error on MFA disable for %s: %s", identity, e, exc_info=True)
         return _error_response("Database error", "db_error", 500)
+    invalidate_user_auth_caches(identity)
     log_audit(identity, "MFA_DISABLED", "auth", "MFA disabled")
     response = jsonify({"msg": "MFA disabled"})
     clear_auth_cookies(response)

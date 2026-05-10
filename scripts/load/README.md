@@ -24,6 +24,12 @@ Reusable load/stress suite for CognIA backend with safe defaults for limited hom
 - `k6_spike.js`: spike and recovery.
 - `k6_soak.js`: sustained stability run.
 - `k6_questionnaire_v2_flow.js`: realistic v2 flow with safe-mode controls.
+- `k6_infra_smoke.js`: health/readiness only (infrastructure check).
+- `k6_auth_read.js`: read-only auth path (`/api/auth/me`).
+- `k6_qv2_active_read.js`: read-only hot path (`/api/v2/questionnaires/active`).
+- `k6_user_journey_read.js`: read-only combined user flow (`auth/me + qv2_active`).
+- `k6_capacity_ladder.js`: controlled VU ladder (`10 -> 30`) with abort thresholds.
+- `k6_constant_rps.js`: controlled throughput ladder (`5/10/15/20 RPS`) with abort thresholds.
 
 ## Environment Variables
 - `BASE_URL`
@@ -57,6 +63,10 @@ Example B:
 Health/readiness detection is auto-resolved from:
 - prefixed path (`{API_PREFIX}/healthz`, `{API_PREFIX}/readyz`)
 - root path (`/healthz`, `/readyz`)
+
+For current production (`https://www.cognia.lat`) the valid health endpoints are at root:
+- `/healthz`
+- `/readyz`
 
 ## Recommended Profiles for Current Hardware
 - Smoke: `5-10 VUs`, `30s`
@@ -133,6 +143,38 @@ SKIP_WRITE_HEAVY=true \
 SKIP_SUBMIT=true \
 SKIP_PDF=true \
 k6 run --summary-export artifacts/load_tests/qv2_flow/summary.json scripts/load/k6_questionnaire_v2_flow.js
+```
+
+User journey read (10 VUs):
+```bash
+BASE_URL=https://www.cognia.lat \
+API_PREFIX=/api \
+USERNAME=<test_user> \
+PASSWORD=<test_password> \
+SAFE_MODE=true \
+K6_VUS=10 \
+K6_DURATION=5m \
+k6 run --summary-export artifacts/load_tests/user_journey_read/summary.json scripts/load/k6_user_journey_read.js
+```
+
+Capacity ladder (10 -> 30 VUs):
+```bash
+BASE_URL=https://www.cognia.lat \
+API_PREFIX=/api \
+USERNAME=<test_user> \
+PASSWORD=<test_password> \
+SAFE_MODE=true \
+k6 run --summary-export artifacts/load_tests/capacity_ladder/summary.json scripts/load/k6_capacity_ladder.js
+```
+
+Constant RPS ladder:
+```bash
+BASE_URL=https://www.cognia.lat \
+API_PREFIX=/api \
+USERNAME=<test_user> \
+PASSWORD=<test_password> \
+SAFE_MODE=true \
+k6 run --summary-export artifacts/load_tests/constant_rps/summary.json scripts/load/k6_constant_rps.js
 ```
 
 ## Evidence Output Convention

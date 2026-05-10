@@ -742,3 +742,42 @@ Claim metodologico sin cambios:
 - Artefactos de auditoria creados:
   - `reports/performance/2026-05-10_a1_backend_internal_optimization_audit.md`
   - `docs/deployment_performance.md`
+
+## Actualizacion de estado (2026-05-10) - a2_capacity_reliability_optimization
+- Se ejecuto intervencion A2 interna (mas agresiva que A1) manteniendo compatibilidad de contratos API existentes.
+- Rama de trabajo: `perf/a2-capacity-reliability-optimization`.
+- Cambios internos principales:
+  - cache backend extensible (memory por defecto, Redis opcional con fallback seguro).
+  - cache TTL corta de `/api/auth/me` con invalidacion en cambios de usuario/password/MFA/roles.
+  - cache avanzada para `GET /api/v2/questionnaires/active`:
+    - snapshot de version activa,
+    - snapshot de activaciones/confianza,
+    - question bank por `version+mode_key`,
+    - payload final por combinacion.
+  - invalidacion coherente de caches en sync/bootstrap de catalogo/modelos.
+  - optimizacion de metricas in-memory:
+    - menor lock hold,
+    - sample size configurable,
+    - exclusion opcional de detalle endpoint para `/healthz` y `/readyz`.
+  - `warmup_backend.py` agregado para precalentar rutas de lectura sin operaciones destructivas.
+  - suite k6 A2 agregada:
+    - `k6_infra_smoke.js`
+    - `k6_auth_read.js`
+    - `k6_qv2_active_read.js`
+    - `k6_user_journey_read.js`
+    - `k6_capacity_ladder.js`
+    - `k6_constant_rps.js`
+  - mejoras puntuales:
+    - cache LRU de `feature contract`,
+    - cache LRU de clave de cifrado de campos,
+    - `create_session` con insercion batch de session items.
+- Guardrails metodologicos intactos:
+  - no cambio de frontend,
+  - no cambio de modelos/thresholds/logica clinica,
+  - no cambio contractual obligatorio en endpoints existentes.
+- Evidencia local A2:
+  - `ruff check --select F api tests`: OK
+  - `python -m compileall -q api app config core scripts run.py`: OK
+  - `python -c "from api.app import create_app; app = create_app(); print(app.name)"`: OK
+  - `pytest -q`: `188 passed, 3 skipped`
+  - `k6 inspect` completo (suite previa + A2): OK
