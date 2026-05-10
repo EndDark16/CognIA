@@ -71,6 +71,41 @@ Scenario suite:
 Usage details:
 - `scripts/load/README.md`
 
+## Runtime Configuration Profiles
+
+### Current homelab (recommended)
+- `GUNICORN_WORKER_CLASS=gthread`
+- `GUNICORN_WORKERS=2`
+- `GUNICORN_THREADS=2`
+- `GUNICORN_TIMEOUT=60`
+- `GUNICORN_GRACEFUL_TIMEOUT=30`
+- `GUNICORN_KEEPALIVE=5`
+- `GUNICORN_MAX_REQUESTS=1000`
+- `GUNICORN_MAX_REQUESTS_JITTER=100`
+- `DB_POOL_SIZE=2`
+- `DB_MAX_OVERFLOW=1`
+- `DB_POOL_TIMEOUT=15`
+- `DB_POOL_PRE_PING=true`
+- `READINESS_CACHE_TTL_SECONDS=5`
+- `READINESS_DB_TIMEOUT_MS=1200`
+- `QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS=20`
+- `JWT_SECURITY_STATE_CACHE_TTL_SECONDS=45`
+
+Notes:
+- Favor stability and predictable latency over max throughput.
+- On memory pressure, evaluate `GUNICORN_WORKERS=1` and `GUNICORN_THREADS=4`.
+
+### Future robust server + fiber (to benchmark, not assumed)
+- Start from homelab profile and increase gradually with measured evidence.
+- Re-benchmark workers/threads and DB pool with external load generator.
+- Recalibrate thresholds for p95/p99 and error rate only after baseline is stable.
+
+## Rate Limit Backend Caveat
+- `RATE_LIMIT_STORAGE_URI=memory://` is per-worker and not globally shared.
+- For global shared rate limits, configure Redis/Valkey:
+  - `RATE_LIMIT_STORAGE_URI=redis://<host>:<port>/<db>`
+- Keep fallback to `memory://` for compatibility when Redis is unavailable.
+
 ## Evidence Storage
 Raw outputs:
 - `artifacts/load_tests/<timestamp>_<scenario>/...`
