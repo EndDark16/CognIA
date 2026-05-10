@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import get_jwt, get_jwt_identity
 from marshmallow import ValidationError
+from sqlalchemy.orm import selectinload
 
 from api.decorators import roles_required
 from api.schemas.user_schema import UserCreateSchema, UserListQuerySchema, UserUpdateSchema
@@ -21,7 +22,7 @@ from api.routes.auth import (
     _USER_TYPE_ROLE,
     _PASSWORD_MIN,
 )
-from api.cache import roles_cache
+from api.cache import invalidate_user_auth_caches, roles_cache
 from app.models import AppUser, Role, UserRole, db
 
 
@@ -111,7 +112,7 @@ def list_users():
         return _error_response("Validation error", "validation_error", 400, exc.messages)
     page = query["page"]
     page_size = query["page_size"]
-    query = AppUser.query.order_by(AppUser.created_at.desc())
+    query = AppUser.query.options(selectinload(AppUser.roles)).order_by(AppUser.created_at.desc())
     total = query.count()
     items = query.offset((page - 1) * page_size).limit(page_size).all()
     return jsonify({"items": [_user_payload(u) for u in items], "page": page, "page_size": page_size, "total": total}), 200
@@ -190,6 +191,7 @@ def create_user():
         db.session.add(UserRole(user_id=user.id, role_id=base_role.id))
         _apply_roles(user, data.get("roles"), required_roles=[role_name])
         db.session.commit()
+        invalidate_user_auth_caches(user.id)
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Database error creating user: %s", e, exc_info=True)
@@ -275,6 +277,7 @@ def update_user(user_id):
         user.updated_at = datetime.now(timezone.utc)
         db.session.add(user)
         db.session.commit()
+        invalidate_user_auth_caches(user.id)
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Database error updating user %s: %s", user.id, e, exc_info=True)
@@ -304,6 +307,7 @@ def deactivate_user(user_id):
         user.updated_at = datetime.now(timezone.utc)
         db.session.add(user)
         db.session.commit()
+        invalidate_user_auth_caches(user.id)
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Database error deactivating user %s: %s", user.id, e, exc_info=True)

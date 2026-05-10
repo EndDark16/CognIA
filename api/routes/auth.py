@@ -54,7 +54,7 @@ from app.models import (
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
 
-from api.cache import roles_cache
+from api.cache import invalidate_user_security_cache, roles_cache
 
 
 def _get_roles(user: AppUser) -> list[str]:
@@ -823,6 +823,7 @@ def change_password():
         _revoke_refresh_tokens(user.id)
         db.session.add(user)
         db.session.commit()
+        invalidate_user_security_cache(user.id)
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Database error on password change for %s: %s", user.id, e, exc_info=True)
@@ -931,6 +932,7 @@ def reset_password():
         _revoke_refresh_tokens(user.id)
         db.session.add(user)
         db.session.commit()
+        invalidate_user_security_cache(user.id)
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Password reset failed for %s: %s", user.id, e, exc_info=True)
