@@ -21,14 +21,15 @@ def _optional_bool_env(name: str):
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
-def _int_env(name: str, default: int) -> int:
-    raw = os.getenv(name)
-    if raw is None or raw.strip() == "":
+def _int_env(name: str, default: int | None) -> int | None:
+    value = os.getenv(name)
+    if value is None or value == "":
         return default
     try:
-        return int(raw.strip())
+        return int(value)
     except ValueError:
         return default
+
 
 class Config:
     DEBUG = False
@@ -152,6 +153,7 @@ class Config:
     METRICS_TOKEN = os.getenv("METRICS_TOKEN")
     METRICS_TOKEN_REQUIRED = os.getenv("METRICS_TOKEN_REQUIRED", "false").lower() == "true"
     RATELIMIT_ENABLED = os.getenv("RATELIMIT_ENABLED", "true").lower() == "true"
+    RATELIMIT_STORAGE_URI = os.getenv("RATE_LIMIT_STORAGE_URI", "memory://")
 
     # Proxy and response hardening
     TRUST_PROXY_HEADERS = _bool_env("TRUST_PROXY_HEADERS", False)
@@ -205,6 +207,7 @@ class Config:
     except ValueError:
         EMAIL_UNSUBSCRIBE_TOKEN_TTL_DAYS = None
     EMAIL_UNSUBSCRIBE_RATE_LIMIT = os.getenv("EMAIL_UNSUBSCRIBE_RATE_LIMIT", "10 per 10 minutes")
+
     SMTP_HOST = os.getenv("SMTP_HOST")
     SMTP_PORT = _int_env("SMTP_PORT", 587)
     SMTP_PORT_SSL = _int_env("SMTP_PORT__SSL", 0) or None
@@ -236,12 +239,12 @@ class ProductionConfig(Config):
     OPENAPI_PUBLIC_ENABLED = _bool_env("OPENAPI_PUBLIC_ENABLED", False)
     # Ajustes de pool para concurrencia en runtime productivo.
     SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_size": max(1, Config.DB_POOL_SIZE),
-        "max_overflow": max(0, Config.DB_MAX_OVERFLOW),
-        "pool_timeout": max(1, Config.DB_POOL_TIMEOUT),
-        "pool_pre_ping": bool(Config.DB_POOL_PRE_PING),
-        "pool_recycle": max(60, Config.DB_POOL_RECYCLE),
-        "pool_use_lifo": True,
+        # Ajustado para no competir con poolers externos (ej. pgbouncer en free tier)
+        "pool_size": _int_env("DB_POOL_SIZE", 3),
+        "max_overflow": _int_env("DB_MAX_OVERFLOW", 2),
+        "pool_timeout": _int_env("DB_POOL_TIMEOUT", 30),
+        "pool_pre_ping": _bool_env("DB_POOL_PRE_PING", True),
+        "pool_recycle": _int_env("DB_POOL_RECYCLE", 1800),
     }
 
 class TestingConfig(Config):

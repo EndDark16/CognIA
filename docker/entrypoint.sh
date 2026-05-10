@@ -35,12 +35,11 @@ fi
 BIND="0.0.0.0:${PORT:-5000}"
 WORKERS=${GUNICORN_WORKERS:-${WEB_CONCURRENCY:-$DEFAULT_WORKERS}}
 THREADS=${GUNICORN_THREADS:-$DEFAULT_THREADS}
-WORKER_CLASS=${GUNICORN_WORKER_CLASS:-gthread}
-TIMEOUT=${GUNICORN_TIMEOUT:-60}
-GRACEFUL_TIMEOUT=${GUNICORN_GRACEFUL_TIMEOUT:-30}
-KEEPALIVE=${GUNICORN_KEEPALIVE:-5}
-MAX_REQUESTS=${GUNICORN_MAX_REQUESTS:-1000}
-MAX_REQUESTS_JITTER=${GUNICORN_MAX_REQUESTS_JITTER:-100}
+BIND="0.0.0.0:${PORT:-5000}"
+TIMEOUT=${GUNICORN_TIMEOUT:-}
+KEEPALIVE=${GUNICORN_KEEPALIVE:-}
+MAX_REQUESTS=${GUNICORN_MAX_REQUESTS:-}
+MAX_REQUESTS_JITTER=${GUNICORN_MAX_REQUESTS_JITTER:-}
 
 should_run_migrations() {
   local run_flag="${RUN_MIGRATIONS:-1}"
@@ -74,16 +73,19 @@ else
   echo "==> Migraciones deshabilitadas (RUN_MIGRATIONS=false o SKIP_MIGRATIONS=true)."
 fi
 
-echo "==> Iniciando Gunicorn bind=${BIND} workers=${WORKERS} threads=${THREADS} class=${WORKER_CLASS} timeout=${TIMEOUT}s keepalive=${KEEPALIVE}s"
-exec gunicorn run:app \
-  --bind "$BIND" \
-  --worker-class "$WORKER_CLASS" \
-  --workers "$WORKERS" \
-  --threads "$THREADS" \
-  --timeout "$TIMEOUT" \
-  --graceful-timeout "$GRACEFUL_TIMEOUT" \
-  --keep-alive "$KEEPALIVE" \
-  --max-requests "$MAX_REQUESTS" \
-  --max-requests-jitter "$MAX_REQUESTS_JITTER" \
-  --access-logfile - \
-  --error-logfile -
+echo "==> Iniciando Gunicorn en ${BIND} con ${WORKERS} workers y ${THREADS} threads"
+ARGS=(-w "$WORKERS" --threads "$THREADS" -b "$BIND")
+if [ -n "$TIMEOUT" ]; then
+  ARGS+=(--timeout "$TIMEOUT")
+fi
+if [ -n "$KEEPALIVE" ]; then
+  ARGS+=(--keep-alive "$KEEPALIVE")
+fi
+if [ -n "$MAX_REQUESTS" ]; then
+  ARGS+=(--max-requests "$MAX_REQUESTS")
+fi
+if [ -n "$MAX_REQUESTS_JITTER" ]; then
+  ARGS+=(--max-requests-jitter "$MAX_REQUESTS_JITTER")
+fi
+
+exec gunicorn "${ARGS[@]}" run:app
