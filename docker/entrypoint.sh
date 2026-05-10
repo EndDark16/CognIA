@@ -34,6 +34,10 @@ fi
 WORKERS=${GUNICORN_WORKERS:-${WEB_CONCURRENCY:-$DEFAULT_WORKERS}}
 THREADS=${GUNICORN_THREADS:-$DEFAULT_THREADS}
 BIND="0.0.0.0:${PORT:-5000}"
+TIMEOUT=${GUNICORN_TIMEOUT:-}
+KEEPALIVE=${GUNICORN_KEEPALIVE:-}
+MAX_REQUESTS=${GUNICORN_MAX_REQUESTS:-}
+MAX_REQUESTS_JITTER=${GUNICORN_MAX_REQUESTS_JITTER:-}
 
 should_run_migrations() {
   local run_flag="${RUN_MIGRATIONS:-1}"
@@ -68,4 +72,18 @@ else
 fi
 
 echo "==> Iniciando Gunicorn en ${BIND} con ${WORKERS} workers y ${THREADS} threads"
-exec gunicorn -w "$WORKERS" --threads "$THREADS" -b "$BIND" run:app
+ARGS=(-w "$WORKERS" --threads "$THREADS" -b "$BIND")
+if [ -n "$TIMEOUT" ]; then
+  ARGS+=(--timeout "$TIMEOUT")
+fi
+if [ -n "$KEEPALIVE" ]; then
+  ARGS+=(--keep-alive "$KEEPALIVE")
+fi
+if [ -n "$MAX_REQUESTS" ]; then
+  ARGS+=(--max-requests "$MAX_REQUESTS")
+fi
+if [ -n "$MAX_REQUESTS_JITTER" ]; then
+  ARGS+=(--max-requests-jitter "$MAX_REQUESTS_JITTER")
+fi
+
+exec gunicorn "${ARGS[@]}" run:app

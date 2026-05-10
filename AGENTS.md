@@ -599,3 +599,76 @@ Validacion declarada en release actual:
   - split de unsubscribe `GET/POST` en `api/routes/email.py`,
   - `DEV_DEBUG=false` por defecto en `.env.example`.
 - Estado operativo declarado en esta ventana: Quality Gate Sonar `PASSED` y sin issues abiertas en new code period.
+
+## Actualizacion de estado (2026-05-10) - perf_safe_backend_optimization_audit_v1
+- Se inicio auditoria de performance/estabilidad/seguridad operativa en rama dedicada:
+  - `perf/safe-backend-optimization-audit`.
+- Se preservo worktree sucio preexistente sin limpieza ni integracion.
+- Archivos protegidos no tocados:
+  - `scripts/hardening_second_pass.py`
+  - `scripts/rebuild_dsm5_exact_datasets.py`
+  - `scripts/run_pipeline.py`
+  - `scripts/seed_users.py`
+  - `tests/test_health.py`
+- Evidencia de estado/diff preservada en:
+  - `reports/audit/backend_perf_stability_security_audit_2026-05-10.md`.
+
+Cambios seguros aplicados (sin romper contratos API conocidos):
+- `core/models/predictor.py`:
+  - cache de carga de modelo (`lru_cache`) para evitar `joblib.load` por request en `/api/predict`.
+- `api/services/questionnaire_v2_service.py`:
+  - reduccion de queries repetidas en `save_answers` (prefetch de preguntas/respuestas/repeat mapping),
+  - recomputo de progreso con agregacion unica en DB,
+  - eliminacion de patron N+1 en `list_history` (batch de summaries por `session_id`).
+- `config/settings.py`:
+  - overrides por entorno para pool DB en `ProductionConfig`:
+    - `DB_POOL_SIZE`
+    - `DB_MAX_OVERFLOW`
+    - `DB_POOL_TIMEOUT`
+    - `DB_POOL_RECYCLE`
+    - `DB_POOL_PRE_PING`
+  - `RATELIMIT_STORAGE_URI` configurable.
+- `docker/entrypoint.sh`:
+  - soporte opcional de parametros Gunicorn por env:
+    - `GUNICORN_TIMEOUT`
+    - `GUNICORN_KEEPALIVE`
+    - `GUNICORN_MAX_REQUESTS`
+    - `GUNICORN_MAX_REQUESTS_JITTER`
+- `.env.example` y `README.md` actualizados con nuevas variables operativas.
+
+Suite formal de carga/estres agregada:
+- `scripts/load/helpers.js`
+- `scripts/load/k6_smoke.js`
+- `scripts/load/k6_baseline.js`
+- `scripts/load/k6_load.js`
+- `scripts/load/k6_stress.js`
+- `scripts/load/k6_spike.js`
+- `scripts/load/k6_soak.js`
+- `scripts/load/k6_questionnaire_v2_flow.js`
+- `scripts/load/README.md`
+- compatibilidad mantenida en `scripts/k6_smoke.js`.
+
+Documentacion/evidencia agregada:
+- `docs/load_testing.md`
+- `reports/load_tests/README.md`
+- `reports/load_tests/summary_template.md`
+- `reports/load_tests/2026-05-10_preopt_production_smoke_summary.md`
+
+Baseline de despliegue observado (probe ligero, no stress):
+- `https://www.cognia.lat/healthz` y `https://www.cognia.lat/readyz` responden `200`.
+- `https://www.cognia.lat/api/healthz` y `.../api/readyz` responden `404`.
+- endpoints autenticados sin token responden `401` esperado.
+- nota TLS: en este entorno local se ejecuto probe con verificacion TLS desactivada para evidencia de reachability.
+
+Validacion local de regresion en esta ventana:
+- `ruff check --select F api tests` => `passed`.
+- `python -m compileall -q api app config core scripts run.py` => `passed`.
+- `python -c "from api.app import create_app; app = create_app(); print(app.name)"` => `api.app`.
+- `pytest -q` => `148 passed, 3 skipped`.
+- `docker build` no ejecutable por daemon no disponible (`dockerDesktopLinuxEngine` no encontrado).
+
+Estado de ejecucion de carga/estres real contra produccion:
+- `por confirmar` (no ejecutado aun en esta ventana) por falta de credenciales de prueba dedicadas y ventana operativa controlada.
+
+Claim metodologico sin cambios:
+- evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.

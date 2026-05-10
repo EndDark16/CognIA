@@ -1,4 +1,3 @@
-import io
 import json
 import secrets
 import uuid
@@ -13,7 +12,7 @@ import pandas as pd
 from flask import current_app
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-from sqlalchemy import and_, func, or_
+from sqlalchemy import case, func, or_
 
 from api.security import check_password, hash_password
 from api.services import questionnaire_v2_loader_service as loader
@@ -21,7 +20,6 @@ from app.models import (
     AppUser,
     GeneratedReport,
     ModelConfidenceRegistry,
-    ModelModeDomainActivation,
     ModelOperationalCaveat,
     ModelVersion,
     QuestionnaireAccessGrant,
@@ -327,8 +325,27 @@ def _mark_item_answered(session_id: uuid.UUID, question_id: uuid.UUID) -> None:
 
 
 def _recompute_progress(session: QuestionnaireSession) -> None:
-    total = QuestionnaireSessionItem.query.filter_by(session_id=session.id, is_visible=True).count()
-    answered = QuestionnaireSessionItem.query.filter_by(session_id=session.id, is_visible=True, answered=True).count()
+    total, answered = (
+        db.session.query(
+            func.count(QuestionnaireSessionItem.id),
+            func.coalesce(
+                func.sum(
+                    case(
+                        (QuestionnaireSessionItem.answered.is_(True), 1),
+                        else_=0,
+                    )
+                ),
+                0,
+            ),
+        )
+        .filter(
+            QuestionnaireSessionItem.session_id == session.id,
+            QuestionnaireSessionItem.is_visible.is_(True),
+        )
+        .one()
+    )
+    total = int(total or 0)
+    answered = int(answered or 0)
     progress = (answered / total) * 100.0 if total > 0 else 0.0
     session.progress_pct = round(progress, 2)
     if session.status == "draft" and answered > 0:
@@ -575,19 +592,62 @@ def save_answers(session: QuestionnaireSession, user_id: uuid.UUID, answers: lis
         raise ValueError("session_not_editable")
 
     allowed_ids = _session_item_question_ids(session.id)
+    normalized_items: list[tuple[uuid.UUID, Any]] = []
     for item in answers:
-        question_id = item["question_id"] if isinstance(item["question_id"], uuid.UUID) else uuid.UUID(str(item["question_id"]))
+        question_id = (
+            item["question_id"]
+            if isinstance(item["question_id"], uuid.UUID)
+            else uuid.UUID(str(item["question_id"]))
+        )
         if question_id not in allowed_ids:
             raise ValueError(f"question_not_in_session:{question_id}")
+        normalized_items.append((question_id, item.get("answer")))
 
-        question = db.session.get(QuestionnaireQuestion, question_id)
+    question_ids = [question_id for question_id, _ in normalized_items]
+    questions = QuestionnaireQuestion.query.filter(QuestionnaireQuestion.id.in_(question_ids)).all()
+    questions_by_id = {row.id: row for row in questions}
+
+    existing_answers = QuestionnaireSessionAnswer.query.filter(
+        QuestionnaireSessionAnswer.session_id == session.id,
+        QuestionnaireSessionAnswer.question_id.in_(question_ids),
+    ).all()
+    answers_by_question_id = {row.question_id: row for row in existing_answers}
+
+    session_items = QuestionnaireSessionItem.query.filter(
+        QuestionnaireSessionItem.session_id == session.id,
+        QuestionnaireSessionItem.question_id.in_(question_ids),
+    ).all()
+    session_items_by_question_id = {row.question_id: row for row in session_items}
+
+    repeat_mappings = QuestionnaireRepeatMapping.query.filter(
+        QuestionnaireRepeatMapping.version_id == session.version_id,
+        QuestionnaireRepeatMapping.canonical_question_id.in_(question_ids),
+        QuestionnaireRepeatMapping.reuse_answer.is_(True),
+    ).all()
+    repeated_ids: set[uuid.UUID] = set()
+    repeated_by_canonical: dict[uuid.UUID, list[uuid.UUID]] = defaultdict(list)
+    for mapping in repeat_mappings:
+        repeated_by_canonical[mapping.canonical_question_id].append(mapping.repeated_question_id)
+        repeated_ids.add(mapping.repeated_question_id)
+
+    existing_repeated_answers: dict[uuid.UUID, QuestionnaireSessionAnswer] = {}
+    if repeated_ids:
+        repeated_rows = QuestionnaireSessionAnswer.query.filter(
+            QuestionnaireSessionAnswer.session_id == session.id,
+            QuestionnaireSessionAnswer.question_id.in_(repeated_ids),
+        ).all()
+        existing_repeated_answers = {row.question_id: row for row in repeated_rows}
+
+    for question_id, answer in normalized_items:
+        question = questions_by_id.get(question_id)
         if not question:
             raise LookupError("question_not_found")
 
-        raw, normalized = _normalize_answer(question, item.get("answer"))
-        answer_row = QuestionnaireSessionAnswer.query.filter_by(session_id=session.id, question_id=question_id).first()
+        raw, normalized = _normalize_answer(question, answer)
+        answer_row = answers_by_question_id.get(question_id)
         if not answer_row:
             answer_row = QuestionnaireSessionAnswer(session_id=session.id, question_id=question_id)
+            answers_by_question_id[question_id] = answer_row
         answer_row.canonical_question_id = question_id
         answer_row.answer_raw = _json(raw)
         answer_row.answer_normalized = normalized
@@ -597,20 +657,21 @@ def save_answers(session: QuestionnaireSession, user_id: uuid.UUID, answers: lis
         answer_row.updated_at = _utcnow()
         db.session.add(answer_row)
 
-        _mark_item_answered(session.id, question_id)
+        session_item = session_items_by_question_id.get(question_id)
+        if session_item:
+            session_item.answered = True
+            session_item.answered_at = _utcnow()
+            session_item.updated_at = _utcnow()
+            db.session.add(session_item)
 
-        repeated = QuestionnaireRepeatMapping.query.filter_by(
-            version_id=session.version_id,
-            canonical_question_id=question_id,
-            reuse_answer=True,
-        ).all()
-        for mapping in repeated:
-            hidden = QuestionnaireSessionAnswer.query.filter_by(
-                session_id=session.id,
-                question_id=mapping.repeated_question_id,
-            ).first()
+        for repeated_question_id in repeated_by_canonical.get(question_id, []):
+            hidden = existing_repeated_answers.get(repeated_question_id)
             if not hidden:
-                hidden = QuestionnaireSessionAnswer(session_id=session.id, question_id=mapping.repeated_question_id)
+                hidden = QuestionnaireSessionAnswer(
+                    session_id=session.id,
+                    question_id=repeated_question_id,
+                )
+                existing_repeated_answers[repeated_question_id] = hidden
             hidden.canonical_question_id = question_id
             hidden.answer_raw = _json(raw)
             hidden.answer_normalized = normalized
@@ -989,14 +1050,24 @@ def list_history(user_id: uuid.UUID, status: str | None = None, page: int = 1, p
         .limit(page_size)
         .all()
     )
+    session_ids = [session.id for session in rows]
+    summary_by_session_id: dict[uuid.UUID, tuple[str | None, bool | None]] = {}
+    if session_ids:
+        result_rows = QuestionnaireSessionResult.query.filter(
+            QuestionnaireSessionResult.session_id.in_(session_ids)
+        ).all()
+        summary_by_session_id = {
+            row.session_id: (row.summary_text, row.needs_professional_review)
+            for row in result_rows
+        }
 
     items = []
     for session in rows:
         item = get_session_payload(session)
-        result = QuestionnaireSessionResult.query.filter_by(session_id=session.id).first()
-        if result:
-            item["summary"] = result.summary_text
-            item["needs_professional_review"] = result.needs_professional_review
+        summary_info = summary_by_session_id.get(session.id)
+        if summary_info is not None:
+            item["summary"] = summary_info[0]
+            item["needs_professional_review"] = summary_info[1]
         items.append(item)
 
     return {

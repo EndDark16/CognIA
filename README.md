@@ -124,12 +124,15 @@ Variables criticas:
 - `SECRET_KEY`
 - `MFA_ENCRYPTION_KEY`
 - `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_SSL_MODE`
+- `DB_POOL_SIZE`, `DB_MAX_OVERFLOW`, `DB_POOL_TIMEOUT`, `DB_POOL_RECYCLE`, `DB_POOL_PRE_PING`
 - `CORS_ORIGINS`
 - `RATELIMIT_ENABLED`
+- `RATE_LIMIT_STORAGE_URI`
 - `OPTIONAL_BLUEPRINTS_STRICT`
 - `OPTIONAL_BLUEPRINTS_REQUIRED`
 - `QV2_SHARED_ACCESS_RATE_LIMIT`
 - `PREDICT_RATE_LIMIT`
+- `GUNICORN_WORKERS`, `GUNICORN_THREADS`, `GUNICORN_TIMEOUT`, `GUNICORN_KEEPALIVE`, `GUNICORN_MAX_REQUESTS`, `GUNICORN_MAX_REQUESTS_JITTER`
 - `PROBLEM_REPORT_UPLOAD_DIR`
 - `PROBLEM_REPORT_MAX_ATTACHMENT_BYTES`
 - `PROBLEM_REPORT_ALLOWED_MIME_TYPES`
@@ -190,6 +193,8 @@ Detalles: `docs/problem_reporting_backend.md`.
 - Guardrail OpenAPI vs runtime: `pytest tests/contracts/test_openapi_runtime_alignment.py -q`
 - Guardrail de calidad documental OpenAPI: `pytest tests/contracts/test_openapi_documentation_quality.py -q`
 - Hardening de predict experimental: `pytest tests/test_predict.py -q`
+- Suite de carga/estres backend (k6): `scripts/load/README.md`
+- Politica de ejecucion de carga/estres: `docs/load_testing.md`
 
 ## SonarCloud (analisis local desde .env)
 - Variables requeridas en `.env`:

@@ -747,3 +747,66 @@ Correcciones/hardening aplicados:
 Estado reportado:
 - Sonar Quality Gate en `PASSED`.
 - Open issues en new code period: `0`.
+
+## Actualizacion de sesion (2026-05-10) - perf_safe_backend_optimization_audit_v1
+Alcance:
+- Auditoria backend de performance/estabilidad/seguridad operativa en rama:
+  - `perf/safe-backend-optimization-audit`.
+- Se preservo worktree sucio preexistente sin limpieza/integracion.
+- Archivos protegidos sin tocar:
+  - `scripts/hardening_second_pass.py`
+  - `scripts/rebuild_dsm5_exact_datasets.py`
+  - `scripts/run_pipeline.py`
+  - `scripts/seed_users.py`
+  - `tests/test_health.py`
+
+Evidencia de estado inicial:
+- `reports/audit/backend_perf_stability_security_audit_2026-05-10.md`
+  - incluye `git status --short` y resumen de `git diff` de los archivos protegidos.
+
+Cambios seguros aplicados:
+- Cache de modelo en predict:
+  - `core/models/predictor.py` (`lru_cache` para evitar `joblib.load` por request).
+- Reduccion de queries repetidas en v2:
+  - `api/services/questionnaire_v2_service.py`
+    - `save_answers` con prefetch de preguntas/respuestas/repeat mapping,
+    - `list_history` sin N+1 para summary,
+    - `_recompute_progress` con agregacion unica.
+- Configuracion operativa tunable por entorno:
+  - `config/settings.py`: `DB_POOL_*` + `RATELIMIT_STORAGE_URI`.
+  - `docker/entrypoint.sh`: soporte opcional `GUNICORN_TIMEOUT`, `GUNICORN_KEEPALIVE`, `GUNICORN_MAX_REQUESTS`, `GUNICORN_MAX_REQUESTS_JITTER`.
+  - `.env.example` y `README.md` actualizados.
+
+Suite formal k6 agregada:
+- `scripts/load/helpers.js`
+- `scripts/load/k6_smoke.js`
+- `scripts/load/k6_baseline.js`
+- `scripts/load/k6_load.js`
+- `scripts/load/k6_stress.js`
+- `scripts/load/k6_spike.js`
+- `scripts/load/k6_soak.js`
+- `scripts/load/k6_questionnaire_v2_flow.js`
+- `scripts/load/README.md`
+- `scripts/k6_smoke.js` mantenido compatible y alineado.
+
+Documentacion/evidencia de carga:
+- `docs/load_testing.md`
+- `reports/load_tests/README.md`
+- `reports/load_tests/summary_template.md`
+- `reports/load_tests/2026-05-10_preopt_production_smoke_summary.md`
+
+Baseline probe de despliegue (ligero, no stress):
+- `GET /healthz` y `GET /readyz` en root => `200`.
+- `GET /api/healthz` y `GET /api/readyz` => `404` en despliegue observado.
+- endpoints autenticados sin token => `401` esperado.
+- caveat TLS en esta estacion: probe ejecutado con verificacion TLS desactivada para reachability.
+
+Validacion local en esta ventana:
+- `ruff check --select F api tests` => `passed`.
+- `python -m compileall -q api app config core scripts run.py` => `passed`.
+- `python -c "from api.app import create_app; app = create_app(); print(app.name)"` => `api.app`.
+- `pytest -q` => `148 passed, 3 skipped`.
+- `docker build` no ejecutable por daemon local no disponible.
+
+Pendiente operativo:
+- carga/estres real contra `https://www.cognia.lat/api` queda `por confirmar` hasta contar con credenciales de prueba dedicadas y ventana controlada.
