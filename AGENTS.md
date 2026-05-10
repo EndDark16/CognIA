@@ -781,3 +781,24 @@ Claim metodologico sin cambios:
   - `python -c "from api.app import create_app; app = create_app(); print(app.name)"`: OK
   - `pytest -q`: `188 passed, 3 skipped`
   - `k6 inspect` completo (suite previa + A2): OK
+
+## Actualizacion de estado (2026-05-10) - a2_capacity_reliability_postdeploy_validation
+- Se completo despliegue A2 hasta `main` con SHA `9d2a4f9f9898940af2a6b32d398b90832ea4efbc`.
+- PRs completados:
+  - `#150` perf/a2 -> dev.enddark
+  - `#151` dev.enddark -> development
+  - `#152` development -> main
+- Verificacion de salud post-deploy:
+  - `https://www.cognia.lat/healthz` => `200`
+  - `https://www.cognia.lat/readyz` => `200`
+  - `https://www.cognia.lat/api/healthz` => `404` esperado
+  - `https://www.cognia.lat/api/readyz` => `404` esperado
+- Warmup script Python (`scripts/warmup_backend.py`) encontro bloqueo CDN/WAF local (`403`, code `1010`) en `/healthz`; se aplico warmup manual seguro con `curl` y endpoints read-only con respuesta `200`.
+- Resultados k6 A2 postopt en produccion (usuario sintetico):
+  - `auth_read` 10 VUs: error `0.0000%`, p95 `1032.80 ms`
+  - `qv2_active_read` 10 VUs: error `0.0000%`, p95 `1212.13 ms`
+  - `user_journey_read` 10 VUs: error `0.0000%`, p95 `1104.68 ms`
+  - `user_journey_read` 15 VUs: error `0.0000%`, p95 `754.89 ms`
+  - `user_journey_read` 20 VUs: error `0.0000%`, p95 `836.62 ms`
+  - `capacity_ladder` 10->30 VUs: criterio de parada activado por `http_req_failed=5.10%` (degradacion controlada en tramo alto)
+- Se confirma continuidad de claim: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
