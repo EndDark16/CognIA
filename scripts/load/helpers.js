@@ -289,6 +289,45 @@ function outputBasePath(config, scenarioName) {
   return `${normalized}/${fileBase}`;
 }
 
+function extractEndpointLatencyRows(data) {
+  const metrics = (data && data.metrics) || {};
+  const rows = [];
+  for (const [metricName, metricData] of Object.entries(metrics)) {
+    const match = metricName.match(/^http_req_duration\{endpoint:([^}]+)\}$/);
+    if (!match || !metricData || !metricData.values) {
+      continue;
+    }
+    const endpoint = match[1];
+    rows.push({
+      endpoint,
+      p95: metricData.values["p(95)"],
+      p99: metricData.values["p(99)"],
+      avg: metricData.values.avg,
+      max: metricData.values.max,
+    });
+  }
+  rows.sort((a, b) => String(a.endpoint).localeCompare(String(b.endpoint)));
+  return rows;
+}
+
+function extractStatusRows(data) {
+  const metrics = (data && data.metrics) || {};
+  const rows = [];
+  for (const [metricName, metricData] of Object.entries(metrics)) {
+    const match = metricName.match(/^http_reqs\{status:([^}]+)\}$/);
+    if (!match || !metricData || !metricData.values) {
+      continue;
+    }
+    rows.push({
+      status: match[1],
+      count: metricData.values.count,
+      rate: metricData.values.rate,
+    });
+  }
+  rows.sort((a, b) => Number(a.status) - Number(b.status));
+  return rows;
+}
+
 export function buildSummaryOutputs(scenarioName, data, config) {
   const base = outputBasePath(config, scenarioName);
   const httpFailed = metricValue(data, "http_req_failed", "rate");
@@ -299,6 +338,8 @@ export function buildSummaryOutputs(scenarioName, data, config) {
   const p95 = metricValue(data, "http_req_duration", "p(95)");
   const p99 = metricValue(data, "http_req_duration", "p(99)");
   const max = metricValue(data, "http_req_duration", "max");
+  const endpointLatencyRows = extractEndpointLatencyRows(data);
+  const statusRows = extractStatusRows(data);
 
   const markdown = [
     `# k6 ${scenarioName} summary`,
@@ -324,6 +365,21 @@ export function buildSummaryOutputs(scenarioName, data, config) {
       ? data.root_group.checks.map(
           (checkItem) => `- ${checkItem.name}: pass=${checkItem.passes} fail=${checkItem.fails}`
         )
+      : ["- N/A"]),
+    "",
+    "## Endpoint latency (if available)",
+    ...(endpointLatencyRows.length > 0
+      ? endpointLatencyRows.map(
+          (row) =>
+            `- ${row.endpoint}: p95=${formatNumber(row.p95)}ms p99=${formatNumber(row.p99)}ms avg=${formatNumber(
+              row.avg
+            )}ms max=${formatNumber(row.max)}ms`
+        )
+      : ["- N/A"]),
+    "",
+    "## Status breakdown (if available)",
+    ...(statusRows.length > 0
+      ? statusRows.map((row) => `- ${row.status}: count=${row.count} rate=${formatNumber(row.rate, 4)}`)
       : ["- N/A"]),
     "",
   ].join("\n");

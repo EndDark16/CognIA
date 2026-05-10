@@ -67,6 +67,12 @@ Scenario suite:
 - `scripts/load/k6_spike.js`
 - `scripts/load/k6_soak.js`
 - `scripts/load/k6_questionnaire_v2_flow.js`
+- `scripts/load/k6_infra_smoke.js`
+- `scripts/load/k6_auth_read.js`
+- `scripts/load/k6_qv2_active_read.js`
+- `scripts/load/k6_user_journey_read.js`
+- `scripts/load/k6_capacity_ladder.js`
+- `scripts/load/k6_constant_rps.js`
 
 Usage details:
 - `scripts/load/README.md`
@@ -88,8 +94,13 @@ Usage details:
 - `DB_POOL_PRE_PING=true`
 - `READINESS_CACHE_TTL_SECONDS=5`
 - `READINESS_DB_TIMEOUT_MS=1200`
-- `QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS=20`
-- `JWT_SECURITY_STATE_CACHE_TTL_SECONDS=45`
+- `QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS=300`
+- `QV2_ACTIVE_VERSION_CACHE_TTL_SECONDS=120`
+- `QV2_ACTIVE_ACTIVATION_CACHE_TTL_SECONDS=300`
+- `JWT_SECURITY_STATE_CACHE_TTL_SECONDS=60`
+- `AUTH_ME_CACHE_TTL_SECONDS=60`
+- `CACHE_BACKEND_URI=` (empty => memory)
+- `CACHE_KEY_PREFIX=cognia`
 
 Notes:
 - Favor stability and predictable latency over max throughput.
@@ -105,6 +116,18 @@ Notes:
 - For global shared rate limits, configure Redis/Valkey:
   - `RATE_LIMIT_STORAGE_URI=redis://<host>:<port>/<db>`
 - Keep fallback to `memory://` for compatibility when Redis is unavailable.
+
+Cache backend (A2):
+- Local fallback by default: `CACHE_BACKEND_URI=` (memory backend).
+- Optional distributed cache:
+  - `CACHE_BACKEND_URI=redis://<host>:<port>/<db>`
+  - `CACHE_KEY_PREFIX=cognia`
+- Backend falls back to memory if Redis is unavailable or not installed.
+
+Warmup (A2):
+- Script: `python scripts/warmup_backend.py`
+- Performs: `/healthz`, `/readyz`, `/api/auth/login`, `/api/auth/me`, `/api/v2/security/transport-key`, `/api/v2/questionnaires/active` by configured role/mode.
+- Safe-only behavior: no create session, no submit, no PDF.
 
 ## Evidence Storage
 Raw outputs:
