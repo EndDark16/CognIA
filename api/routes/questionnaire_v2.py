@@ -152,6 +152,7 @@ def get_transport_key():
 
 @questionnaire_v2_bp.post("/questionnaires/sessions")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_SESSION_CREATE_RATE_LIMIT", "60 per minute"))
 def create_session():
     user_id, user = _current_user()
     if not user_id or not user:
@@ -292,6 +293,7 @@ def get_session_page_secure(session_id: str):
 
 @questionnaire_v2_bp.patch("/questionnaires/sessions/<session_id>/answers")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_SAVE_ANSWERS_RATE_LIMIT", "120 per minute"))
 def patch_answers(session_id: str):
     user_id, user = _current_user()
     if not user_id or not user:
@@ -331,6 +333,7 @@ def patch_answers(session_id: str):
 
 @questionnaire_v2_bp.post("/questionnaires/sessions/<session_id>/submit")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_SUBMIT_RATE_LIMIT", "20 per minute"))
 def submit_session(session_id: str):
     user_id, user = _current_user()
     if not user_id or not user:
@@ -471,6 +474,7 @@ def history_results_secure(session_id: str):
 
 @questionnaire_v2_bp.post("/questionnaires/history/<session_id>/clinical-summary")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_CLINICAL_SUMMARY_RATE_LIMIT", "30 per minute"))
 def history_clinical_summary(session_id: str):
     user_id, user = _current_user()
     if not user_id or not user:
@@ -649,6 +653,7 @@ def shared_access_secure():
 
 @questionnaire_v2_bp.post("/questionnaires/history/<session_id>/pdf/generate")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_PDF_RATE_LIMIT", "8 per minute"))
 def pdf_generate(session_id: str):
     user_id, user = _current_user()
     if not user_id or not user:
@@ -786,6 +791,7 @@ def pdf_download(session_id: str):
 
 @questionnaire_v2_bp.get("/dashboard/adoption-history")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_adoption_history():
     schema = DashboardQuerySchema()
     try:
@@ -797,6 +803,7 @@ def dashboard_adoption_history():
 
 @questionnaire_v2_bp.get("/dashboard/questionnaire-volume")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_questionnaire_volume():
     schema = DashboardQuerySchema()
     try:
@@ -808,6 +815,7 @@ def dashboard_questionnaire_volume():
 
 @questionnaire_v2_bp.get("/dashboard/user-growth")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_user_growth():
     schema = DashboardQuerySchema()
     try:
@@ -819,6 +827,7 @@ def dashboard_user_growth():
 
 @questionnaire_v2_bp.get("/dashboard/funnel")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_funnel():
     schema = DashboardQuerySchema()
     try:
@@ -830,6 +839,7 @@ def dashboard_funnel():
 
 @questionnaire_v2_bp.get("/dashboard/retention")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_retention():
     schema = DashboardQuerySchema()
     try:
@@ -841,6 +851,7 @@ def dashboard_retention():
 
 @questionnaire_v2_bp.get("/dashboard/productivity")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_productivity():
     schema = DashboardQuerySchema()
     try:
@@ -852,6 +863,7 @@ def dashboard_productivity():
 
 @questionnaire_v2_bp.get("/dashboard/questionnaire-quality")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_questionnaire_quality():
     schema = DashboardQuerySchema()
     try:
@@ -863,6 +875,7 @@ def dashboard_questionnaire_quality():
 
 @questionnaire_v2_bp.get("/dashboard/data-quality")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_data_quality():
     schema = DashboardQuerySchema()
     try:
@@ -874,6 +887,7 @@ def dashboard_data_quality():
 
 @questionnaire_v2_bp.get("/dashboard/api-health")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_api_health():
     schema = DashboardQuerySchema()
     try:
@@ -885,6 +899,7 @@ def dashboard_api_health():
 
 @questionnaire_v2_bp.get("/dashboard/model-monitoring")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_model_monitoring():
     schema = DashboardQuerySchema()
     try:
@@ -896,6 +911,7 @@ def dashboard_model_monitoring():
 
 @questionnaire_v2_bp.get("/dashboard/drift")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_drift():
     schema = DashboardQuerySchema()
     try:
@@ -907,6 +923,7 @@ def dashboard_drift():
 
 @questionnaire_v2_bp.get("/dashboard/equity")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_equity():
     schema = DashboardQuerySchema()
     try:
@@ -918,6 +935,7 @@ def dashboard_equity():
 
 @questionnaire_v2_bp.get("/dashboard/human-review")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_human_review():
     schema = DashboardQuerySchema()
     try:
@@ -929,6 +947,7 @@ def dashboard_human_review():
 
 @questionnaire_v2_bp.get("/dashboard/executive-summary")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_DASHBOARD_RATE_LIMIT", "90 per minute"))
 def dashboard_executive_summary():
     schema = DashboardQuerySchema()
     try:
@@ -940,6 +959,7 @@ def dashboard_executive_summary():
 
 @questionnaire_v2_bp.post("/reports/jobs")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_REPORT_RATE_LIMIT", "20 per minute"))
 def create_report_job():
     user_id, user = _current_user()
     if not user_id or not user:

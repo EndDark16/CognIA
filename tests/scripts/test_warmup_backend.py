@@ -11,6 +11,7 @@ from scripts.warmup_backend import (
     build_config,
     default_api_prefix_from_base,
     normalize_api_prefix,
+    parse_headers,
 )
 
 
@@ -45,7 +46,49 @@ def test_build_config_uses_empty_prefix_when_base_already_has_api(monkeypatch):
         warmup_modes=None,
         warmup_roles=None,
         safe_mode=None,
+        user_agent=None,
+        headers=None,
+        insecure=None,
+        curl_compatible_mode=None,
     )
     cfg = build_config(args)
     assert cfg.base_url == "https://www.cognia.lat/api"
     assert cfg.api_prefix == ""
+
+
+def test_parse_headers_supports_env_and_args():
+    headers = parse_headers(
+        ["X-Test: one", "X-Trace=two"],
+        "X-Env=ok;X-Ignore",
+    )
+    assert headers["X-Test"] == "one"
+    assert headers["X-Trace"] == "two"
+    assert headers["X-Env"] == "ok"
+
+
+def test_build_config_reads_user_agent_and_curl_mode(monkeypatch):
+    monkeypatch.setenv("BASE_URL", "https://www.cognia.lat")
+    monkeypatch.setenv("SAFE_MODE", "true")
+    monkeypatch.setenv("WARMUP_USER_AGENT", "Warmup-A3-Test/1.0")
+    monkeypatch.setenv("WARMUP_CURL_COMPATIBLE_MODE", "true")
+    monkeypatch.setenv("WARMUP_EXTRA_HEADERS", "X-Env=ready")
+
+    args = argparse.Namespace(
+        base_url=None,
+        api_prefix=None,
+        username=None,
+        password=None,
+        timeout_seconds=None,
+        warmup_modes=None,
+        warmup_roles=None,
+        safe_mode=None,
+        user_agent=None,
+        headers=["X-Test: yes"],
+        insecure=None,
+        curl_compatible_mode=None,
+    )
+    cfg = build_config(args)
+    assert cfg.user_agent == "Warmup-A3-Test/1.0"
+    assert cfg.curl_compatible_mode is True
+    assert cfg.extra_headers["X-Env"] == "ready"
+    assert cfg.extra_headers["X-Test"] == "yes"

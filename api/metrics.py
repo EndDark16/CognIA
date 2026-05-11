@@ -2,6 +2,7 @@ import threading
 import time
 from collections import defaultdict, deque
 from flask import Blueprint, jsonify, current_app, request
+from urllib.parse import urlparse, urlunparse
 
 
 _LOCK = threading.Lock()
@@ -26,6 +27,31 @@ _ERROR_KEYS = {
     "server_error",
     "runtime_artifact_unavailable",
 }
+
+
+def _mask_uri_credentials(raw_uri: str | None) -> str:
+    if not raw_uri:
+        return "memory://"
+    try:
+        parsed = urlparse(raw_uri)
+        if parsed.username or parsed.password:
+            host = parsed.hostname or ""
+            if parsed.port:
+                host = f"{host}:{parsed.port}"
+            netloc = f"***:***@{host}" if host else "***:***"
+            return urlunparse(
+                (
+                    parsed.scheme,
+                    netloc,
+                    parsed.path,
+                    parsed.params,
+                    parsed.query,
+                    parsed.fragment,
+                )
+            )
+        return raw_uri
+    except Exception:
+        return "<invalid_rate_limit_uri>"
 
 
 def _normalize_excluded_tokens(values) -> set[str]:
@@ -133,6 +159,21 @@ def _approx_p95(values: deque[float]) -> float:
 
 
 def _snapshot_metrics() -> dict:
+    cache_info = {"backend": "memory", "prefix": "cognia"}
+    cache_detail = {}
+    try:
+        from api.cache import cache_backend_info, cache_metrics_snapshot
+
+        cache_info = cache_backend_info()
+        cache_detail = cache_metrics_snapshot()
+    except Exception:
+        cache_info = {"backend": "unknown", "prefix": "unknown"}
+        cache_detail = {}
+
+    rate_limit_storage = _mask_uri_credentials(
+        current_app.config.get("RATELIMIT_STORAGE_URI", "memory://")
+    )
+
     with _LOCK:
         total_requests = _TOTAL_REQUESTS
         total_latency = _TOTAL_LATENCY_MS
@@ -175,6 +216,9 @@ def _snapshot_metrics() -> dict:
         "endpoint_latency_ms_max": endpoint_max,
         "endpoint_latency_ms_p95_approx": endpoint_p95,
         "error_counts": error_counts,
+        "cache_backend": cache_info,
+        "cache_metrics": cache_detail,
+        "rate_limit_storage_uri": rate_limit_storage,
     }
 
 
