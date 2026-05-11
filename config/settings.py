@@ -31,6 +31,16 @@ def _int_env(name: str, default: int | None) -> int | None:
         return default
 
 
+def _float_env(name: str, default: float) -> float:
+    value = os.getenv(name)
+    if value is None or value == "":
+        return default
+    try:
+        return float(value)
+    except ValueError:
+        return default
+
+
 class Config:
     DEBUG = False
     TESTING = False
@@ -127,6 +137,13 @@ class Config:
     QR_PIN_LOCK_MINUTES = int(os.getenv("QR_PIN_LOCK_MINUTES", "10"))
     QV2_SHARED_ACCESS_RATE_LIMIT = os.getenv("QV2_SHARED_ACCESS_RATE_LIMIT", "30 per minute")
     QV2_TRANSPORT_KEY_RATE_LIMIT = os.getenv("QV2_TRANSPORT_KEY_RATE_LIMIT", "60 per minute")
+    QV2_SESSION_CREATE_RATE_LIMIT = os.getenv("QV2_SESSION_CREATE_RATE_LIMIT", "60 per minute")
+    QV2_SAVE_ANSWERS_RATE_LIMIT = os.getenv("QV2_SAVE_ANSWERS_RATE_LIMIT", "120 per minute")
+    QV2_SUBMIT_RATE_LIMIT = os.getenv("QV2_SUBMIT_RATE_LIMIT", "20 per minute")
+    QV2_PDF_RATE_LIMIT = os.getenv("QV2_PDF_RATE_LIMIT", "8 per minute")
+    QV2_DASHBOARD_RATE_LIMIT = os.getenv("QV2_DASHBOARD_RATE_LIMIT", "90 per minute")
+    QV2_REPORT_RATE_LIMIT = os.getenv("QV2_REPORT_RATE_LIMIT", "20 per minute")
+    QV2_CLINICAL_SUMMARY_RATE_LIMIT = os.getenv("QV2_CLINICAL_SUMMARY_RATE_LIMIT", "30 per minute")
     QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS = _int_env("QV2_TRANSPORT_KEY_CACHE_TTL_SECONDS", 60)
     QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS = _int_env("QV2_ACTIVE_PAYLOAD_CACHE_TTL_SECONDS", 300)
     QV2_ACTIVE_VERSION_CACHE_TTL_SECONDS = _int_env("QV2_ACTIVE_VERSION_CACHE_TTL_SECONDS", 120)
@@ -142,6 +159,7 @@ class Config:
     PROBLEM_REPORT_MAX_ATTACHMENT_BYTES = int(os.getenv("PROBLEM_REPORT_MAX_ATTACHMENT_BYTES", str(5 * 1024 * 1024)))
     _problem_allowed_mime = os.getenv("PROBLEM_REPORT_ALLOWED_MIME_TYPES", "image/png,image/jpeg,image/webp")
     PROBLEM_REPORT_ALLOWED_MIME_TYPES = [x.strip() for x in _problem_allowed_mime.split(",") if x.strip()]
+    PROBLEM_REPORT_CREATE_RATE_LIMIT = os.getenv("PROBLEM_REPORT_CREATE_RATE_LIMIT", "20 per 10 minutes")
 
     # Logging / Metrics
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
@@ -163,8 +181,14 @@ class Config:
         item.strip() for item in _metrics_exclude_endpoint_details.split(",") if item.strip()
     }
     CACHE_BACKEND_URI = os.getenv("CACHE_BACKEND_URI", "").strip()
+    CACHE_BACKEND_REQUIRED = _bool_env("CACHE_BACKEND_REQUIRED", False)
+    CACHE_FAIL_OPEN = _bool_env("CACHE_FAIL_OPEN", True)
+    CACHE_DEFAULT_TTL_SECONDS = _int_env("CACHE_DEFAULT_TTL_SECONDS", 300)
+    CACHE_REDIS_SOCKET_TIMEOUT = _float_env("CACHE_REDIS_SOCKET_TIMEOUT", 0.25)
+    CACHE_REDIS_CONNECT_TIMEOUT = _float_env("CACHE_REDIS_CONNECT_TIMEOUT", 0.25)
     CACHE_KEY_PREFIX = os.getenv("CACHE_KEY_PREFIX", "cognia").strip() or "cognia"
     RATELIMIT_ENABLED = os.getenv("RATELIMIT_ENABLED", "true").lower() == "true"
+    RATE_LIMIT_FAIL_OPEN = _bool_env("RATE_LIMIT_FAIL_OPEN", True)
     RATELIMIT_STORAGE_URI = os.getenv("RATE_LIMIT_STORAGE_URI", "memory://")
 
     # Proxy and response hardening

@@ -39,6 +39,7 @@ Introduce durable async execution for heavy operations (PDF, reporting, email, o
 ## Backward-Compatible Migration Strategy
 1. Keep current synchronous endpoint behavior as default.
 2. Add internal enqueue layer behind feature flags.
+   - A3 internal base: `api/services/job_queue_service.py` with queue primitives (`enqueue`, `claim`, `mark_succeeded`, `mark_failed`, `queue_snapshot`).
 3. If async enabled:
    - endpoints may still return the existing payload for current clients, while persisting job state.
    - optionally expose additional non-breaking metadata fields where safe.
