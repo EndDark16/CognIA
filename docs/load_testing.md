@@ -101,6 +101,16 @@ Usage details:
 - `AUTH_ME_CACHE_TTL_SECONDS=60`
 - `CACHE_BACKEND_URI=` (empty => memory)
 - `CACHE_KEY_PREFIX=cognia`
+- `CACHE_BACKEND_REQUIRED=false`
+- `CACHE_FAIL_OPEN=true`
+- `CACHE_DEFAULT_TTL_SECONDS=300`
+- `CACHE_REDIS_SOCKET_TIMEOUT=0.25`
+- `CACHE_REDIS_CONNECT_TIMEOUT=0.25`
+- `RATE_LIMIT_FAIL_OPEN=true`
+- `QV2_SUBMIT_RATE_LIMIT=20 per minute`
+- `QV2_PDF_RATE_LIMIT=8 per minute`
+- `QV2_DASHBOARD_RATE_LIMIT=90 per minute`
+- `PROBLEM_REPORT_CREATE_RATE_LIMIT=20 per 10 minutes`
 
 Notes:
 - Favor stability and predictable latency over max throughput.
@@ -129,9 +139,17 @@ Warmup (A2):
 - Performs: `/healthz`, `/readyz`, `/api/auth/login`, `/api/auth/me`, `/api/v2/security/transport-key`, `/api/v2/questionnaires/active` by configured role/mode.
 - Safe-only behavior: no create session, no submit, no PDF.
 
+Warmup fallback (A3):
+- If Python warmup is blocked by CDN/WAF (`403`/`1010`), use:
+  - `bash scripts/warmup_backend.sh`
+- Script keeps safe behavior and avoids printing token/password.
+
 ## Evidence Storage
 Raw outputs:
 - `artifacts/load_tests/<timestamp>_<scenario>/...`
 
 Versioned summaries:
 - `reports/load_tests/<timestamp>_<scenario>_summary.md`
+
+Optional host-level snapshot during load window:
+- `bash scripts/capture_host_snapshot.sh`

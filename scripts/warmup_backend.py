@@ -1,12 +1,17 @@
 import argparse
 import json
 import os
+import ssl
 import sys
 import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from typing import Any
+
+
+class WarmupBlockedError(RuntimeError):
+    """Raised when warmup traffic is blocked by CDN/WAF."""
 
 
 def parse_bool(raw: str | None, default: bool = False) -> bool:
@@ -75,6 +80,42 @@ def parse_csv_items(raw: str | None, default_items: list[str]) -> list[str]:
     return [item for item in items if item]
 
 
+def parse_headers(raw_items: list[str] | None, raw_env: str | None) -> dict[str, str]:
+    headers: dict[str, str] = {}
+
+    if raw_env:
+        for item in str(raw_env).split(";"):
+            part = item.strip()
+            if not part or "=" not in part:
+                continue
+            key, value = part.split("=", 1)
+            key = key.strip()
+            value = value.strip()
+            if key:
+                headers[key] = value
+
+    for entry in raw_items or []:
+        text = str(entry or "").strip()
+        if not text:
+            continue
+        separator = ":" if ":" in text else "="
+        if separator not in text:
+            continue
+        key, value = text.split(separator, 1)
+        key = key.strip()
+        value = value.strip()
+        if key:
+            headers[key] = value
+
+    return headers
+
+
+def _looks_like_waf_1010(payload: Any) -> bool:
+    text = str(payload or "")
+    lowered = text.lower()
+    return "1010" in lowered and ("access denied" in lowered or "cloudflare" in lowered)
+
+
 @dataclass
 class WarmupConfig:
     base_url: str
@@ -85,6 +126,10 @@ class WarmupConfig:
     safe_mode: bool
     warmup_modes: list[str]
     warmup_roles: list[str]
+    user_agent: str
+    extra_headers: dict[str, str]
+    insecure: bool
+    curl_compatible_mode: bool
 
 
 def build_config(args: argparse.Namespace) -> WarmupConfig:
@@ -96,6 +141,10 @@ def build_config(args: argparse.Namespace) -> WarmupConfig:
         else os.getenv("API_PREFIX") if has_api_prefix_env else default_api_prefix_from_base(base_url)
     )
     api_prefix = normalize_api_prefix(base_url, prefix_input)
+
+    raw_header_list = getattr(args, "headers", None)
+    extra_headers = parse_headers(raw_header_list, os.getenv("WARMUP_EXTRA_HEADERS"))
+
     return WarmupConfig(
         base_url=base_url,
         api_prefix=api_prefix,
@@ -108,6 +157,20 @@ def build_config(args: argparse.Namespace) -> WarmupConfig:
         ),
         warmup_modes=parse_csv_items(args.warmup_modes or os.getenv("WARMUP_MODES"), ["short", "medium"]),
         warmup_roles=parse_csv_items(args.warmup_roles or os.getenv("WARMUP_ROLES"), ["guardian", "psychologist"]),
+        user_agent=str(args.user_agent or os.getenv("WARMUP_USER_AGENT") or "CognIA-Warmup/1.0").strip(),
+        extra_headers=extra_headers,
+        insecure=parse_bool(
+            str(args.insecure if args.insecure is not None else os.getenv("WARMUP_INSECURE")),
+            False,
+        ),
+        curl_compatible_mode=parse_bool(
+            str(
+                args.curl_compatible_mode
+                if args.curl_compatible_mode is not None
+                else os.getenv("WARMUP_CURL_COMPATIBLE_MODE")
+            ),
+            False,
+        ),
     )
 
 
@@ -118,16 +181,23 @@ def request_json(
     timeout_seconds: int,
     headers: dict[str, str] | None = None,
     payload: dict[str, Any] | None = None,
+    user_agent: str,
+    insecure: bool,
 ) -> tuple[int, Any]:
     body = None
     req_headers = dict(headers or {})
+    req_headers.setdefault("User-Agent", user_agent)
     if payload is not None:
         body = json.dumps(payload).encode("utf-8")
         req_headers.setdefault("Content-Type", "application/json")
 
     request = urllib.request.Request(url=url, data=body, method=method.upper(), headers=req_headers)
+    context = None
+    if insecure:
+        context = ssl._create_unverified_context()
+
     try:
-        with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+        with urllib.request.urlopen(request, timeout=timeout_seconds, context=context) as response:
             raw = response.read().decode("utf-8")
             content_type = response.headers.get("Content-Type", "")
             if "application/json" in content_type.lower():
@@ -139,17 +209,34 @@ def request_json(
     except urllib.error.HTTPError as exc:
         raw = exc.read().decode("utf-8") if exc.fp else ""
         try:
-            return exc.code, json.loads(raw)
+            parsed = json.loads(raw)
         except Exception:
-            return exc.code, raw
+            parsed = raw
+
+        if exc.code == 403 and _looks_like_waf_1010(parsed):
+            raise WarmupBlockedError(
+                "Warmup blocked by CDN/WAF (403/1010). Use scripts/warmup_backend.sh (curl fallback) "
+                "or whitelist this client user-agent/IP."
+            ) from exc
+
+        return exc.code, parsed
 
 
 def run_warmup(config: WarmupConfig) -> dict[str, Any]:
     steps: list[dict[str, Any]] = []
 
+    shared_headers = dict(config.extra_headers)
+
     for root_path in ("/healthz", "/readyz"):
         url = build_root_url(config.base_url, root_path)
-        status_code, payload = request_json("GET", url, timeout_seconds=config.timeout_seconds)
+        status_code, payload = request_json(
+            "GET",
+            url,
+            timeout_seconds=config.timeout_seconds,
+            headers=shared_headers,
+            user_agent=config.user_agent,
+            insecure=config.insecure,
+        )
         steps.append({"step": root_path, "status": status_code})
         if status_code != 200:
             raise RuntimeError(f"warmup failed at {root_path}: status={status_code} payload={payload}")
@@ -157,11 +244,18 @@ def run_warmup(config: WarmupConfig) -> dict[str, Any]:
     token = None
     if config.username and config.password:
         login_url = build_api_url(config.base_url, config.api_prefix, "/auth/login")
+        login_headers = dict(shared_headers)
+        if config.curl_compatible_mode:
+            login_headers.setdefault("Accept", "application/json")
+
         status_code, payload = request_json(
             "POST",
             login_url,
             timeout_seconds=config.timeout_seconds,
+            headers=login_headers,
             payload={"identifier": config.username, "password": config.password},
+            user_agent=config.user_agent,
+            insecure=config.insecure,
         )
         steps.append({"step": "auth/login", "status": status_code})
         if status_code != 200 or not isinstance(payload, dict) or not payload.get("access_token"):
@@ -172,6 +266,8 @@ def run_warmup(config: WarmupConfig) -> dict[str, Any]:
 
     if token:
         auth_headers = {"Authorization": f"Bearer {token}"}
+        auth_headers.update(shared_headers)
+
         for path in ("/auth/me", "/v2/security/transport-key"):
             url = build_api_url(config.base_url, config.api_prefix, path)
             status_code, payload = request_json(
@@ -179,6 +275,8 @@ def run_warmup(config: WarmupConfig) -> dict[str, Any]:
                 url,
                 timeout_seconds=config.timeout_seconds,
                 headers=auth_headers,
+                user_agent=config.user_agent,
+                insecure=config.insecure,
             )
             steps.append({"step": path, "status": status_code})
             if status_code != 200:
@@ -194,6 +292,8 @@ def run_warmup(config: WarmupConfig) -> dict[str, Any]:
                     url,
                     timeout_seconds=config.timeout_seconds,
                     headers=auth_headers,
+                    user_agent=config.user_agent,
+                    insecure=config.insecure,
                 )
                 steps.append({"step": f"qv2_active:{role}:{mode}", "status": status_code})
                 if status_code != 200:
@@ -205,6 +305,9 @@ def run_warmup(config: WarmupConfig) -> dict[str, Any]:
         "base_url": config.base_url,
         "api_prefix": config.api_prefix,
         "safe_mode": config.safe_mode,
+        "user_agent": config.user_agent,
+        "insecure": config.insecure,
+        "curl_compatible_mode": config.curl_compatible_mode,
         "steps": steps,
     }
 
@@ -219,6 +322,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--warmup-modes", dest="warmup_modes", default=None)
     parser.add_argument("--warmup-roles", dest="warmup_roles", default=None)
     parser.add_argument("--safe-mode", dest="safe_mode", default=None)
+    parser.add_argument("--user-agent", dest="user_agent", default=None)
+    parser.add_argument("--header", dest="headers", action="append", default=None)
+    parser.add_argument("--insecure", dest="insecure", default=None)
+    parser.add_argument("--curl-compatible-mode", dest="curl_compatible_mode", default=None)
     return parser.parse_args(argv)
 
 
@@ -229,7 +336,12 @@ def main(argv: list[str]) -> int:
         print("SAFE_MODE=false is not allowed for warmup_backend.py")
         return 2
 
-    summary = run_warmup(config)
+    try:
+        summary = run_warmup(config)
+    except WarmupBlockedError as exc:
+        print(str(exc))
+        return 3
+
     print(json.dumps(summary, ensure_ascii=True, indent=2))
     return 0
 
