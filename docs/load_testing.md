@@ -143,6 +143,8 @@ Warmup fallback (A3):
 - If Python warmup is blocked by CDN/WAF (`403`/`1010`), use:
   - `bash scripts/warmup_backend.sh`
 - Script keeps safe behavior and avoids printing token/password.
+- For Windows Schannel revocation issues, set:
+  - `WARMUP_CURL_SSL_NO_REVOKE=true`
 
 ## Evidence Storage
 Raw outputs:
