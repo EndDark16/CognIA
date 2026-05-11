@@ -903,3 +903,30 @@ Actualizacion operativa (2026-05-10) - ejecucion real en produccion:
   - `user_journey_read` 20 VUs: `0.0000%` errors, p95 `836.62 ms`
   - `capacity_ladder` (10->30 VUs): degraded at high stage, abort triggered by `http_req_failed=5.10%`
 - Conclusion of operational window: stable user-journey capacity observed through 20 VUs; high-stage degradation appears near top ladder range in current homelab constraints.
+
+## Update 2026-05-10 - A3 Professional Reliability Post-Deploy
+- Runtime verified in `main` at SHA `f69252321cd26d8c5f8657223a0a027183bd52e5`.
+- Health checks:
+  - `https://www.cognia.lat/healthz` => `200`
+  - `https://www.cognia.lat/readyz` => `200`
+  - `/api/healthz` and `/api/readyz` => `404` expected
+- Safe warmup:
+  - `scripts/warmup_backend.py` successful (`200` on all planned non-destructive steps)
+  - `scripts/warmup_backend.sh` initially failed on Windows Schannel revocation, then validated after A3 hardening:
+    - optional flag `WARMUP_CURL_SSL_NO_REVOKE=true`
+    - login token parse fix in shell script
+- k6 postopt A3 results (production):
+  - `infra_smoke`: error `0.61%`, p95 `1137.97 ms`
+  - `auth_read` 10 VUs: error `0%`, p95 `487.08 ms`
+  - `qv2_active_read` 10 VUs: error `0%`, p95 `510.30 ms`
+  - `user_journey_read` 10/20/25/30 VUs: error `0%`, p95 `460.52 / 464.52 / 547.24 / 585.41 ms`
+  - `capacity_ladder` 10->30: threshold abort at high stage (`http_req_failed=5.04%`)
+  - `constant_rps` controlled:
+    - 5->10: error `0%`, p95 `387.56 ms`
+    - 5->10->15: error `0%`, p95 `395.96 ms`
+- Operational interpretation:
+  - dedicated user-journey runs remained stable through 30 VUs.
+  - degradation still appears in sustained high-stage ladder zone (25-30 VUs equivalent), consistent with homelab constraints.
+- Versioned evidence:
+  - `reports/load_tests/2026-05-10_a3_postopt_*_summary.md`
+  - `reports/performance/2026-05-10_a3_professional_reliability_final_report.md`
