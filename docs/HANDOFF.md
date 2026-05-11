@@ -930,3 +930,13 @@ Actualizacion operativa (2026-05-10) - ejecucion real en produccion:
 - Versioned evidence:
   - `reports/load_tests/2026-05-10_a3_postopt_*_summary.md`
   - `reports/performance/2026-05-10_a3_professional_reliability_final_report.md`
+
+## Update 2026-05-11 - A3 Final Promotion Sync
+- Final A3 evidence/hardening package promoted through:
+  - `#160` (`perf/a3-postdeploy-report-hardening -> dev.enddark`)
+  - `#161` (`dev.enddark -> development`)
+  - `#162` (`development -> main`)
+- Final `main` SHA after this closure: `73a3c2cd88c357af473cb29073fba003e91e9f09`.
+- Post-merge health pattern verified:
+  - `/healthz` and `/readyz` => `200`
+  - `/api/healthz` and `/api/readyz` => `404` expected
