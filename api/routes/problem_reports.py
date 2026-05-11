@@ -11,6 +11,7 @@ from api.schemas.problem_report_schema import (
     ProblemReportListQuerySchema,
     ProblemReportUpdateSchema,
 )
+from api.extensions import limiter
 from api.services import problem_report_service as service
 from app.models import AppUser, db
 
@@ -63,6 +64,7 @@ def _jwt_roles() -> list[str]:
 
 @problem_reports_bp.post("/problem-reports")
 @jwt_required()
+@limiter.limit(lambda: current_app.config.get("PROBLEM_REPORT_CREATE_RATE_LIMIT", "20 per 10 minutes"))
 def create_problem_report():
     user_id, user = _current_user()
     if not user_id or not user:

@@ -152,10 +152,28 @@ def create_app(config_class=DevelopmentConfig):
     # Initialize extensions
     db.init_app(app)
     jwt = JWTManager(app)
-    limiter.init_app(app)
+    rate_limit_storage_uri = app.config.get("RATELIMIT_STORAGE_URI") or "memory://"
+    app.config["RATELIMIT_STORAGE_URI"] = rate_limit_storage_uri
+    try:
+        limiter.init_app(app)
+    except Exception as exc:
+        if app.config.get("RATE_LIMIT_FAIL_OPEN", True):
+            app.logger.warning(
+                "rate limiter storage unavailable, fallback memory://: %s",
+                exc,
+            )
+            app.config["RATELIMIT_STORAGE_URI"] = "memory://"
+            limiter.init_app(app)
+        else:
+            raise
     init_cache_backend(
         cache_backend_uri=app.config.get("CACHE_BACKEND_URI"),
         cache_key_prefix=app.config.get("CACHE_KEY_PREFIX"),
+        cache_backend_required=app.config.get("CACHE_BACKEND_REQUIRED"),
+        cache_default_ttl_seconds=app.config.get("CACHE_DEFAULT_TTL_SECONDS"),
+        cache_fail_open=app.config.get("CACHE_FAIL_OPEN"),
+        cache_redis_socket_timeout=app.config.get("CACHE_REDIS_SOCKET_TIMEOUT"),
+        cache_redis_connect_timeout=app.config.get("CACHE_REDIS_CONNECT_TIMEOUT"),
         logger=app.logger,
     )
     backend_info = cache_backend_info()
