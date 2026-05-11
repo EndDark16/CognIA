@@ -10,10 +10,16 @@ SAFE_MODE="${SAFE_MODE:-true}"
 WARMUP_MODES="${WARMUP_MODES:-short,medium}"
 WARMUP_ROLES="${WARMUP_ROLES:-guardian,psychologist}"
 WARMUP_USER_AGENT="${WARMUP_USER_AGENT:-CognIA-Warmup-Curl/1.0}"
+WARMUP_CURL_SSL_NO_REVOKE="${WARMUP_CURL_SSL_NO_REVOKE:-false}"
 
 if [[ ! "${SAFE_MODE,,}" =~ ^(1|true|yes|on)$ ]]; then
   echo "SAFE_MODE=false is not allowed for warmup_backend.sh"
   exit 2
+fi
+
+CURL_COMMON_OPTS=(-sS --max-time "${TIMEOUT_SECONDS}" -A "${WARMUP_USER_AGENT}")
+if [[ "${WARMUP_CURL_SSL_NO_REVOKE,,}" =~ ^(1|true|yes|on)$ ]]; then
+  CURL_COMMON_OPTS+=(--ssl-no-revoke)
 fi
 
 trim_slashes() {
@@ -70,13 +76,13 @@ curl_json_status() {
   local url="$2"
   local data="${3:-}"
   if [[ -n "$data" ]]; then
-    curl -sS --max-time "${TIMEOUT_SECONDS}" -A "${WARMUP_USER_AGENT}" -X "$method" \
+    curl "${CURL_COMMON_OPTS[@]}" -X "$method" \
       -H "Content-Type: application/json" \
       -d "$data" \
       -w "\n%{http_code}" \
       "$url"
   else
-    curl -sS --max-time "${TIMEOUT_SECONDS}" -A "${WARMUP_USER_AGENT}" -X "$method" \
+    curl "${CURL_COMMON_OPTS[@]}" -X "$method" \
       -w "\n%{http_code}" \
       "$url"
   fi
@@ -109,14 +115,14 @@ if [[ -n "${USERNAME}" && -n "${PASSWORD}" ]]; then
     echo "Warmup login failed status=${LOGIN_STATUS}"
     exit 1
   fi
-  ACCESS_TOKEN="$(echo "$LOGIN_BODY" | python - <<'PY'
-import json,sys
-raw=sys.stdin.read().strip()
+  ACCESS_TOKEN="$(LOGIN_BODY="$LOGIN_BODY" python - <<'PY'
+import json, os
+raw = os.environ.get("LOGIN_BODY", "").strip()
 try:
-    data=json.loads(raw)
+    data = json.loads(raw)
 except Exception:
-    data={}
-print(data.get('access_token',''))
+    data = {}
+print(data.get("access_token", ""))
 PY
 )"
   if [[ -z "${ACCESS_TOKEN}" ]]; then
@@ -131,7 +137,7 @@ if [[ -n "${ACCESS_TOKEN}" ]]; then
     local label="$1"
     local url="$2"
     local response
-    response="$(curl -sS --max-time "${TIMEOUT_SECONDS}" -A "${WARMUP_USER_AGENT}" \
+    response="$(curl "${CURL_COMMON_OPTS[@]}" \
       -H "Authorization: Bearer ${ACCESS_TOKEN}" \
       -w "\n%{http_code}" \
       "$url")"
