@@ -802,3 +802,30 @@ Claim metodologico sin cambios:
   - `user_journey_read` 20 VUs: error `0.0000%`, p95 `836.62 ms`
   - `capacity_ladder` 10->30 VUs: criterio de parada activado por `http_req_failed=5.10%` (degradacion controlada en tramo alto)
 - Se confirma continuidad de claim: evidencia para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de estado (2026-05-10) - a3_professional_reliability_cache_queue
+- Se completo A3 con mejoras internas de confiabilidad/cache/backpressure sin cambios breaking de contrato API.
+- SHA runtime validado en produccion: `f69252321cd26d8c5f8657223a0a027183bd52e5`.
+- Flow GitHub completado previamente en A3:
+  - PR `#157` merged (`perf/a3-professional-reliability-cache-queue -> dev.enddark`)
+  - PR `#158` merged (`dev.enddark -> development`)
+  - PR `#159` merged (`development -> main`)
+- Resultado health pattern:
+  - `/healthz` y `/readyz` => `200`
+  - `/api/healthz` y `/api/readyz` => `404` esperado
+- Resultados post-deploy A3 (k6, modo seguro):
+  - `auth_read` 10 VUs: error `0%`, p95 `487.08 ms`
+  - `qv2_active_read` 10 VUs: error `0%`, p95 `510.30 ms`
+  - `user_journey_read` 10/20/25/30 VUs: error `0%`, p95 `460.52 / 464.52 / 547.24 / 585.41 ms`
+  - `capacity_ladder` 10->30: corte por criterio (`http_req_failed=5.04%`) en tramo alto
+  - `constant_rps` controlado 5->10 y 5->10->15: error `0%`
+- Hardening operativo adicional en warmup shell:
+  - nuevo flag opcional `WARMUP_CURL_SSL_NO_REVOKE=true`
+  - fix parse token login en `scripts/warmup_backend.sh`
+- Archivos protegidos/sucios preservados sin cambios:
+  - `scripts/hardening_second_pass.py`
+  - `scripts/rebuild_dsm5_exact_datasets.py`
+  - `scripts/run_pipeline.py`
+  - `scripts/seed_users.py`
+  - `tests/test_health.py`
+- Claim metodologico sin cambios: screening/apoyo profesional en entorno simulado; no diagnostico automatico.
