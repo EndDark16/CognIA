@@ -829,3 +829,11 @@ Claim metodologico sin cambios:
   - `scripts/seed_users.py`
   - `tests/test_health.py`
 - Claim metodologico sin cambios: screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de cierre (2026-05-11) - a3_report_hardening_promoted
+- Cierre final A3 promovido en segunda cadena de PRs:
+  - `#160` perf/a3-postdeploy-report-hardening -> dev.enddark
+  - `#161` dev.enddark -> development
+  - `#162` development -> main
+- SHA final de `main` tras cierre documental/hardening: `73a3c2cd88c357af473cb29073fba003e91e9f09`.
+- Este cierre no cambia contratos API ni frontend; consolida evidencia A3 y hardening de warmup shell.
