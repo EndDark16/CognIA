@@ -2,7 +2,11 @@
 
 ## 1) Resumen ejecutivo
 - A3 se ejecutó con foco en confiabilidad operativa y rendimiento interno sin cambios contractuales de API.
+<<<<<<< HEAD
 - El backend desplegado para batería k6 fue `main` en SHA `f69252321cd26d8c5f8657223a0a027183bd52e5`; luego se promovió el paquete final A3 de evidencia/hardening a `main` en SHA `73a3c2cd88c357af473cb29073fba003e91e9f09`.
+=======
+- El backend desplegado en `main` (`f69252321cd26d8c5f8657223a0a027183bd52e5`) se validó con health checks y batería k6 post-deploy en modo seguro.
+>>>>>>> origin/dev.enddark
 - Se confirmó estabilidad en `user_journey_read` hasta `30 VUs` en corrida dedicada (error `0.00%`, p95 global `585.41 ms`).
 - En `capacity_ladder` 10→30 VUs se volvió a activar corte por criterio de parada en tramo alto (`http_req_failed=5.04%`), sin caída de `healthz/readyz`.
 - Se añadió hardening operativo para warmup shell en Windows (`WARMUP_CURL_SSL_NO_REVOKE` + fix parse login token), sin impacto funcional en API.
