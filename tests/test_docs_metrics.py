@@ -118,6 +118,28 @@ def test_metrics_can_exclude_health_endpoint_details_without_losing_totals():
         _teardown(app)
 
 
+def test_metrics_exposes_cache_and_rate_limit_observability_fields():
+    client, app = _client_with_config(
+        {
+            "METRICS_ENABLED": True,
+            "METRICS_TOKEN": None,
+            "METRICS_TOKEN_REQUIRED": False,
+            "RATELIMIT_STORAGE_URI": "redis://user:secret@localhost:6379/0",
+        }
+    )
+    try:
+        assert client.get("/healthz").status_code == 200
+        resp = client.get("/metrics")
+        assert resp.status_code == 200
+        body = resp.get_json()
+        assert "cache_backend" in body
+        assert "cache_metrics" in body
+        assert "rate_limit_storage_uri" in body
+        assert "secret" not in str(body.get("rate_limit_storage_uri", ""))
+    finally:
+        _teardown(app)
+
+
 def test_swagger_disabled_returns_404():
     client, app = _client_with_config({"SWAGGER_ENABLED": False})
     try:

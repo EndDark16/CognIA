@@ -45,6 +45,14 @@ Use conservative defaults and override by environment only when measured evidenc
 - Key namespace: `CACHE_KEY_PREFIX=cognia`
 - Fallback behavior: if Redis is unavailable, service falls back to memory cache.
 
+### Cache backend hardening (A3)
+- `CACHE_BACKEND_REQUIRED=false` (default): do not break deploy when Redis is unavailable.
+- `CACHE_FAIL_OPEN=true` (default): cache backend failures fall back to local memory.
+- `CACHE_DEFAULT_TTL_SECONDS=300`
+- `CACHE_REDIS_SOCKET_TIMEOUT=0.25`
+- `CACHE_REDIS_CONNECT_TIMEOUT=0.25`
+- Security note: cache payload serialization is JSON-based; avoid storing secrets/tokens/passwords.
+
 ### Metrics detail controls (A2)
 - `METRICS_ENDPOINT_SAMPLE_SIZE=512`
 - `METRICS_EXCLUDE_ENDPOINT_DETAILS=/healthz,/readyz`
@@ -53,6 +61,17 @@ Use conservative defaults and override by environment only when measured evidenc
 ### Rate limiting backend
 - Default fallback: `RATE_LIMIT_STORAGE_URI=memory://`
 - For cross-worker/global limits: `RATE_LIMIT_STORAGE_URI=redis://<host>:<port>/<db>`
+- `RATE_LIMIT_FAIL_OPEN=true` keeps API available with local memory fallback if shared storage is unavailable.
+
+### Endpoint backpressure (A3 defaults)
+- `QV2_SESSION_CREATE_RATE_LIMIT=60 per minute`
+- `QV2_SAVE_ANSWERS_RATE_LIMIT=120 per minute`
+- `QV2_SUBMIT_RATE_LIMIT=20 per minute`
+- `QV2_CLINICAL_SUMMARY_RATE_LIMIT=30 per minute`
+- `QV2_PDF_RATE_LIMIT=8 per minute`
+- `QV2_DASHBOARD_RATE_LIMIT=90 per minute`
+- `QV2_REPORT_RATE_LIMIT=20 per minute`
+- `PROBLEM_REPORT_CREATE_RATE_LIMIT=20 per 10 minutes`
 
 ## Future Robust Server + Fiber Profile
 Do not hardcode future values without benchmark evidence.
@@ -81,4 +100,17 @@ SAFE_MODE=true \
 WARMUP_ROLES=guardian,psychologist \
 WARMUP_MODES=short,medium \
 python scripts/warmup_backend.py
+```
+
+If Python warmup is blocked by CDN/WAF, use curl fallback:
+
+```bash
+BASE_URL=https://www.cognia.lat \
+API_PREFIX=/api \
+USERNAME=<test_user> \
+PASSWORD=<test_password> \
+SAFE_MODE=true \
+WARMUP_ROLES=guardian,psychologist \
+WARMUP_MODES=short,medium \
+bash scripts/warmup_backend.sh
 ```
