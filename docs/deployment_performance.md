@@ -114,3 +114,6 @@ WARMUP_ROLES=guardian,psychologist \
 WARMUP_MODES=short,medium \
 bash scripts/warmup_backend.sh
 ```
+
+For Windows Schannel environments that fail certificate revocation checks, enable:
+- `WARMUP_CURL_SSL_NO_REVOKE=true`
