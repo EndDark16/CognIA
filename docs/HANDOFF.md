@@ -979,3 +979,21 @@ Actualizacion operativa (2026-05-10) - ejecucion real en produccion:
   - no Supabase SQL snapshot access configured,
   - no WAF/CDN log access in-window,
   - no authenticated k6 diagnostic runs yet (`auth_me`, `qv2_active`) in this A4 branch window.
+
+## Update 2026-05-12 - A4 Promotion Completed to Main
+- PR chain completed:
+  - `#166` `perf/a4-bottleneck-attribution -> dev.enddark` (merged)
+  - `#167` `dev.enddark -> development` (merged)
+  - `#168` `development -> main` (merged via squash)
+- Main commit after promotion: `4998eb0568b0873d52038bf3aa66053618ceb4bc`.
+- Actions status for this main commit:
+  - `CI Backend` run `25764254773`: `success`
+  - `Deploy Backend (Best Effort)` run `25764254789`: `success`
+- Post-merge health checks:
+  - `https://www.cognia.lat/healthz` -> `200`
+  - `https://www.cognia.lat/readyz` -> `200`
+  - `https://www.cognia.lat/api/healthz` -> `404` expected
+  - `https://www.cognia.lat/api/readyz` -> `404` expected
+- A4 diagnostic outcome state:
+  - tooling/reporting promoted successfully;
+  - full bottleneck attribution still requires authenticated diagnostic windows with host/network/DB/WAF snapshots in the same time window.
