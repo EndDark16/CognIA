@@ -837,7 +837,6 @@ Claim metodologico sin cambios:
   - `#162` development -> main
 - SHA final de `main` tras cierre documental/hardening: `73a3c2cd88c357af473cb29073fba003e91e9f09`.
 - Este cierre no cambia contratos API ni frontend; consolida evidencia A3 y hardening de warmup shell.
-
 ## Actualizacion de estado (2026-05-12) - a4_bottleneck_attribution_diagnostic_phase
 - Se abrio fase A4 de diagnostico forense para atribucion de cuello de botella con correlacion multi-fuente.
 - Rama tecnica: `perf/a4-bottleneck-attribution` (worktree limpio desde `main` para no tocar archivos protegidos sucios del workspace original).

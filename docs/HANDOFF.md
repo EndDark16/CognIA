@@ -940,7 +940,6 @@ Actualizacion operativa (2026-05-10) - ejecucion real en produccion:
 - Post-merge health pattern verified:
   - `/healthz` and `/readyz` => `200`
   - `/api/healthz` and `/api/readyz` => `404` expected
-
 ## Update 2026-05-12 - A4 Bottleneck Attribution Diagnostic Kickoff
 - New branch/worktree for A4: `perf/a4-bottleneck-attribution` from `main` SHA `c36cd5ba0669697a04a38f53fefd3dc38454d2c3`.
 - Protected dirty files in the original workspace were preserved untouched:
