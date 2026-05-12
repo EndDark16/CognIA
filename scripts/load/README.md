@@ -30,6 +30,10 @@ Reusable load/stress suite for CognIA backend with safe defaults for limited hom
 - `k6_user_journey_read.js`: read-only combined user flow (`auth/me + qv2_active`).
 - `k6_capacity_ladder.js`: controlled VU ladder (`10 -> 30`) with abort thresholds.
 - `k6_constant_rps.js`: controlled throughput ladder (`5/10/15/20 RPS`) with abort thresholds.
+- `k6_diagnostic_health_vs_api.js`: diagnostic contrast of `healthz/readyz` vs `auth_me/qv2_active`.
+- `k6_diagnostic_auth_vs_qv2.js`: diagnostic split `auth_me` vs `qv2_active` across `10/20/30` VUs.
+- `k6_diagnostic_ladder_short.js`: short ladder `10 -> 30` with endpoint/status breakdown.
+- `k6_diagnostic_soak_light.js`: light soak (`20 VUs`, `10-15m`) for cumulative degradation checks.
 
 ## Environment Variables
 - `BASE_URL`
@@ -175,6 +179,28 @@ USERNAME=<test_user> \
 PASSWORD=<test_password> \
 SAFE_MODE=true \
 k6 run --summary-export artifacts/load_tests/constant_rps/summary.json scripts/load/k6_constant_rps.js
+```
+
+Diagnostic health vs api:
+```bash
+BASE_URL=https://www.cognia.lat \
+API_PREFIX=/api \
+USERNAME=<test_user> \
+PASSWORD=<test_password> \
+SAFE_MODE=true \
+K6_VUS=10 \
+K6_DURATION=5m \
+k6 run --summary-export artifacts/load_tests/diagnostic_health_vs_api/summary.json scripts/load/k6_diagnostic_health_vs_api.js
+```
+
+Diagnostic auth vs qv2:
+```bash
+BASE_URL=https://www.cognia.lat \
+API_PREFIX=/api \
+USERNAME=<test_user> \
+PASSWORD=<test_password> \
+SAFE_MODE=true \
+k6 run --summary-export artifacts/load_tests/diagnostic_auth_vs_qv2/summary.json scripts/load/k6_diagnostic_auth_vs_qv2.js
 ```
 
 ## Evidence Output Convention
