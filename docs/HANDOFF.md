@@ -940,3 +940,43 @@ Actualizacion operativa (2026-05-10) - ejecucion real en produccion:
 - Post-merge health pattern verified:
   - `/healthz` and `/readyz` => `200`
   - `/api/healthz` and `/api/readyz` => `404` expected
+
+## Update 2026-05-12 - A4 Bottleneck Attribution Diagnostic Kickoff
+- New branch/worktree for A4: `perf/a4-bottleneck-attribution` from `main` SHA `c36cd5ba0669697a04a38f53fefd3dc38454d2c3`.
+- Protected dirty files in the original workspace were preserved untouched:
+  - `scripts/hardening_second_pass.py`
+  - `scripts/rebuild_dsm5_exact_datasets.py`
+  - `scripts/run_pipeline.py`
+  - `scripts/seed_users.py`
+  - `tests/test_health.py`
+- A4 diagnostic tooling added (internal, backward-compatible, no API contract changes):
+  - `scripts/diagnostics/capture_host_snapshot.sh`
+  - `scripts/diagnostics/capture_backend_logs.sh`
+  - `scripts/diagnostics/capture_network_snapshot.sh`
+  - `scripts/diagnostics/capture_supabase_snapshot.sql`
+  - `scripts/diagnostics/run_diagnostic_window.sh`
+  - `scripts/diagnostics/analyze_diagnostic_run.py`
+- New k6 diagnostic scenarios:
+  - `scripts/load/k6_diagnostic_health_vs_api.js`
+  - `scripts/load/k6_diagnostic_auth_vs_qv2.js`
+  - `scripts/load/k6_diagnostic_ladder_short.js`
+  - `scripts/load/k6_diagnostic_soak_light.js`
+- `scripts/load/helpers.js` enhanced for A4 summaries:
+  - endpoint checks rollup,
+  - endpoint latency sections,
+  - degradation signal metadata,
+  - per-run diagnostic digest JSON.
+- A4 reports created:
+  - `reports/performance/2026-05-10_a4_bottleneck_initial_state.md`
+  - `reports/performance/2026-05-10_a4_hypothesis_signal_map.md`
+  - `reports/performance/2026-05-10_a4_bottleneck_analysis.md`
+  - `reports/performance/2026-05-10_a4_bottleneck_attribution_final_report.md`
+- Real execution evidence in this window (safe partial run):
+  - `artifacts/diagnostics/20260512T163900_manual_health_noauth_v7_raw/`
+  - scope measured: `healthz` vs `readyz` only (`REQUIRE_AUTH=false` because synthetic auth credentials were unavailable in this window).
+  - observed: `readyz` p95 above `healthz` on this run.
+- Explicit blockers/limits for full attribution in this window:
+  - no operational bash runtime locally (shell-based before/during/after snapshot orchestration pending),
+  - no Supabase SQL snapshot access configured,
+  - no WAF/CDN log access in-window,
+  - no authenticated k6 diagnostic runs yet (`auth_me`, `qv2_active`) in this A4 branch window.

@@ -837,3 +837,39 @@ Claim metodologico sin cambios:
   - `#162` development -> main
 - SHA final de `main` tras cierre documental/hardening: `73a3c2cd88c357af473cb29073fba003e91e9f09`.
 - Este cierre no cambia contratos API ni frontend; consolida evidencia A3 y hardening de warmup shell.
+
+## Actualizacion de estado (2026-05-12) - a4_bottleneck_attribution_diagnostic_phase
+- Se abrio fase A4 de diagnostico forense para atribucion de cuello de botella con correlacion multi-fuente.
+- Rama tecnica: `perf/a4-bottleneck-attribution` (worktree limpio desde `main` para no tocar archivos protegidos sucios del workspace original).
+- Instrumentacion segura agregada (sin cambios de contrato API):
+  - `scripts/diagnostics/capture_host_snapshot.sh`
+  - `scripts/diagnostics/capture_backend_logs.sh`
+  - `scripts/diagnostics/capture_network_snapshot.sh`
+  - `scripts/diagnostics/capture_supabase_snapshot.sql`
+  - `scripts/diagnostics/run_diagnostic_window.sh`
+  - `scripts/diagnostics/analyze_diagnostic_run.py`
+- Escenarios k6 diagnosticos agregados:
+  - `scripts/load/k6_diagnostic_health_vs_api.js`
+  - `scripts/load/k6_diagnostic_auth_vs_qv2.js`
+  - `scripts/load/k6_diagnostic_ladder_short.js`
+  - `scripts/load/k6_diagnostic_soak_light.js`
+- Helper k6 extendido (`scripts/load/helpers.js`) con:
+  - resumen enriquecido por endpoint,
+  - checks por endpoint,
+  - senal de degradacion relativa,
+  - digest JSON por corrida.
+- Reportes A4 creados:
+  - `reports/performance/2026-05-10_a4_bottleneck_initial_state.md`
+  - `reports/performance/2026-05-10_a4_hypothesis_signal_map.md`
+  - `reports/performance/2026-05-10_a4_bottleneck_analysis.md`
+  - `reports/performance/2026-05-10_a4_bottleneck_attribution_final_report.md`
+- Evidencia ejecutada en esta ventana (parcial, segura):
+  - corrida real: `artifacts/diagnostics/20260512T163900_manual_health_noauth_v7_raw/`
+  - alcance medido: `healthz` vs `readyz` (sin auth/qv2 por falta de credenciales sinteticas en esta ventana).
+  - resultado parcial: `readyz` con p95 mayor que `healthz` en la corrida medida.
+- Limitaciones explicitas de esta ventana:
+  - `por confirmar`: snapshots host/log/network via shell durante la misma ventana (bash operativo no disponible localmente).
+  - `por confirmar`: correlacion SQL Supabase (`pg_stat_activity/waits/locks`) y logs WAF/CDN.
+  - `por confirmar`: attribution completa auth/qv2/pool/gunicorn bajo carga autenticada.
+- Claim metodologico sin cambios:
+  - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
