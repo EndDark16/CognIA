@@ -872,3 +872,20 @@ Claim metodologico sin cambios:
   - `por confirmar`: attribution completa auth/qv2/pool/gunicorn bajo carga autenticada.
 - Claim metodologico sin cambios:
   - evidencia apta para screening/apoyo profesional en entorno simulado; no diagnostico automatico.
+
+## Actualizacion de cierre (2026-05-12) - a4_bottleneck_attribution_promoted_main
+- Flujo Git completado:
+  - PR `#166`: `perf/a4-bottleneck-attribution -> dev.enddark` (merged, merge commit `aa845336233d3c60c9ee7849066ab0132a1de4ed`)
+  - PR `#167`: `dev.enddark -> development` (merged, merge commit `7e69565104af8978458e5b312503b116a0b0ef29`)
+  - PR `#168`: `development -> main` (merged via squash, main commit `4998eb0568b0873d52038bf3aa66053618ceb4bc`)
+- Workflows en `main` (`4998eb0568b0873d52038bf3aa66053618ceb4bc`):
+  - `CI Backend` run `25764254773`: `success`
+  - `Deploy Backend (Best Effort)` run `25764254789`: `success`
+- Verificacion de salud post-merge:
+  - `https://www.cognia.lat/healthz` => `200`
+  - `https://www.cognia.lat/readyz` => `200`
+  - `https://www.cognia.lat/api/healthz` => `404` esperado
+  - `https://www.cognia.lat/api/readyz` => `404` esperado
+- Estado metodologico A4:
+  - instrumentacion y analisis forense versionados en repo.
+  - atribucion causal completa queda `no concluyente` hasta ejecutar ventana completa autenticada con snapshots host/db/network/waf correlados.
