@@ -1,4 +1,4 @@
-# AGENTS.md
+﻿# AGENTS.md
 
 ## Propósito del proyecto
 Este repositorio implementa una tesis de ingeniería aplicada en salud mental infantil: un sistema de alerta temprana para niños de 6 a 11 años.

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Analyze one A4 diagnostic window and emit a correlated Markdown report."""
 
 from __future__ import annotations
