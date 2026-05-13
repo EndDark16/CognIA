@@ -465,7 +465,7 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
 
     pdf_download = client.get(f"/api/v2/questionnaires/history/{session_id}/pdf/download", headers=owner_headers)
     assert pdf_download.status_code == 200
-    if PdfReader is not None:
+    if PdfReader is not None and runtime_service._pdf_reportlab_backend() is not None:
         reader = PdfReader(BytesIO(pdf_download.data))
         pdf_text = "\n".join((page.extract_text() or "") for page in reader.pages)
         assert "Reporte de screening / apoyo profesional" in pdf_text
