@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Analyze one A4 diagnostic window and emit a correlated Markdown report."""
 
 from __future__ import annotations
@@ -274,18 +274,46 @@ def parse_host_snapshot(path: Path) -> dict[str, Any]:
     swap_used_mb: float | None = None
     memory_pressure_percent: float | None = None
 
-    cpu_matches = re.findall(r"([0-9]+(?:\.[0-9]+)?)%", text)
-    for item in cpu_matches:
-        try:
-            cpu_perc_values.append(float(item))
-        except Exception:
-            continue
-
     for line in lines:
+        # macOS top format: "CPU usage: 7.69% user, 7.69% sys, 84.61% idle"
+        mac_cpu = re.search(r"CPU usage:\s*([0-9.]+)% user,\s*([0-9.]+)% sys,\s*([0-9.]+)% idle", line, re.I)
+        if mac_cpu:
+            try:
+                busy = float(mac_cpu.group(1)) + float(mac_cpu.group(2))
+                cpu_perc_values.append(busy)
+            except Exception:
+                pass
+
+        # Linux top/vmstat style lines with idle percentage.
+        linux_cpu = re.search(r"Cpu\(s\):.*?([0-9.]+)\s*id", line, re.I)
+        if linux_cpu:
+            try:
+                idle = float(linux_cpu.group(1))
+                cpu_perc_values.append(max(0.0, 100.0 - idle))
+            except Exception:
+                pass
+
+        # Windows WMI style "LoadPercentage 23"
+        win_cpu = re.search(r"\bLoadPercentage\b[^0-9]*([0-9]+)", line, re.I)
+        if win_cpu:
+            try:
+                cpu_perc_values.append(float(win_cpu.group(1)))
+            except Exception:
+                pass
+
         match = re.search(r"load averages?:\s*([0-9.]+)[,\s]+([0-9.]+)[,\s]+([0-9.]+)", line, re.I)
         if match:
             try:
                 load_values.extend([float(match.group(1)), float(match.group(2)), float(match.group(3))])
+            except Exception:
+                pass
+        # /proc/loadavg single-line format: "0.37 0.42 0.31 2/123 4567"
+        proc_load = re.fullmatch(r"\s*([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\s+\d+/\d+\s+\d+\s*", line)
+        if proc_load:
+            try:
+                load_values.extend(
+                    [float(proc_load.group(1)), float(proc_load.group(2)), float(proc_load.group(3))]
+                )
             except Exception:
                 pass
         match = re.search(r"used\s*=\s*([0-9.]+)([MG])", line, re.I)
@@ -293,6 +321,14 @@ def parse_host_snapshot(path: Path) -> dict[str, Any]:
             value = float(match.group(1))
             unit = match.group(2).upper()
             swap_used_mb = value if unit == "M" else value * 1024.0
+        # /proc/swaps row: "<file> file <size_kb> <used_kb> <priority>"
+        proc_swap = re.search(r"\sfile\s+([0-9]+)\s+([0-9]+)\s+[-0-9]+\s*$", line, re.I)
+        if proc_swap:
+            try:
+                used_kb = float(proc_swap.group(2))
+                swap_used_mb = used_kb / 1024.0
+            except Exception:
+                pass
         match = re.search(r"System-wide memory free percentage:\s*([0-9]+)%", line, re.I)
         if match:
             free_pct = float(match.group(1))
@@ -353,6 +389,21 @@ def parse_backend_logs(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {"available": False}
     text = path.read_text(encoding="utf-8", errors="ignore")
+
+    summary_matches = {
+        "db_or_pool": re.search(r"db_or_pool_signals_count=([0-9]+)", text, flags=re.I),
+        "rate_limited": re.search(r"rate_limited_count=([0-9]+)", text, flags=re.I),
+        "server_error": re.search(r"server_error_count=([0-9]+)", text, flags=re.I),
+        "client_error": re.search(r"client_error_count=([0-9]+)", text, flags=re.I),
+        "gunicorn_timeout": re.search(r"gunicorn_timeout_count=([0-9]+)", text, flags=re.I),
+        "request_id": re.search(r"request_id_mentions_count=([0-9]+)", text, flags=re.I),
+    }
+    if all(v is not None for v in summary_matches.values()):
+        return {
+            "available": True,
+            "counts": {key: int(match.group(1)) for key, match in summary_matches.items() if match},
+        }
+
     patterns = {
         "db_or_pool": r"db_unavailable|database error|sqlalchemy|queuepool|pool_timeout|operationalerror|psycopg|timeout waiting for connection",
         "gunicorn_timeout": r"worker timeout|gunicorn",
