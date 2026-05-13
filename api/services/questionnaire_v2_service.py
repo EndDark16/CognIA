@@ -1820,28 +1820,31 @@ def _pdf_output_dir() -> Path:
 
 
 def _pdf_reportlab_backend():
-    from reportlab.lib import colors
-    from reportlab.lib.pagesizes import landscape, letter
-    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-    from reportlab.lib.units import inch
-    from reportlab.platypus import Image as RLImage
-    from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+    try:
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import landscape, letter
+        from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+        from reportlab.lib.units import inch
+        from reportlab.platypus import Image as RLImage
+        from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-    return {
-        "colors": colors,
-        "landscape": landscape,
-        "letter": letter,
-        "ParagraphStyle": ParagraphStyle,
-        "getSampleStyleSheet": getSampleStyleSheet,
-        "inch": inch,
-        "RLImage": RLImage,
-        "PageBreak": PageBreak,
-        "Paragraph": Paragraph,
-        "SimpleDocTemplate": SimpleDocTemplate,
-        "Spacer": Spacer,
-        "Table": Table,
-        "TableStyle": TableStyle,
-    }
+        return {
+            "colors": colors,
+            "landscape": landscape,
+            "letter": letter,
+            "ParagraphStyle": ParagraphStyle,
+            "getSampleStyleSheet": getSampleStyleSheet,
+            "inch": inch,
+            "RLImage": RLImage,
+            "PageBreak": PageBreak,
+            "Paragraph": Paragraph,
+            "SimpleDocTemplate": SimpleDocTemplate,
+            "Spacer": Spacer,
+            "Table": Table,
+            "TableStyle": TableStyle,
+        }
+    except ModuleNotFoundError:
+        return None
 
 
 def _pdf_paragraph_safe(value: Any) -> str:
@@ -2144,6 +2147,8 @@ def _operational_recommendation_for_pdf(domains: list[dict[str, Any]], default_r
 
 def _build_pdf_table(rows: list[list[Any]], col_widths: list[float], font_size: int = 8):
     backend = _pdf_reportlab_backend()
+    if backend is None:
+        raise RuntimeError("reportlab_not_available")
     Table = backend["Table"]
     TableStyle = backend["TableStyle"]
     colors = backend["colors"]
@@ -2170,6 +2175,45 @@ def _build_pdf_table(rows: list[list[Any]], col_widths: list[float], font_size: 
     return table
 
 
+def _write_legacy_pdf(file_path: Path, session: QuestionnaireSession, result_payload: dict[str, Any], domains: list[dict[str, Any]]) -> None:
+    probabilities = [float(item["probability"]) * 100.0 for item in domains]
+    labels = [item["domain"].upper() for item in domains]
+    plt, PdfPages = _pdf_plot_backend()
+
+    with PdfPages(file_path) as pdf:
+        fig, ax = plt.subplots(figsize=(11, 8.5))
+        ax.barh(labels, probabilities, color="#2E6F95")
+        ax.set_xlim(0, 100)
+        ax.set_xlabel("Probabilidad (%)")
+        ax.set_title("Resultados por dominio (screening no diagnostico)")
+        for idx, val in enumerate(probabilities):
+            ax.text(val + 1, idx, f"{val:.1f}%", va="center", fontsize=9)
+        plt.tight_layout()
+        pdf.savefig(fig)
+        plt.close(fig)
+
+        fig2, ax2 = plt.subplots(figsize=(11, 8.5))
+        ax2.axis("off")
+        lines = [
+            f"Questionnaire ID: {session.questionnaire_public_id}",
+            f"Session ID: {session.id}",
+            f"Generated at: {_utcnow().isoformat()}",
+            f"Mode: {session.mode} ({session.mode_key})",
+            f"Role: {_normalize_role(session.respondent_role)}",
+            f"Questionnaire version: {session.questionnaire_version_label}",
+            "",
+            f"Executive summary: {result_payload['result'].get('summary') or 'N/A'}",
+            f"Operational recommendation: {result_payload['result'].get('operational_recommendation') or 'N/A'}",
+            "",
+            "Important: this report is for screening/support in simulated setting, not automatic diagnosis.",
+        ]
+        for idx, line in enumerate(lines):
+            ax2.text(0.02, 0.96 - idx * 0.05, line, fontsize=10, ha="left", va="top")
+        plt.tight_layout()
+        pdf.savefig(fig2)
+        plt.close(fig2)
+
+
 def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> QuestionnaireSessionPdfExport:
     result_payload = get_results_payload(session)
     domains = result_payload["domains"]
@@ -2185,6 +2229,28 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
     domain_stats = _domain_question_stats(question_rows)
 
     backend = _pdf_reportlab_backend()
+    if backend is None:
+        current_app.logger.warning("reportlab not installed; using legacy matplotlib PDF renderer")
+        _write_legacy_pdf(file_path=file_path, session=session, result_payload=result_payload, domains=domains)
+        export = QuestionnaireSessionPdfExport(
+            session_id=session.id,
+            file_path=str(file_path),
+            file_name=file_name,
+            status="generated",
+            generated_by_user_id=user_id,
+            metadata_json=_encrypt_json(
+                {
+                    "questionnaire_version": session.questionnaire_version_label,
+                    "model_bundle": (result_row.model_bundle_version if result_row else None) or session.model_pipeline_version,
+                },
+                "questionnaire_session_pdf_export.metadata_json",
+            ),
+        )
+        db.session.add(export)
+        _audit(session.id, user_id, "pdf_generated", {"file_path": str(file_path), "renderer": "matplotlib_legacy"})
+        db.session.commit()
+        return export
+
     colors = backend["colors"]
     landscape = backend["landscape"]
     letter = backend["letter"]
