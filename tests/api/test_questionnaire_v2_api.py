@@ -1,11 +1,13 @@
 ﻿import os
 import sys
 import uuid
+from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
 import pytest
 from flask_jwt_extended import create_access_token
+from pypdf import PdfReader
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if PROJECT_ROOT not in sys.path:
@@ -460,6 +462,13 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
 
     pdf_download = client.get(f"/api/v2/questionnaires/history/{session_id}/pdf/download", headers=owner_headers)
     assert pdf_download.status_code == 200
+    reader = PdfReader(BytesIO(pdf_download.data))
+    pdf_text = "\n".join((page.extract_text() or "") for page in reader.pages)
+    assert "Reporte de screening / apoyo profesional" in pdf_text
+    assert "Resultados por dominio" in pdf_text
+    assert "Preguntas y respuestas respondidas" in pdf_text
+    assert "Resumen por secciones" in pdf_text
+    assert "Anexo tecnico" in pdf_text
 
     adoption = client.get("/api/v2/dashboard/adoption-history?months=6", headers=owner_headers)
     assert adoption.status_code == 200
