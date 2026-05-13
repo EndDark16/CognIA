@@ -4,6 +4,8 @@ import uuid
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
+from html import escape
+from io import BytesIO
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +32,7 @@ from app.models import (
     QuestionnaireAuditEvent,
     QuestionnaireQuestion,
     QuestionnaireQuestionMode,
+    QuestionnaireSection,
     QuestionnaireRepeatMapping,
     QuestionnaireSession,
     QuestionnaireSessionAccessLink,
@@ -1816,6 +1819,40 @@ def _pdf_output_dir() -> Path:
     return path
 
 
+def _pdf_reportlab_backend():
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import landscape, letter
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import inch
+    from reportlab.platypus import Image as RLImage
+    from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+    return {
+        "colors": colors,
+        "landscape": landscape,
+        "letter": letter,
+        "ParagraphStyle": ParagraphStyle,
+        "getSampleStyleSheet": getSampleStyleSheet,
+        "inch": inch,
+        "RLImage": RLImage,
+        "PageBreak": PageBreak,
+        "Paragraph": Paragraph,
+        "SimpleDocTemplate": SimpleDocTemplate,
+        "Spacer": Spacer,
+        "Table": Table,
+        "TableStyle": TableStyle,
+    }
+
+
+def _pdf_paragraph_safe(value: Any) -> str:
+    if value is None:
+        return "N/A"
+    text = str(value).strip()
+    if not text:
+        return "N/A"
+    return escape(text).replace("\n", "<br/>")
+
+
 def resolve_download_path(raw_path: str | None) -> Path | None:
     if not raw_path:
         return None
@@ -1829,6 +1866,310 @@ def resolve_download_path(raw_path: str | None) -> Path | None:
     return candidate
 
 
+def _pdf_alert_label(alert_level: str | None) -> str:
+    mapping = {
+        "low": "Bajo",
+        "moderate": "Moderado",
+        "elevated": "Elevado",
+        "high": "Alto",
+        "critical_review": "Critico para revision",
+    }
+    return mapping.get(str(alert_level or "").strip().lower(), "No especificado")
+
+
+def _answer_display(raw_answer: Any, options: Any) -> str:
+    if raw_answer is None:
+        return "No respondida"
+    raw_text = raw_answer if isinstance(raw_answer, str) else json.dumps(raw_answer, ensure_ascii=False)
+    opts = _json(options)
+    if isinstance(opts, list):
+        for opt in opts:
+            if isinstance(opt, dict):
+                value = opt.get("value")
+                label = opt.get("label")
+                if label is None:
+                    continue
+                if str(value) == str(raw_answer):
+                    return f"{raw_text} ({label})"
+            elif str(opt) == str(raw_answer):
+                return raw_text
+    return raw_text
+
+
+def _extract_numeric_answer(raw_answer: Any, normalized_answer: str | None) -> float | None:
+    numeric = _to_float(raw_answer)
+    if numeric is not None:
+        return numeric
+    return _to_float(normalized_answer)
+
+
+def _session_pdf_question_rows(session_id: uuid.UUID) -> list[dict[str, Any]]:
+    rows = (
+        db.session.query(
+            QuestionnaireSessionItem,
+            QuestionnaireQuestion,
+            QuestionnaireSessionAnswer,
+            QuestionnaireSection,
+        )
+        .join(QuestionnaireQuestion, QuestionnaireSessionItem.question_id == QuestionnaireQuestion.id)
+        .outerjoin(
+            QuestionnaireSessionAnswer,
+            (
+                (QuestionnaireSessionAnswer.session_id == QuestionnaireSessionItem.session_id)
+                & (QuestionnaireSessionAnswer.question_id == QuestionnaireSessionItem.question_id)
+            ),
+        )
+        .outerjoin(QuestionnaireSection, QuestionnaireSection.id == QuestionnaireSessionItem.section_id)
+        .filter(QuestionnaireSessionItem.session_id == session_id)
+        .filter(QuestionnaireSessionItem.is_visible.is_(True))
+        .order_by(QuestionnaireSessionItem.page_number.asc(), QuestionnaireSessionItem.display_order.asc())
+        .all()
+    )
+
+    out: list[dict[str, Any]] = []
+    for idx, (item, question, answer, section) in enumerate(rows, start=1):
+        prompt = question.caregiver_question or question.psychologist_question or question.question_text_primary or "N/A"
+        raw = (
+            _decrypt_json(
+                answer.answer_raw,
+                "questionnaire_session_answer.answer_raw",
+            )
+            if answer
+            else None
+        )
+        normalized = (
+            _decrypt_text(
+                answer.answer_normalized,
+                "questionnaire_session_answer.answer_normalized",
+            )
+            if answer
+            else None
+        )
+        section_title = section.title if section and section.title else f"Pagina {item.page_number}"
+        section_key = section.section_key if section and section.section_key else f"page_{item.page_number}"
+        out.append(
+            {
+                "index": idx,
+                "page_number": item.page_number,
+                "section_key": section_key,
+                "section_title": section_title,
+                "question_id": str(question.id),
+                "question_code": question.question_code,
+                "domain": str(question.domain or "general").strip().lower(),
+                "domains_final": str(question.domains_final or ""),
+                "prompt": prompt,
+                "response_type": question.response_type,
+                "raw_answer": raw,
+                "raw_answer_display": _answer_display(raw, question.response_options_json),
+                "normalized_answer": normalized,
+                "is_required": bool(item.is_required),
+                "is_answered": bool(item.answered and answer is not None),
+                "min_value": question.min_value,
+                "max_value": question.max_value,
+                "numeric_answer": _extract_numeric_answer(raw, normalized),
+            }
+        )
+    return out
+
+
+def _domain_question_stats(question_rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    for domain in DOMAIN_ORDER:
+        out[domain] = {
+            "total": 0,
+            "answered": 0,
+            "high_half": 0,
+        }
+
+    for row in question_rows:
+        row_domain = str(row.get("domain") or "").strip().lower()
+        row_domains_final = [item.strip().lower() for item in str(row.get("domains_final") or "").split("|") if item.strip()]
+        linked_domains = [d for d in DOMAIN_ORDER if d == row_domain or d in row_domains_final]
+        if not linked_domains:
+            continue
+        for domain in linked_domains:
+            stats = out.setdefault(domain, {"total": 0, "answered": 0, "high_half": 0})
+            stats["total"] += 1
+            if row.get("is_answered"):
+                stats["answered"] += 1
+                numeric = row.get("numeric_answer")
+                min_value = _to_float(row.get("min_value"), 0.0) or 0.0
+                max_value = _to_float(row.get("max_value"), 0.0) or 0.0
+                if numeric is not None and max_value > min_value:
+                    midpoint = min_value + ((max_value - min_value) / 2.0)
+                    if float(numeric) >= midpoint:
+                        stats["high_half"] += 1
+    return out
+
+
+def _section_summary(question_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[tuple[int, str], dict[str, Any]] = {}
+    for row in question_rows:
+        key = (int(row.get("page_number") or 0), str(row.get("section_title") or "Sin seccion"))
+        if key not in grouped:
+            grouped[key] = {
+                "page_number": key[0],
+                "section_title": key[1],
+                "questions": 0,
+                "answered": 0,
+            }
+        grouped[key]["questions"] += 1
+        if row.get("is_answered"):
+            grouped[key]["answered"] += 1
+
+    out = []
+    for key in sorted(grouped.keys(), key=lambda item: (item[0], item[1])):
+        item = grouped[key]
+        questions = int(item["questions"])
+        answered = int(item["answered"])
+        pct = round((answered / questions) * 100.0, 1) if questions > 0 else 0.0
+        if pct >= 95:
+            obs = "Cobertura alta"
+        elif pct >= 70:
+            obs = "Cobertura parcial"
+        else:
+            obs = "Cobertura baja"
+        out.append(
+            {
+                "page_number": item["page_number"],
+                "section_title": item["section_title"],
+                "questions": questions,
+                "answered": answered,
+                "completion_pct": pct,
+                "observation": obs,
+            }
+        )
+    return out
+
+
+def _domain_interpretation(domain_row: dict[str, Any], domain_stats: dict[str, dict[str, Any]]) -> str:
+    domain = str(domain_row.get("domain") or "").strip().lower()
+    prob_pct = round(float(domain_row.get("probability") or 0.0) * 100.0, 1)
+    alert_level = str(domain_row.get("alert_level") or "").strip().lower()
+    stats = domain_stats.get(domain, {})
+    answered = int(stats.get("answered", 0))
+    total = int(stats.get("total", 0))
+    high_half = int(stats.get("high_half", 0))
+
+    base = (
+        f"Resultado de screening en {domain.upper()}: {prob_pct}% con nivel {_pdf_alert_label(alert_level).lower()}. "
+        f"Se respondieron {answered}/{total} items vinculados al dominio"
+    )
+    if total > 0:
+        base += f" y {high_half} respuestas quedaron en la mitad superior de su escala."
+    else:
+        base += "."
+
+    if alert_level in {"critical_review", "high"}:
+        base += " Senal consistente con prioridad de revision profesional."
+    elif alert_level == "elevated":
+        base += " Senal elevada que sugiere seguimiento profesional."
+    elif alert_level == "moderate":
+        base += " Senal intermedia que requiere contexto clinico para interpretacion."
+    else:
+        base += " Sin elevacion dominante en esta corrida."
+    return base
+
+
+def _domain_chart_png(domains: list[dict[str, Any]]) -> BytesIO:
+    sorted_rows = sorted(domains, key=lambda row: float(row.get("probability") or 0.0), reverse=True)
+    labels = [str(row.get("domain") or "").upper() for row in sorted_rows]
+    values = [float(row.get("probability") or 0.0) * 100.0 for row in sorted_rows]
+    colors_by_alert = {
+        "critical_review": "#8B0000",
+        "high": "#C0392B",
+        "elevated": "#E67E22",
+        "moderate": "#F1C40F",
+        "low": "#2E86C1",
+    }
+    bar_colors = [colors_by_alert.get(str(row.get("alert_level") or "").lower(), "#5D6D7E") for row in sorted_rows]
+
+    plt, _ = _pdf_plot_backend()
+    fig, ax = plt.subplots(figsize=(10.5, 3.8))
+    bars = ax.bar(labels, values, color=bar_colors)
+    ax.set_ylim(0, 100)
+    ax.set_ylabel("Probabilidad (%)")
+    ax.set_title("Probabilidades por dominio (screening/apoyo profesional)")
+    ax.grid(axis="y", linestyle="--", alpha=0.25)
+    for bar, value in zip(bars, values):
+        ax.text(
+            bar.get_x() + (bar.get_width() / 2.0),
+            min(99.0, value + 1.0),
+            f"{value:.1f}%",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
+    fig.text(
+        0.01,
+        0.01,
+        "Nota: visual de apoyo para screening en entorno simulado; no equivale a diagnostico clinico.",
+        fontsize=8,
+    )
+    fig.tight_layout(rect=(0, 0.03, 1, 1))
+    out = BytesIO()
+    fig.savefig(out, format="png", dpi=180)
+    plt.close(fig)
+    out.seek(0)
+    return out
+
+
+def _operational_recommendation_for_pdf(domains: list[dict[str, Any]], default_recommendation: str | None) -> str:
+    sorted_rows = sorted(domains, key=lambda row: float(row.get("probability") or 0.0), reverse=True)
+    top = sorted_rows[0] if sorted_rows else None
+    if not top:
+        return default_recommendation or "No hay informacion suficiente para emitir recomendacion operativa."
+    top_alert = str(top.get("alert_level") or "").lower()
+    top_domain = str(top.get("domain") or "").upper()
+    if top_alert in {"critical_review", "high"}:
+        return (
+            f"Priorizar revision profesional focal en {top_domain}, validar consistencia de respuestas "
+            "y complementar con entrevista clinica estructurada."
+        )
+    if top_alert == "elevated":
+        return (
+            f"Programar seguimiento profesional para {top_domain}, revisar factores contextuales y "
+            "repetir screening ante cambios funcionales."
+        )
+    if top_alert == "moderate":
+        return (
+            f"Interpretar con cautela el resultado intermedio en {top_domain}; usarlo como senal de apoyo "
+            "y contrastarlo con observacion profesional."
+        )
+    return (
+        default_recommendation
+        or "Mantener monitoreo preventivo y repetir el cuestionario solo si aparecen cambios conductuales o emocionales."
+    )
+
+
+def _build_pdf_table(rows: list[list[Any]], col_widths: list[float], font_size: int = 8):
+    backend = _pdf_reportlab_backend()
+    Table = backend["Table"]
+    TableStyle = backend["TableStyle"]
+    colors = backend["colors"]
+
+    table = Table(rows, colWidths=col_widths, repeatRows=1)
+    table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#E7EEF7")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.HexColor("#1F2D3D")),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, -1), font_size),
+                ("ALIGN", (0, 0), (-1, 0), "CENTER"),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#C8D2E0")),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#FAFCFF")]),
+                ("LEFTPADDING", (0, 0), (-1, -1), 4),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+                ("TOPPADDING", (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+            ]
+        )
+    )
+    return table
+
+
 def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> QuestionnaireSessionPdfExport:
     result_payload = get_results_payload(session)
     domains = result_payload["domains"]
@@ -1838,43 +2179,327 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
     output_dir = _pdf_output_dir()
     file_name = f"questionnaire_{session.questionnaire_public_id}_{int(_utcnow().timestamp())}.pdf"
     file_path = (output_dir / file_name).resolve()
+    result_row = QuestionnaireSessionResult.query.filter_by(session_id=session.id).first()
+    question_rows = _session_pdf_question_rows(session.id)
+    section_rows = _section_summary(question_rows)
+    domain_stats = _domain_question_stats(question_rows)
 
-    probabilities = [float(item["probability"]) * 100.0 for item in domains]
-    labels = [item["domain"].upper() for item in domains]
-    plt, PdfPages = _pdf_plot_backend()
+    backend = _pdf_reportlab_backend()
+    colors = backend["colors"]
+    landscape = backend["landscape"]
+    letter = backend["letter"]
+    ParagraphStyle = backend["ParagraphStyle"]
+    getSampleStyleSheet = backend["getSampleStyleSheet"]
+    inch = backend["inch"]
+    RLImage = backend["RLImage"]
+    PageBreak = backend["PageBreak"]
+    Paragraph = backend["Paragraph"]
+    SimpleDocTemplate = backend["SimpleDocTemplate"]
+    Spacer = backend["Spacer"]
 
-    with PdfPages(file_path) as pdf:
-        fig, ax = plt.subplots(figsize=(11, 8.5))
-        ax.barh(labels, probabilities, color="#2E6F95")
-        ax.set_xlim(0, 100)
-        ax.set_xlabel("Probabilidad (%)")
-        ax.set_title("Resultados por dominio (screening no diagnostico)")
-        for idx, val in enumerate(probabilities):
-            ax.text(val + 1, idx, f"{val:.1f}%", va="center", fontsize=9)
-        plt.tight_layout()
-        pdf.savefig(fig)
-        plt.close(fig)
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        "qv2_title",
+        parent=styles["Title"],
+        fontName="Helvetica-Bold",
+        fontSize=18,
+        leading=22,
+        textColor=colors.HexColor("#17324D"),
+        spaceAfter=10,
+    )
+    h1_style = ParagraphStyle(
+        "qv2_h1",
+        parent=styles["Heading2"],
+        fontName="Helvetica-Bold",
+        fontSize=12,
+        leading=15,
+        textColor=colors.HexColor("#17324D"),
+        spaceBefore=8,
+        spaceAfter=6,
+    )
+    body_style = ParagraphStyle(
+        "qv2_body",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=9,
+        leading=12,
+        textColor=colors.HexColor("#1F2D3D"),
+    )
+    small_style = ParagraphStyle(
+        "qv2_small",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=8,
+        leading=10,
+        textColor=colors.HexColor("#34495E"),
+    )
 
-        fig2, ax2 = plt.subplots(figsize=(11, 8.5))
-        ax2.axis("off")
-        lines = [
-            f"Questionnaire ID: {session.questionnaire_public_id}",
-            f"Session ID: {session.id}",
-            f"Generated at: {_utcnow().isoformat()}",
-            f"Mode: {session.mode} ({session.mode_key})",
-            f"Role: {_normalize_role(session.respondent_role)}",
-            f"Questionnaire version: {session.questionnaire_version_label}",
-            "",
-            f"Executive summary: {result_payload['result'].get('summary') or 'N/A'}",
-            f"Operational recommendation: {result_payload['result'].get('operational_recommendation') or 'N/A'}",
-            "",
-            "Important: this report is for screening/support in simulated setting, not automatic diagnosis.",
-        ]
-        for idx, line in enumerate(lines):
-            ax2.text(0.02, 0.96 - idx * 0.05, line, fontsize=10, ha="left", va="top")
-        plt.tight_layout()
-        pdf.savefig(fig2)
-        plt.close(fig2)
+    role = _normalize_role(session.respondent_role)
+    generated_at = _utcnow()
+    metadata = _decrypt_json(session.metadata_json, "questionnaire_session.metadata_json") or {}
+    metadata_extra = metadata.get("metadata") if isinstance(metadata, dict) else {}
+    if not isinstance(metadata_extra, dict):
+        metadata_extra = {}
+
+    synthetic_flag = metadata_extra.get("synthetic_case")
+    if synthetic_flag is True:
+        synthetic_note = "Caso sintetico de demostracion: si"
+    elif synthetic_flag is False:
+        synthetic_note = "Caso sintetico de demostracion: no declarado"
+    else:
+        synthetic_note = "Caso sintetico de demostracion: por confirmar"
+
+    completeness_pct = float(session.progress_pct or 0.0)
+    quality_score = result_payload["result"].get("completion_quality_score")
+    quality_text = f"{round(float(quality_score) * 100.0, 1)}%" if quality_score is not None else "N/A"
+
+    story: list[Any] = []
+    story.append(Paragraph("CognIA", title_style))
+    story.append(Paragraph("Reporte de screening / apoyo profesional", h1_style))
+    story.append(
+        Paragraph(
+            "Uso profesional: resultado de tamizaje en entorno simulado. No equivale a diagnostico clinico definitivo.",
+            body_style,
+        )
+    )
+    story.append(Spacer(1, 0.15 * inch))
+
+    cover_rows = [
+        ["Fecha de generacion", generated_at.isoformat()],
+        ["Questionnaire ID", session.questionnaire_public_id],
+        ["Session ID", str(session.id)],
+        ["Modo aplicado", f"{session.mode} ({session.mode_key})"],
+        ["Rol respondiente", role],
+        ["Version de cuestionario", session.questionnaire_version_label or "N/A"],
+        ["Version de escalas", session.scales_version_label or "N/A"],
+        ["Pipeline/model bundle", (result_row.model_bundle_version if result_row else None) or session.model_pipeline_version or "N/A"],
+    ]
+    story.append(_build_pdf_table([["Campo", "Valor"], *cover_rows], [2.5 * inch, 7.2 * inch], font_size=9))
+    story.append(Spacer(1, 0.15 * inch))
+
+    story.append(Paragraph("Resumen del caso", h1_style))
+    age_value = metadata.get("child_age_years") if isinstance(metadata, dict) else None
+    sex_value = metadata.get("child_sex_assigned_at_birth") if isinstance(metadata, dict) else None
+    case_rows = [
+        ["Edad (si disponible)", str(age_value) if age_value is not None else "N/A"],
+        ["Sexo asignado (si disponible)", str(sex_value) if sex_value else "N/A"],
+        ["Completitud de respuestas", f"{round(completeness_pct, 1)}%"],
+        ["Calidad/completitud del procesamiento", quality_text],
+        ["Observacion de origen", synthetic_note],
+        ["Resumen ejecutivo", result_payload["result"].get("summary") or "N/A"],
+    ]
+    story.append(_build_pdf_table([["Elemento", "Detalle"], *case_rows], [2.8 * inch, 6.9 * inch], font_size=9))
+    story.append(Spacer(1, 0.12 * inch))
+
+    story.append(Paragraph("Resultados por dominio", h1_style))
+    domain_table = [["Dominio", "Probabilidad", "Alerta", "Confianza", "Modelo/version", "Caveat operativo"]]
+    sorted_domains = sorted(domains, key=lambda item: float(item.get("probability") or 0.0), reverse=True)
+    for row in sorted_domains:
+        conf_pct = row.get("confidence_pct")
+        conf_text = "N/A"
+        if conf_pct is not None:
+            conf_text = f"{round(float(conf_pct), 1)}%"
+        if row.get("confidence_band"):
+            conf_text = f"{conf_text} ({row.get('confidence_band')})"
+        model_text = f"{row.get('model_id') or 'N/A'} / {row.get('model_version') or 'N/A'}"
+        domain_table.append(
+            [
+                str(row.get("domain") or "").upper(),
+                f"{round(float(row.get('probability') or 0.0) * 100.0, 1)}%",
+                _pdf_alert_label(row.get("alert_level")),
+                conf_text,
+                model_text,
+                row.get("operational_caveat") or "N/A",
+            ]
+        )
+    story.append(
+        _build_pdf_table(
+            domain_table,
+            [0.9 * inch, 1.0 * inch, 1.1 * inch, 1.2 * inch, 2.7 * inch, 3.8 * inch],
+            font_size=8,
+        )
+    )
+    story.append(Spacer(1, 0.1 * inch))
+
+    for row in sorted_domains:
+        interp = _domain_interpretation(row, domain_stats)
+        story.append(Paragraph(f"<b>{_pdf_paragraph_safe(str(row.get('domain') or '').upper())}:</b> {_pdf_paragraph_safe(interp)}", small_style))
+        story.append(Spacer(1, 0.05 * inch))
+
+    story.append(Spacer(1, 0.08 * inch))
+    story.append(Paragraph("Grafica de probabilidades", h1_style))
+    chart_image = RLImage(_domain_chart_png(domains), width=9.8 * inch, height=3.55 * inch)
+    story.append(chart_image)
+    story.append(Spacer(1, 0.12 * inch))
+
+    story.append(Paragraph("Comorbilidades y patrones cruzados", h1_style))
+    comorbidity_rows = result_payload.get("comorbidity") or []
+    if comorbidity_rows:
+        comorb_table = [["Par de dominios", "Riesgo combinado", "Nivel", "Resumen"]]
+        for row in comorbidity_rows:
+            domains_pair = ", ".join([str(item).upper() for item in (row.get("domains") or [])])
+            comorb_table.append(
+                [
+                    domains_pair or "N/A",
+                    f"{round(float(row.get('combined_risk_score') or 0.0) * 100.0, 1)}%",
+                    str(row.get("coexistence_level") or "N/A"),
+                    row.get("summary") or "N/A",
+                ]
+            )
+        story.append(
+            _build_pdf_table(
+                comorb_table,
+                [1.8 * inch, 1.3 * inch, 1.0 * inch, 6.2 * inch],
+                font_size=8,
+            )
+        )
+    else:
+        top_prob = float(sorted_domains[0].get("probability") or 0.0) if sorted_domains else 0.0
+        second_prob = float(sorted_domains[1].get("probability") or 0.0) if len(sorted_domains) > 1 else 0.0
+        ambiguous = (top_prob < 0.55) and (abs(top_prob - second_prob) <= 0.1)
+        if ambiguous:
+            pattern_text = (
+                "No se detecta comorbilidad elevada formal, pero el patron global es intermedio/ambiguo "
+                "por proximidad de probabilidades entre dominios principales."
+            )
+        else:
+            pattern_text = "No se observan pares con comorbilidad operativa elevada en esta corrida."
+        story.append(Paragraph(_pdf_paragraph_safe(pattern_text), body_style))
+    story.append(Spacer(1, 0.12 * inch))
+
+    story.append(Paragraph("Recomendacion operativa", h1_style))
+    recommendation = _operational_recommendation_for_pdf(
+        domains=domains,
+        default_recommendation=result_payload["result"].get("operational_recommendation"),
+    )
+    story.append(Paragraph(_pdf_paragraph_safe(recommendation), body_style))
+    story.append(PageBreak())
+
+    story.append(Paragraph("Preguntas y respuestas respondidas", h1_style))
+    qa_header = [
+        "#",
+        "Seccion",
+        "Dominio",
+        "Codigo",
+        "Pregunta",
+        "Tipo",
+        "Respuesta dada",
+        "Respuesta normalizada",
+        "Req",
+        "Rsp",
+        "Relacion dominio",
+    ]
+    qa_rows: list[list[Any]] = [qa_header]
+    for row in question_rows:
+        domain_related = row["domain"] or "general"
+        if row.get("domains_final"):
+            domain_related = f"{domain_related} | {row.get('domains_final')}"
+        qa_rows.append(
+            [
+                str(row["index"]),
+                Paragraph(_pdf_paragraph_safe(f"P{row['page_number']} - {row['section_title']}"), small_style),
+                Paragraph(_pdf_paragraph_safe(str(row["domain"] or "general").upper()), small_style),
+                Paragraph(_pdf_paragraph_safe(row["question_code"]), small_style),
+                Paragraph(_pdf_paragraph_safe(row["prompt"]), small_style),
+                Paragraph(_pdf_paragraph_safe(row["response_type"]), small_style),
+                Paragraph(_pdf_paragraph_safe(row["raw_answer_display"]), small_style),
+                Paragraph(_pdf_paragraph_safe(row["normalized_answer"] or "N/A"), small_style),
+                "Si" if row["is_required"] else "No",
+                "Si" if row["is_answered"] else "No",
+                Paragraph(_pdf_paragraph_safe(domain_related), small_style),
+            ]
+        )
+    story.append(
+        _build_pdf_table(
+            qa_rows,
+            [
+                0.3 * inch,
+                0.9 * inch,
+                0.9 * inch,
+                1.0 * inch,
+                2.2 * inch,
+                0.8 * inch,
+                1.0 * inch,
+                1.0 * inch,
+                0.5 * inch,
+                0.5 * inch,
+                1.1 * inch,
+            ],
+            font_size=7,
+        )
+    )
+    story.append(Spacer(1, 0.12 * inch))
+
+    story.append(Paragraph("Resumen por secciones", h1_style))
+    section_table = [["Seccion/pagina", "Preguntas", "Respondidas", "Completitud", "Observacion"]]
+    for row in section_rows:
+        section_table.append(
+            [
+                f"P{row['page_number']} - {row['section_title']}",
+                str(row["questions"]),
+                str(row["answered"]),
+                f"{row['completion_pct']}%",
+                row["observation"],
+            ]
+        )
+    story.append(
+        _build_pdf_table(
+            section_table,
+            [3.6 * inch, 1.0 * inch, 1.1 * inch, 1.3 * inch, 3.3 * inch],
+            font_size=8,
+        )
+    )
+    story.append(Spacer(1, 0.1 * inch))
+
+    story.append(Paragraph("Limitaciones y uso responsable", h1_style))
+    limitations = [
+        "Este reporte corresponde a screening/apoyo profesional en entorno simulado.",
+        "No equivale a diagnostico clinico automatico ni reemplaza evaluacion profesional.",
+        synthetic_note,
+        "Los dominios con confianza baja o caveats operativos requieren cautela interpretativa.",
+        "Se recomienda triangulacion con entrevista y contexto funcional.",
+    ]
+    for idx, item in enumerate(limitations, start=1):
+        story.append(Paragraph(_pdf_paragraph_safe(f"{idx}. {item}"), body_style))
+        story.append(Spacer(1, 0.03 * inch))
+
+    story.append(Spacer(1, 0.08 * inch))
+    story.append(Paragraph("Anexo tecnico", h1_style))
+    annex_rows = [
+        ["Session ID", str(session.id)],
+        ["Questionnaire ID", session.questionnaire_public_id],
+        ["Version cuestionario", session.questionnaire_version_label or "N/A"],
+        ["Version escalas", session.scales_version_label or "N/A"],
+        ["Pipeline/model bundle", (result_row.model_bundle_version if result_row else None) or session.model_pipeline_version or "N/A"],
+        ["Timestamp procesamiento", result_row.processed_at.isoformat() if result_row and result_row.processed_at else "N/A"],
+        ["Timestamp generacion PDF", generated_at.isoformat()],
+        ["Modo / Rol", f"{session.mode_key} / {role}"],
+        ["Runtime ms", str(result_row.runtime_ms) if result_row and result_row.runtime_ms is not None else "N/A"],
+    ]
+    story.append(_build_pdf_table([["Parametro", "Valor"], *annex_rows], [2.7 * inch, 7.0 * inch], font_size=8))
+
+    def _draw_footer(canvas, doc):
+        canvas.saveState()
+        footer = (
+            "CognIA | Reporte de screening/apoyo profesional | "
+            "No diagnostico automatico | Pagina %d" % doc.page
+        )
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(colors.HexColor("#6C7A89"))
+        canvas.drawString(36, 18, footer)
+        canvas.restoreState()
+
+    doc = SimpleDocTemplate(
+        str(file_path),
+        pagesize=landscape(letter),
+        leftMargin=0.35 * inch,
+        rightMargin=0.35 * inch,
+        topMargin=0.35 * inch,
+        bottomMargin=0.45 * inch,
+        title=f"Reporte screening {session.questionnaire_public_id}",
+        author="CognIA",
+    )
+    doc.build(story, onFirstPage=_draw_footer, onLaterPages=_draw_footer)
 
     export = QuestionnaireSessionPdfExport(
         session_id=session.id,
@@ -1885,7 +2510,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
         metadata_json=_encrypt_json(
             {
                 "questionnaire_version": session.questionnaire_version_label,
-                "model_bundle": session.model_pipeline_version,
+                "model_bundle": (result_row.model_bundle_version if result_row else None) or session.model_pipeline_version,
             },
             "questionnaire_session_pdf_export.metadata_json",
         ),
