@@ -9,6 +9,7 @@ PASSWORD="${PASSWORD:-}"
 TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-15}"
 SAMPLES_PER_ENDPOINT="${SAMPLES_PER_ENDPOINT:-3}"
 USER_AGENT="${DIAGNOSTIC_USER_AGENT:-CognIA-Diagnostic-Curl/1.0}"
+NETWORK_CURL_SSL_NO_REVOKE="${NETWORK_CURL_SSL_NO_REVOKE:-false}"
 
 if [[ -z "${OUTPUT_FILE}" ]]; then
   DEST="/dev/stdout"
@@ -51,6 +52,11 @@ write_line() {
   printf '%s\n' "$1" >>"${DEST}"
 }
 
+CURL_COMMON_OPTS=(-sS --max-time "${TIMEOUT_SECONDS}" -A "${USER_AGENT}")
+if [[ "$(echo "${NETWORK_CURL_SSL_NO_REVOKE}" | tr '[:upper:]' '[:lower:]')" =~ ^(1|true|yes|on)$ ]]; then
+  CURL_COMMON_OPTS+=(--ssl-no-revoke)
+fi
+
 root_url() {
   local path="$1"
   [[ "${path}" == /* ]] || path="/${path}"
@@ -72,12 +78,12 @@ curl_timing_line() {
   local http_code="000"
   local timing
   if [[ -n "${auth_header}" ]]; then
-    timing="$(curl -sS --max-time "${TIMEOUT_SECONDS}" -A "${USER_AGENT}" \
+    timing="$(curl "${CURL_COMMON_OPTS[@]}" \
       -H "${auth_header}" -o /dev/null \
       -w "http_code=%{http_code} time_namelookup=%{time_namelookup} time_connect=%{time_connect} time_appconnect=%{time_appconnect} time_starttransfer=%{time_starttransfer} time_total=%{time_total}" \
       "${url}" 2>"${tmp_file}" || true)"
   else
-    timing="$(curl -sS --max-time "${TIMEOUT_SECONDS}" -A "${USER_AGENT}" \
+    timing="$(curl "${CURL_COMMON_OPTS[@]}" \
       -o /dev/null \
       -w "http_code=%{http_code} time_namelookup=%{time_namelookup} time_connect=%{time_connect} time_appconnect=%{time_appconnect} time_starttransfer=%{time_starttransfer} time_total=%{time_total}" \
       "${url}" 2>"${tmp_file}" || true)"
@@ -104,7 +110,7 @@ PY
 TOKEN=""
 if [[ -n "${USERNAME}" && -n "${PASSWORD}" ]]; then
   LOGIN_PAYLOAD="{\"identifier\":\"${USERNAME}\",\"password\":\"${PASSWORD}\"}"
-  LOGIN_RAW="$(curl -sS --max-time "${TIMEOUT_SECONDS}" -A "${USER_AGENT}" \
+  LOGIN_RAW="$(curl "${CURL_COMMON_OPTS[@]}" \
     -H "Content-Type: application/json" \
     -X POST "$(api_url /auth/login)" \
     -d "${LOGIN_PAYLOAD}" \

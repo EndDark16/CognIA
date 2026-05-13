@@ -31,6 +31,19 @@ bool_is_true() {
   [[ "${value}" =~ ^(1|true|yes|on)$ ]]
 }
 
+to_k6_runtime_path() {
+  local path="$1"
+  if command -v cygpath >/dev/null 2>&1; then
+    case "$(uname -s 2>/dev/null || true)" in
+      MINGW*|MSYS*|CYGWIN*)
+        cygpath -w "${path}"
+        return 0
+        ;;
+    esac
+  fi
+  echo "${path}"
+}
+
 resolve_k6_script() {
   if [[ -n "${K6_SCRIPT_INPUT}" ]]; then
     echo "${K6_SCRIPT_INPUT}"
@@ -128,6 +141,10 @@ K6_SUMMARY_FILE="${RUN_DIR}/k6_summary_export.json"
 K6_RAW_FILE="${RUN_DIR}/k6_raw_output.json"
 K6_STDOUT_FILE="${RUN_DIR}/k6_stdout.log"
 K6_EXIT_CODE=0
+K6_SCRIPT_RUNTIME_PATH="$(to_k6_runtime_path "${K6_SCRIPT_PATH}")"
+K6_SUMMARY_RUNTIME_PATH="$(to_k6_runtime_path "${K6_SUMMARY_FILE}")"
+K6_RAW_RUNTIME_PATH="$(to_k6_runtime_path "${K6_RAW_FILE}")"
+K6_OUTPUT_DIR_RUNTIME_PATH="$(to_k6_runtime_path "${RUN_DIR}/k6_handle_summary")"
 
 log "running k6 scenario"
 (
@@ -141,11 +158,11 @@ log "running k6 scenario"
   TEST_RUN_ID="${TEST_RUN_ID}" \
   K6_VUS="${VUS}" \
   K6_DURATION="${DURATION}" \
-  K6_OUTPUT_DIR="${RUN_DIR}/k6_handle_summary" \
+  K6_OUTPUT_DIR="${K6_OUTPUT_DIR_RUNTIME_PATH}" \
   k6 run \
-    --summary-export "${K6_SUMMARY_FILE}" \
-    --out "json=${K6_RAW_FILE}" \
-    "${K6_SCRIPT_PATH}"
+    --summary-export "${K6_SUMMARY_RUNTIME_PATH}" \
+    --out "json=${K6_RAW_RUNTIME_PATH}" \
+    "${K6_SCRIPT_RUNTIME_PATH}"
 ) >"${K6_STDOUT_FILE}" 2>&1 || K6_EXIT_CODE=$?
 
 echo "${K6_EXIT_CODE}" >"${RUN_DIR}/k6_exit_code.txt"
@@ -162,11 +179,14 @@ OUTPUT_FILE="${RUN_DIR}/network_after.txt" BASE_URL="${BASE_URL}" API_PREFIX="${
 
 if [[ -f "${SCRIPT_DIR}/analyze_diagnostic_run.py" ]]; then
   log "running diagnostic analyzer"
+  ANALYZER_SCRIPT_RUNTIME_PATH="$(to_k6_runtime_path "${SCRIPT_DIR}/analyze_diagnostic_run.py")"
+  RUN_DIR_RUNTIME_PATH="$(to_k6_runtime_path "${RUN_DIR}")"
+  ANALYZER_OUTPUT_RUNTIME_PATH="$(to_k6_runtime_path "${RUN_DIR}/diagnostic_analysis.md")"
   (
     cd "${REPO_ROOT}"
-    python "${SCRIPT_DIR}/analyze_diagnostic_run.py" \
-      --run-dir "${RUN_DIR}" \
-      --output "${RUN_DIR}/diagnostic_analysis.md"
+    python "${ANALYZER_SCRIPT_RUNTIME_PATH}" \
+      --run-dir "${RUN_DIR_RUNTIME_PATH}" \
+      --output "${ANALYZER_OUTPUT_RUNTIME_PATH}"
   ) >"${RUN_DIR}/analyzer.log" 2>&1 || true
 fi
 
@@ -181,7 +201,11 @@ context = run_dir / "run_context.env"
 exit_code_file = run_dir / "k6_exit_code.txt"
 
 def metric(data, name, field):
-    return (((data or {}).get("metrics") or {}).get(name) or {}).get("values", {}).get(field)
+    metric_obj = (((data or {}).get("metrics") or {}).get(name) or {})
+    values = metric_obj.get("values")
+    if isinstance(values, dict) and field in values:
+        return values.get(field)
+    return metric_obj.get(field)
 
 data = {}
 if summary.exists():
