@@ -1,4 +1,4 @@
-# AGENTS.md
+﻿# AGENTS.md
 
 ## Propósito del proyecto
 Este repositorio implementa una tesis de ingeniería aplicada en salud mental infantil: un sistema de alerta temprana para niños de 6 a 11 años.
@@ -889,3 +889,33 @@ Claim metodologico sin cambios:
 - Estado metodologico A4:
   - instrumentacion y analisis forense versionados en repo.
   - atribucion causal completa queda `no concluyente` hasta ejecutar ventana completa autenticada con snapshots host/db/network/waf correlados.
+
+## Actualizacion de estado (2026-05-12) - A4 bottleneck attribution complete
+- Se completo la fase A4 de diagnostico bajo carga controlada contra `https://www.cognia.lat` con tooling versionado:
+  - `scripts/diagnostics/run_diagnostic_window.sh`
+  - `scripts/diagnostics/analyze_diagnostic_run.py`
+  - `k6_diagnostic_health_vs_api`, `k6_diagnostic_auth_vs_qv2`, `k6_diagnostic_ladder_short`, `k6_diagnostic_soak_light`.
+- Corridas finales ejecutadas:
+  - health_vs_api 10 VUs 5m
+  - auth_vs_qv2 10 VUs
+  - auth_vs_qv2 20 VUs
+  - ladder_short 10->30
+  - soak_light 20 VUs 10m
+- Usuario sintetico temporal usado: `diag01` (activo, sin MFA, no admin), con credencial guardada localmente en `artifacts/local_only/a4_diag_user.txt` (no versionado).
+- Atribucion final cerrada:
+  - cuello primario: latencia del path DB-backed (Supabase/PostgreSQL) visible en `readyz` y `qv2_active`.
+  - cuello secundario: piso de latencia edge/red (Cloudflare + red de origen).
+  - factor secundario adicional: cache in-memory por worker (no compartida), con outliers por misses/rotacion.
+- Evidencia principal versionada en reportes:
+  - `reports/performance/2026-05-10_a4_bottleneck_analysis.md`
+  - `reports/performance/2026-05-10_a4_bottleneck_attribution_final_report.md`
+- Evidencia operativa local no versionada en:
+  - `artifacts/diagnostics/20260512T230500Z_diagnostic_health_vs_api_a4_health_10vu_final/`
+  - `artifacts/diagnostics/20260512T231118Z_diagnostic_auth_vs_qv2_a4_authqv2_10vu_final/`
+  - `artifacts/diagnostics/20260512T231726Z_diagnostic_auth_vs_qv2_a4_authqv2_20vu_final/`
+  - `artifacts/diagnostics/20260512T232345Z_diagnostic_ladder_short_a4_ladder_10_30_final/`
+  - `artifacts/diagnostics/20260512T233005Z_diagnostic_soak_light_a4_soak_20vu_10m_final/`
+- Limitaciones reales documentadas con error exacto:
+  - SSH host de produccion no accesible (`port 22: Connection timed out`).
+  - `psql` no disponible en runner local para snapshot SQL directo.
+  - `/api/admin/metrics` requiere rol ADMIN (`403` con usuario sintetico no admin).
