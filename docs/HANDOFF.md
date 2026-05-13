@@ -997,3 +997,35 @@ Actualizacion operativa (2026-05-10) - ejecucion real en produccion:
 - A4 diagnostic outcome state:
   - tooling/reporting promoted successfully;
   - full bottleneck attribution still requires authenticated diagnostic windows with host/network/DB/WAF snapshots in the same time window.
+
+## 2026-05-12 - A4 bottleneck attribution (cerrado)
+
+### Estado
+- Fase A4 completada con ejecucion real de ventana diagnostica y clasificacion final de cuello.
+- Reportes finales:
+  - `reports/performance/2026-05-10_a4_bottleneck_analysis.md`
+  - `reports/performance/2026-05-10_a4_bottleneck_attribution_final_report.md`
+
+### Resultado tecnico
+- Cuello primario: latencia del path DB-backed (Supabase/PostgreSQL), evidenciado por `readyz` y `qv2_active`.
+- Cuello secundario: piso de latencia edge/red (Cloudflare + red de origen).
+- Factor secundario adicional: cache in-memory por worker/proceso (no compartida), con outliers por misses.
+
+### Corridas ejecutadas
+- `diagnostic_health_vs_api` 10 VUs 5m
+- `diagnostic_auth_vs_qv2` 10 VUs
+- `diagnostic_auth_vs_qv2` 20 VUs
+- `diagnostic_ladder_short` 10->30
+- `diagnostic_soak_light` 20 VUs 10m
+
+### Evidencia local (no versionada)
+- `artifacts/diagnostics/20260512T230500Z_diagnostic_health_vs_api_a4_health_10vu_final/`
+- `artifacts/diagnostics/20260512T231118Z_diagnostic_auth_vs_qv2_a4_authqv2_10vu_final/`
+- `artifacts/diagnostics/20260512T231726Z_diagnostic_auth_vs_qv2_a4_authqv2_20vu_final/`
+- `artifacts/diagnostics/20260512T232345Z_diagnostic_ladder_short_a4_ladder_10_30_final/`
+- `artifacts/diagnostics/20260512T233005Z_diagnostic_soak_light_a4_soak_20vu_10m_final/`
+
+### Limitaciones reales documentadas
+- Sin SSH productivo (port 22 timeout en `cognia.lat` y `www.cognia.lat`).
+- Sin `psql` en runner local para snapshot SQL directo.
+- `/api/admin/metrics` no accesible con usuario sintetico no-admin (403).
