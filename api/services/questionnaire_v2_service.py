@@ -1,4 +1,5 @@
 import json
+import os
 import secrets
 import uuid
 from collections import defaultdict
@@ -12,7 +13,7 @@ from typing import Any
 import joblib
 import pandas as pd
 from flask import current_app
-from sqlalchemy import case, func, or_
+from sqlalchemy import and_, case, func, or_
 
 from api.cache import (
     qv2_activation_snapshot_cache,
@@ -84,6 +85,9 @@ CLINICAL_SUMMARY_DISCLAIMER = (
     "calificado antes de tomar decisiones clinicas, educativas o terapeuticas."
 )
 
+FEATURE_COVERAGE_WARN_THRESHOLD = 0.80
+FEATURE_COVERAGE_FAIL_THRESHOLD = 0.50
+
 
 class RuntimeArtifactResolutionError(RuntimeError):
     """Raised when an active champion artifact cannot be resolved/executed."""
@@ -139,6 +143,31 @@ def _default_feature_value(feature: str) -> Any:
     if lowered in {"age_years", "age"}:
         return 9.0
     return 0.0
+
+
+def _truthy_env_flag(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _allow_testing_heuristic_fallback() -> bool:
+    if bool(current_app.config.get("TESTING")):
+        return True
+    cfg_value = current_app.config.get("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS")
+    if _truthy_env_flag(cfg_value):
+        return True
+    return _truthy_env_flag(os.getenv("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS"))
+
+
+def _feature_contract_coverage(feature_map: dict[str, Any], feature_columns: list[str]) -> tuple[float, int, int]:
+    total = len(feature_columns)
+    if total <= 0:
+        return 0.0, 0, 0
+    answered = sum(1 for col in feature_columns if col in feature_map)
+    return answered / float(total), answered, total
 
 
 def _json(value: Any) -> Any:
@@ -359,9 +388,12 @@ def _load_feature_contract_cached(
     return list(feature_columns), metadata
 
 
-def _load_feature_contract(model_version: ModelVersion) -> tuple[list[str], dict[str, Any]]:
+def _load_feature_contract(
+    model_version: ModelVersion,
+    artifact_path_override: str | None = None,
+) -> tuple[list[str], dict[str, Any]]:
     metadata = model_version.metadata_json or {}
-    artifact_path = model_version.artifact_path or model_version.fallback_artifact_path
+    artifact_path = artifact_path_override or model_version.artifact_path or model_version.fallback_artifact_path
     try:
         metadata_signature = json.dumps(metadata, sort_keys=True, ensure_ascii=True)
     except Exception:
@@ -762,8 +794,62 @@ def get_session_or_404(session_id: uuid.UUID) -> QuestionnaireSession:
     return row
 
 
-def get_session_payload(session: QuestionnaireSession) -> dict[str, Any]:
+def _session_answer_rows(session: QuestionnaireSession):
+    return (
+        db.session.query(
+            QuestionnaireSessionItem,
+            QuestionnaireQuestion,
+            QuestionnaireSessionAnswer,
+            QuestionnaireSection,
+        )
+        .join(
+            QuestionnaireQuestion,
+            QuestionnaireSessionItem.question_id == QuestionnaireQuestion.id,
+        )
+        .outerjoin(
+            QuestionnaireSessionAnswer,
+            and_(
+                QuestionnaireSessionAnswer.session_id == QuestionnaireSessionItem.session_id,
+                QuestionnaireSessionAnswer.question_id == QuestionnaireSessionItem.question_id,
+            ),
+        )
+        .outerjoin(
+            QuestionnaireSection,
+            QuestionnaireQuestion.section_id == QuestionnaireSection.id,
+        )
+        .filter(QuestionnaireSessionItem.session_id == session.id)
+        .filter(QuestionnaireSessionItem.is_visible.is_(True))
+        .order_by(
+            QuestionnaireSessionItem.page_number.asc(),
+            QuestionnaireSessionItem.display_order.asc(),
+        )
+        .all()
+    )
+
+
+def _build_answer_resume_payload(
+    question: QuestionnaireQuestion,
+    section: QuestionnaireSection | None,
+    answer_row: QuestionnaireSessionAnswer,
+) -> dict[str, Any]:
     return {
+        "question_id": str(question.id),
+        "question_code": question.question_code,
+        "section": section.title if section else None,
+        "answer": _decrypt_json(
+            answer_row.answer_raw,
+            "questionnaire_session_answer.answer_raw",
+        ),
+        "answer_value": _decrypt_text(
+            answer_row.answer_normalized,
+            "questionnaire_session_answer.answer_normalized",
+        ),
+        "updated_at": answer_row.updated_at.isoformat() if answer_row.updated_at else None,
+    }
+
+
+def get_session_payload(session: QuestionnaireSession, include_answers: bool = False) -> dict[str, Any]:
+    payload = {
         "session_id": str(session.id),
         "questionnaire_id": session.questionnaire_public_id,
         "status": session.status,
@@ -775,6 +861,18 @@ def get_session_payload(session: QuestionnaireSession) -> dict[str, Any]:
         "created_at": session.created_at.isoformat() if session.created_at else None,
         "updated_at": session.updated_at.isoformat() if session.updated_at else None,
     }
+    if include_answers:
+        rows = _session_answer_rows(session)
+        answers = [
+            _build_answer_resume_payload(question, section, answer_row)
+            for _item, question, answer_row, section in rows
+            if answer_row and answer_row.answer_raw is not None
+        ]
+        payload["total_questions"] = len(rows)
+        payload["answered_count"] = len(answers)
+        payload["progress_percent"] = float(session.progress_pct or 0)
+        payload["answers"] = answers
+    return payload
 
 
 def get_session_page_payload(session: QuestionnaireSession, page: int, page_size: int) -> dict[str, Any]:
@@ -805,10 +903,21 @@ def get_session_page_payload(session: QuestionnaireSession, page: int, page_size
     grouped: dict[int, list[dict[str, Any]]] = defaultdict(list)
     if page_numbers:
         rows = (
-            db.session.query(QuestionnaireSessionItem, QuestionnaireQuestion)
+            db.session.query(
+                QuestionnaireSessionItem,
+                QuestionnaireQuestion,
+                QuestionnaireSessionAnswer,
+            )
             .join(
                 QuestionnaireQuestion,
                 QuestionnaireSessionItem.question_id == QuestionnaireQuestion.id,
+            )
+            .outerjoin(
+                QuestionnaireSessionAnswer,
+                and_(
+                    QuestionnaireSessionAnswer.session_id == QuestionnaireSessionItem.session_id,
+                    QuestionnaireSessionAnswer.question_id == QuestionnaireSessionItem.question_id,
+                ),
             )
             .filter(QuestionnaireSessionItem.session_id == session.id)
             .filter(QuestionnaireSessionItem.is_visible.is_(True))
@@ -819,7 +928,20 @@ def get_session_page_payload(session: QuestionnaireSession, page: int, page_size
             )
             .all()
         )
-        for item, question in rows:
+        for item, question, answer_row in rows:
+            answer = None
+            answer_value = None
+            answer_updated_at = None
+            if answer_row and answer_row.answer_raw is not None:
+                answer = _decrypt_json(
+                    answer_row.answer_raw,
+                    "questionnaire_session_answer.answer_raw",
+                )
+                answer_value = _decrypt_text(
+                    answer_row.answer_normalized,
+                    "questionnaire_session_answer.answer_normalized",
+                )
+                answer_updated_at = answer_row.updated_at.isoformat() if answer_row.updated_at else None
             grouped[item.page_number].append(
                 {
                     "session_item_id": str(item.id),
@@ -836,6 +958,9 @@ def get_session_page_payload(session: QuestionnaireSession, page: int, page_size
                     "min_value": question.min_value,
                     "max_value": question.max_value,
                     "answered": bool(item.answered),
+                    "answer": answer,
+                    "answer_value": answer_value,
+                    "answer_updated_at": answer_updated_at,
                 }
             )
 
@@ -1068,8 +1193,18 @@ def _heuristic_domain_probability(domain: str, feature_map: dict[str, Any]) -> f
 
 
 def _model_probability(model_version: ModelVersion, feature_map: dict[str, Any], domain: str) -> float:
-    artifact_path = model_version.artifact_path or model_version.fallback_artifact_path
-    allow_testing_heuristic = bool(current_app.config.get("TESTING"))
+    primary_artifact_path = (model_version.artifact_path or "").strip()
+    fallback_artifact_path = (model_version.fallback_artifact_path or "").strip()
+    artifact_path = primary_artifact_path
+    allow_testing_heuristic = _allow_testing_heuristic_fallback()
+    if not artifact_path and allow_testing_heuristic and fallback_artifact_path:
+        artifact_path = fallback_artifact_path
+        current_app.logger.warning(
+            "qv2_testing_runtime_fallback artifact_missing_using_fallback domain=%s model_id=%s fallback_path=%s",
+            domain,
+            model_version.model_registry_id,
+            fallback_artifact_path,
+        )
     if not artifact_path:
         if allow_testing_heuristic:
             return _heuristic_domain_probability(domain, feature_map)
@@ -1077,16 +1212,42 @@ def _model_probability(model_version: ModelVersion, feature_map: dict[str, Any],
             f"active_artifact_missing_path:{domain}:{model_version.model_registry_id}"
         )
     if not Path(artifact_path).exists():
-        if allow_testing_heuristic:
+        if allow_testing_heuristic and fallback_artifact_path and Path(fallback_artifact_path).exists():
+            artifact_path = fallback_artifact_path
+            current_app.logger.warning(
+                "qv2_testing_runtime_fallback artifact_not_found_using_fallback domain=%s model_id=%s fallback_path=%s",
+                domain,
+                model_version.model_registry_id,
+                fallback_artifact_path,
+            )
+        elif allow_testing_heuristic:
             return _heuristic_domain_probability(domain, feature_map)
+        else:
+            raise RuntimeArtifactResolutionError(
+                f"active_artifact_not_found:{domain}:{artifact_path}"
+            )
+    if not Path(artifact_path).exists():
         raise RuntimeArtifactResolutionError(
             f"active_artifact_not_found:{domain}:{artifact_path}"
         )
 
-    feature_columns, _ = _load_feature_contract(model_version)
+    feature_columns, _ = _load_feature_contract(model_version, artifact_path_override=artifact_path)
     if not feature_columns:
         raise RuntimeArtifactResolutionError(
             f"active_feature_contract_missing:{domain}:{model_version.model_registry_id}"
+        )
+    coverage, answered, total = _feature_contract_coverage(feature_map, feature_columns)
+    if coverage < FEATURE_COVERAGE_WARN_THRESHOLD:
+        current_app.logger.warning(
+            "qv2_feature_coverage_low domain=%s coverage=%.4f answered=%s total=%s",
+            domain,
+            coverage,
+            answered,
+            total,
+        )
+    if coverage < FEATURE_COVERAGE_FAIL_THRESHOLD and not allow_testing_heuristic:
+        raise RuntimeArtifactResolutionError(
+            f"feature_coverage_below_minimum:{domain}:{coverage:.4f}:{answered}/{total}"
         )
 
     vector = {}
@@ -1820,28 +1981,31 @@ def _pdf_output_dir() -> Path:
 
 
 def _pdf_reportlab_backend():
-    from reportlab.lib import colors
-    from reportlab.lib.pagesizes import landscape, letter
-    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-    from reportlab.lib.units import inch
-    from reportlab.platypus import Image as RLImage
-    from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+    try:
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import landscape, letter
+        from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+        from reportlab.lib.units import inch
+        from reportlab.platypus import Image as RLImage
+        from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-    return {
-        "colors": colors,
-        "landscape": landscape,
-        "letter": letter,
-        "ParagraphStyle": ParagraphStyle,
-        "getSampleStyleSheet": getSampleStyleSheet,
-        "inch": inch,
-        "RLImage": RLImage,
-        "PageBreak": PageBreak,
-        "Paragraph": Paragraph,
-        "SimpleDocTemplate": SimpleDocTemplate,
-        "Spacer": Spacer,
-        "Table": Table,
-        "TableStyle": TableStyle,
-    }
+        return {
+            "colors": colors,
+            "landscape": landscape,
+            "letter": letter,
+            "ParagraphStyle": ParagraphStyle,
+            "getSampleStyleSheet": getSampleStyleSheet,
+            "inch": inch,
+            "RLImage": RLImage,
+            "PageBreak": PageBreak,
+            "Paragraph": Paragraph,
+            "SimpleDocTemplate": SimpleDocTemplate,
+            "Spacer": Spacer,
+            "Table": Table,
+            "TableStyle": TableStyle,
+        }
+    except ModuleNotFoundError:
+        return None
 
 
 def _pdf_paragraph_safe(value: Any) -> str:
@@ -2144,6 +2308,8 @@ def _operational_recommendation_for_pdf(domains: list[dict[str, Any]], default_r
 
 def _build_pdf_table(rows: list[list[Any]], col_widths: list[float], font_size: int = 8):
     backend = _pdf_reportlab_backend()
+    if backend is None:
+        raise RuntimeError("reportlab_not_available")
     Table = backend["Table"]
     TableStyle = backend["TableStyle"]
     colors = backend["colors"]
@@ -2170,6 +2336,45 @@ def _build_pdf_table(rows: list[list[Any]], col_widths: list[float], font_size: 
     return table
 
 
+def _write_legacy_pdf(file_path: Path, session: QuestionnaireSession, result_payload: dict[str, Any], domains: list[dict[str, Any]]) -> None:
+    probabilities = [float(item["probability"]) * 100.0 for item in domains]
+    labels = [item["domain"].upper() for item in domains]
+    plt, PdfPages = _pdf_plot_backend()
+
+    with PdfPages(file_path) as pdf:
+        fig, ax = plt.subplots(figsize=(11, 8.5))
+        ax.barh(labels, probabilities, color="#2E6F95")
+        ax.set_xlim(0, 100)
+        ax.set_xlabel("Probabilidad (%)")
+        ax.set_title("Resultados por dominio (screening no diagnostico)")
+        for idx, val in enumerate(probabilities):
+            ax.text(val + 1, idx, f"{val:.1f}%", va="center", fontsize=9)
+        plt.tight_layout()
+        pdf.savefig(fig)
+        plt.close(fig)
+
+        fig2, ax2 = plt.subplots(figsize=(11, 8.5))
+        ax2.axis("off")
+        lines = [
+            f"Questionnaire ID: {session.questionnaire_public_id}",
+            f"Session ID: {session.id}",
+            f"Generated at: {_utcnow().isoformat()}",
+            f"Mode: {session.mode} ({session.mode_key})",
+            f"Role: {_normalize_role(session.respondent_role)}",
+            f"Questionnaire version: {session.questionnaire_version_label}",
+            "",
+            f"Executive summary: {result_payload['result'].get('summary') or 'N/A'}",
+            f"Operational recommendation: {result_payload['result'].get('operational_recommendation') or 'N/A'}",
+            "",
+            "Important: this report is for screening/support in simulated setting, not automatic diagnosis.",
+        ]
+        for idx, line in enumerate(lines):
+            ax2.text(0.02, 0.96 - idx * 0.05, line, fontsize=10, ha="left", va="top")
+        plt.tight_layout()
+        pdf.savefig(fig2)
+        plt.close(fig2)
+
+
 def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> QuestionnaireSessionPdfExport:
     result_payload = get_results_payload(session)
     domains = result_payload["domains"]
@@ -2185,6 +2390,28 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
     domain_stats = _domain_question_stats(question_rows)
 
     backend = _pdf_reportlab_backend()
+    if backend is None:
+        current_app.logger.warning("reportlab not installed; using legacy matplotlib PDF renderer")
+        _write_legacy_pdf(file_path=file_path, session=session, result_payload=result_payload, domains=domains)
+        export = QuestionnaireSessionPdfExport(
+            session_id=session.id,
+            file_path=str(file_path),
+            file_name=file_name,
+            status="generated",
+            generated_by_user_id=user_id,
+            metadata_json=_encrypt_json(
+                {
+                    "questionnaire_version": session.questionnaire_version_label,
+                    "model_bundle": (result_row.model_bundle_version if result_row else None) or session.model_pipeline_version,
+                },
+                "questionnaire_session_pdf_export.metadata_json",
+            ),
+        )
+        db.session.add(export)
+        _audit(session.id, user_id, "pdf_generated", {"file_path": str(file_path), "renderer": "matplotlib_legacy"})
+        db.session.commit()
+        return export
+
     colors = backend["colors"]
     landscape = backend["landscape"]
     letter = backend["letter"]

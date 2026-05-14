@@ -729,12 +729,20 @@ def refresh():
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required()
 def logout():
+    def _logout_response(payload: dict, status_code: int):
+        resp = jsonify(payload)
+        clear_auth_cookies(resp)
+        return resp, status_code
+
     identity = _parse_identity(get_jwt_identity())
     if not identity:
-        return _error_response("Invalid user", "invalid_user", 401)
+        return _logout_response({"msg": "Invalid user", "error": "invalid_user"}, 401)
 
     if not validate_csrf_header():
-        return _error_response("Missing or invalid CSRF token", "csrf_failed", 403)
+        return _logout_response(
+            {"msg": "Missing or invalid CSRF token", "error": "csrf_failed"},
+            403,
+        )
 
     # Revoke all refresh tokens for this user (logout all sessions)
     try:
@@ -742,7 +750,7 @@ def logout():
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Database error revoking refresh tokens for %s: %s", identity, e, exc_info=True)
-        return jsonify({"msg": "Database error"}), 500
+        return _logout_response({"msg": "Database error", "error": "db_error"}, 500)
 
     last_session = (
         UserSession.query.filter_by(user_id=identity, ended_at=None)
@@ -758,12 +766,10 @@ def logout():
     except Exception as e:
         db.session.rollback()
         current_app.logger.error("Database error on logout for user %s: %s", identity, e, exc_info=True)
-        return jsonify({"msg": "Database error"}), 500
+        return _logout_response({"msg": "Database error", "error": "db_error"}, 500)
 
     log_audit(identity, "logout", "auth", "User logged out")
-    response = jsonify({"message": "logged out"})
-    clear_auth_cookies(response)
-    return response, 200
+    return _logout_response({"message": "logged out"}, 200)
 
 
 @auth_bp.route("/me", methods=["GET"])

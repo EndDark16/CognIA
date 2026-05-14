@@ -2,8 +2,8 @@ import bcrypt
 import re
 from app.models import db, AuditLog, AppUser, RefreshToken
 from datetime import datetime, timezone
-from flask import request
-from flask_jwt_extended import set_refresh_cookies
+from flask import current_app, request
+from flask_jwt_extended import set_refresh_cookies, unset_jwt_cookies
 from cryptography.fernet import Fernet, InvalidToken
 import base64
 import os
@@ -82,11 +82,52 @@ def set_refresh_cookie(response, refresh_token: str) -> None:
 
 
 def clear_auth_cookies(response) -> None:
-    """Clear auth-related cookies (refresh + csrf)."""
-    response.delete_cookie("refresh_token", path="/api/auth/refresh")
-    response.delete_cookie("csrf_refresh_token", path="/")
-    # Also clear default access cookie name to be safe
-    response.delete_cookie("access_token_cookie", path="/")
+    """Clear auth-related cookies using framework defaults plus defensive variants."""
+    unset_jwt_cookies(response)
+
+    access_cookie = current_app.config.get("JWT_ACCESS_COOKIE_NAME", "access_token_cookie")
+    refresh_cookie = current_app.config.get("JWT_REFRESH_COOKIE_NAME", "refresh_token")
+    access_csrf_cookie = current_app.config.get("JWT_ACCESS_CSRF_COOKIE_NAME", "csrf_access_token")
+    refresh_csrf_cookie = current_app.config.get("JWT_REFRESH_CSRF_COOKIE_NAME", "csrf_refresh_token")
+
+    cookie_names = [access_cookie, refresh_cookie, access_csrf_cookie, refresh_csrf_cookie]
+    cookie_paths = [
+        current_app.config.get("JWT_ACCESS_COOKIE_PATH", "/"),
+        current_app.config.get("JWT_REFRESH_COOKIE_PATH", "/api/auth/refresh"),
+        current_app.config.get("JWT_ACCESS_CSRF_COOKIE_PATH", "/"),
+        current_app.config.get("JWT_REFRESH_CSRF_COOKIE_PATH", "/"),
+        "/",
+        "/api",
+        "/api/auth",
+        "/api/auth/refresh",
+    ]
+    cookie_domain = current_app.config.get("JWT_COOKIE_DOMAIN")
+    domains = [None]
+    if cookie_domain:
+        domains.append(cookie_domain)
+    secure = current_app.config.get("JWT_COOKIE_SECURE")
+    samesite = current_app.config.get("JWT_COOKIE_SAMESITE")
+
+    seen = set()
+    for cookie_name in cookie_names:
+        if not cookie_name:
+            continue
+        for cookie_path in cookie_paths:
+            if not cookie_path:
+                continue
+            for domain in domains:
+                key = (cookie_name, cookie_path, domain)
+                if key in seen:
+                    continue
+                seen.add(key)
+                kwargs = {
+                    "path": cookie_path,
+                    "secure": bool(secure),
+                    "samesite": samesite,
+                }
+                if domain:
+                    kwargs["domain"] = domain
+                response.delete_cookie(cookie_name, **kwargs)
 
 
 def validate_csrf_header(header_name: str = "X-CSRF-Token", cookie_name: str = "csrf_refresh_token") -> bool:

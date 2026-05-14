@@ -14,6 +14,14 @@ Base path: `/api/v2`
 - `PATCH /questionnaires/sessions/{id}/answers`
 - `POST /questionnaires/sessions/{id}/submit`
 
+### Continuacion de borrador (resume)
+- `GET /questionnaires/sessions/{id}` devuelve estado reanudable para el duenio autorizado:
+  - `session_id`, `status`, `mode`, `role`, `progress_pct`
+  - `answered_count`, `total_questions`
+  - `answers[]` con `question_id`, `question_code`, `section`, `answer`, `answer_value`, `updated_at`
+- `GET /questionnaires/sessions/{id}/page` devuelve por pregunta:
+  - `answered`, `answer`, `answer_value`, `answer_updated_at`
+
 ## Historial y resultados
 - `GET /questionnaires/history`
 - `GET /questionnaires/history/{id}`

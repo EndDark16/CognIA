@@ -39,6 +39,7 @@ from api.metrics import (
     record_error_metric,
     configure_metrics,
 )
+from api.security import clear_auth_cookies
 import logging
 from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import SQLAlchemyError, OperationalError, DBAPIError
@@ -193,6 +194,10 @@ def create_app(config_class=DevelopmentConfig):
     
     @jwt.unauthorized_loader
     def handle_missing_or_bad_token(reason):
+        if request.method == "POST" and request.path.rstrip("/") == "/api/auth/logout":
+            resp = jsonify({"message": "logged out"})
+            clear_auth_cookies(resp)
+            return resp, 200
         reason_lower = reason.lower()
         if "csrf" in reason_lower:
             return {"msg": "Missing or invalid CSRF token", "error": "csrf_failed"}, 403
@@ -200,14 +205,26 @@ def create_app(config_class=DevelopmentConfig):
 
     @jwt.invalid_token_loader
     def handle_invalid_token(reason):
+        if request.method == "POST" and request.path.rstrip("/") == "/api/auth/logout":
+            resp = jsonify({"message": "logged out"})
+            clear_auth_cookies(resp)
+            return resp, 200
         return {"msg": "Unauthorized", "error": "unauthorized"}, 401
 
     @jwt.expired_token_loader
     def handle_expired_token(jwt_header, jwt_payload):
+        if request.method == "POST" and request.path.rstrip("/") == "/api/auth/logout":
+            resp = jsonify({"message": "logged out"})
+            clear_auth_cookies(resp)
+            return resp, 200
         return {"msg": "Token expired", "error": "token_expired"}, 401
 
     @jwt.revoked_token_loader
     def handle_revoked_token(jwt_header, jwt_payload):
+        if request.method == "POST" and request.path.rstrip("/") == "/api/auth/logout":
+            resp = jsonify({"message": "logged out"})
+            clear_auth_cookies(resp)
+            return resp, 200
         return {"msg": "Token revoked", "error": "token_revoked"}, 401
 
     # Enable CORS with credentials
