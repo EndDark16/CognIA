@@ -8,9 +8,15 @@ __pycache__
 .pytest_cache
 venv
 .env
-data
-models
+data/*
+!data/cuestionario_v16.4/**
+!data/hybrid_active_modes_freeze_v17/**
+!data/hybrid_operational_freeze_v17/**
+models/*
+!models/active_modes/**
+!models/champions/**
 *.pkl
+!models/**/*.pkl
 *.sqlite
 *.db
 *.egg-info

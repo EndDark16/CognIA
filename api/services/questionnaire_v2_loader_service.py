@@ -1,5 +1,6 @@
-﻿import json
+import json
 import math
+import os
 import re
 import uuid
 from dataclasses import dataclass
@@ -538,10 +539,21 @@ def _resolve_mode_key(role: str, mode: str) -> str:
     raise ValueError(f"invalid role/mode pair: {role}/{mode}")
 
 
+def _allow_legacy_model_fallback_for_tests() -> bool:
+    if bool(current_app.config.get("TESTING")):
+        return True
+    raw = current_app.config.get("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS")
+    if raw is None:
+        raw = os.getenv("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS")
+    return str(raw or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _resolve_artifact_path(domain: str, model_key: str, calibration: str | None = None) -> tuple[str, str]:
     domain = domain.lower()
     calib = _normalize_text(calibration).lower()
     slot_dir = Path("models") / "active_modes" / model_key
+    allow_legacy = _allow_legacy_model_fallback_for_tests()
+    legacy_dir = Path("models") / "champions" / f"rf_{domain}_current"
     preferred = (
         [slot_dir / "calibrated.joblib", slot_dir / "pipeline.joblib"]
         if calib and calib != "none"
@@ -549,35 +561,31 @@ def _resolve_artifact_path(domain: str, model_key: str, calibration: str | None 
     )
     for path in preferred:
         if path.exists():
-            fallback = Path("models") / "champions" / f"rf_{domain}_current" / path.name
-            return str(path), str(fallback)
+            fallback = str(legacy_dir / path.name) if allow_legacy else ""
+            return str(path), fallback
 
     # Hardened resolution: if exact canonical names do not exist, use any slot-local joblib.
     if slot_dir.exists():
         dynamic_candidates = sorted(slot_dir.glob("*.joblib"))
         if dynamic_candidates:
             picked = dynamic_candidates[0]
-            fallback = Path("models") / "champions" / f"rf_{domain}_current" / picked.name
-            return str(picked), str(fallback)
+            fallback = str(legacy_dir / picked.name) if allow_legacy else ""
+            return str(picked), fallback
 
-    fallback_candidates = [
-        Path("models") / "champions" / f"rf_{domain}_current" / "calibrated.joblib",
-        Path("models") / "champions" / f"rf_{domain}_current" / "pipeline.joblib",
-    ]
-    fallback = next((str(path) for path in fallback_candidates if path.exists()), None)
-    if fallback:
-        primary = str(preferred[0])
-        return primary, fallback
+    fallback = ""
+    if allow_legacy:
+        fallback_candidates = [
+            legacy_dir / "calibrated.joblib",
+            legacy_dir / "pipeline.joblib",
+        ]
+        fallback = next((str(path) for path in fallback_candidates if path.exists()), "")
+        if not fallback and legacy_dir.exists():
+            dynamic_fallback = sorted(legacy_dir.glob("*.joblib"))
+            if dynamic_fallback:
+                fallback = str(dynamic_fallback[0])
 
-    fallback_dir = Path("models") / "champions" / f"rf_{domain}_current"
-    if fallback_dir.exists():
-        dynamic_fallback = sorted(fallback_dir.glob("*.joblib"))
-        if dynamic_fallback:
-            primary = str(preferred[0])
-            return primary, str(dynamic_fallback[0])
-
-    # Deterministic expected paths even when artifacts are not present locally.
-    return str(preferred[0]), str(fallback_candidates[0])
+    # Deterministic expected primary path even when artifacts are not present locally.
+    return str(preferred[0]), fallback
 
 
 def sync_active_models() -> dict[str, Any]:
@@ -830,3 +838,4 @@ def get_active_activation(domain: str, mode_key: str, role: str) -> ModelModeDom
             return row
 
     raise LookupError(f"activation_not_found:{domain}:{mode_key}:{canonical_role}")
+
