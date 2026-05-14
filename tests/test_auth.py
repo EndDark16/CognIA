@@ -57,6 +57,23 @@ def _persist_cookies(client, set_cookie_headers):
     return refresh_cookie_val, csrf_refresh
 
 
+def _has_expired_cookie(set_cookie_headers, cookie_name: str, path: str | None = None, domain: str | None = None) -> bool:
+    normalized_domain = (domain or "").lstrip(".").lower()
+    for header in set_cookie_headers:
+        if f"{cookie_name}=" not in header:
+            continue
+        if ("Max-Age=0" not in header) and ("Expires=" not in header):
+            continue
+        if path and f"Path={path}" not in header:
+            continue
+        if normalized_domain:
+            header_lower = header.lower()
+            if f"domain={normalized_domain}" not in header_lower:
+                continue
+        return True
+    return False
+
+
 def test_register_and_login(client):
     username = f"testuser_{uuid.uuid4().hex[:8]}"
     email = f"{username}@example.com"
@@ -119,8 +136,8 @@ def test_register_and_login(client):
         },
     )
     assert resp_logout.status_code == 200
-    logout_set_cookie = resp_logout.headers.get("Set-Cookie", "")
-    assert "refresh_token=" in logout_set_cookie and ("Max-Age=0" in logout_set_cookie or "Expires=" in logout_set_cookie)
+    logout_set_cookie_headers = resp_logout.headers.getlist("Set-Cookie")
+    assert _has_expired_cookie(logout_set_cookie_headers, "refresh_token")
 
     client2 = create_app(TestingConfig).test_client()
     resp_no_cookie = client2.post(
@@ -465,6 +482,89 @@ def test_logout_revokes_refresh(client):
     client.set_cookie("csrf_refresh_token", old_csrf, path="/")
     resp_refresh = client.post("/api/auth/refresh", headers={"X-CSRF-Token": old_csrf})
     assert resp_refresh.status_code == 401
+
+
+def test_logout_clears_jwt_cookies_with_configured_paths(client, app):
+    username = f"logout_path_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+
+    client.post(
+        "/api/auth/register",
+        json={"username": username, "email": email, "password": password, "full_name": "Logout Path", "user_type": "guardian"},
+    )
+    resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
+    assert resp_login.status_code == 200
+    access_token = resp_login.json["access_token"]
+    _, csrf_refresh = _persist_cookies(client, resp_login.headers.getlist("Set-Cookie"))
+
+    resp_logout = client.post(
+        "/api/auth/logout",
+        headers={"Authorization": f"Bearer {access_token}", "X-CSRF-Token": csrf_refresh},
+    )
+    assert resp_logout.status_code == 200
+    set_cookie_headers = resp_logout.headers.getlist("Set-Cookie")
+
+    refresh_name = app.config.get("JWT_REFRESH_COOKIE_NAME", "refresh_token")
+    refresh_path = app.config.get("JWT_REFRESH_COOKIE_PATH", "/api/auth/refresh")
+    refresh_csrf_name = app.config.get("JWT_REFRESH_CSRF_COOKIE_NAME", "csrf_refresh_token")
+    refresh_csrf_path = app.config.get("JWT_REFRESH_CSRF_COOKIE_PATH", "/")
+    access_name = app.config.get("JWT_ACCESS_COOKIE_NAME", "access_token_cookie")
+    access_path = app.config.get("JWT_ACCESS_COOKIE_PATH", "/")
+    access_csrf_name = app.config.get("JWT_ACCESS_CSRF_COOKIE_NAME", "csrf_access_token")
+    access_csrf_path = app.config.get("JWT_ACCESS_CSRF_COOKIE_PATH", "/")
+    domain = app.config.get("JWT_COOKIE_DOMAIN")
+
+    assert _has_expired_cookie(set_cookie_headers, refresh_name, path=refresh_path, domain=domain)
+    assert _has_expired_cookie(set_cookie_headers, refresh_csrf_name, path=refresh_csrf_path, domain=domain)
+    assert _has_expired_cookie(set_cookie_headers, access_name, path=access_path, domain=domain)
+    assert _has_expired_cookie(set_cookie_headers, access_csrf_name, path=access_csrf_path, domain=domain)
+
+
+def test_logout_without_valid_jwt_still_clears_cookies(client):
+    client.set_cookie("refresh_token", "dummy", path="/api/auth/refresh")
+    client.set_cookie("csrf_refresh_token", "dummy-csrf", path="/")
+    client.set_cookie("access_token_cookie", "dummy-access", path="/")
+    client.set_cookie("csrf_access_token", "dummy-access-csrf", path="/")
+
+    resp_logout = client.post("/api/auth/logout")
+    assert resp_logout.status_code == 200
+    assert resp_logout.json.get("message") == "logged out"
+    set_cookie_headers = resp_logout.headers.getlist("Set-Cookie")
+    assert _has_expired_cookie(set_cookie_headers, "refresh_token")
+    assert _has_expired_cookie(set_cookie_headers, "csrf_refresh_token")
+    assert _has_expired_cookie(set_cookie_headers, "access_token_cookie")
+    assert _has_expired_cookie(set_cookie_headers, "csrf_access_token")
+
+
+def test_logout_csrf_failure_clears_cookies_without_revoking_token(client):
+    username = f"logout_csrf_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+
+    client.post(
+        "/api/auth/register",
+        json={"username": username, "email": email, "password": password, "full_name": "Logout CSRF", "user_type": "guardian"},
+    )
+    resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
+    assert resp_login.status_code == 200
+    access_token = resp_login.json["access_token"]
+    old_refresh, old_csrf = _persist_cookies(client, resp_login.headers.getlist("Set-Cookie"))
+
+    resp_logout = client.post(
+        "/api/auth/logout",
+        headers={"Authorization": f"Bearer {access_token}", "X-CSRF-Token": "bad-csrf"},
+    )
+    assert resp_logout.status_code == 403
+    assert resp_logout.json.get("error") == "csrf_failed"
+    set_cookie_headers = resp_logout.headers.getlist("Set-Cookie")
+    assert _has_expired_cookie(set_cookie_headers, "refresh_token")
+    assert _has_expired_cookie(set_cookie_headers, "csrf_refresh_token")
+
+    client.set_cookie("refresh_token", old_refresh, path="/api/auth/refresh")
+    client.set_cookie("csrf_refresh_token", old_csrf, path="/")
+    resp_refresh = client.post("/api/auth/refresh", headers={"X-CSRF-Token": old_csrf})
+    assert resp_refresh.status_code == 200
 
 
 def test_refresh_rejects_invalid_csrf(client):
