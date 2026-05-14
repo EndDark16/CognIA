@@ -194,7 +194,7 @@ def get_session(session_id: str):
     except PermissionError as exc:
         return _error("forbidden", str(exc), 403)
 
-    payload = service.get_session_payload(session)
+    payload = service.get_session_payload(session, include_answers=True)
     payload["tags"] = service.list_session_tags(session.id)
     response = jsonify(payload)
     response.status_code = 200
@@ -224,7 +224,7 @@ def get_session_secure(session_id: str):
     except PermissionError as exc:
         return _error("forbidden", str(exc), 403)
 
-    payload = service.get_session_payload(session)
+    payload = service.get_session_payload(session, include_answers=True)
     payload["tags"] = service.list_session_tags(session.id)
     return _sensitive_json_response(payload, 200, transport_context)
 

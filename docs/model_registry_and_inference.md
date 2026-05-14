@@ -85,8 +85,9 @@ Nota de continuidad (2026-04-22):
 1. Resolver `mode_key` desde `(role, mode)`.
 2. Buscar activacion activa exacta (`domain, mode_key, role`).
 3. Cargar `ModelVersion` y artefacto:
-   - `artifact_path` si existe.
-   - fallback a champion por dominio `models/champions/rf_<domain>_current/*`.
+   - `artifact_path` activo del slot.
+   - fallback legacy deshabilitado por defecto.
+   - fallback de pruebas solo si `TESTING=true` o `ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS=true`.
    - deserializacion explicita con `joblib.load(...)` en runtime (`questionnaire_v2_service` y `questionnaire_runtime_service`).
 4. Construir vector por `feature_columns` (metadata) con defaults trazables.
 5. Ejecutar `predict_proba` cuando esta disponible.

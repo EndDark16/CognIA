@@ -29,7 +29,7 @@ TABLES_DIR = OUT_BASE / "tables"
 VALIDATION_DIR = OUT_BASE / "validation"
 REPORTS_DIR = OUT_BASE / "reports"
 
-ACTIVE_CSV = ROOT / "data" / "hybrid_active_modes_freeze_v16" / "tables" / "hybrid_active_models_30_modes.csv"
+ACTIVE_CSV = ROOT / "data" / "hybrid_active_modes_freeze_v17" / "tables" / "hybrid_active_models_30_modes.csv"
 
 
 def _config_class_from_env():
@@ -101,9 +101,7 @@ def _resolve_artifact(model_version: ModelVersion) -> ArtifactCheck:
 
     if artifact_exists == "yes":
         return ArtifactCheck(str(artifact_path), "artifact_path", artifact_exists, fallback_exists)
-    if fallback_exists == "yes":
-        return ArtifactCheck(str(fallback_path), "fallback_artifact_path", artifact_exists, fallback_exists)
-    return ArtifactCheck(None, "none", artifact_exists, fallback_exists)
+    return ArtifactCheck(None, "artifact_path_missing", artifact_exists, fallback_exists)
 
 
 def main() -> int:
@@ -183,9 +181,8 @@ def main() -> int:
                 except Exception as exc:
                     predict_error = f"{type(exc).__name__}:{exc}"
 
-            if artifact.path_source == "fallback_artifact_path":
-                # Fallback can be valid if feature columns match exact slot contract.
-                fallback_verified_for_slot = "yes" if feature_match == "yes" and predict_ok == "yes" else "no"
+            if version.fallback_artifact_path:
+                fallback_verified_for_slot = "configured"
 
             row = {
                 "activation_id": str(activation.id),
@@ -200,7 +197,7 @@ def main() -> int:
                 "artifact_registry_locator": registry_row.artifact_locator if registry_row else None,
                 "path_source": artifact.path_source,
                 "resolved_artifact_path": artifact.resolved_path,
-                "runtime_artifact_available": artifact.artifact_exists if artifact.path_source == "artifact_path" else ("yes" if artifact.resolved_path else "no"),
+                "runtime_artifact_available": artifact.artifact_exists,
                 "fallback_artifact_available": artifact.fallback_exists,
                 "joblib_load_ok": joblib_load_ok,
                 "predict_proba_smoke_ok": predict_ok,
@@ -210,7 +207,7 @@ def main() -> int:
                 "por_confirmar_active_model": "yes"
                 if bool((version.metadata_json or {}).get("por_confirmar"))
                 else "no",
-                "fallback_domain_used": "yes" if artifact.path_source == "fallback_artifact_path" else "no",
+                "fallback_domain_used": "no",
                 "fallback_verified_for_slot": fallback_verified_for_slot,
                 "model_family_detected": model_family_detected,
                 "artifact_hash": artifact_hash,
@@ -258,11 +255,8 @@ def main() -> int:
     predict_ok = int((inventory_df["predict_proba_smoke_ok"] == "yes").sum()) if not inventory_df.empty else 0
     feature_match = int((inventory_df["feature_columns_match"] == "yes").sum()) if not inventory_df.empty else 0
     por_confirmar = int((inventory_df["por_confirmar_active_model"] == "yes").sum()) if not inventory_df.empty else 0
-    generic_domain_fallback_unverified = int(
-        (
-            (inventory_df["fallback_domain_used"] == "yes")
-            & (inventory_df["fallback_verified_for_slot"] != "yes")
-        ).sum()
+    legacy_fallback_configured = int(
+        (inventory_df["fallback_verified_for_slot"] == "configured").sum()
     ) if not inventory_df.empty else 0
 
     total_slots = int(inventory_df.shape[0])
@@ -273,7 +267,7 @@ def main() -> int:
         and predict_ok == total_slots
         and feature_match == total_slots
         and por_confirmar == 0
-        and generic_domain_fallback_unverified == 0
+        and legacy_fallback_configured == 0
     ):
         final_status = "fail"
 
@@ -283,7 +277,7 @@ def main() -> int:
         "joblib_load_ok_slots": joblib_load_ok,
         "predict_proba_smoke_ok_slots": predict_ok,
         "heuristic_fallback_used": 0,
-        "generic_domain_fallback_unverified": generic_domain_fallback_unverified,
+        "legacy_fallback_configured_slots": legacy_fallback_configured,
         "feature_columns_match_slots": feature_match,
         "por_confirmar_active_models": por_confirmar,
         "artifact_duplicate_hash_count": duplicate_hash_count,
@@ -309,7 +303,7 @@ def main() -> int:
         f"- predict_proba_smoke_ok: {predict_ok}/{total_slots}",
         f"- feature_columns_match: {feature_match}/{total_slots}",
         f"- por_confirmar_active_models: {por_confirmar}",
-        f"- generic_domain_fallback_unverified: {generic_domain_fallback_unverified}",
+        f"- legacy_fallback_configured_slots: {legacy_fallback_configured}",
         f"- artifact_duplicate_hash_count: {duplicate_hash_count}",
         f"- runtime_artifact_validation_status: {final_status}",
         "",

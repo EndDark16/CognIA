@@ -321,6 +321,91 @@ def test_questionnaire_v2_session_flow(client, app):
     assert domain_keys == {"adhd", "conduct", "elimination", "anxiety", "depression"}
 
 
+def test_questionnaire_v2_session_resume_payload_includes_saved_answers(client, app):
+    _, token = _user_token(app, "resume_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=50", headers=headers)
+    assert page.status_code == 200
+    questions = page.json["pages"][0]["questions"][:3]
+    answer_payload = []
+    for q in questions:
+        options = q.get("response_options") or []
+        value = options[-1]["value"] if options and isinstance(options[0], dict) else 1
+        answer_payload.append({"question_id": q["question_id"], "answer": value})
+
+    saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={"answers": answer_payload, "mark_final": False},
+        headers=headers,
+    )
+    assert saved.status_code == 200
+
+    detail = client.get(f"/api/v2/questionnaires/sessions/{session_id}", headers=headers)
+    assert detail.status_code == 200
+    payload = detail.get_json()
+    assert payload["status"] in {"draft", "in_progress"}
+    assert payload["answered_count"] == len(answer_payload)
+    assert payload["total_questions"] >= len(answer_payload)
+    assert isinstance(payload["answers"], list)
+
+    answers_by_question = {row["question_id"]: row for row in payload["answers"]}
+    for item in answer_payload:
+        row = answers_by_question[item["question_id"]]
+        assert str(row["answer_value"]) == str(item["answer"])
+        assert row["answer"] == item["answer"]
+        assert row["updated_at"] is not None
+
+
+def test_questionnaire_v2_session_page_includes_answer_values_for_resume(client, app):
+    _, token = _user_token(app, "resume_page_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "child_age_years": 10, "child_sex_assigned_at_birth": "female"},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    page_before = client.get(
+        f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=10",
+        headers=headers,
+    )
+    assert page_before.status_code == 200
+    first_question = page_before.json["pages"][0]["questions"][0]
+    options = first_question.get("response_options") or []
+    value = options[-1]["value"] if options and isinstance(options[0], dict) else 1
+
+    saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={"answers": [{"question_id": first_question["question_id"], "answer": value}], "mark_final": False},
+        headers=headers,
+    )
+    assert saved.status_code == 200
+
+    page_after = client.get(
+        f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=10",
+        headers=headers,
+    )
+    assert page_after.status_code == 200
+    questions_after = page_after.json["pages"][0]["questions"]
+    row = next(q for q in questions_after if q["question_id"] == first_question["question_id"])
+    assert row["answered"] is True
+    assert row["answer"] == value
+    assert str(row["answer_value"]) == str(value)
+    assert row["answer_updated_at"] is not None
+
+
 def test_questionnaire_v2_active_payload_cache_and_invalidation(client, app, monkeypatch):
     _, token = _user_token(app, "cache_owner_qv2")
     headers = {"Authorization": f"Bearer {token}"}
@@ -465,7 +550,7 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
 
     pdf_download = client.get(f"/api/v2/questionnaires/history/{session_id}/pdf/download", headers=owner_headers)
     assert pdf_download.status_code == 200
-    if PdfReader is not None:
+    if PdfReader is not None and runtime_service._pdf_reportlab_backend() is not None:
         reader = PdfReader(BytesIO(pdf_download.data))
         pdf_text = "\n".join((page.extract_text() or "") for page in reader.pages)
         assert "Reporte de screening / apoyo profesional" in pdf_text
