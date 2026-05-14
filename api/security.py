@@ -90,29 +90,27 @@ def clear_auth_cookies(response) -> None:
     access_csrf_cookie = current_app.config.get("JWT_ACCESS_CSRF_COOKIE_NAME", "csrf_access_token")
     refresh_csrf_cookie = current_app.config.get("JWT_REFRESH_CSRF_COOKIE_NAME", "csrf_refresh_token")
 
-    cookie_names = [access_cookie, refresh_cookie, access_csrf_cookie, refresh_csrf_cookie]
-    cookie_paths = [
-        current_app.config.get("JWT_ACCESS_COOKIE_PATH", "/"),
-        current_app.config.get("JWT_REFRESH_COOKIE_PATH", "/api/auth/refresh"),
-        current_app.config.get("JWT_ACCESS_CSRF_COOKIE_PATH", "/"),
-        current_app.config.get("JWT_REFRESH_CSRF_COOKIE_PATH", "/"),
-        "/",
-        "/api",
-        "/api/auth",
-        "/api/auth/refresh",
-    ]
+    access_path = current_app.config.get("JWT_ACCESS_COOKIE_PATH", "/")
+    refresh_path = current_app.config.get("JWT_REFRESH_COOKIE_PATH", "/api/auth/refresh")
+    access_csrf_path = current_app.config.get("JWT_ACCESS_CSRF_COOKIE_PATH", "/")
+    refresh_csrf_path = current_app.config.get("JWT_REFRESH_CSRF_COOKIE_PATH", "/")
+
+    cookie_path_by_name = {
+        access_cookie: [access_path],
+        refresh_cookie: [refresh_path, "/"],
+        access_csrf_cookie: [access_csrf_path],
+        refresh_csrf_cookie: [refresh_csrf_path, "/", refresh_path],
+    }
     cookie_domain = current_app.config.get("JWT_COOKIE_DOMAIN")
-    domains = [None]
-    if cookie_domain:
-        domains.append(cookie_domain)
+    domains = [cookie_domain] if cookie_domain else [None]
     secure = current_app.config.get("JWT_COOKIE_SECURE")
     samesite = current_app.config.get("JWT_COOKIE_SAMESITE")
 
     seen = set()
-    for cookie_name in cookie_names:
+    for cookie_name, candidate_paths in cookie_path_by_name.items():
         if not cookie_name:
             continue
-        for cookie_path in cookie_paths:
+        for cookie_path in candidate_paths:
             if not cookie_path:
                 continue
             for domain in domains:
