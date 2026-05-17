@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import secrets
 import uuid
 from collections import defaultdict
@@ -87,6 +88,12 @@ CLINICAL_SUMMARY_DISCLAIMER = (
 
 FEATURE_COVERAGE_WARN_THRESHOLD = 0.80
 FEATURE_COVERAGE_FAIL_THRESHOLD = 0.50
+WINDOWS_DRIVE_PATTERN = re.compile(r"^[A-Za-z]:[\\/]")
+RUNTIME_PATH_MARKERS = (
+    "models/active_modes/",
+    "models/champions/",
+    "data/",
+)
 
 
 class RuntimeArtifactResolutionError(RuntimeError):
@@ -160,6 +167,77 @@ def _allow_testing_heuristic_fallback() -> bool:
     if _truthy_env_flag(cfg_value):
         return True
     return _truthy_env_flag(os.getenv("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS"))
+
+
+def _runtime_repo_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def _normalize_path_separators(raw_path: str | None) -> str:
+    return str(raw_path or "").strip().replace("\\", "/")
+
+
+def _path_candidates(raw_path: str | None) -> list[Path]:
+    path_text = str(raw_path or "").strip()
+    if not path_text:
+        return []
+
+    normalized = _normalize_path_separators(path_text)
+    repo_root = _runtime_repo_root()
+    candidates: list[Path] = []
+    seen: set[str] = set()
+
+    def _add(path: Path) -> None:
+        try:
+            candidate = path if path.is_absolute() else path.resolve()
+        except Exception:
+            candidate = path
+        key = str(candidate)
+        if key in seen:
+            return
+        seen.add(key)
+        candidates.append(candidate)
+
+    for raw in (path_text, normalized):
+        if not raw:
+            continue
+        p = Path(raw)
+        if p.is_absolute():
+            _add(p)
+
+    if normalized.startswith("/app/"):
+        _add(Path(normalized))
+
+    lower_norm = normalized.lower()
+    for marker in RUNTIME_PATH_MARKERS:
+        idx = lower_norm.find(marker)
+        if idx >= 0:
+            rel = normalized[idx:].lstrip("/")
+            _add(repo_root / rel)
+            _add(Path("/app") / rel)
+            break
+
+    if WINDOWS_DRIVE_PATTERN.match(normalized):
+        trimmed = normalized[2:].lstrip("/")
+        if trimmed:
+            _add(repo_root / trimmed)
+            _add(Path("/app") / trimmed)
+
+    if not Path(path_text).is_absolute():
+        _add(repo_root / path_text)
+    if not Path(normalized).is_absolute():
+        _add(repo_root / normalized)
+    return candidates
+
+
+def _first_existing_path(candidates: list[Path]) -> Path | None:
+    for candidate in candidates:
+        try:
+            if candidate.exists():
+                return candidate.resolve()
+        except Exception:
+            continue
+    return None
 
 
 def _feature_contract_coverage(feature_map: dict[str, Any], feature_columns: list[str]) -> tuple[float, int, int]:
@@ -988,13 +1066,33 @@ def save_answers(session: QuestionnaireSession, user_id: uuid.UUID, answers: lis
         raise ValueError("session_not_editable")
 
     allowed_ids = _session_item_question_ids(session.id)
+    question_rows = (
+        db.session.query(QuestionnaireSessionItem.question_id, QuestionnaireQuestion.question_code)
+        .join(QuestionnaireQuestion, QuestionnaireSessionItem.question_id == QuestionnaireQuestion.id)
+        .filter(QuestionnaireSessionItem.session_id == session.id)
+        .all()
+    )
+    question_code_to_id: dict[str, uuid.UUID] = {}
+    for row_question_id, row_question_code in question_rows:
+        code = str(row_question_code or "").strip().upper()
+        if code:
+            question_code_to_id[code] = row_question_id
     normalized_items: list[tuple[uuid.UUID, Any]] = []
     for item in answers:
-        question_id = (
-            item["question_id"]
-            if isinstance(item["question_id"], uuid.UUID)
-            else uuid.UUID(str(item["question_id"]))
-        )
+        question_id_raw = item.get("question_id")
+        question_code_raw = str(item.get("question_code") or "").strip().upper()
+        if question_id_raw:
+            question_id = (
+                question_id_raw
+                if isinstance(question_id_raw, uuid.UUID)
+                else uuid.UUID(str(question_id_raw))
+            )
+        elif question_code_raw:
+            question_id = question_code_to_id.get(question_code_raw)
+            if not question_id:
+                raise ValueError(f"question_code_not_in_session:{question_code_raw}")
+        else:
+            raise ValueError("missing_question_identifier")
         if question_id not in allowed_ids:
             raise ValueError(f"question_not_in_session:{question_id}")
         normalized_items.append((question_id, item.get("answer")))
@@ -1093,9 +1191,19 @@ def save_answers(session: QuestionnaireSession, user_id: uuid.UUID, answers: lis
     _audit(session.id, user_id, "answers_saved", {"count": len(answers), "mark_final": mark_final})
     db.session.commit()
 
+    session_payload = get_session_payload(session, include_answers=True)
+    saved_ids = {str(question_id) for question_id, _ in normalized_items}
+    saved_rows = [row for row in session_payload.get("answers", []) if str(row.get("question_id")) in saved_ids]
+
     return {
-        "session": get_session_payload(session),
+        "session": session_payload,
         "saved_answers": len(answers),
+        "saved_count": len(saved_rows),
+        "answered_count": session_payload.get("answered_count", 0),
+        "total_questions": session_payload.get("total_questions", 0),
+        "progress_percent": session_payload.get("progress_percent", float(session.progress_pct or 0.0)),
+        "updated_at": session_payload.get("updated_at"),
+        "answers": saved_rows,
     }
 
 
@@ -1195,40 +1303,43 @@ def _heuristic_domain_probability(domain: str, feature_map: dict[str, Any]) -> f
 def _model_probability(model_version: ModelVersion, feature_map: dict[str, Any], domain: str) -> float:
     primary_artifact_path = (model_version.artifact_path or "").strip()
     fallback_artifact_path = (model_version.fallback_artifact_path or "").strip()
-    artifact_path = primary_artifact_path
     allow_testing_heuristic = _allow_testing_heuristic_fallback()
-    if not artifact_path and allow_testing_heuristic and fallback_artifact_path:
-        artifact_path = fallback_artifact_path
-        current_app.logger.warning(
-            "qv2_testing_runtime_fallback artifact_missing_using_fallback domain=%s model_id=%s fallback_path=%s",
-            domain,
-            model_version.model_registry_id,
-            fallback_artifact_path,
-        )
-    if not artifact_path:
-        if allow_testing_heuristic:
-            return _heuristic_domain_probability(domain, feature_map)
-        raise RuntimeArtifactResolutionError(
-            f"active_artifact_missing_path:{domain}:{model_version.model_registry_id}"
-        )
-    if not Path(artifact_path).exists():
-        if allow_testing_heuristic and fallback_artifact_path and Path(fallback_artifact_path).exists():
-            artifact_path = fallback_artifact_path
+    primary_candidates = _path_candidates(primary_artifact_path)
+    fallback_candidates = _path_candidates(fallback_artifact_path)
+    resolved_primary = _first_existing_path(primary_candidates)
+    resolved_fallback = _first_existing_path(fallback_candidates)
+
+    if not primary_artifact_path:
+        if allow_testing_heuristic and resolved_fallback:
             current_app.logger.warning(
-                "qv2_testing_runtime_fallback artifact_not_found_using_fallback domain=%s model_id=%s fallback_path=%s",
+                "qv2_testing_runtime_fallback artifact_missing_using_fallback domain=%s model_id=%s fallback_path=%s",
                 domain,
                 model_version.model_registry_id,
-                fallback_artifact_path,
+                resolved_fallback,
             )
+            artifact_path = str(resolved_fallback)
         elif allow_testing_heuristic:
             return _heuristic_domain_probability(domain, feature_map)
         else:
             raise RuntimeArtifactResolutionError(
-                f"active_artifact_not_found:{domain}:{artifact_path}"
+                f"active_artifact_missing_path:{domain}:{model_version.model_registry_id}"
             )
-    if not Path(artifact_path).exists():
+    elif resolved_primary:
+        artifact_path = str(resolved_primary)
+    elif allow_testing_heuristic and resolved_fallback:
+        current_app.logger.warning(
+            "qv2_testing_runtime_fallback artifact_not_found_using_fallback domain=%s model_id=%s fallback_path=%s",
+            domain,
+            model_version.model_registry_id,
+            resolved_fallback,
+        )
+        artifact_path = str(resolved_fallback)
+    elif allow_testing_heuristic:
+        return _heuristic_domain_probability(domain, feature_map)
+    else:
+        attempted = [str(p) for p in primary_candidates[:6]]
         raise RuntimeArtifactResolutionError(
-            f"active_artifact_not_found:{domain}:{artifact_path}"
+            f"active_artifact_not_found:{domain}:{primary_artifact_path}:attempted={attempted}"
         )
 
     feature_columns, _ = _load_feature_contract(model_version, artifact_path_override=artifact_path)
@@ -2028,6 +2139,49 @@ def resolve_download_path(raw_path: str | None) -> Path | None:
         current_app.logger.warning("Rejected download path outside runtime_reports: %s", candidate)
         return None
     return candidate
+
+
+def get_report_job_or_404(report_job_id: uuid.UUID) -> ReportJob:
+    row = db.session.get(ReportJob, report_job_id)
+    if not row:
+        raise LookupError("report_job_not_found")
+    return row
+
+
+def ensure_report_access(report_job: ReportJob, user_id: uuid.UUID, is_admin: bool = False) -> None:
+    if is_admin:
+        return
+    if report_job.requested_by_user_id != user_id:
+        raise PermissionError("forbidden_report_access")
+
+
+def latest_generated_report_for_job(report_job_id: uuid.UUID) -> GeneratedReport | None:
+    return (
+        GeneratedReport.query.filter_by(report_job_id=report_job_id)
+        .order_by(GeneratedReport.created_at.desc())
+        .first()
+    )
+
+
+def report_job_payload(report_job: ReportJob, generated: GeneratedReport | None = None) -> dict[str, Any]:
+    file_name = None
+    if generated and generated.file_path:
+        try:
+            file_name = Path(generated.file_path).name
+        except Exception:
+            file_name = None
+    download_url = None
+    if generated:
+        download_url = f"/api/v2/reports/jobs/{report_job.id}/download"
+    return {
+        "report_job_id": str(report_job.id),
+        "report_type": report_job.job_type,
+        "status": report_job.status,
+        "file_name": file_name,
+        "download_url": download_url,
+        "created_at": report_job.created_at.isoformat() if report_job.created_at else None,
+        "completed_at": report_job.finished_at.isoformat() if report_job.finished_at else None,
+    }
 
 
 def _pdf_alert_label(alert_level: str | None) -> str:
@@ -2863,5 +3017,7 @@ def build_report(report_type: str, months: int, requested_by_user_id: uuid.UUID)
         "report_job_id": str(report_job.id),
         "report_type": report_type,
         "file_path": str(file_path),
+        "file_name": file_name,
+        "download_url": f"/api/v2/reports/jobs/{report_job.id}/download",
         "dataset": dataset,
     }

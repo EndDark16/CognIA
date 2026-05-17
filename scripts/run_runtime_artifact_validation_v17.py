@@ -30,6 +30,7 @@ VALIDATION_DIR = OUT_BASE / "validation"
 REPORTS_DIR = OUT_BASE / "reports"
 
 ACTIVE_CSV = ROOT / "data" / "hybrid_active_modes_freeze_v17" / "tables" / "hybrid_active_models_30_modes.csv"
+PATH_MARKERS = ("models/active_modes/", "models/champions/", "data/")
 
 
 def _config_class_from_env():
@@ -72,10 +73,61 @@ def _sha256(path: Path) -> str:
 def _to_abs(path_value: str | None) -> Path | None:
     if not path_value:
         return None
-    p = Path(path_value)
-    if p.is_absolute():
-        return p
-    return (ROOT / p).resolve()
+    raw = str(path_value).strip()
+    if not raw:
+        return None
+    normalized = raw.replace("\\", "/")
+    candidates: list[Path] = []
+    seen: set[str] = set()
+
+    def _add(path: Path) -> None:
+        try:
+            candidate = path if path.is_absolute() else path.resolve()
+        except Exception:
+            candidate = path
+        key = str(candidate)
+        if key in seen:
+            return
+        seen.add(key)
+        candidates.append(candidate)
+
+    for raw_variant in (raw, normalized):
+        p = Path(raw_variant)
+        if p.is_absolute():
+            _add(p)
+
+    if normalized.startswith("/app/"):
+        _add(Path(normalized))
+
+    low = normalized.lower()
+    for marker in PATH_MARKERS:
+        idx = low.find(marker)
+        if idx >= 0:
+            rel = normalized[idx:].lstrip("/")
+            _add(ROOT / rel)
+            _add(Path("/app") / rel)
+            break
+
+    if len(normalized) >= 3 and normalized[1:3] in {":/", ":\\"}:
+        rel_drive = normalized[2:].lstrip("/")
+        if rel_drive:
+            _add(ROOT / rel_drive)
+            _add(Path("/app") / rel_drive)
+
+    p_raw = Path(raw)
+    p_norm = Path(normalized)
+    if not p_raw.is_absolute():
+        _add(ROOT / p_raw)
+    if not p_norm.is_absolute():
+        _add(ROOT / p_norm)
+
+    for candidate in candidates:
+        try:
+            if candidate.exists():
+                return candidate.resolve()
+        except Exception:
+            continue
+    return candidates[0] if candidates else None
 
 
 def _read_feature_columns(model_version: ModelVersion) -> list[str]:

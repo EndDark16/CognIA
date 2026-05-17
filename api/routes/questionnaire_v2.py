@@ -1,7 +1,7 @@
 import uuid
 
 from flask import Blueprint, current_app, jsonify, request, send_file
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 from sqlalchemy.exc import DBAPIError, OperationalError, SQLAlchemyError
 
@@ -69,6 +69,12 @@ def _current_user() -> tuple[uuid.UUID | None, AppUser | None]:
     if not user_id:
         return None, None
     return user_id, db.session.get(AppUser, user_id)
+
+
+def _has_admin_role_from_jwt() -> bool:
+    claims = get_jwt() or {}
+    roles = claims.get("roles") or []
+    return any(str(role).strip().upper() == "ADMIN" for role in roles)
 
 
 def _decode_sensitive_payload() -> tuple[dict, transport_crypto.TransportContext]:
@@ -292,6 +298,7 @@ def get_session_page_secure(session_id: str):
 
 
 @questionnaire_v2_bp.patch("/questionnaires/sessions/<session_id>/answers")
+@questionnaire_v2_bp.patch("/questionnaires/sessions/<session_id>/answers/bulk")
 @jwt_required()
 @limiter.limit(lambda: current_app.config.get("QV2_SAVE_ANSWERS_RATE_LIMIT", "120 per minute"))
 def patch_answers(session_id: str):
@@ -983,3 +990,58 @@ def create_report_job():
         return _handle_backend_failure(exc, "report_failed")
 
     return jsonify(result), 201
+
+
+@questionnaire_v2_bp.get("/reports/jobs/<report_job_id>")
+@jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_REPORT_RATE_LIMIT", "20 per minute"))
+def get_report_job(report_job_id: str):
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    rid = _parse_uuid(report_job_id)
+    if not rid:
+        return _error("invalid_report_job_id", "invalid_report_job_id", 400)
+
+    try:
+        report_job = service.get_report_job_or_404(rid)
+        service.ensure_report_access(report_job, user_id, is_admin=_has_admin_role_from_jwt())
+        generated = service.latest_generated_report_for_job(report_job.id)
+    except LookupError as exc:
+        return _error("not_found", str(exc), 404)
+    except PermissionError as exc:
+        return _error("forbidden", str(exc), 403)
+    except Exception as exc:
+        return _handle_backend_failure(exc, "report_metadata_failed")
+
+    return jsonify(service.report_job_payload(report_job, generated)), 200
+
+
+@questionnaire_v2_bp.get("/reports/jobs/<report_job_id>/download")
+@jwt_required()
+@limiter.limit(lambda: current_app.config.get("QV2_REPORT_RATE_LIMIT", "20 per minute"))
+def download_report_job(report_job_id: str):
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    rid = _parse_uuid(report_job_id)
+    if not rid:
+        return _error("invalid_report_job_id", "invalid_report_job_id", 400)
+
+    try:
+        report_job = service.get_report_job_or_404(rid)
+        service.ensure_report_access(report_job, user_id, is_admin=_has_admin_role_from_jwt())
+        generated = service.latest_generated_report_for_job(report_job.id)
+    except LookupError as exc:
+        return _error("not_found", str(exc), 404)
+    except PermissionError as exc:
+        return _error("forbidden", str(exc), 403)
+    except Exception as exc:
+        return _handle_backend_failure(exc, "report_download_failed")
+
+    if not generated:
+        return _error("not_found", "report_file_not_found", 404)
+    path = service.resolve_download_path(generated.file_path)
+    if path is None or not path.exists():
+        return _error("not_found", "report_file_missing", 404)
+    return send_file(path, as_attachment=True, download_name=path.name)
