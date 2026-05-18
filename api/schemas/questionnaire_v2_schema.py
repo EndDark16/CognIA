@@ -65,7 +65,19 @@ class ReportRequestSchema(BaseSchema):
             [
                 "executive_monthly",
                 "adoption_history",
+                "executive_summary",
+                "user_growth",
+                "questionnaire_volume",
+                "funnel",
+                "retention",
+                "productivity",
+                "questionnaire_quality",
+                "data_quality",
+                "api_health",
                 "model_monitoring",
+                "drift",
+                "equity",
+                "human_review",
                 "operational_productivity",
                 "security_compliance",
                 "traceability_audit",
@@ -73,6 +85,18 @@ class ReportRequestSchema(BaseSchema):
         ),
     )
     months = fields.Integer(load_default=12, validate=validate.Range(min=1, max=120))
+    date_from = fields.Date(required=False)
+    date_to = fields.Date(required=False)
+    granularity = fields.String(required=False, load_default="month", validate=validate.OneOf(["day", "week", "month"]))
+    format = fields.String(required=False, load_default="pdf", validate=validate.OneOf(["pdf"]))
+    filters = fields.Dict(required=False, load_default=dict)
+
+    @validates_schema
+    def validate_period(self, data, **kwargs):
+        date_from = data.get("date_from")
+        date_to = data.get("date_to")
+        if date_from and date_to and date_from > date_to:
+            raise ValidationError("date_from_must_be_before_or_equal_date_to")
 
 
 class SessionSubmitSchema(BaseSchema):

@@ -61,6 +61,10 @@ Base path: `/api/v2`
 - `POST /reports/jobs`
 - `GET /reports/jobs/{report_job_id}`
 - `GET /reports/jobs/{report_job_id}/download`
+- Estos endpoints requieren rol `ADMIN`.
+- `POST /reports/jobs` acepta filtros no-breaking (`months`, `date_from`, `date_to`, `granularity`, `format`, `filters`).
+- `GET /reports/jobs/{report_job_id}` devuelve metadata + preview operativo (headline metrics y secciones).
+- Ver contrato detallado en [docs/admin_reports_contract.md](/C:/Users/andre/Documents/cognia_clean_work/cognia_runtime_draft_fix_clean2/docs/admin_reports_contract.md).
 
 ## Admin bootstrap
 - `POST /questionnaires/admin/bootstrap` (requiere `ADMIN`)
