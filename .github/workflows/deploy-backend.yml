@@ -103,15 +103,18 @@ jobs:
           git fetch --prune origin "$DEPLOY_BRANCH"
           REMOTE_SHA="$(git rev-parse "origin/$DEPLOY_BRANCH")"
           echo "Remote $DEPLOY_BRANCH commit: $REMOTE_SHA"
-
-          if [ "$REMOTE_SHA" != "$EXPECTED_SHA" ]; then
+          DEPLOY_SHA="$EXPECTED_SHA"
+          if [ "${GITHUB_EVENT_NAME:-}" = "workflow_dispatch" ]; then
+            DEPLOY_SHA="$REMOTE_SHA"
+            echo "workflow_dispatch detected; deploying latest origin/$DEPLOY_BRANCH: $DEPLOY_SHA"
+          elif [ "$REMOTE_SHA" != "$EXPECTED_SHA" ]; then
             echo "::error::Expected workflow SHA $EXPECTED_SHA but origin/$DEPLOY_BRANCH resolved $REMOTE_SHA."
             echo "final_status=sha_mismatch" >> "$GITHUB_OUTPUT"
             exit 1
           fi
 
-          git checkout -B "$DEPLOY_BRANCH" "$EXPECTED_SHA"
-          git reset --hard "$EXPECTED_SHA"
+          git checkout -B "$DEPLOY_BRANCH" "$DEPLOY_SHA"
+          git reset --hard "$DEPLOY_SHA"
 
           TARGET_SHA="$(git rev-parse HEAD)"
           echo "Target commit after update: $TARGET_SHA"
