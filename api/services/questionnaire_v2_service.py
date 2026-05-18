@@ -4,7 +4,7 @@ import re
 import secrets
 import uuid
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from html import escape
 from io import BytesIO
@@ -2173,12 +2173,23 @@ def report_job_payload(report_job: ReportJob, generated: GeneratedReport | None 
     download_url = None
     if generated:
         download_url = f"/api/v2/reports/jobs/{report_job.id}/download"
+    params = report_job.params_json if isinstance(report_job.params_json, dict) else {}
+    generated_meta = generated.metadata_json if (generated and isinstance(generated.metadata_json, dict)) else {}
+    preview = generated_meta.get("summary") if isinstance(generated_meta.get("summary"), dict) else {}
     return {
         "report_job_id": str(report_job.id),
         "report_type": report_job.job_type,
         "status": report_job.status,
         "file_name": file_name,
         "download_url": download_url,
+        "filters": params.get("filters", {}),
+        "period": generated_meta.get("period") or {
+            "months": params.get("months"),
+            "date_from": params.get("date_from"),
+            "date_to": params.get("date_to"),
+        },
+        "summary": preview,
+        "warnings": generated_meta.get("warnings", []),
         "created_at": report_job.created_at.isoformat() if report_job.created_at else None,
         "completed_at": report_job.finished_at.isoformat() if report_job.finished_at else None,
     }
@@ -2969,42 +2980,437 @@ def dashboard_adoption_history(months: int = 12) -> dict[str, Any]:
     }
 
 
-def build_report(report_type: str, months: int, requested_by_user_id: uuid.UUID) -> dict[str, Any]:
-    report_job = ReportJob(job_type=report_type, requested_by_user_id=requested_by_user_id, status="running", params_json={"months": months})
+_REPORT_TYPE_ALIAS = {
+    "executive_monthly": "executive_summary",
+    "operational_productivity": "productivity",
+    "security_compliance": "api_health",
+    "traceability_audit": "model_monitoring",
+}
+_REPORT_TYPE_SET = {
+    "executive_summary",
+    "adoption_history",
+    "user_growth",
+    "questionnaire_volume",
+    "funnel",
+    "retention",
+    "productivity",
+    "questionnaire_quality",
+    "data_quality",
+    "api_health",
+    "model_monitoring",
+    "drift",
+    "equity",
+    "human_review",
+}
+_SUPPORTED_FILTERS = {"role", "mode", "status", "domain", "include_sections"}
+
+
+def _normalize_report_type(report_type: str) -> str:
+    key = str(report_type or "").strip().lower()
+    canonical = _REPORT_TYPE_ALIAS.get(key, key)
+    if canonical not in _REPORT_TYPE_SET:
+        raise ValueError("unsupported_report_type")
+    return canonical
+
+
+def _period_bounds(
+    months: int,
+    date_from: date | None,
+    date_to: date | None,
+) -> tuple[datetime, datetime, dict[str, Any]]:
+    if date_from and date_to:
+        start = datetime.combine(date_from, datetime.min.time(), tzinfo=timezone.utc)
+        end = datetime.combine(date_to + timedelta(days=1), datetime.min.time(), tzinfo=timezone.utc)
+        return start, end, {"months": months, "date_from": date_from.isoformat(), "date_to": date_to.isoformat()}
+
+    now = _utcnow()
+    month_start = datetime(now.year, now.month, 1, tzinfo=timezone.utc)
+    start = (pd.Timestamp(month_start) - pd.DateOffset(months=max(months - 1, 0))).to_pydatetime()
+    end = now + timedelta(days=1)
+    return start, end, {"months": months, "date_from": start.date().isoformat(), "date_to": now.date().isoformat()}
+
+
+def _bucket_series(datetimes: list[datetime], start: datetime, end: datetime, granularity: str) -> list[dict[str, Any]]:
+    if start >= end:
+        return []
+    freq_map = {"day": "D", "week": "W-MON", "month": "MS"}
+    freq = freq_map.get(granularity, "MS")
+    index = pd.date_range(start=start.date(), end=(end - timedelta(seconds=1)).date(), freq=freq)
+    counts = {str(ts.date()): 0 for ts in index}
+    for dt in datetimes:
+        stamp = pd.Timestamp(dt)
+        if granularity == "day":
+            key = str(stamp.date())
+        elif granularity == "week":
+            key = str((stamp - pd.Timedelta(days=stamp.weekday())).date())
+        else:
+            key = str(stamp.replace(day=1).date())
+        if key in counts:
+            counts[key] += 1
+    return [{"bucket": key, "count": value} for key, value in counts.items()]
+
+
+def _safe_ratio(num: float, den: float) -> float:
+    return round(float(num) / float(den), 4) if den else 0.0
+
+
+def _dashboard_bundle(
+    report_type: str,
+    start: datetime,
+    end: datetime,
+    granularity: str,
+    filters: dict[str, Any],
+) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]], list[str]]:
+    warnings: list[str] = []
+    unsupported_filters = sorted(set(filters.keys()) - _SUPPORTED_FILTERS)
+    if unsupported_filters:
+        warnings.append(f"Unsupported filters ignored: {', '.join(unsupported_filters)}")
+
+    sessions_q = QuestionnaireSession.query.filter(
+        QuestionnaireSession.created_at >= start,
+        QuestionnaireSession.created_at < end,
+    )
+    users_q = AppUser.query.filter(
+        AppUser.created_at >= start,
+        AppUser.created_at < end,
+    )
+    reports_q = GeneratedReport.query.filter(
+        GeneratedReport.created_at >= start,
+        GeneratedReport.created_at < end,
+    )
+
+    status_filter = str(filters.get("status") or "").strip().lower()
+    if status_filter:
+        sessions_q = sessions_q.filter(QuestionnaireSession.status == status_filter)
+
+    mode_filter = str(filters.get("mode") or "").strip().lower()
+    if mode_filter:
+        sessions_q = sessions_q.filter(QuestionnaireSession.mode == mode_filter)
+
+    role_filter = str(filters.get("role") or "").strip().lower()
+    if role_filter:
+        sessions_q = sessions_q.filter(QuestionnaireSession.respondent_role == role_filter)
+
+    sessions = sessions_q.all()
+    users = users_q.all()
+    reports = reports_q.all()
+
+    sessions_created = len(sessions)
+    sessions_processed = sum(1 for row in sessions if row.status == "processed")
+    sessions_submitted = sum(1 for row in sessions if row.status in {"submitted", "processed"})
+    sessions_draft = sum(1 for row in sessions if row.status in {"draft", "in_progress"})
+    new_users = len(users)
+    reports_generated = len(reports)
+    completion_rate = _safe_ratio(sessions_processed, sessions_created)
+
+    session_datetimes = [row.created_at for row in sessions if row.created_at]
+    user_datetimes = [row.created_at for row in users if row.created_at]
+    report_datetimes = [row.created_at for row in reports if row.created_at]
+
+    questionnaire_volume_series = _bucket_series(session_datetimes, start, end, granularity)
+    user_growth_series = _bucket_series(user_datetimes, start, end, granularity)
+    report_volume_series = _bucket_series(report_datetimes, start, end, granularity)
+
+    domain_rows = (
+        db.session.query(
+            QuestionnaireSessionResultDomain.domain,
+            func.count(QuestionnaireSessionResultDomain.id),
+            func.avg(QuestionnaireSessionResultDomain.probability),
+        )
+        .join(QuestionnaireSession, QuestionnaireSession.id == QuestionnaireSessionResultDomain.session_id)
+        .filter(
+            QuestionnaireSession.created_at >= start,
+            QuestionnaireSession.created_at < end,
+        )
+        .group_by(QuestionnaireSessionResultDomain.domain)
+        .all()
+    )
+    domain_summary = [
+        {"domain": str(domain), "count": int(count), "mean_probability": round(float(mean_prob or 0.0), 4)}
+        for domain, count, mean_prob in domain_rows
+    ]
+
+    headline_metrics = [
+        {"label": "Usuarios nuevos", "value": new_users},
+        {"label": "Cuestionarios iniciados", "value": sessions_created},
+        {"label": "Cuestionarios enviados", "value": sessions_submitted},
+        {"label": "Cuestionarios completados", "value": sessions_processed},
+        {"label": "Tasa de finalizacion", "value": round(completion_rate * 100.0, 2), "unit": "%"},
+        {"label": "Reportes generados", "value": reports_generated},
+    ]
+
+    sections = [
+        {
+            "title": "Crecimiento de usuarios",
+            "description": "Evolucion temporal de altas de usuarios en el periodo.",
+            "chart_type": "line",
+            "available": bool(user_growth_series),
+            "series": user_growth_series,
+        },
+        {
+            "title": "Volumen de cuestionarios",
+            "description": "Sesiones creadas en el periodo por granularidad.",
+            "chart_type": "bar",
+            "available": bool(questionnaire_volume_series),
+            "series": questionnaire_volume_series,
+        },
+        {
+            "title": "Embudo operativo",
+            "description": "Flujo agregado entre creado, enviado y procesado.",
+            "chart_type": "bar",
+            "available": sessions_created > 0,
+            "metrics": [
+                {"label": "Creados", "value": sessions_created},
+                {"label": "Enviados", "value": sessions_submitted},
+                {"label": "Procesados", "value": sessions_processed},
+                {"label": "Conversion creado->procesado", "value": completion_rate},
+            ],
+        },
+        {
+            "title": "Monitoreo de dominios",
+            "description": "Conteos agregados y probabilidad media por dominio.",
+            "chart_type": "bar",
+            "available": bool(domain_summary),
+            "table": domain_summary,
+        },
+        {
+            "title": "Productividad",
+            "description": "Actividad de generacion de reportes administrativos.",
+            "chart_type": "line",
+            "available": bool(report_volume_series),
+            "series": report_volume_series,
+        },
+    ]
+
+    section_map = {
+        "executive_summary": [sections[0], sections[1], sections[2], sections[4]],
+        "adoption_history": [sections[0], sections[1], sections[2]],
+        "user_growth": [sections[0]],
+        "questionnaire_volume": [sections[1]],
+        "funnel": [sections[2]],
+        "retention": [sections[0], sections[2]],
+        "productivity": [sections[4]],
+        "questionnaire_quality": [sections[1], sections[2]],
+        "data_quality": [sections[1], sections[2]],
+        "api_health": [sections[4]],
+        "model_monitoring": [sections[3]],
+        "drift": [sections[3]],
+        "equity": [sections[3]],
+        "human_review": [sections[2], sections[3]],
+    }
+    selected_sections = section_map.get(report_type, [sections[0], sections[1], sections[2]])
+
+    include_sections = filters.get("include_sections")
+    if isinstance(include_sections, list) and include_sections:
+        include_set = {str(item).strip().lower() for item in include_sections if str(item).strip()}
+        selected_sections = [row for row in selected_sections if str(row["title"]).strip().lower() in include_set]
+        if not selected_sections:
+            warnings.append("No sections matched include_sections filter; defaulting to report template sections.")
+            selected_sections = section_map.get(report_type, [sections[0], sections[1], sections[2]])
+
+    dataset = {
+        "summary": {
+            "users_new": new_users,
+            "sessions_created": sessions_created,
+            "sessions_submitted": sessions_submitted,
+            "sessions_processed": sessions_processed,
+            "sessions_draft": sessions_draft,
+            "completion_rate": completion_rate,
+            "reports_generated": reports_generated,
+        },
+        "questionnaire_volume": {"series": questionnaire_volume_series},
+        "user_growth": {"series": user_growth_series},
+        "funnel": {
+            "created": sessions_created,
+            "submitted": sessions_submitted,
+            "processed": sessions_processed,
+            "conversion_created_to_processed": completion_rate,
+        },
+        "model_monitoring": {"domains": domain_summary},
+        "report_volume": {"series": report_volume_series},
+    }
+    return dataset, headline_metrics, selected_sections, warnings
+
+
+def _render_report_pdf(
+    file_path: Path,
+    report_type: str,
+    period: dict[str, Any],
+    filters: dict[str, Any],
+    headline_metrics: list[dict[str, Any]],
+    sections: list[dict[str, Any]],
+    warnings: list[str],
+) -> None:
+    plt, PdfPages = _pdf_plot_backend()
+    with PdfPages(file_path) as pdf:
+        cover = plt.figure(figsize=(11, 8.5))
+        ax = cover.add_subplot(111)
+        ax.axis("off")
+        ax.text(0.02, 0.94, "CognIA - Reporte Administrativo", fontsize=22, fontweight="bold")
+        ax.text(0.02, 0.88, f"Tipo de reporte: {report_type}", fontsize=13)
+        ax.text(
+            0.02,
+            0.82,
+            f"Periodo: {period.get('date_from')} a {period.get('date_to')} | months={period.get('months')}",
+            fontsize=11,
+        )
+        ax.text(0.02, 0.77, f"Generado: {_utcnow().isoformat()}", fontsize=10)
+        ax.text(0.02, 0.71, f"Filtros aplicados: {json.dumps(filters, ensure_ascii=False)}", fontsize=10, wrap=True)
+        ax.text(
+            0.02,
+            0.60,
+            "Datos agregados de operacion; uso para monitoreo y mejora continua. "
+            "No reemplaza analisis profesional individual.",
+            fontsize=10,
+            wrap=True,
+        )
+        if warnings:
+            ax.text(0.02, 0.52, "Advertencias:", fontsize=11, fontweight="bold")
+            for idx, warning in enumerate(warnings[:8], start=1):
+                ax.text(0.04, 0.52 - idx * 0.035, f"- {warning}", fontsize=9, wrap=True)
+        pdf.savefig(cover)
+        plt.close(cover)
+
+        hm_fig = plt.figure(figsize=(11, 8.5))
+        hax = hm_fig.add_subplot(111)
+        hax.axis("off")
+        hax.text(0.02, 0.95, "Resumen ejecutivo", fontsize=16, fontweight="bold")
+        table_rows = [["Indicador", "Valor"]]
+        for metric in headline_metrics:
+            unit = metric.get("unit")
+            value = metric.get("value")
+            rendered_value = f"{value}{unit}" if unit else str(value)
+            table_rows.append([metric.get("label", "N/A"), rendered_value])
+        table = hax.table(cellText=table_rows, cellLoc="left", colWidths=[0.52, 0.28], loc="center")
+        table.auto_set_font_size(False)
+        table.set_fontsize(10)
+        table.scale(1, 1.5)
+        pdf.savefig(hm_fig)
+        plt.close(hm_fig)
+
+        for section in sections:
+            fig = plt.figure(figsize=(11, 8.5))
+            ax = fig.add_subplot(111)
+            ax.axis("off")
+            ax.text(0.02, 0.95, section.get("title", "Seccion"), fontsize=15, fontweight="bold")
+            ax.text(0.02, 0.90, section.get("description", ""), fontsize=10, wrap=True)
+            if not section.get("available", False):
+                ax.text(0.02, 0.82, "No hay datos suficientes para este bloque en el periodo seleccionado.", fontsize=10)
+                pdf.savefig(fig)
+                plt.close(fig)
+                continue
+
+            series = section.get("series") or []
+            if series:
+                chart_ax = fig.add_axes([0.08, 0.20, 0.84, 0.58])
+                labels = [str(item.get("bucket")) for item in series]
+                values = [float(item.get("count") or 0.0) for item in series]
+                chart_type = str(section.get("chart_type") or "line").lower()
+                if chart_type == "bar":
+                    chart_ax.bar(labels, values, color="#3568d4")
+                else:
+                    chart_ax.plot(labels, values, marker="o", color="#1f4aa8")
+                chart_ax.set_ylabel("Conteo")
+                chart_ax.tick_params(axis="x", labelrotation=45)
+                chart_ax.grid(alpha=0.3)
+            elif section.get("metrics"):
+                metric_rows = [["Metrica", "Valor"]]
+                for row in section["metrics"]:
+                    metric_rows.append([str(row.get("label", "N/A")), str(row.get("value", "N/A"))])
+                tbl = ax.table(cellText=metric_rows, cellLoc="left", colWidths=[0.54, 0.24], bbox=[0.06, 0.24, 0.88, 0.56])
+                tbl.auto_set_font_size(False)
+                tbl.set_fontsize(10)
+            elif section.get("table"):
+                domain_rows = [["Dominio", "Conteo", "Prob. media"]]
+                for row in section["table"]:
+                    domain_rows.append(
+                        [str(row.get("domain", "N/A")), str(row.get("count", 0)), str(row.get("mean_probability", 0.0))]
+                    )
+                tbl = ax.table(cellText=domain_rows, cellLoc="left", colWidths=[0.26, 0.18, 0.24], bbox=[0.08, 0.24, 0.84, 0.56])
+                tbl.auto_set_font_size(False)
+                tbl.set_fontsize(10)
+            pdf.savefig(fig)
+            plt.close(fig)
+
+
+def build_report(
+    report_type: str,
+    months: int,
+    requested_by_user_id: uuid.UUID,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    granularity: str = "month",
+    file_format: str = "pdf",
+    filters: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    canonical_report_type = _normalize_report_type(report_type)
+    if str(file_format).strip().lower() != "pdf":
+        raise ValueError("unsupported_report_format")
+
+    safe_filters = filters if isinstance(filters, dict) else {}
+    report_job = ReportJob(
+        job_type=canonical_report_type,
+        requested_by_user_id=requested_by_user_id,
+        status="running",
+        params_json={
+            "months": months,
+            "date_from": date_from.isoformat() if date_from else None,
+            "date_to": date_to.isoformat() if date_to else None,
+            "granularity": granularity,
+            "format": "pdf",
+            "filters": safe_filters,
+        },
+    )
     db.session.add(report_job)
     db.session.flush()
 
-    if report_type in {"executive_monthly", "adoption_history"}:
-        dataset = dashboard_adoption_history(months)
-    elif report_type in {"model_monitoring", "traceability_audit", "operational_productivity", "security_compliance"}:
-        dataset = {
-            "volume": dashboard_questionnaire_volume(months),
-            "funnel": dashboard_funnel(months),
-        }
-    else:
-        raise ValueError("unsupported_report_type")
+    start, end, period = _period_bounds(months, date_from, date_to)
+    dataset, headline_metrics, sections, warnings = _dashboard_bundle(
+        report_type=canonical_report_type,
+        start=start,
+        end=end,
+        granularity=str(granularity or "month"),
+        filters=safe_filters,
+    )
 
     output_dir = _pdf_output_dir()
-    file_name = f"report_{report_type}_{int(_utcnow().timestamp())}.pdf"
+    file_name = f"report_{canonical_report_type}_{int(_utcnow().timestamp())}.pdf"
     file_path = (output_dir / file_name).resolve()
-    plt, PdfPages = _pdf_plot_backend()
-
-    with PdfPages(file_path) as pdf:
-        fig, ax = plt.subplots(figsize=(11, 8.5))
-        ax.axis("off")
-        ax.text(0.02, 0.95, f"Report: {report_type}", fontsize=14, fontweight="bold")
-        ax.text(0.02, 0.90, f"Generated: {_utcnow().isoformat()}", fontsize=10)
-        ax.text(0.02, 0.84, json.dumps(dataset, ensure_ascii=True, indent=2)[:4500], fontsize=8, family="monospace")
-        plt.tight_layout()
-        pdf.savefig(fig)
-        plt.close(fig)
+    _render_report_pdf(
+        file_path=file_path,
+        report_type=canonical_report_type,
+        period=period,
+        filters=safe_filters,
+        headline_metrics=headline_metrics,
+        sections=sections,
+        warnings=warnings,
+    )
 
     generated = GeneratedReport(
         report_job_id=report_job.id,
-        report_type=report_type,
+        report_type=canonical_report_type,
         file_path=str(file_path),
         file_format="pdf",
-        metadata_json={"months": months},
+        metadata_json={
+            "months": months,
+            "period": period,
+            "filters": safe_filters,
+            "granularity": granularity,
+            "summary": {
+                "title": f"Reporte {canonical_report_type}",
+                "headline_metrics": headline_metrics,
+                "sections": [
+                    {
+                        "title": section.get("title"),
+                        "description": section.get("description"),
+                        "chart_type": section.get("chart_type"),
+                        "available": bool(section.get("available")),
+                    }
+                    for section in sections
+                ],
+            },
+            "warnings": warnings,
+        },
     )
     db.session.add(generated)
 
@@ -3015,9 +3421,12 @@ def build_report(report_type: str, months: int, requested_by_user_id: uuid.UUID)
 
     return {
         "report_job_id": str(report_job.id),
-        "report_type": report_type,
-        "file_path": str(file_path),
+        "report_type": canonical_report_type,
+        "status": report_job.status,
         "file_name": file_name,
         "download_url": f"/api/v2/reports/jobs/{report_job.id}/download",
-        "dataset": dataset,
+        "period": period,
+        "filters": safe_filters,
+        "summary": generated.metadata_json.get("summary", {}),
+        "warnings": warnings,
     }
