@@ -34,7 +34,17 @@ def _search_roots() -> list[Path]:
                 _add(Path(item))
 
     if not roots:
-        for default_root in (ROOT, ROOT.parent, Path("/opt/cognia"), Path("/opt")):
+        for default_root in (
+            ROOT,
+            ROOT.parent,
+            Path("/opt/cognia"),
+            Path("/opt"),
+            Path("/home"),
+            Path("/root"),
+            Path("/srv"),
+            Path("/mnt"),
+            Path("/var/lib"),
+        ):
             _add(default_root)
 
     return [r for r in roots if r.exists()]
