@@ -135,8 +135,8 @@ jobs:
             exit 1
           fi
 
-          git checkout -B "$DEPLOY_BRANCH" "$DEPLOY_SHA"
-          git reset --hard "$DEPLOY_SHA"
+          git -c filter.lfs.required=false -c filter.lfs.process= -c filter.lfs.smudge= -c filter.lfs.clean= checkout -B "$DEPLOY_BRANCH" "$DEPLOY_SHA"
+          git -c filter.lfs.required=false -c filter.lfs.process= -c filter.lfs.smudge= -c filter.lfs.clean= reset --hard "$DEPLOY_SHA"
 
           TARGET_SHA="$(git rev-parse HEAD)"
           echo "Target commit after update: $TARGET_SHA"
@@ -155,7 +155,7 @@ jobs:
 
           echo "::warning::Post-deploy readyz check failed for $TARGET_SHA. Rolling back to $PREVIOUS_SHA"
           cd "$BACKEND_REPO_DIR"
-          git reset --hard "$PREVIOUS_SHA"
+          git -c filter.lfs.required=false -c filter.lfs.process= -c filter.lfs.smudge= -c filter.lfs.clean= reset --hard "$PREVIOUS_SHA"
 
           ROLLBACK_SHA="$(git rev-parse HEAD)"
           echo "Rollback commit: $ROLLBACK_SHA"
