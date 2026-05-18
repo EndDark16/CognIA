@@ -20,8 +20,14 @@ class SessionCreateSchema(BaseSchema):
 
 
 class SessionAnswerItemSchema(BaseSchema):
-    question_id = fields.UUID(required=True)
+    question_id = fields.UUID(required=False)
+    question_code = fields.String(required=False, validate=validate.Length(min=1, max=80))
     answer = fields.Raw(required=True)
+
+    @validates_schema
+    def validate_identifier(self, data, **kwargs):
+        if data.get("question_id") is None and not str(data.get("question_code") or "").strip():
+            raise ValidationError("question_id_or_question_code_required")
 
 
 class SessionAnswersPatchSchema(BaseSchema):

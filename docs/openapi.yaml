@@ -19129,6 +19129,126 @@ paths:
       description: Identificador del recurso `session_id` en la ruta.
       schema:
         type: string
+  /api/v2/questionnaires/sessions/{session_id}/answers/bulk:
+    patch:
+      tags:
+      - QuestionnaireV2
+      summary: Guardar respuestas en lote para autosave de sesion v2
+      description: |-
+        **Objetivo funcional**
+        Guardar o actualizar respuestas por lote durante el autosave de una sesion v2.
+
+        **Cuando debe usarse**
+        En debounce/autosave, cambio de pagina o flush previo a submit.
+
+        **Actor que lo consume**
+        Frontend autenticado del flujo de cuestionarios v2.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`. Soporta transporte cifrado por envelope.
+
+        **Entrada esperada**
+        - Metodo y ruta: `PATCH /api/v2/questionnaires/sessions/{session_id}/answers/bulk`.
+        - Parametros de ruta: `session_id` (obligatorio).
+        - Query params: no aplica.
+        - Headers adicionales: `X-CognIA-Encrypted`, `X-CognIA-Crypto-Version` cuando aplique.
+        - Body obligatorio: `SessionAnswersPatchRequestPlain` o `TransportEncryptedRequestEnvelope`.
+
+        **Resultado exitoso**
+        - Codigo de exito: `200`.
+        - Respuesta: `SessionAnswersSaveResponsePlain` o `TransportEncryptedResponseEnvelope`.
+
+        **Errores posibles y causa funcional**
+        - `400 invalid_session_id|plaintext_not_allowed|encrypted_payload_invalid|invalid_crypto_version|validation_error`.
+        - `401 invalid_user|unauthorized`.
+        - `403 forbidden`.
+        - `404 not_found`.
+        - `429 rate_limited`.
+        - `500 db_error|save_failed|server_error`.
+        - `503 db_unavailable|runtime_assets_unavailable`.
+
+        **Estado contractual**
+        - `KEEP_ACTIVE`.
+        - Alias no-breaking del guardado de respuestas en lote.
+      operationId: patchV2QuestionnairesSessionsSessionIdAnswersBulk
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/CognIAEncryptedHeader'
+      - $ref: '#/components/parameters/CognIACryptoVersionHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/SessionAnswersPatchRequestPlain'
+              - $ref: '#/components/schemas/TransportEncryptedRequestEnvelope'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Respuestas guardadas correctamente.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/SessionAnswersSaveResponsePlain'
+                - $ref: '#/components/schemas/TransportEncryptedResponseEnvelope'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Request invalido o payload fuera de contrato.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: No autenticado o token invalido.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: El actor autenticado no puede modificar esa sesion.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Sesion no encontrada.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Limite de solicitudes excedido.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Falla interna durante guardado.
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Dependencia temporalmente no disponible.
+      x-contract-status: KEEP_ACTIVE
+    parameters:
+    - name: session_id
+      in: path
+      required: true
+      description: Identificador del recurso `session_id` en la ruta.
+      schema:
+        type: string
   /api/v2/questionnaires/sessions/{session_id}/page:
     get:
       tags:
@@ -19848,6 +19968,210 @@ paths:
           description: "El backend encontr\xF3 una falla interna durante consulta, persistencia, generaci\xF3n, inferencia\
             \ o coordinaci\xF3n del flujo."
       x-contract-status: KEEP_ACTIVE
+  /api/v2/reports/jobs/{report_job_id}:
+    get:
+      tags:
+      - Reports
+      summary: Obtener metadata de un reporte generado
+      description: |-
+        **Objetivo funcional**
+        Consultar metadata del reporte generado por `report_job_id`.
+
+        **Cuando debe usarse**
+        Luego de crear un report job y antes de disparar la descarga.
+
+        **Actor que lo consume**
+        Frontend/backoffice autenticado con acceso al job (owner o ADMIN).
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`.
+
+        **Entrada esperada**
+        - Metodo y ruta: `GET /api/v2/reports/jobs/{report_job_id}`.
+        - Parametros de ruta: `report_job_id` (obligatorio).
+        - Query params: no aplica.
+        - Headers adicionales: no aplica.
+        - Body: no aplica.
+
+        **Resultado exitoso**
+        - Codigo de exito: `200`.
+        - Respuesta con `status`, `report_type`, `file_name` y `download_url`.
+
+        **Errores posibles y causa funcional**
+        - `400 invalid_report_job_id`.
+        - `401 invalid_user|unauthorized`.
+        - `403 forbidden_report_access`.
+        - `404 report_job_not_found`.
+        - `429 rate_limited`.
+        - `500 report_metadata_failed|server_error`.
+
+        **Estado contractual**
+        - `KEEP_ACTIVE`.
+        - Endpoint seguro para metadata de reportes.
+      operationId: getV2ReportsJobsReportJobId
+      parameters:
+      - in: path
+        name: report_job_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Metadata del reporte disponible.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Identificador de reporte invalido.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: No autenticado o token invalido.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Sin permisos para consultar ese reporte.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Reporte no encontrado.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Limite de solicitudes excedido.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Falla interna del backend.
+      x-contract-status: KEEP_ACTIVE
+    parameters:
+    - name: report_job_id
+      in: path
+      required: true
+      description: Identificador del recurso `report_job_id` en la ruta.
+      schema:
+        type: string
+  /api/v2/reports/jobs/{report_job_id}/download:
+    get:
+      tags:
+      - Reports
+      summary: Descargar PDF de reporte generado
+      description: |-
+        **Objetivo funcional**
+        Descargar el PDF generado para un `report_job_id`.
+
+        **Cuando debe usarse**
+        Tras validar metadata del reporte y disponibilidad de archivo.
+
+        **Actor que lo consume**
+        Frontend/backoffice autenticado con acceso al job (owner o ADMIN).
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth` y validacion de ownership/permisos.
+
+        **Entrada esperada**
+        - Metodo y ruta: `GET /api/v2/reports/jobs/{report_job_id}/download`.
+        - Parametros de ruta: `report_job_id` (obligatorio).
+        - Query params: no aplica.
+        - Headers adicionales: no aplica.
+        - Body: no aplica.
+
+        **Resultado exitoso**
+        - Codigo de exito: `200`.
+        - Respuesta `application/pdf` (binary stream).
+
+        **Errores posibles y causa funcional**
+        - `400 invalid_report_job_id`.
+        - `401 invalid_user|unauthorized`.
+        - `403 forbidden_report_access`.
+        - `404 report_job_not_found|report_file_not_found|report_file_missing`.
+        - `429 rate_limited`.
+        - `500 report_download_failed|server_error`.
+
+        **Estado contractual**
+        - `KEEP_ACTIVE`.
+        - Descarga segura con validacion de path y acceso.
+      operationId: getV2ReportsJobsReportJobIdDownload
+      parameters:
+      - in: path
+        name: report_job_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: PDF descargado correctamente.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Identificador de reporte invalido.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: No autenticado o token invalido.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Sin permisos para descargar ese reporte.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Archivo de reporte no encontrado.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Limite de solicitudes excedido.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Falla interna del backend.
+      x-contract-status: KEEP_ACTIVE
+    parameters:
+    - name: report_job_id
+      in: path
+      required: true
+      description: Identificador del recurso `report_job_id` en la ruta.
+      schema:
+        type: string
   /docs:
     get:
       tags:

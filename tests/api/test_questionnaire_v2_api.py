@@ -245,7 +245,7 @@ def client(app):
     return app.test_client()
 
 
-def _user_token(app, username: str, user_type: str = "guardian"):
+def _user_token(app, username: str, user_type: str = "guardian", roles: list[str] | None = None):
     with app.app_context():
         user = AppUser(
             username=username,
@@ -256,7 +256,7 @@ def _user_token(app, username: str, user_type: str = "guardian"):
         )
         db.session.add(user)
         db.session.commit()
-        token = create_access_token(identity=str(user.id), additional_claims={"roles": []})
+        token = create_access_token(identity=str(user.id), additional_claims={"roles": roles or []})
         return user.id, token
 
 
@@ -319,6 +319,42 @@ def test_questionnaire_v2_session_flow(client, app):
 
     domain_keys = {item["domain"] for item in submitted.json["domains"]}
     assert domain_keys == {"adhd", "conduct", "elimination", "anxiety", "depression"}
+
+
+def test_questionnaire_v2_bulk_answers_alias_accepts_question_code(client, app):
+    _, token = _user_token(app, "bulk_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=10", headers=headers)
+    assert page.status_code == 200
+    questions = page.json["pages"][0]["questions"][:2]
+    assert len(questions) >= 1
+    payload = [{"question_code": q["question_code"], "answer": 1} for q in questions]
+
+    saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers/bulk",
+        json={"answers": payload, "mark_final": False},
+        headers=headers,
+    )
+    assert saved.status_code == 200
+    expected_count = len(questions)
+    assert saved.json["saved_answers"] == expected_count
+    assert saved.json["saved_count"] == expected_count
+    assert saved.json["answered_count"] >= expected_count
+    assert isinstance(saved.json.get("answers"), list)
+
+    session_resp = client.get(f"/api/v2/questionnaires/sessions/{session_id}", headers=headers)
+    assert session_resp.status_code == 200
+    answered_codes = {item["question_code"] for item in session_resp.json.get("answers", [])}
+    assert {q["question_code"] for q in questions}.issubset(answered_codes)
 
 
 def test_questionnaire_v2_session_resume_payload_includes_saved_answers(client, app):
@@ -588,6 +624,42 @@ def test_questionnaire_v2_permissions_block_ungranted_user(client, app):
 
     forbidden = client.get(f"/api/v2/questionnaires/sessions/{session_id}", headers=stranger_headers)
     assert forbidden.status_code == 403
+
+
+def test_questionnaire_v2_report_job_metadata_and_download(client, app):
+    _, owner_token = _user_token(app, "report_owner_qv2")
+    _, outsider_token = _user_token(app, "report_outsider_qv2")
+    _, admin_token = _user_token(app, "report_admin_qv2", roles=["ADMIN"])
+
+    owner_headers = {"Authorization": f"Bearer {owner_token}"}
+    outsider_headers = {"Authorization": f"Bearer {outsider_token}"}
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
+
+    created = client.post(
+        "/api/v2/reports/jobs",
+        json={"report_type": "adoption_history", "months": 6},
+        headers=owner_headers,
+    )
+    assert created.status_code == 201
+    report_job_id = created.json["report_job_id"]
+    assert created.json["download_url"].endswith(f"/api/v2/reports/jobs/{report_job_id}/download")
+
+    owner_meta = client.get(f"/api/v2/reports/jobs/{report_job_id}", headers=owner_headers)
+    assert owner_meta.status_code == 200
+    assert owner_meta.json["report_job_id"] == report_job_id
+    assert owner_meta.json["download_url"].endswith(f"/api/v2/reports/jobs/{report_job_id}/download")
+    assert "file_path" not in owner_meta.json
+
+    owner_download = client.get(f"/api/v2/reports/jobs/{report_job_id}/download", headers=owner_headers)
+    assert owner_download.status_code == 200
+    assert owner_download.headers.get("Content-Type", "").startswith("application/pdf")
+
+    outsider_meta = client.get(f"/api/v2/reports/jobs/{report_job_id}", headers=outsider_headers)
+    assert outsider_meta.status_code == 403
+
+    admin_meta = client.get(f"/api/v2/reports/jobs/{report_job_id}", headers=admin_headers)
+    assert admin_meta.status_code == 200
+    assert admin_meta.json["report_job_id"] == report_job_id
 
 
 def test_questionnaire_v2_tables_created_in_metadata(app):

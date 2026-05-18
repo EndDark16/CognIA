@@ -12,6 +12,7 @@ Base path: `/api/v2`
 - `GET /questionnaires/sessions/{id}`
 - `GET /questionnaires/sessions/{id}/page?page=1&page_size=20`
 - `PATCH /questionnaires/sessions/{id}/answers`
+- `PATCH /questionnaires/sessions/{id}/answers/bulk`
 - `POST /questionnaires/sessions/{id}/submit`
 
 ### Continuacion de borrador (resume)
@@ -58,6 +59,8 @@ Base path: `/api/v2`
 
 ## Reportes
 - `POST /reports/jobs`
+- `GET /reports/jobs/{report_job_id}`
+- `GET /reports/jobs/{report_job_id}/download`
 
 ## Admin bootstrap
 - `POST /questionnaires/admin/bootstrap` (requiere `ADMIN`)
