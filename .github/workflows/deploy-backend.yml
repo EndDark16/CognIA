@@ -50,6 +50,16 @@ jobs:
             "$PYTHON_BIN" scripts/sync_runtime_artifacts_from_local_store.py --strict
           }
 
+          hydrate_lfs_artifacts() {
+            cd "$BACKEND_REPO_DIR"
+            if ! git lfs version >/dev/null 2>&1; then
+              echo "::error::git-lfs is required on deploy host to materialize tracked runtime artifacts."
+              return 1
+            fi
+            git lfs install --local
+            git lfs pull origin "$DEPLOY_SHA"
+          }
+
           inspect_runtime_sources() {
             IFS=':' read -r -a roots <<< "${RUNTIME_ARTIFACT_SEARCH_ROOTS:-}"
             echo "[runtime-source-inspect] configured_roots=${#roots[@]}"
@@ -120,6 +130,7 @@ jobs:
           echo "Target commit after update: $TARGET_SHA"
           echo "target_sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
 
+          hydrate_lfs_artifacts
           inspect_runtime_sources
           sync_runtime_artifacts
 
