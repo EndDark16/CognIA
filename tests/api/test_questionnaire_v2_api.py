@@ -357,6 +357,32 @@ def test_questionnaire_v2_bulk_answers_alias_accepts_question_code(client, app):
     assert {q["question_code"] for q in questions}.issubset(answered_codes)
 
 
+def test_questionnaire_v2_submit_maps_low_coverage_to_validation_error(client, app, monkeypatch):
+    _, token = _user_token(app, "coverage_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    def _raise_low_coverage(*_args, **_kwargs):
+        raise runtime_service.RuntimeArtifactResolutionError("feature_coverage_below_minimum:adhd:0.1200:3/25")
+
+    monkeypatch.setattr(runtime_service, "submit_session", _raise_low_coverage)
+    submitted = client.post(
+        f"/api/v2/questionnaires/sessions/{session_id}/submit",
+        json={"force_reprocess": False},
+        headers=headers,
+    )
+    assert submitted.status_code == 400
+    assert submitted.json["error"] == "validation_error"
+    assert submitted.json["details"]["runtime"].startswith("feature_coverage_below_minimum:")
+
+
 def test_questionnaire_v2_session_resume_payload_includes_saved_answers(client, app):
     _, token = _user_token(app, "resume_owner_qv2")
     headers = {"Authorization": f"Bearer {token}"}
