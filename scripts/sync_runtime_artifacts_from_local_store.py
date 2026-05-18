@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import os
 import shutil
 from pathlib import Path
-
-import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 ACTIVE_CSV = ROOT / "data" / "hybrid_active_modes_freeze_v17" / "tables" / "hybrid_active_models_30_modes.csv"
@@ -95,14 +94,9 @@ def main() -> int:
     if not ACTIVE_CSV.exists():
         raise FileNotFoundError(f"active models csv missing: {ACTIVE_CSV}")
 
-    df = pd.read_csv(ACTIVE_CSV)
-    model_keys = sorted(
-        {
-            str(value).strip()
-            for value in df.get("active_model_id", pd.Series(dtype=str)).tolist()
-            if str(value).strip()
-        }
-    )
+    with ACTIVE_CSV.open("r", encoding="utf-8", newline="") as fp:
+        reader = csv.DictReader(fp)
+        model_keys = sorted({str((row.get("active_model_id") or "")).strip() for row in reader if row.get("active_model_id")})
     if not model_keys:
         raise RuntimeError("active_model_id list is empty")
 
