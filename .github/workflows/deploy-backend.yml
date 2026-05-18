@@ -50,7 +50,7 @@ jobs:
             "$PYTHON_BIN" scripts/sync_runtime_artifacts_from_local_store.py --strict
           }
 
-          hydrate_lfs_artifacts() {
+          ensure_git_lfs_available() {
             cd "$BACKEND_REPO_DIR"
             if ! git lfs version >/dev/null 2>&1; then
               echo "git-lfs not found; bootstrapping portable binary"
@@ -68,6 +68,11 @@ jobs:
                 return 1
               fi
             fi
+          }
+
+          hydrate_lfs_artifacts() {
+            cd "$BACKEND_REPO_DIR"
+            ensure_git_lfs_available
             git lfs install --local
             git lfs pull origin "$DEPLOY_SHA"
           }
@@ -135,8 +140,9 @@ jobs:
             exit 1
           fi
 
-          git -c filter.lfs.required=false -c filter.lfs.process= -c filter.lfs.smudge= -c filter.lfs.clean= checkout -B "$DEPLOY_BRANCH" "$DEPLOY_SHA"
-          git -c filter.lfs.required=false -c filter.lfs.process= -c filter.lfs.smudge= -c filter.lfs.clean= reset --hard "$DEPLOY_SHA"
+          ensure_git_lfs_available
+          git -c core.hooksPath=/dev/null -c filter.lfs.required=false -c filter.lfs.process= -c filter.lfs.smudge= -c filter.lfs.clean= checkout -B "$DEPLOY_BRANCH" "$DEPLOY_SHA"
+          git -c core.hooksPath=/dev/null -c filter.lfs.required=false -c filter.lfs.process= -c filter.lfs.smudge= -c filter.lfs.clean= reset --hard "$DEPLOY_SHA"
 
           TARGET_SHA="$(git rev-parse HEAD)"
           echo "Target commit after update: $TARGET_SHA"
@@ -155,7 +161,7 @@ jobs:
 
           echo "::warning::Post-deploy readyz check failed for $TARGET_SHA. Rolling back to $PREVIOUS_SHA"
           cd "$BACKEND_REPO_DIR"
-          git -c filter.lfs.required=false -c filter.lfs.process= -c filter.lfs.smudge= -c filter.lfs.clean= reset --hard "$PREVIOUS_SHA"
+          git -c core.hooksPath=/dev/null -c filter.lfs.required=false -c filter.lfs.process= -c filter.lfs.smudge= -c filter.lfs.clean= reset --hard "$PREVIOUS_SHA"
 
           ROLLBACK_SHA="$(git rev-parse HEAD)"
           echo "Rollback commit: $ROLLBACK_SHA"
