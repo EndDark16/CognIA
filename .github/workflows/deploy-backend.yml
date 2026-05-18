@@ -38,10 +38,26 @@ jobs:
         run: |
           set -Eeuo pipefail
 
+          PYTHON_BIN="${PYTHON_BIN:-python3}"
+          if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
+            PYTHON_BIN="python"
+          fi
+
+          sync_runtime_artifacts() {
+            cd "$BACKEND_REPO_DIR"
+            "$PYTHON_BIN" scripts/sync_runtime_artifacts_from_local_store.py --strict
+          }
+
           deploy_compose() {
             cd "$COMPOSE_DIR"
             docker compose up -d --build backend
             docker compose up -d --force-recreate gateway
+          }
+
+          validate_runtime_artifacts() {
+            cd "$COMPOSE_DIR"
+            docker compose exec -T backend python scripts/bootstrap_questionnaire_backend_v2.py load-models
+            docker compose exec -T backend python scripts/run_runtime_artifact_validation_v17.py
           }
 
           check_readyz() {
@@ -85,9 +101,11 @@ jobs:
           echo "Target commit after update: $TARGET_SHA"
           echo "target_sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
 
+          sync_runtime_artifacts
+
           deploy_compose
 
-          if check_readyz; then
+          if check_readyz && validate_runtime_artifacts; then
             echo "final_status=deployed" >> "$GITHUB_OUTPUT"
             exit 0
           fi
