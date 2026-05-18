@@ -975,6 +975,8 @@ def create_report_job():
     user_id, user = _current_user()
     if not user_id or not user:
         return _error("invalid_user", "invalid_user", 401)
+    if not _has_admin_role_from_jwt():
+        return _error("forbidden", "admin_required", 403)
 
     schema = ReportRequestSchema()
     try:
@@ -987,6 +989,11 @@ def create_report_job():
             report_type=payload["report_type"],
             months=payload["months"],
             requested_by_user_id=user_id,
+            date_from=payload.get("date_from"),
+            date_to=payload.get("date_to"),
+            granularity=payload.get("granularity", "month"),
+            file_format=payload.get("format", "pdf"),
+            filters=payload.get("filters") or {},
         )
     except ValueError as exc:
         return _error("validation_error", str(exc), 400)
@@ -1006,6 +1013,8 @@ def get_report_job(report_job_id: str):
     rid = _parse_uuid(report_job_id)
     if not rid:
         return _error("invalid_report_job_id", "invalid_report_job_id", 400)
+    if not _has_admin_role_from_jwt():
+        return _error("forbidden", "admin_required", 403)
 
     try:
         report_job = service.get_report_job_or_404(rid)
@@ -1031,6 +1040,8 @@ def download_report_job(report_job_id: str):
     rid = _parse_uuid(report_job_id)
     if not rid:
         return _error("invalid_report_job_id", "invalid_report_job_id", 400)
+    if not _has_admin_role_from_jwt():
+        return _error("forbidden", "admin_required", 403)
 
     try:
         report_job = service.get_report_job_or_404(rid)

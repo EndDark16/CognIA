@@ -549,9 +549,11 @@ def test_questionnaire_v2_feature_contract_cache_hits(app):
 def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
     owner_id, owner_token = _user_token(app, "owner2_qv2")
     psychologist_id, psychologist_token = _user_token(app, "psych_qv2", user_type="psychologist")
+    _, admin_token = _user_token(app, "admin_reports_qv2", roles=["ADMIN"])
 
     owner_headers = {"Authorization": f"Bearer {owner_token}"}
     psych_headers = {"Authorization": f"Bearer {psychologist_token}"}
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
 
     created = client.post(
         "/api/v2/questionnaires/sessions",
@@ -628,10 +630,12 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
     report = client.post(
         "/api/v2/reports/jobs",
         json={"report_type": "adoption_history", "months": 6},
-        headers=owner_headers,
+        headers=admin_headers,
     )
     assert report.status_code == 201
-    assert Path(report.json["file_path"]).exists()
+    assert report.json["download_url"].startswith("/api/v2/reports/jobs/")
+    assert "file_path" not in report.json
+    assert report.json["summary"]["headline_metrics"]
 
 
 def test_questionnaire_v2_permissions_block_ungranted_user(client, app):
@@ -656,36 +660,101 @@ def test_questionnaire_v2_report_job_metadata_and_download(client, app):
     _, owner_token = _user_token(app, "report_owner_qv2")
     _, outsider_token = _user_token(app, "report_outsider_qv2")
     _, admin_token = _user_token(app, "report_admin_qv2", roles=["ADMIN"])
+    _, admin2_token = _user_token(app, "report_admin2_qv2", roles=["ADMIN"])
 
     owner_headers = {"Authorization": f"Bearer {owner_token}"}
     outsider_headers = {"Authorization": f"Bearer {outsider_token}"}
     admin_headers = {"Authorization": f"Bearer {admin_token}"}
+    admin2_headers = {"Authorization": f"Bearer {admin2_token}"}
 
     created = client.post(
         "/api/v2/reports/jobs",
-        json={"report_type": "adoption_history", "months": 6},
-        headers=owner_headers,
+        json={
+            "report_type": "executive_summary",
+            "months": 6,
+            "granularity": "month",
+            "format": "pdf",
+            "filters": {"status": "processed", "include_sections": ["Crecimiento de usuarios"]},
+        },
+        headers=admin_headers,
     )
     assert created.status_code == 201
     report_job_id = created.json["report_job_id"]
     assert created.json["download_url"].endswith(f"/api/v2/reports/jobs/{report_job_id}/download")
+    assert created.json["summary"]["headline_metrics"]
 
     owner_meta = client.get(f"/api/v2/reports/jobs/{report_job_id}", headers=owner_headers)
-    assert owner_meta.status_code == 200
-    assert owner_meta.json["report_job_id"] == report_job_id
-    assert owner_meta.json["download_url"].endswith(f"/api/v2/reports/jobs/{report_job_id}/download")
-    assert "file_path" not in owner_meta.json
-
-    owner_download = client.get(f"/api/v2/reports/jobs/{report_job_id}/download", headers=owner_headers)
-    assert owner_download.status_code == 200
-    assert owner_download.headers.get("Content-Type", "").startswith("application/pdf")
+    assert owner_meta.status_code == 403
 
     outsider_meta = client.get(f"/api/v2/reports/jobs/{report_job_id}", headers=outsider_headers)
     assert outsider_meta.status_code == 403
 
-    admin_meta = client.get(f"/api/v2/reports/jobs/{report_job_id}", headers=admin_headers)
+    admin_meta = client.get(f"/api/v2/reports/jobs/{report_job_id}", headers=admin2_headers)
     assert admin_meta.status_code == 200
     assert admin_meta.json["report_job_id"] == report_job_id
+    assert admin_meta.json["summary"]["headline_metrics"]
+    assert admin_meta.json["period"]["months"] == 6
+    assert "file_path" not in admin_meta.json
+
+    admin_download = client.get(f"/api/v2/reports/jobs/{report_job_id}/download", headers=admin_headers)
+    assert admin_download.status_code == 200
+    assert admin_download.headers.get("Content-Type", "").startswith("application/pdf")
+
+    non_admin_download = client.get(f"/api/v2/reports/jobs/{report_job_id}/download", headers=owner_headers)
+    assert non_admin_download.status_code == 403
+
+
+def test_questionnaire_v2_report_job_multiple_types_and_invalid_filters(client, app):
+    _, admin_token = _user_token(app, "report_admin_types_qv2", roles=["ADMIN"])
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    for report_type in ["executive_summary", "user_growth", "questionnaire_volume", "funnel", "model_monitoring"]:
+        created = client.post(
+            "/api/v2/reports/jobs",
+            json={"report_type": report_type, "months": 3, "granularity": "week", "filters": {"mode": "complete"}},
+            headers=headers,
+        )
+        assert created.status_code == 201
+        assert created.json["report_type"] == report_type
+        assert created.json["summary"]["sections"]
+
+    bad_period = client.post(
+        "/api/v2/reports/jobs",
+        json={"report_type": "executive_summary", "date_from": "2026-05-10", "date_to": "2026-05-01"},
+        headers=headers,
+    )
+    assert bad_period.status_code == 400
+
+    bad_format = client.post(
+        "/api/v2/reports/jobs",
+        json={"report_type": "executive_summary", "format": "csv"},
+        headers=headers,
+    )
+    assert bad_format.status_code == 400
+
+
+def test_questionnaire_v2_report_download_rejects_outside_runtime_reports(client, app, monkeypatch):
+    _, admin_token = _user_token(app, "report_admin_guard_qv2", roles=["ADMIN"])
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    created = client.post(
+        "/api/v2/reports/jobs",
+        json={"report_type": "executive_summary", "months": 1},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    report_job_id = created.json["report_job_id"]
+
+    from api.routes import questionnaire_v2 as route_module
+
+    class _Generated:
+        file_path = str((Path.cwd() / "README.md").resolve())
+
+    monkeypatch.setattr(route_module.service, "latest_generated_report_for_job", lambda _rid: _Generated())
+
+    resp = client.get(f"/api/v2/reports/jobs/{report_job_id}/download", headers=headers)
+    assert resp.status_code == 404
+    assert resp.json["error"] == "report_file_missing"
 
 
 def test_questionnaire_v2_tables_created_in_metadata(app):
