@@ -23,6 +23,8 @@ jobs:
       COMPOSE_DIR: /opt/cognia
       EXPECTED_SHA: ${{ github.sha }}
       READY_URL: http://localhost/readyz
+      RUNTIME_ARTIFACT_SEARCH_ROOTS: >-
+        /opt/cognia/runtime_artifacts/models/active_modes:/opt/cognia/runtime_artifacts:/opt/cognia/backend/models/active_modes:/opt/cognia/backend:/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app/models/active_modes:/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app:/mnt/c/Users/andre/Documents/cognia_clean_work/cognia_runtime_draft_fix_clean2/models/active_modes
 
     steps:
       - name: Validate server paths
@@ -46,6 +48,20 @@ jobs:
           sync_runtime_artifacts() {
             cd "$BACKEND_REPO_DIR"
             "$PYTHON_BIN" scripts/sync_runtime_artifacts_from_local_store.py --strict
+          }
+
+          inspect_runtime_sources() {
+            IFS=':' read -r -a roots <<< "${RUNTIME_ARTIFACT_SEARCH_ROOTS:-}"
+            echo "[runtime-source-inspect] configured_roots=${#roots[@]}"
+            for root in "${roots[@]}"; do
+              [ -z "$root" ] && continue
+              if [ -d "$root" ]; then
+                count="$(find "$root" -maxdepth 3 -type f -name '*.joblib' 2>/dev/null | wc -l | tr -d ' ')"
+                echo "[runtime-source-inspect] exists root=$root joblib_count=$count"
+              else
+                echo "[runtime-source-inspect] missing root=$root"
+              fi
+            done
           }
 
           deploy_compose() {
@@ -101,6 +117,7 @@ jobs:
           echo "Target commit after update: $TARGET_SHA"
           echo "target_sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
 
+          inspect_runtime_sources
           sync_runtime_artifacts
 
           deploy_compose
