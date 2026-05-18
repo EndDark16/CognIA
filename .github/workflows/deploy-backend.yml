@@ -24,7 +24,7 @@ jobs:
       EXPECTED_SHA: ${{ github.sha }}
       READY_URL: http://localhost/readyz
       RUNTIME_ARTIFACT_SEARCH_ROOTS: >-
-        /opt/cognia/runtime_artifacts/models/active_modes:/opt/cognia/runtime_artifacts:/opt/cognia/backend/models/active_modes:/opt/cognia/backend:/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app/models/active_modes:/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app:/mnt/c/Users/andre/Documents/cognia_clean_work/cognia_runtime_draft_fix_clean2/models/active_modes
+        /opt/cognia/runtime_artifacts/models/active_modes:/opt/cognia/runtime_artifacts:/opt/cognia/backend/models/active_modes:/opt/cognia/backend:/opt:/home:/root:/srv:/mnt:/var/lib:/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app/models/active_modes:/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app:/mnt/c/Users/andre/Documents/cognia_clean_work/cognia_runtime_draft_fix_clean2/models/active_modes
 
     steps:
       - name: Validate server paths
