@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import os
 import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ACTIVE_CSV = ROOT / "data" / "hybrid_active_modes_freeze_v17" / "tables" / "hybrid_active_models_30_modes.csv"
+HASH_INVENTORY_CSV = ROOT / "data" / "hybrid_domain_specialized_rf_v17" / "tables" / "v17_artifact_hash_inventory.csv"
 TARGET_MODELS_DIR = ROOT / "models" / "active_modes"
 
 
@@ -96,7 +98,60 @@ def _search_candidate(model_key: str, roots: list[Path]) -> Path | None:
     return None
 
 
-def _sync_slot(model_key: str, roots: list[Path], dry_run: bool = False) -> tuple[str, str]:
+def _sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        while True:
+            chunk = fh.read(1024 * 1024)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _collect_joblib_hash_index(roots: list[Path]) -> dict[str, Path]:
+    index: dict[str, Path] = {}
+    for root in roots:
+        if not root.exists():
+            continue
+        try:
+            walker = os.walk(root, onerror=lambda _err: None)
+            for dirpath, _dirnames, filenames in walker:
+                for fname in filenames:
+                    if not fname.lower().endswith(".joblib"):
+                        continue
+                    candidate = Path(dirpath) / fname
+                    try:
+                        digest = _sha256(candidate)
+                    except Exception:
+                        continue
+                    index.setdefault(digest, candidate)
+        except Exception:
+            continue
+    return index
+
+
+def _load_expected_hashes() -> dict[str, str]:
+    if not HASH_INVENTORY_CSV.exists():
+        return {}
+    out: dict[str, str] = {}
+    with HASH_INVENTORY_CSV.open("r", encoding="utf-8", newline="") as fp:
+        reader = csv.DictReader(fp)
+        for row in reader:
+            model_key = str(row.get("active_model_id") or "").strip()
+            artifact_hash = str(row.get("artifact_hash") or "").strip().lower()
+            if model_key and artifact_hash:
+                out[model_key] = artifact_hash
+    return out
+
+
+def _sync_slot(
+    model_key: str,
+    roots: list[Path],
+    expected_hashes: dict[str, str],
+    hash_index: dict[str, Path],
+    dry_run: bool = False,
+) -> tuple[str, str]:
     slot_dir = TARGET_MODELS_DIR / model_key
     slot_dir.mkdir(parents=True, exist_ok=True)
 
@@ -105,6 +160,10 @@ def _sync_slot(model_key: str, roots: list[Path], dry_run: bool = False) -> tupl
         return "already_present", str(current)
 
     source = _search_candidate(model_key, roots)
+    if source is None:
+        expected_hash = expected_hashes.get(model_key)
+        if expected_hash:
+            source = hash_index.get(expected_hash)
     if source is None:
         return "missing_source", ""
 
@@ -138,12 +197,25 @@ def main() -> int:
     for root in roots:
         print(f" - {root}")
 
+    expected_hashes = _load_expected_hashes()
+    hash_index: dict[str, Path] = {}
+    if expected_hashes:
+        print(f"[sync-runtime-artifacts] expected_hash_inventory={len(expected_hashes)}")
+        hash_index = _collect_joblib_hash_index(roots)
+        print(f"[sync-runtime-artifacts] host_joblib_hash_index={len(hash_index)}")
+
     copied = 0
     already = 0
     missing: list[str] = []
 
     for model_key in model_keys:
-        status, path = _sync_slot(model_key, roots=roots, dry_run=args.dry_run)
+        status, path = _sync_slot(
+            model_key,
+            roots=roots,
+            expected_hashes=expected_hashes,
+            hash_index=hash_index,
+            dry_run=args.dry_run,
+        )
         if status == "copied":
             copied += 1
             print(f"[copied] {model_key} -> {path}")
