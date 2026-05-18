@@ -92,6 +92,16 @@ Nota de continuidad (2026-04-22):
 4. Construir vector por `feature_columns` (metadata) con defaults trazables.
 5. Ejecutar `predict_proba` cuando esta disponible.
 6. Si artefacto no esta disponible en runtime activo (produccion): error explicito de resolucion (`runtime_artifact_unavailable`), sin fallback heuristico.
+
+## Operacion de deploy (runtime artifacts no versionados)
+
+- Los `*.joblib` de `models/active_modes/` son artefactos tecnicos no versionados por politica de repositorio.
+- Antes de levantar backend en servidor, el deploy debe materializar esos artefactos desde storage local del host:
+  - `python scripts/sync_runtime_artifacts_from_local_store.py --strict`
+- Despues del despliegue, se debe sincronizar activaciones y validar runtime activo:
+  - `python scripts/bootstrap_questionnaire_backend_v2.py load-models`
+  - `python scripts/run_runtime_artifact_validation_v17.py`
+- En produccion, si alguna de esas validaciones falla, el deploy debe considerarse fallido (sin reactivar fallback legacy).
 7. En entorno `TESTING` se permite fallback heuristico solo para no romper pruebas aisladas sin artefactos.
 
 Nota de rol operativo (2026-04-21):
