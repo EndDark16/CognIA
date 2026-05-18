@@ -53,13 +53,15 @@ jobs:
           hydrate_lfs_artifacts() {
             cd "$BACKEND_REPO_DIR"
             if ! git lfs version >/dev/null 2>&1; then
-              echo "git-lfs not found; attempting host install"
-              if command -v sudo >/dev/null 2>&1; then
-                sudo apt-get update -y
-                sudo apt-get install -y git-lfs
-              else
-                apt-get update -y
-                apt-get install -y git-lfs
+              echo "git-lfs not found; bootstrapping portable binary"
+              local lfs_tmp
+              lfs_tmp="$(mktemp -d)"
+              curl -fsSL "https://github.com/git-lfs/git-lfs/releases/download/v3.7.0/git-lfs-linux-amd64-v3.7.0.tar.gz" -o "$lfs_tmp/git-lfs.tgz"
+              tar -xzf "$lfs_tmp/git-lfs.tgz" -C "$lfs_tmp"
+              local lfs_bin
+              lfs_bin="$(find "$lfs_tmp" -type f -name git-lfs | head -n 1 || true)"
+              if [ -n "$lfs_bin" ] && [ -x "$lfs_bin" ]; then
+                export PATH="$(dirname "$lfs_bin"):$PATH"
               fi
               if ! git lfs version >/dev/null 2>&1; then
                 echo "::error::git-lfs is required on deploy host to materialize tracked runtime artifacts."
