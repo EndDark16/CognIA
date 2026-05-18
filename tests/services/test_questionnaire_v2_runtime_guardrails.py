@@ -99,3 +99,30 @@ def test_testing_mode_can_use_explicit_fallback_and_skip_coverage_fail(tmp_path,
         prob = qv2._model_probability(version, {"f1": 1, "f2": 2}, "adhd")
     assert 0.0 <= prob <= 1.0
     monkeypatch.delenv("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS", raising=False)
+
+
+def test_active_model_artifact_accepts_backslash_relative_path(tmp_path):
+    app = create_app(StrictConfig)
+    repo_root = Path(qv2.__file__).resolve().parents[2]
+    model_rel = Path("models") / "active_modes" / f"slot_{uuid.uuid4().hex[:8]}" / "pipeline.joblib"
+    model_abs = repo_root / model_rel
+    _write_model(model_abs)
+    try:
+        windows_like_rel = model_rel.as_posix().replace("/", "\\")
+        version = ModelVersion(
+            model_registry_id=uuid.uuid4(),
+            model_version_tag="test-v17-backslash-relative",
+            artifact_path=windows_like_rel,
+            fallback_artifact_path="",
+            metadata_json={"feature_columns": ["f1", "f2"]},
+        )
+        with app.app_context():
+            prob = qv2._model_probability(version, {"f1": 2, "f2": 2}, "adhd")
+        assert 0.0 <= prob <= 1.0
+    finally:
+        try:
+            model_abs.unlink(missing_ok=True)
+            model_abs.parent.rmdir()
+            model_abs.parent.parent.rmdir()
+        except Exception:
+            pass
