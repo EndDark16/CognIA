@@ -102,6 +102,14 @@ Nota de continuidad (2026-04-22):
   - `python scripts/bootstrap_questionnaire_backend_v2.py load-models`
   - `python scripts/run_runtime_artifact_validation_v17.py`
 - En produccion, si alguna de esas validaciones falla, el deploy debe considerarse fallido (sin reactivar fallback legacy).
+## Actualizacion operativa (2026-05-18) - fuente oficial reproducible v17
+
+- Los 30 artefactos activos `hybrid_domain_specialized_rf_v17` quedan versionados como fuente oficial mediante Git LFS:
+  - `models/active_modes/<active_model_id>/pipeline.joblib`
+- El deploy en host debe ejecutar `git lfs pull` sobre el SHA objetivo antes del sync/validacion runtime.
+- `sync_runtime_artifacts_from_local_store.py --strict` se mantiene como guardrail para copiar desde storage local solo si falta algun slot.
+- Criterio operativo obligatorio en produccion:
+  - `python scripts/run_runtime_artifact_validation_v17.py` con 30/30 en disponibilidad, carga `joblib`, smoke `predict_proba`, y sin fallback legacy configurado.
 7. En entorno `TESTING` se permite fallback heuristico solo para no romper pruebas aisladas sin artefactos.
 
 Nota de rol operativo (2026-04-21):
