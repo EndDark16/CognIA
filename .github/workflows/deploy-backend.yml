@@ -24,7 +24,7 @@ jobs:
       EXPECTED_SHA: ${{ github.sha }}
       READY_URL: http://localhost/readyz
       RUNTIME_ARTIFACT_SEARCH_ROOTS: >-
-        /opt/cognia/runtime_artifacts/models/active_modes:/opt/cognia/runtime_artifacts:/opt/cognia/backend/models/active_modes:/opt/cognia/backend:/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app/models/active_modes:/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app:/mnt/c/Users/andre/Documents/cognia_clean_work/cognia_runtime_draft_fix_clean2/models/active_modes
+        /opt/cognia/runtime_artifacts/models/active_modes:/opt/cognia/runtime_artifacts:/opt/cognia/backend/models/active_modes:/opt/cognia/backend:/opt:/home:/root:/srv:/mnt:/var/lib:/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app/models/active_modes:/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app:/mnt/c/Users/andre/Documents/cognia_clean_work/cognia_runtime_draft_fix_clean2/models/active_modes
 
     steps:
       - name: Validate server paths
@@ -50,13 +50,33 @@ jobs:
             "$PYTHON_BIN" scripts/sync_runtime_artifacts_from_local_store.py --strict
           }
 
+          hydrate_lfs_artifacts() {
+            cd "$BACKEND_REPO_DIR"
+            if ! git lfs version >/dev/null 2>&1; then
+              echo "git-lfs not found; attempting host install"
+              if command -v sudo >/dev/null 2>&1; then
+                sudo apt-get update -y
+                sudo apt-get install -y git-lfs
+              else
+                apt-get update -y
+                apt-get install -y git-lfs
+              fi
+              if ! git lfs version >/dev/null 2>&1; then
+                echo "::error::git-lfs is required on deploy host to materialize tracked runtime artifacts."
+                return 1
+              fi
+            fi
+            git lfs install --local
+            git lfs pull origin "$DEPLOY_SHA"
+          }
+
           inspect_runtime_sources() {
             IFS=':' read -r -a roots <<< "${RUNTIME_ARTIFACT_SEARCH_ROOTS:-}"
             echo "[runtime-source-inspect] configured_roots=${#roots[@]}"
             for root in "${roots[@]}"; do
               [ -z "$root" ] && continue
               if [ -d "$root" ]; then
-                count="$(find "$root" -maxdepth 3 -type f -name '*.joblib' 2>/dev/null | wc -l | tr -d ' ')"
+                count="$( (find "$root" -maxdepth 3 -type f -name '*.joblib' 2>/dev/null || true) | wc -l | tr -d ' ' )"
                 echo "[runtime-source-inspect] exists root=$root joblib_count=$count"
               else
                 echo "[runtime-source-inspect] missing root=$root"
@@ -103,20 +123,24 @@ jobs:
           git fetch --prune origin "$DEPLOY_BRANCH"
           REMOTE_SHA="$(git rev-parse "origin/$DEPLOY_BRANCH")"
           echo "Remote $DEPLOY_BRANCH commit: $REMOTE_SHA"
-
-          if [ "$REMOTE_SHA" != "$EXPECTED_SHA" ]; then
+          DEPLOY_SHA="$EXPECTED_SHA"
+          if [ "${GITHUB_EVENT_NAME:-}" = "workflow_dispatch" ]; then
+            DEPLOY_SHA="$REMOTE_SHA"
+            echo "workflow_dispatch detected; deploying latest origin/$DEPLOY_BRANCH: $DEPLOY_SHA"
+          elif [ "$REMOTE_SHA" != "$EXPECTED_SHA" ]; then
             echo "::error::Expected workflow SHA $EXPECTED_SHA but origin/$DEPLOY_BRANCH resolved $REMOTE_SHA."
             echo "final_status=sha_mismatch" >> "$GITHUB_OUTPUT"
             exit 1
           fi
 
-          git checkout -B "$DEPLOY_BRANCH" "$EXPECTED_SHA"
-          git reset --hard "$EXPECTED_SHA"
+          git checkout -B "$DEPLOY_BRANCH" "$DEPLOY_SHA"
+          git reset --hard "$DEPLOY_SHA"
 
           TARGET_SHA="$(git rev-parse HEAD)"
           echo "Target commit after update: $TARGET_SHA"
           echo "target_sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
 
+          hydrate_lfs_artifacts
           inspect_runtime_sources
           sync_runtime_artifacts
 
