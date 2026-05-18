@@ -53,8 +53,18 @@ jobs:
           hydrate_lfs_artifacts() {
             cd "$BACKEND_REPO_DIR"
             if ! git lfs version >/dev/null 2>&1; then
-              echo "::error::git-lfs is required on deploy host to materialize tracked runtime artifacts."
-              return 1
+              echo "git-lfs not found; attempting host install"
+              if command -v sudo >/dev/null 2>&1; then
+                sudo apt-get update -y
+                sudo apt-get install -y git-lfs
+              else
+                apt-get update -y
+                apt-get install -y git-lfs
+              fi
+              if ! git lfs version >/dev/null 2>&1; then
+                echo "::error::git-lfs is required on deploy host to materialize tracked runtime artifacts."
+                return 1
+              fi
             fi
             git lfs install --local
             git lfs pull origin "$DEPLOY_SHA"
