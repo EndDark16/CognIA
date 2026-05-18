@@ -50,6 +50,10 @@ def _server_error(message: str, error: str = "server_error"):
 def _handle_backend_failure(exc: Exception, fallback_message: str, fallback_error: str = "server_error"):
     db.session.rollback()
     if isinstance(exc, service.RuntimeArtifactResolutionError):
+        error_text = str(exc)
+        if error_text.startswith("feature_coverage_below_minimum:"):
+            current_app.logger.warning("questionnaire_v2_feature_coverage_blocked: %s", error_text)
+            return _error("validation_error", "validation_error", 400, {"runtime": error_text})
         current_app.logger.error("questionnaire_v2_runtime_artifact_error: %s", exc, exc_info=True)
         return _error("Runtime model artifact unavailable", "runtime_artifact_unavailable", 503)
     if isinstance(exc, FileNotFoundError):
