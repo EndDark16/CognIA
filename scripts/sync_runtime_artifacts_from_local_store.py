@@ -37,13 +37,19 @@ def _search_roots() -> list[Path]:
         for default_root in (
             ROOT,
             ROOT.parent,
+            ROOT / "models" / "active_modes",
             Path("/opt/cognia"),
+            Path("/opt/cognia/runtime_artifacts/models/active_modes"),
+            Path("/opt/cognia/runtime_artifacts"),
             Path("/opt"),
             Path("/home"),
             Path("/root"),
             Path("/srv"),
             Path("/mnt"),
             Path("/var/lib"),
+            Path("/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app/models/active_modes"),
+            Path("/mnt/c/Users/andre/Documents/Workspace Academic/Backend Tesis/cognia_app"),
+            Path("/mnt/c/Users/andre/Documents/cognia_clean_work/cognia_runtime_draft_fix_clean2/models/active_modes"),
         ):
             _add(default_root)
 
@@ -60,6 +66,23 @@ def _existing_joblib(slot_dir: Path) -> Path | None:
 
 
 def _search_candidate(model_key: str, roots: list[Path]) -> Path | None:
+    # Fast-path exact locations to avoid expensive recursive scans.
+    for root in roots:
+        candidate_dirs = (
+            root / model_key,
+            root / "models" / "active_modes" / model_key,
+        )
+        for directory in candidate_dirs:
+            if not directory.exists():
+                continue
+            for name in ("pipeline.joblib", "calibrated.joblib"):
+                path = directory / name
+                if path.exists():
+                    return path
+            files = sorted(directory.glob("*.joblib"))
+            if files:
+                return files[0]
+
     preferred_patterns = (
         f"**/{model_key}/pipeline.joblib",
         f"**/{model_key}/calibrated.joblib",
