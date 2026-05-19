@@ -350,11 +350,133 @@ def test_questionnaire_v2_bulk_answers_alias_accepts_question_code(client, app):
     assert saved.json["saved_count"] == expected_count
     assert saved.json["answered_count"] >= expected_count
     assert isinstance(saved.json.get("answers"), list)
+    assert len(saved.json["answers"]) == expected_count
+    saved_codes = {item["question_code"] for item in saved.json["answers"]}
+    assert saved_codes == {q["question_code"] for q in questions}
+    assert "answers" not in saved.json["session"]
 
     session_resp = client.get(f"/api/v2/questionnaires/sessions/{session_id}", headers=headers)
     assert session_resp.status_code == 200
     answered_codes = {item["question_code"] for item in session_resp.json.get("answers", [])}
     assert {q["question_code"] for q in questions}.issubset(answered_codes)
+
+
+def test_questionnaire_v2_patch_answers_returns_only_saved_rows(client, app):
+    _, token = _user_token(app, "save_perf_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "complete", "role": "guardian", "child_age_years": 8, "child_sex_assigned_at_birth": "male"},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=10", headers=headers)
+    assert page.status_code == 200
+    questions = [q for section in page.json.get("pages", []) for q in section.get("questions", [])][:2]
+    assert len(questions) == 2
+
+    q1 = questions[0]
+    q2 = questions[1]
+
+    save_1 = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={"answers": [{"question_id": q1["question_id"], "answer": 1}]},
+        headers=headers,
+    )
+    assert save_1.status_code == 200
+    assert save_1.json["saved_count"] == 1
+    assert len(save_1.json["answers"]) == 1
+    assert save_1.json["answers"][0]["question_id"] == q1["question_id"]
+    assert save_1.json["answered_count"] == 1
+    assert "answers" not in save_1.json["session"]
+
+    save_2 = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={"answers": [{"question_id": q2["question_id"], "answer": 1}]},
+        headers=headers,
+    )
+    assert save_2.status_code == 200
+    assert save_2.json["saved_count"] == 1
+    assert len(save_2.json["answers"]) == 1
+    assert save_2.json["answers"][0]["question_id"] == q2["question_id"]
+    assert save_2.json["answered_count"] == 2
+    assert "answers" not in save_2.json["session"]
+
+    detail = client.get(f"/api/v2/questionnaires/sessions/{session_id}", headers=headers)
+    assert detail.status_code == 200
+    detail_ids = {row["question_id"] for row in detail.json.get("answers", [])}
+    assert q1["question_id"] in detail_ids
+    assert q2["question_id"] in detail_ids
+
+
+def test_questionnaire_v2_patch_answers_include_answers_true_returns_full_session_answers(client, app):
+    _, token = _user_token(app, "save_include_answers_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "child_age_years": 8, "child_sex_assigned_at_birth": "female"},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=10", headers=headers)
+    assert page.status_code == 200
+    first_question = page.json["pages"][0]["questions"][0]
+
+    saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={
+            "answers": [{"question_id": first_question["question_id"], "answer": 1}],
+            "include_answers": True,
+        },
+        headers=headers,
+    )
+    assert saved.status_code == 200
+    assert "answers" in saved.json["session"]
+    assert len(saved.json["session"]["answers"]) >= 1
+
+
+def test_questionnaire_v2_bulk_answers_returns_only_saved_rows_from_request(client, app):
+    _, token = _user_token(app, "bulk_scope_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "complete", "role": "guardian", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=10", headers=headers)
+    assert page.status_code == 200
+    questions = [q for section in page.json.get("pages", []) for q in section.get("questions", [])][:2]
+    assert len(questions) == 2
+
+    first = questions[0]
+    second = questions[1]
+    first_saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={"answers": [{"question_id": first["question_id"], "answer": 1}]},
+        headers=headers,
+    )
+    assert first_saved.status_code == 200
+    assert first_saved.json["saved_count"] == 1
+
+    bulk_saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers/bulk",
+        json={"answers": [{"question_id": second["question_id"], "answer": 1}]},
+        headers=headers,
+    )
+    assert bulk_saved.status_code == 200
+    assert bulk_saved.json["saved_count"] == 1
+    assert len(bulk_saved.json["answers"]) == 1
+    assert bulk_saved.json["answers"][0]["question_id"] == second["question_id"]
 
 
 def test_questionnaire_v2_submit_maps_low_coverage_to_validation_error(client, app, monkeypatch):
