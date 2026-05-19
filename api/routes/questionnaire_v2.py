@@ -329,6 +329,7 @@ def patch_answers(session_id: str):
             user_id=user_id,
             answers=payload["answers"],
             mark_final=payload.get("mark_final", False),
+            include_answers=payload.get("include_answers", False),
         )
     except LookupError as exc:
         return _error("not_found", str(exc), 404)
