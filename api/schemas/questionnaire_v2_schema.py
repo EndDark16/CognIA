@@ -33,6 +33,7 @@ class SessionAnswerItemSchema(BaseSchema):
 class SessionAnswersPatchSchema(BaseSchema):
     answers = fields.List(fields.Nested(SessionAnswerItemSchema), required=True, validate=validate.Length(min=1))
     mark_final = fields.Boolean(load_default=False)
+    include_answers = fields.Boolean(load_default=False)
 
 
 class SessionPageQuerySchema(BaseSchema):

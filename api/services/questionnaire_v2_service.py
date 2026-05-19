@@ -532,7 +532,7 @@ def _mark_item_answered(session_id: uuid.UUID, question_id: uuid.UUID) -> None:
     db.session.add(row)
 
 
-def _recompute_progress(session: QuestionnaireSession) -> None:
+def _recompute_progress(session: QuestionnaireSession) -> dict[str, int | float]:
     total, answered = (
         db.session.query(
             func.count(QuestionnaireSessionItem.id),
@@ -560,6 +560,11 @@ def _recompute_progress(session: QuestionnaireSession) -> None:
         session.status = "in_progress"
     session.updated_at = _utcnow()
     db.session.add(session)
+    return {
+        "total_questions": total,
+        "answered_count": answered,
+        "progress_percent": float(session.progress_pct or 0.0),
+    }
 
 
 def _session_sections(session_id: uuid.UUID) -> list[dict[str, Any]]:
@@ -926,6 +931,34 @@ def _build_answer_resume_payload(
     }
 
 
+def _build_saved_answers_payload(
+    session: QuestionnaireSession,
+    saved_question_ids: list[uuid.UUID],
+) -> list[dict[str, Any]]:
+    unique_ids = list(dict.fromkeys(saved_question_ids))
+    if not unique_ids:
+        return []
+
+    rows = (
+        db.session.query(
+            QuestionnaireSessionAnswer,
+            QuestionnaireQuestion,
+            QuestionnaireSection,
+        )
+        .join(QuestionnaireQuestion, QuestionnaireSessionAnswer.question_id == QuestionnaireQuestion.id)
+        .outerjoin(QuestionnaireSection, QuestionnaireQuestion.section_id == QuestionnaireSection.id)
+        .filter(QuestionnaireSessionAnswer.session_id == session.id)
+        .filter(QuestionnaireSessionAnswer.question_id.in_(unique_ids))
+        .order_by(QuestionnaireQuestion.display_order.asc())
+        .all()
+    )
+    payload: list[dict[str, Any]] = []
+    for answer_row, question, section in rows:
+        if answer_row and answer_row.answer_raw is not None:
+            payload.append(_build_answer_resume_payload(question, section, answer_row))
+    return payload
+
+
 def get_session_payload(session: QuestionnaireSession, include_answers: bool = False) -> dict[str, Any]:
     payload = {
         "session_id": str(session.id),
@@ -1061,7 +1094,13 @@ def get_session_page_payload(session: QuestionnaireSession, page: int, page_size
     }
 
 
-def save_answers(session: QuestionnaireSession, user_id: uuid.UUID, answers: list[dict[str, Any]], mark_final: bool = False) -> dict[str, Any]:
+def save_answers(
+    session: QuestionnaireSession,
+    user_id: uuid.UUID,
+    answers: list[dict[str, Any]],
+    mark_final: bool = False,
+    include_answers: bool = False,
+) -> dict[str, Any]:
     if session.status in {"submitted", "processed", "archived"}:
         raise ValueError("session_not_editable")
 
@@ -1187,21 +1226,29 @@ def save_answers(session: QuestionnaireSession, user_id: uuid.UUID, answers: lis
             hidden.updated_at = _utcnow()
             db.session.add(hidden)
 
-    _recompute_progress(session)
+    progress_stats = _recompute_progress(session)
     _audit(session.id, user_id, "answers_saved", {"count": len(answers), "mark_final": mark_final})
     db.session.commit()
 
-    session_payload = get_session_payload(session, include_answers=True)
-    saved_ids = {str(question_id) for question_id, _ in normalized_items}
-    saved_rows = [row for row in session_payload.get("answers", []) if str(row.get("question_id")) in saved_ids]
+    saved_question_ids = [question_id for question_id, _ in normalized_items]
+    if include_answers:
+        session_payload = get_session_payload(session, include_answers=True)
+        saved_ids = {str(question_id) for question_id in saved_question_ids}
+        saved_rows = [row for row in session_payload.get("answers", []) if str(row.get("question_id")) in saved_ids]
+    else:
+        session_payload = get_session_payload(session)
+        saved_rows = _build_saved_answers_payload(session, saved_question_ids)
+        session_payload["total_questions"] = int(progress_stats.get("total_questions", 0))
+        session_payload["answered_count"] = int(progress_stats.get("answered_count", 0))
+        session_payload["progress_percent"] = float(progress_stats.get("progress_percent", float(session.progress_pct or 0.0)))
 
     return {
         "session": session_payload,
         "saved_answers": len(answers),
         "saved_count": len(saved_rows),
-        "answered_count": session_payload.get("answered_count", 0),
-        "total_questions": session_payload.get("total_questions", 0),
-        "progress_percent": session_payload.get("progress_percent", float(session.progress_pct or 0.0)),
+        "answered_count": int(progress_stats.get("answered_count", session_payload.get("answered_count", 0))),
+        "total_questions": int(progress_stats.get("total_questions", session_payload.get("total_questions", 0))),
+        "progress_percent": float(progress_stats.get("progress_percent", session_payload.get("progress_percent", float(session.progress_pct or 0.0)))),
         "updated_at": session_payload.get("updated_at"),
         "answers": saved_rows,
     }
