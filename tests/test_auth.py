@@ -275,7 +275,33 @@ def test_mfa_setup_and_login_flow(client, app):
 
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
     assert resp_login.status_code == 200
-    access_token = resp_login.json["access_token"]
+    if "access_token" in resp_login.json:
+        access_token = resp_login.json["access_token"]
+    else:
+        assert resp_login.json.get("mfa_enrollment_required") is True
+        enroll_token = resp_login.json["enrollment_token"]
+
+        resp_setup = client.post("/api/mfa/setup", headers={"Authorization": f"Bearer {enroll_token}"})
+        assert resp_setup.status_code == 200
+        secret = resp_setup.json["secret"]
+        code = pyotp.TOTP(secret).now()
+        resp_confirm = client.post(
+            "/api/mfa/confirm",
+            headers={"Authorization": f"Bearer {enroll_token}"},
+            json={"code": code},
+        )
+        assert resp_confirm.status_code == 200
+
+        resp_login_2 = client.post("/api/auth/login", json={"username": username, "password": password})
+        assert resp_login_2.status_code == 200
+        assert resp_login_2.json.get("mfa_required") is True
+        challenge_id = resp_login_2.json["challenge_id"]
+        resp_mfa = client.post(
+            "/api/auth/login/mfa",
+            json={"challenge_id": challenge_id, "code": pyotp.TOTP(secret).now()},
+        )
+        assert resp_mfa.status_code == 200
+        access_token = resp_mfa.json["access_token"]
 
     set_cookie_headers = resp_login.headers.getlist("Set-Cookie")
     _persist_cookies(client, set_cookie_headers)
@@ -468,7 +494,33 @@ def test_logout_revokes_refresh(client):
     )
     resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
     assert resp_login.status_code == 200
-    access_token = resp_login.json["access_token"]
+    if "access_token" in resp_login.json:
+        access_token = resp_login.json["access_token"]
+    else:
+        assert resp_login.json.get("mfa_enrollment_required") is True
+        enroll_token = resp_login.json["enrollment_token"]
+
+        resp_setup = client.post("/api/mfa/setup", headers={"Authorization": f"Bearer {enroll_token}"})
+        assert resp_setup.status_code == 200
+        secret = resp_setup.json["secret"]
+        code = pyotp.TOTP(secret).now()
+        resp_confirm = client.post(
+            "/api/mfa/confirm",
+            headers={"Authorization": f"Bearer {enroll_token}"},
+            json={"code": code},
+        )
+        assert resp_confirm.status_code == 200
+
+        resp_login_2 = client.post("/api/auth/login", json={"username": username, "password": password})
+        assert resp_login_2.status_code == 200
+        assert resp_login_2.json.get("mfa_required") is True
+        challenge_id = resp_login_2.json["challenge_id"]
+        resp_mfa = client.post(
+            "/api/auth/login/mfa",
+            json={"challenge_id": challenge_id, "code": pyotp.TOTP(secret).now()},
+        )
+        assert resp_mfa.status_code == 200
+        access_token = resp_mfa.json["access_token"]
     old_refresh, old_csrf = _persist_cookies(client, resp_login.headers.getlist("Set-Cookie"))
 
     resp_logout = client.post(
@@ -844,3 +896,115 @@ def test_auth_me_returns_profile(client):
     assert resp_me.status_code == 200
     assert resp_me.json["username"] == username
     assert resp_me.json["email"] == email
+
+
+def test_auth_profile_update_location_fields(client):
+    username = f"profile_update_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={"username": username, "email": email, "password": password, "full_name": "Profile Update User", "user_type": "guardian"},
+    )
+    assert resp_reg.status_code == 201
+
+    resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
+    assert resp_login.status_code == 200
+    access_token = resp_login.json["access_token"]
+
+    update_resp = client.patch(
+        "/api/auth/me/profile",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={
+            "city": "Facatativa",
+            "department": "Cundinamarca",
+            "location": "Facatativa, Cundinamarca",
+            "professional_city": "Bogota",
+            "professional_department": "Cundinamarca",
+            "professional_location": "Bogota, Cundinamarca",
+        },
+    )
+    assert update_resp.status_code == 200
+    assert update_resp.json["user"]["city"] == "Facatativa"
+    assert update_resp.json["user"]["location"] == "Facatativa, Cundinamarca"
+    assert update_resp.json["user"]["professional_location"] == "Bogota, Cundinamarca"
+
+    me_resp = client.get("/api/auth/me", headers={"Authorization": f"Bearer {access_token}"})
+    assert me_resp.status_code == 200
+    assert me_resp.json["city"] == "Facatativa"
+    assert me_resp.json["department"] == "Cundinamarca"
+
+    invalid_resp = client.patch(
+        "/api/auth/me/profile",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={"city": {"bad": "shape"}},
+    )
+    assert invalid_resp.status_code == 400
+    assert invalid_resp.json.get("error") == "profile_update_validation_error"
+
+
+def test_auth_profile_update_location_fields_psychologist(client):
+    username = f"profile_psych_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={
+            "username": username,
+            "email": email,
+            "password": password,
+            "full_name": "Psych Profile User",
+            "user_type": "psychologist",
+            "professional_card_number": "COLPSIC-77777",
+        },
+    )
+    assert resp_reg.status_code == 201
+
+    with client.application.app_context():
+        user = AppUser.query.filter_by(username=username).first()
+        user.colpsic_verified = True
+        db.session.add(user)
+        db.session.commit()
+
+    resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
+    assert resp_login.status_code == 200
+    if "access_token" in resp_login.json:
+        access_token = resp_login.json["access_token"]
+    else:
+        assert resp_login.json.get("mfa_enrollment_required") is True
+        enroll_token = resp_login.json["enrollment_token"]
+
+        resp_setup = client.post("/api/mfa/setup", headers={"Authorization": f"Bearer {enroll_token}"})
+        assert resp_setup.status_code == 200
+        secret = resp_setup.json["secret"]
+        code = pyotp.TOTP(secret).now()
+        resp_confirm = client.post(
+            "/api/mfa/confirm",
+            headers={"Authorization": f"Bearer {enroll_token}"},
+            json={"code": code},
+        )
+        assert resp_confirm.status_code == 200
+
+        resp_login_2 = client.post("/api/auth/login", json={"username": username, "password": password})
+        assert resp_login_2.status_code == 200
+        assert resp_login_2.json.get("mfa_required") is True
+        challenge_id = resp_login_2.json["challenge_id"]
+        resp_mfa = client.post(
+            "/api/auth/login/mfa",
+            json={"challenge_id": challenge_id, "code": pyotp.TOTP(secret).now()},
+        )
+        assert resp_mfa.status_code == 200
+        access_token = resp_mfa.json["access_token"]
+
+    update_resp = client.patch(
+        "/api/auth/me/profile",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={
+            "professional_city": "Madrid",
+            "professional_department": "Cundinamarca",
+            "professional_location": "Madrid, Cundinamarca",
+        },
+    )
+    assert update_resp.status_code == 200
+    assert update_resp.json["user"]["professional_city"] == "Madrid"
+    assert update_resp.json["user"]["professional_location"] == "Madrid, Cundinamarca"

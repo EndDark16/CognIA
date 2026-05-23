@@ -3,6 +3,9 @@ import os
 import re
 import secrets
 import uuid
+import hashlib
+import hmac
+import unicodedata
 from collections import defaultdict
 from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
@@ -36,6 +39,7 @@ from app.models import (
     QuestionnaireProfessionalReview,
     QuestionnaireQuestion,
     QuestionnaireQuestionMode,
+    QuestionnaireNotification,
     QuestionnaireSection,
     QuestionnaireRepeatMapping,
     QuestionnaireSession,
@@ -81,6 +85,7 @@ SESSION_STATUSES = {
     "archived",
 }
 CASE_STATUSES = {"active", "archived"}
+SHARE_REQUEST_STATUSES = {"pending", "accepted", "rejected"}
 PROFESSIONAL_REVIEW_STATUSES = {
     "pending",
     "in_review",
@@ -104,6 +109,12 @@ RUNTIME_PATH_MARKERS = (
     "models/champions/",
     "data/",
 )
+NOTIFICATION_TYPES = {
+    "questionnaire_share_requested",
+    "questionnaire_share_accepted",
+    "questionnaire_share_rejected",
+    "professional_review_created",
+}
 
 
 class RuntimeArtifactResolutionError(RuntimeError):
@@ -144,6 +155,22 @@ def _new_public_id() -> str:
 
 def _new_case_public_id() -> str:
     return f"CASO-{secrets.token_hex(3).upper()}"
+
+
+def _normalize_case_label(value: str) -> str:
+    text = unicodedata.normalize("NFKD", str(value or ""))
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    text = re.sub(r"\s+", " ", text.strip().lower())
+    return text
+
+
+def _hash_case_label(value: str) -> str:
+    normalized = _normalize_case_label(value)
+    if not normalized:
+        return ""
+    secret = str(current_app.config.get("CASE_LABEL_HASH_SECRET") or current_app.config.get("SECRET_KEY") or "")
+    digest = hmac.new(secret.encode("utf-8"), normalized.encode("utf-8"), hashlib.sha256).hexdigest()
+    return digest
 
 
 def _generate_case_public_id() -> str:
@@ -389,10 +416,24 @@ def _resolve_case_for_session_creation(owner_user_id: uuid.UUID, payload: dict[s
         return case
 
     if case_label:
+        label_hash = _hash_case_label(case_label)
+        if label_hash:
+            existing_case = (
+                QuestionnaireCase.query.filter_by(
+                    owner_user_id=owner_user_id,
+                    status="active",
+                    private_label_hash=label_hash,
+                )
+                .order_by(QuestionnaireCase.updated_at.desc())
+                .first()
+            )
+            if existing_case:
+                return existing_case
         case = QuestionnaireCase(
             case_public_id=_generate_case_public_id(),
             owner_user_id=owner_user_id,
             private_label=_encrypt_text(case_label, "questionnaire_case.private_label") or case_label,
+            private_label_hash=label_hash or None,
             status="active",
             metadata_json=payload.get("metadata") or {},
         )
@@ -431,6 +472,12 @@ def _access_grant_for_user(session_id: uuid.UUID, user_id: uuid.UUID) -> Questio
     return (
         QuestionnaireAccessGrant.query.filter_by(session_id=session_id, grantee_user_id=user_id)
         .filter(QuestionnaireAccessGrant.revoked_at.is_(None))
+        .filter(
+            or_(
+                QuestionnaireAccessGrant.request_status.is_(None),
+                QuestionnaireAccessGrant.request_status == "accepted",
+            )
+        )
         .filter(or_(QuestionnaireAccessGrant.expires_at.is_(None), QuestionnaireAccessGrant.expires_at > now))
         .order_by(QuestionnaireAccessGrant.created_at.desc())
         .first()
@@ -504,6 +551,57 @@ def _record_access(
             notes=notes,
         )
     )
+
+
+def _create_notification(
+    *,
+    user_id: uuid.UUID,
+    notification_type: str,
+    title: str,
+    message: str,
+    actor_user_id: uuid.UUID | None = None,
+    session_id: uuid.UUID | None = None,
+    case_id: uuid.UUID | None = None,
+    grant_id: uuid.UUID | None = None,
+    payload_json: dict[str, Any] | None = None,
+) -> QuestionnaireNotification:
+    if notification_type not in NOTIFICATION_TYPES:
+        raise ValueError("invalid_notification_type")
+    row = QuestionnaireNotification(
+        user_id=user_id,
+        actor_user_id=actor_user_id,
+        session_id=session_id,
+        case_id=case_id,
+        grant_id=grant_id,
+        notification_type=notification_type,
+        title=title,
+        message=message,
+        payload_json=payload_json or {},
+    )
+    db.session.add(row)
+    return row
+
+
+def _notification_payload(row: QuestionnaireNotification, viewer_user_id: uuid.UUID) -> dict[str, Any]:
+    if row.user_id != viewer_user_id:
+        raise PermissionError("notification_forbidden")
+    case_public_id = None
+    if row.case_id:
+        case_row = db.session.get(QuestionnaireCase, row.case_id)
+        if case_row:
+            case_public_id = case_row.case_public_id
+    return {
+        "notification_id": str(row.id),
+        "type": row.notification_type,
+        "title": row.title,
+        "message": row.message,
+        "case_public_id": case_public_id,
+        "session_id": str(row.session_id) if row.session_id else None,
+        "grant_id": str(row.grant_id) if row.grant_id else None,
+        "payload": row.payload_json or {},
+        "read_at": row.read_at.isoformat() if row.read_at else None,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+    }
 
 
 def _confidence_for_activation(activation_id: uuid.UUID) -> tuple[float, str, str | None]:
@@ -2042,6 +2140,7 @@ def persist_clinical_summary_payload(session: QuestionnaireSession, clinical_pay
 
 
 def list_history(user_id: uuid.UUID, status: str | None = None, page: int = 1, page_size: int = 20) -> dict[str, Any]:
+    now = _utcnow()
     query = QuestionnaireSession.query.filter(
         or_(
             QuestionnaireSession.owner_user_id == user_id,
@@ -2049,6 +2148,15 @@ def list_history(user_id: uuid.UUID, status: str | None = None, page: int = 1, p
                 db.session.query(QuestionnaireAccessGrant.session_id).filter(
                     QuestionnaireAccessGrant.grantee_user_id == user_id,
                     QuestionnaireAccessGrant.revoked_at.is_(None),
+                    QuestionnaireAccessGrant.can_view.is_(True),
+                    or_(
+                        QuestionnaireAccessGrant.request_status.is_(None),
+                        QuestionnaireAccessGrant.request_status == "accepted",
+                    ),
+                    or_(
+                        QuestionnaireAccessGrant.expires_at.is_(None),
+                        QuestionnaireAccessGrant.expires_at > now,
+                    ),
                 )
             ),
         )
@@ -2118,10 +2226,27 @@ def create_case(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> dict[str, 
     private_label = str(payload.get("private_label") or "").strip()
     if not private_label:
         raise ValueError("case_label_invalid")
+    label_hash = _hash_case_label(private_label)
+    if label_hash:
+        existing = (
+            QuestionnaireCase.query.filter_by(
+                owner_user_id=owner_user_id,
+                status="active",
+                private_label_hash=label_hash,
+            )
+            .order_by(QuestionnaireCase.updated_at.desc())
+            .first()
+        )
+        if existing:
+            case_payload = _case_payload(existing, viewer_user_id=owner_user_id)
+            sessions_count = QuestionnaireSession.query.filter_by(case_id=existing.id).count()
+            case_payload["sessions_count"] = sessions_count
+            return {"case": case_payload, "reused": True}
     row = QuestionnaireCase(
         case_public_id=_generate_case_public_id(),
         owner_user_id=owner_user_id,
         private_label=_encrypt_text(private_label, "questionnaire_case.private_label") or private_label,
+        private_label_hash=label_hash or None,
         status="active",
         metadata_json=payload.get("metadata") or {},
     )
@@ -2194,6 +2319,7 @@ def update_case(case: QuestionnaireCase, owner_user_id: uuid.UUID, payload: dict
         private_label = str(payload.get("private_label") or "").strip()
         if not private_label:
             raise ValueError("case_label_invalid")
+        case.private_label_hash = _hash_case_label(private_label) or None
         case.private_label = _encrypt_text(private_label, "questionnaire_case.private_label") or private_label
     if "status" in payload and payload.get("status") is not None:
         status = str(payload.get("status") or "").strip().lower()
@@ -2406,6 +2532,10 @@ def psychologist_dashboard(
     grants = QuestionnaireAccessGrant.query.filter_by(grantee_user_id=psychologist_user_id).filter(
         QuestionnaireAccessGrant.revoked_at.is_(None),
         QuestionnaireAccessGrant.can_view.is_(True),
+        or_(
+            QuestionnaireAccessGrant.request_status.is_(None),
+            QuestionnaireAccessGrant.request_status == "accepted",
+        ),
     )
     now = _utcnow()
     grants = grants.filter(or_(QuestionnaireAccessGrant.expires_at.is_(None), QuestionnaireAccessGrant.expires_at > now))
@@ -2619,6 +2749,61 @@ def search_psychologists(q: str | None = None, location: str | None = None, page
     }
 
 
+def list_notifications(
+    user_id: uuid.UUID,
+    *,
+    unread_only: bool = False,
+    notification_type: str | None = None,
+    page: int = 1,
+    page_size: int = 20,
+) -> dict[str, Any]:
+    query = QuestionnaireNotification.query.filter_by(user_id=user_id)
+    if unread_only:
+        query = query.filter(QuestionnaireNotification.read_at.is_(None))
+    if notification_type:
+        query = query.filter(QuestionnaireNotification.notification_type == notification_type)
+    total = query.count()
+    rows = (
+        query.order_by(QuestionnaireNotification.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+    unread_count = (
+        QuestionnaireNotification.query.filter_by(user_id=user_id)
+        .filter(QuestionnaireNotification.read_at.is_(None))
+        .count()
+    )
+    return {
+        "items": [_notification_payload(row, viewer_user_id=user_id) for row in rows],
+        "summary": {"unread_count": int(unread_count)},
+        "pagination": {
+            "page": page,
+            "page_size": page_size,
+            "total": total,
+            "pages": max(1, (total + page_size - 1) // page_size),
+        },
+    }
+
+
+def mark_notification_read(notification_id: uuid.UUID, user_id: uuid.UUID) -> dict[str, Any]:
+    row = db.session.get(QuestionnaireNotification, notification_id)
+    if not row:
+        raise LookupError("notification_not_found")
+    if row.user_id != user_id:
+        raise PermissionError("notification_forbidden")
+    if row.read_at is None:
+        row.read_at = _utcnow()
+        db.session.add(row)
+        db.session.commit()
+    return {
+        "notification": {
+            "notification_id": str(row.id),
+            "read_at": row.read_at.isoformat() if row.read_at else None,
+        }
+    }
+
+
 def _professional_review_payload(
     row: QuestionnaireProfessionalReview,
     viewer_user_id: uuid.UUID | None = None,
@@ -2673,6 +2858,7 @@ def upsert_professional_review(
         session_id=session.id,
         psychologist_user_id=psychologist_user_id,
     ).first()
+    created_new = review is None
     if not review:
         review = QuestionnaireProfessionalReview(
             session_id=session.id,
@@ -2694,6 +2880,18 @@ def upsert_professional_review(
     review.updated_at = _utcnow()
     db.session.add(review)
     _audit(session.id, psychologist_user_id, "professional_review_created", {"review_status": status})
+    if created_new and bool(review.visible_to_guardian):
+        case = db.session.get(QuestionnaireCase, session.case_id) if session.case_id else None
+        _create_notification(
+            user_id=session.owner_user_id,
+            actor_user_id=psychologist_user_id,
+            session_id=session.id,
+            case_id=session.case_id,
+            notification_type="professional_review_created",
+            title="Nuevo concepto profesional",
+            message=f"Se registro un concepto inicial para el caso {case.case_public_id if case else session.questionnaire_public_id}.",
+            payload_json={"case_public_id": case.case_public_id if case else None, "review_status": status},
+        )
     db.session.commit()
     return _professional_review_payload(review, viewer_user_id=psychologist_user_id)
 
@@ -2850,6 +3048,8 @@ def create_share(session: QuestionnaireSession, user_id: uuid.UUID, payload: dic
     grantee_id = payload.get("grantee_user_id")
     grantee_user: AppUser | None = None
     grant: QuestionnaireAccessGrant | None = None
+    grant_requested_can_tag = bool(payload.get("grant_can_tag", False))
+    grant_requested_can_download_pdf = bool(payload.get("grant_can_download_pdf", True))
     if grantee_id:
         grantee_user = db.session.get(AppUser, grantee_id)
         if not grantee_user:
@@ -2859,16 +3059,55 @@ def create_share(session: QuestionnaireSession, user_id: uuid.UUID, payload: dic
         if not bool(grantee_user.is_active):
             raise ValueError("share_grantee_inactive")
         grant = QuestionnaireAccessGrant.query.filter_by(session_id=session.id, grantee_user_id=grantee_id).first()
+        now = _utcnow()
+        if grant and grant.revoked_at is None:
+            current_status = str(grant.request_status or "accepted").strip().lower() or "accepted"
+            if current_status == "pending":
+                raise ValueError("share_request_already_pending")
+            if current_status == "accepted" and (
+                grant.expires_at is None or grant.expires_at > now
+            ):
+                raise ValueError("share_request_already_accepted")
         if not grant:
             grant = QuestionnaireAccessGrant(session_id=session.id, owner_user_id=user_id, grantee_user_id=grantee_id)
         grant.grant_type = "share_code"
-        grant.can_view = True
-        grant.can_tag = bool(payload.get("grant_can_tag", True))
-        grant.can_download_pdf = bool(payload.get("grant_can_download_pdf", True))
+        grant.request_status = "pending"
+        grant.requested_at = _utcnow()
+        grant.responded_at = None
+        grant.response_message = None
+        grant.decision_by_user_id = None
+        grant.requested_can_tag = grant_requested_can_tag
+        grant.requested_can_download_pdf = grant_requested_can_download_pdf
+        grant.can_view = False
+        grant.can_tag = False
+        grant.can_download_pdf = False
         grant.expires_at = expires_at
         grant.revoked_at = None
         grant.updated_at = _utcnow()
         db.session.add(grant)
+        db.session.flush()
+
+        case_public_id = None
+        if session.case_id:
+            case_row = db.session.get(QuestionnaireCase, session.case_id)
+            case_public_id = case_row.case_public_id if case_row else None
+        _create_notification(
+            user_id=grantee_user.id,
+            actor_user_id=user_id,
+            session_id=session.id,
+            case_id=session.case_id,
+            grant_id=grant.id,
+            notification_type="questionnaire_share_requested",
+            title="Nueva solicitud de revision",
+            message=(
+                f"Recibiste una solicitud para revisar el caso {case_public_id or session.questionnaire_public_id}."
+            ),
+            payload_json={
+                "case_public_id": case_public_id,
+                "questionnaire_id": session.questionnaire_public_id,
+                "request_status": "pending",
+            },
+        )
 
     audit_payload = {"share_code_id": str(row.id)}
     if grantee_user:
@@ -2904,11 +3143,259 @@ def create_share(session: QuestionnaireSession, user_id: uuid.UUID, payload: dic
     if grant:
         result["grant"] = {
             "grant_id": str(grant.id),
+            "request_status": grant.request_status,
             "can_view": bool(grant.can_view),
             "can_download_pdf": bool(grant.can_download_pdf),
             "can_tag": bool(grant.can_tag),
+            "requested_at": grant.requested_at.isoformat() if grant.requested_at else None,
         }
     return result
+
+
+def _share_request_summary_payload(session: QuestionnaireSession) -> dict[str, Any]:
+    domain_rows = (
+        QuestionnaireSessionResultDomain.query.filter_by(session_id=session.id)
+        .order_by(QuestionnaireSessionResultDomain.probability.desc())
+        .all()
+    )
+    highest_alert = "low"
+    rank = {"low": 0, "moderate": 1, "elevated": 2, "high": 3, "critical_review": 4}
+    domains: list[dict[str, Any]] = []
+    result_summary = None
+    needs_professional_review = False
+    for row in domain_rows:
+        domains.append(
+            {
+                "domain": row.domain,
+                "probability": row.probability,
+                "alert_level": row.alert_level,
+            }
+        )
+        if rank.get(row.alert_level, 0) > rank.get(highest_alert, 0):
+            highest_alert = row.alert_level
+        if row.needs_professional_review:
+            needs_professional_review = True
+        if not result_summary and row.result_summary:
+            result_summary = row.result_summary
+    return {
+        "needs_professional_review": needs_professional_review,
+        "highest_alert_level": highest_alert,
+        "domains": domains[:5],
+        "result_summary": result_summary,
+    }
+
+
+def _share_request_payload(grant: QuestionnaireAccessGrant) -> dict[str, Any]:
+    session = get_session_or_404(grant.session_id)
+    case = db.session.get(QuestionnaireCase, session.case_id) if session.case_id else None
+    guardian = db.session.get(AppUser, session.owner_user_id)
+    summary = _share_request_summary_payload(session)
+    return {
+        "grant_id": str(grant.id),
+        "request_status": str(grant.request_status or "accepted"),
+        "requested_at": grant.requested_at.isoformat() if grant.requested_at else None,
+        "responded_at": grant.responded_at.isoformat() if grant.responded_at else None,
+        "case": {"case_public_id": case.case_public_id if case else None},
+        "session": {
+            "session_id": str(session.id),
+            "questionnaire_id": session.questionnaire_public_id,
+            "status": session.status,
+            "mode": session.mode,
+            "role": _normalize_role(session.respondent_role),
+            "created_at": session.created_at.isoformat() if session.created_at else None,
+            "submitted_at": session.submitted_at.isoformat() if session.submitted_at else None,
+            "processed_at": session.processed_at.isoformat() if session.processed_at else None,
+            "progress_pct": float(session.progress_pct or 0.0),
+        },
+        "guardian": {
+            "user_id": str(session.owner_user_id),
+            "display_name": _safe_display_name(guardian),
+        },
+        "summary": summary,
+        "can_accept": str(grant.request_status or "").lower() == "pending",
+        "can_reject": str(grant.request_status or "").lower() == "pending",
+    }
+
+
+def list_psychologist_share_requests(
+    psychologist_user_id: uuid.UUID,
+    *,
+    status: str = "pending",
+    page: int = 1,
+    page_size: int = 20,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    q: str | None = None,
+) -> dict[str, Any]:
+    query = QuestionnaireAccessGrant.query.filter_by(grantee_user_id=psychologist_user_id).filter(
+        QuestionnaireAccessGrant.revoked_at.is_(None),
+    )
+    status_key = str(status or "pending").strip().lower()
+    if status_key not in {"pending", "accepted", "rejected", "all"}:
+        raise ValueError("psychologist_share_requests_invalid_filter")
+    if status_key != "all":
+        query = query.filter(QuestionnaireAccessGrant.request_status == status_key)
+    if date_from:
+        query = query.filter(func.date(QuestionnaireAccessGrant.requested_at) >= date_from)
+    if date_to:
+        query = query.filter(func.date(QuestionnaireAccessGrant.requested_at) <= date_to)
+    if q:
+        text = f"%{q.strip()}%"
+        query = query.join(QuestionnaireSession, QuestionnaireSession.id == QuestionnaireAccessGrant.session_id).outerjoin(
+            QuestionnaireCase, QuestionnaireCase.id == QuestionnaireSession.case_id
+        ).filter(
+            or_(
+                QuestionnaireSession.questionnaire_public_id.ilike(text),
+                QuestionnaireCase.case_public_id.ilike(text),
+            )
+        )
+
+    total = query.count()
+    rows = (
+        query.order_by(QuestionnaireAccessGrant.requested_at.desc(), QuestionnaireAccessGrant.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+    items = [_share_request_payload(row) for row in rows]
+
+    counts_rows = (
+        db.session.query(QuestionnaireAccessGrant.request_status, func.count(QuestionnaireAccessGrant.id))
+        .filter(
+            QuestionnaireAccessGrant.grantee_user_id == psychologist_user_id,
+            QuestionnaireAccessGrant.revoked_at.is_(None),
+        )
+        .group_by(QuestionnaireAccessGrant.request_status)
+        .all()
+    )
+    counters = {str(key or "accepted"): int(value) for key, value in counts_rows}
+    return {
+        "items": items,
+        "pagination": {
+            "page": page,
+            "page_size": page_size,
+            "total": total,
+            "pages": max(1, (total + page_size - 1) // page_size),
+        },
+        "summary": {
+            "pending_count": counters.get("pending", 0),
+            "accepted_count": counters.get("accepted", 0),
+            "rejected_count": counters.get("rejected", 0),
+        },
+    }
+
+
+def _get_grant_for_psychologist(grant_id: uuid.UUID, psychologist_user_id: uuid.UUID) -> QuestionnaireAccessGrant:
+    psychologist = db.session.get(AppUser, psychologist_user_id)
+    if not psychologist or str(psychologist.user_type or "").strip().lower() != "psychologist":
+        raise PermissionError("share_request_requires_psychologist")
+    grant = db.session.get(QuestionnaireAccessGrant, grant_id)
+    if not grant:
+        raise LookupError("share_request_not_found")
+    if grant.grantee_user_id != psychologist_user_id:
+        raise PermissionError("share_request_forbidden")
+    if grant.revoked_at is not None:
+        raise PermissionError("share_request_forbidden")
+    return grant
+
+
+def accept_share_request(
+    grant_id: uuid.UUID,
+    psychologist_user_id: uuid.UUID,
+    message: str | None = None,
+) -> dict[str, Any]:
+    grant = _get_grant_for_psychologist(grant_id, psychologist_user_id)
+    if str(grant.request_status or "").lower() != "pending":
+        raise ValueError("share_request_not_pending")
+    if message and len(message) > 1000:
+        raise ValueError("share_request_message_too_long")
+
+    grant.request_status = "accepted"
+    grant.responded_at = _utcnow()
+    grant.decision_by_user_id = psychologist_user_id
+    grant.response_message = message.strip() if message else None
+    grant.can_view = True
+    grant.can_tag = bool(grant.requested_can_tag)
+    grant.can_download_pdf = bool(grant.requested_can_download_pdf)
+    grant.updated_at = _utcnow()
+    db.session.add(grant)
+
+    session = get_session_or_404(grant.session_id)
+    case = db.session.get(QuestionnaireCase, session.case_id) if session.case_id else None
+    _create_notification(
+        user_id=session.owner_user_id,
+        actor_user_id=psychologist_user_id,
+        session_id=session.id,
+        case_id=session.case_id,
+        grant_id=grant.id,
+        notification_type="questionnaire_share_accepted",
+        title="Solicitud aceptada",
+        message=f"El psicologo acepto revisar el caso {case.case_public_id if case else session.questionnaire_public_id}.",
+        payload_json={"case_public_id": case.case_public_id if case else None, "questionnaire_id": session.questionnaire_public_id},
+    )
+    _audit(session.id, psychologist_user_id, "share_request_accepted", {"grant_id": str(grant.id)})
+    db.session.commit()
+    return {
+        "grant": {
+            "grant_id": str(grant.id),
+            "request_status": grant.request_status,
+            "responded_at": grant.responded_at.isoformat() if grant.responded_at else None,
+            "can_view": bool(grant.can_view),
+            "can_download_pdf": bool(grant.can_download_pdf),
+            "can_tag": bool(grant.can_tag),
+        },
+        "case": {"case_public_id": case.case_public_id if case else None},
+    }
+
+
+def reject_share_request(
+    grant_id: uuid.UUID,
+    psychologist_user_id: uuid.UUID,
+    message: str | None = None,
+) -> dict[str, Any]:
+    grant = _get_grant_for_psychologist(grant_id, psychologist_user_id)
+    if str(grant.request_status or "").lower() != "pending":
+        raise ValueError("share_request_not_pending")
+    if message and len(message) > 1000:
+        raise ValueError("share_request_message_too_long")
+
+    grant.request_status = "rejected"
+    grant.responded_at = _utcnow()
+    grant.decision_by_user_id = psychologist_user_id
+    grant.response_message = message.strip() if message else None
+    grant.can_view = False
+    grant.can_tag = False
+    grant.can_download_pdf = False
+    grant.updated_at = _utcnow()
+    db.session.add(grant)
+
+    session = get_session_or_404(grant.session_id)
+    case = db.session.get(QuestionnaireCase, session.case_id) if session.case_id else None
+    _create_notification(
+        user_id=session.owner_user_id,
+        actor_user_id=psychologist_user_id,
+        session_id=session.id,
+        case_id=session.case_id,
+        grant_id=grant.id,
+        notification_type="questionnaire_share_rejected",
+        title="Solicitud rechazada",
+        message=f"El psicologo rechazo la solicitud del caso {case.case_public_id if case else session.questionnaire_public_id}.",
+        payload_json={"case_public_id": case.case_public_id if case else None, "questionnaire_id": session.questionnaire_public_id},
+    )
+    _audit(session.id, psychologist_user_id, "share_request_rejected", {"grant_id": str(grant.id)})
+    db.session.commit()
+    return {
+        "grant": {
+            "grant_id": str(grant.id),
+            "request_status": grant.request_status,
+            "responded_at": grant.responded_at.isoformat() if grant.responded_at else None,
+            "can_view": bool(grant.can_view),
+            "can_download_pdf": bool(grant.can_download_pdf),
+            "can_tag": bool(grant.can_tag),
+            "response_message": grant.response_message,
+        },
+        "case": {"case_public_id": case.case_public_id if case else None},
+    }
 
 
 def get_shared_session(questionnaire_id: str, share_code: str) -> QuestionnaireSession:
