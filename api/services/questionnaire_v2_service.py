@@ -32,8 +32,6 @@ from app.models import (
     ModelVersion,
     QuestionnaireAccessGrant,
     QuestionnaireAuditEvent,
-    QuestionnaireCase,
-    QuestionnaireProfessionalReview,
     QuestionnaireQuestion,
     QuestionnaireQuestionMode,
     QuestionnaireSection,
@@ -79,14 +77,6 @@ SESSION_STATUSES = {
     "processed",
     "failed",
     "archived",
-}
-CASE_STATUSES = {"active", "archived"}
-PROFESSIONAL_REVIEW_STATUSES = {
-    "pending",
-    "in_review",
-    "reviewed",
-    "orientation_recommended",
-    "closed",
 }
 
 CLINICAL_SUMMARY_DISCLAIMER = (
@@ -140,48 +130,6 @@ def _pdf_plot_backend():
 
 def _new_public_id() -> str:
     return f"QV2-{secrets.token_hex(6).upper()}"
-
-
-def _new_case_public_id() -> str:
-    return f"CASO-{secrets.token_hex(3).upper()}"
-
-
-def _generate_case_public_id() -> str:
-    for _ in range(8):
-        candidate = _new_case_public_id()
-        if not QuestionnaireCase.query.filter_by(case_public_id=candidate).first():
-            return candidate
-    raise RuntimeError("case_public_id_conflict")
-
-
-def _safe_display_name(user: AppUser | None) -> str:
-    if not user:
-        return "Usuario"
-    name = str(user.full_name or "").strip()
-    if name:
-        return name
-    return str(user.username or "Usuario")
-
-
-def _case_display_label(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None) -> str:
-    if viewer_user_id and viewer_user_id == case.owner_user_id and case.private_label:
-        return str(case.private_label)
-    return f"Caso {case.case_public_id}"
-
-
-def _case_payload(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None = None) -> dict[str, Any]:
-    private_label = _decrypt_text(case.private_label, "questionnaire_case.private_label") if case.private_label else None
-    payload: dict[str, Any] = {
-        "case_id": str(case.id),
-        "case_public_id": case.case_public_id,
-        "status": case.status,
-        "display_label": private_label if (viewer_user_id and viewer_user_id == case.owner_user_id and private_label) else f"Caso {case.case_public_id}",
-        "created_at": case.created_at.isoformat() if case.created_at else None,
-        "updated_at": case.updated_at.isoformat() if case.updated_at else None,
-    }
-    if viewer_user_id and viewer_user_id == case.owner_user_id:
-        payload["private_label"] = private_label
-    return payload
 
 
 def _to_float(value: Any, default: float | None = None) -> float | None:
@@ -365,43 +313,6 @@ def _active_model_pipeline_version() -> str:
         return Path(loader.DEFAULT_ACTIVE_MODELS).parent.parent.name
     except Exception:
         return "hybrid_active_modes_freeze_v16"
-
-
-def _resolve_case_for_session_creation(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> QuestionnaireCase | None:
-    case_id = payload.get("case_id")
-    case_public_id = str(payload.get("case_public_id") or "").strip().upper()
-    case_label = str(payload.get("case_label") or "").strip()
-
-    if case_id:
-        case = db.session.get(QuestionnaireCase, case_id)
-        if not case:
-            raise LookupError("session_case_not_found")
-        if case.owner_user_id != owner_user_id:
-            raise PermissionError("session_case_forbidden")
-        return case
-
-    if case_public_id:
-        case = QuestionnaireCase.query.filter_by(case_public_id=case_public_id).first()
-        if not case:
-            raise LookupError("session_case_not_found")
-        if case.owner_user_id != owner_user_id:
-            raise PermissionError("session_case_forbidden")
-        return case
-
-    if case_label:
-        case = QuestionnaireCase(
-            case_public_id=_generate_case_public_id(),
-            owner_user_id=owner_user_id,
-            private_label=_encrypt_text(case_label, "questionnaire_case.private_label") or case_label,
-            status="active",
-            metadata_json=payload.get("metadata") or {},
-        )
-        db.session.add(case)
-        db.session.flush()
-        _audit(None, owner_user_id, "case_created", {"case_id": str(case.id), "case_public_id": case.case_public_id})
-        return case
-
-    return None
 
 
 def _active_payload_cache_ttl_seconds() -> int:
@@ -888,7 +799,6 @@ def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> Questio
     role = _normalize_role(str(payload.get("role") or "").strip().lower())
     mode_key = _get_mode_key(role, mode)
     version = _active_version()
-    linked_case = _resolve_case_for_session_creation(owner_user_id, payload)
 
     session_metadata = {
         "child_age_years": payload.get("child_age_years"),
@@ -898,7 +808,6 @@ def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> Questio
 
     session = QuestionnaireSession(
         questionnaire_public_id=_new_public_id(),
-        case_id=linked_case.id if linked_case else None,
         version_id=version.id,
         owner_user_id=owner_user_id,
         respondent_role=role,
@@ -957,13 +866,6 @@ def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> Questio
         db.session.add_all(session_items)
 
     _audit(session.id, owner_user_id, "session_created", {"mode": mode, "role": role, "mode_key": mode_key})
-    if linked_case:
-        _audit(
-            session.id,
-            owner_user_id,
-            "session_case_attached",
-            {"case_id": str(linked_case.id), "case_public_id": linked_case.case_public_id},
-        )
     db.session.commit()
     return session
 
@@ -1057,11 +959,7 @@ def _build_saved_answers_payload(
     return payload
 
 
-def get_session_payload(
-    session: QuestionnaireSession,
-    include_answers: bool = False,
-    viewer_user_id: uuid.UUID | None = None,
-) -> dict[str, Any]:
+def get_session_payload(session: QuestionnaireSession, include_answers: bool = False) -> dict[str, Any]:
     payload = {
         "session_id": str(session.id),
         "questionnaire_id": session.questionnaire_public_id,
@@ -1074,10 +972,6 @@ def get_session_payload(
         "created_at": session.created_at.isoformat() if session.created_at else None,
         "updated_at": session.updated_at.isoformat() if session.updated_at else None,
     }
-    if session.case_id:
-        case_row = db.session.get(QuestionnaireCase, session.case_id)
-        if case_row:
-            payload["case"] = _case_payload(case_row, viewer_user_id=viewer_user_id)
     if include_answers:
         rows = _session_answer_rows(session)
         answers = [
@@ -1748,7 +1642,7 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
     return get_results_payload(session)
 
 
-def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID | None = None) -> dict[str, Any]:
+def get_results_payload(session: QuestionnaireSession) -> dict[str, Any]:
     result = QuestionnaireSessionResult.query.filter_by(session_id=session.id).first()
     domains = QuestionnaireSessionResultDomain.query.filter_by(session_id=session.id).order_by(
         QuestionnaireSessionResultDomain.domain.asc()
@@ -1769,7 +1663,7 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
         result_recommendation = None
 
     return {
-        "session": get_session_payload(session, viewer_user_id=viewer_user_id),
+        "session": get_session_payload(session),
         "result": {
             "summary": result_summary,
             "operational_recommendation": result_recommendation,
@@ -2077,7 +1971,7 @@ def list_history(user_id: uuid.UUID, status: str | None = None, page: int = 1, p
 
     items = []
     for session in rows:
-        item = get_session_payload(session, viewer_user_id=user_id)
+        item = get_session_payload(session)
         summary_info = summary_by_session_id.get(session.id)
         if summary_info is not None:
             item["summary"] = summary_info[0]
@@ -2092,672 +1986,6 @@ def list_history(user_id: uuid.UUID, status: str | None = None, page: int = 1, p
             "total": total,
             "pages": max(1, (total + page_size - 1) // page_size),
         },
-    }
-
-
-def get_case_or_404(case_id: uuid.UUID) -> QuestionnaireCase:
-    row = db.session.get(QuestionnaireCase, case_id)
-    if not row:
-        raise LookupError("case_not_found")
-    return row
-
-
-def get_case_by_public_id_or_404(case_public_id: str) -> QuestionnaireCase:
-    row = QuestionnaireCase.query.filter_by(case_public_id=str(case_public_id).strip().upper()).first()
-    if not row:
-        raise LookupError("case_not_found")
-    return row
-
-
-def ensure_case_owner(case: QuestionnaireCase, user_id: uuid.UUID) -> None:
-    if case.owner_user_id != user_id:
-        raise PermissionError("case_forbidden")
-
-
-def create_case(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> dict[str, Any]:
-    private_label = str(payload.get("private_label") or "").strip()
-    if not private_label:
-        raise ValueError("case_label_invalid")
-    row = QuestionnaireCase(
-        case_public_id=_generate_case_public_id(),
-        owner_user_id=owner_user_id,
-        private_label=_encrypt_text(private_label, "questionnaire_case.private_label") or private_label,
-        status="active",
-        metadata_json=payload.get("metadata") or {},
-    )
-    db.session.add(row)
-    db.session.flush()
-    _audit(None, owner_user_id, "case_created", {"case_id": str(row.id), "case_public_id": row.case_public_id})
-    db.session.commit()
-    case_payload = _case_payload(row, viewer_user_id=owner_user_id)
-    case_payload["sessions_count"] = 0
-    return {"case": case_payload}
-
-
-def list_cases(owner_user_id: uuid.UUID, status: str | None = None, page: int = 1, page_size: int = 20) -> dict[str, Any]:
-    query = QuestionnaireCase.query.filter(QuestionnaireCase.owner_user_id == owner_user_id)
-    if status:
-        query = query.filter(QuestionnaireCase.status == status)
-    total = query.count()
-    rows = (
-        query.order_by(QuestionnaireCase.updated_at.desc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-        .all()
-    )
-    case_ids = [row.id for row in rows]
-    sessions_by_case: dict[uuid.UUID, list[QuestionnaireSession]] = defaultdict(list)
-    if case_ids:
-        session_rows = (
-            QuestionnaireSession.query.filter(QuestionnaireSession.case_id.in_(case_ids))
-            .order_by(QuestionnaireSession.created_at.desc())
-            .all()
-        )
-        for session in session_rows:
-            sessions_by_case[session.case_id].append(session)
-    latest_session_ids = [sessions[0].id for sessions in sessions_by_case.values() if sessions]
-    latest_alert_by_session: dict[uuid.UUID, str] = {}
-    if latest_session_ids:
-        domain_rows = (
-            QuestionnaireSessionResultDomain.query.filter(QuestionnaireSessionResultDomain.session_id.in_(latest_session_ids))
-            .order_by(QuestionnaireSessionResultDomain.probability.desc())
-            .all()
-        )
-        for row in domain_rows:
-            latest_alert_by_session.setdefault(row.session_id, row.alert_level)
-
-    items: list[dict[str, Any]] = []
-    for row in rows:
-        base = _case_payload(row, viewer_user_id=owner_user_id)
-        sessions = sessions_by_case.get(row.id) or []
-        latest = sessions[0] if sessions else None
-        base["sessions_count"] = len(sessions)
-        base["latest_session_id"] = str(latest.id) if latest else None
-        base["latest_processed_at"] = latest.processed_at.isoformat() if latest and latest.processed_at else None
-        base["latest_alert_level"] = latest_alert_by_session.get(latest.id) if latest else None
-        items.append(base)
-
-    return {
-        "items": items,
-        "pagination": {
-            "page": page,
-            "page_size": page_size,
-            "total": total,
-            "pages": max(1, (total + page_size - 1) // page_size),
-        },
-    }
-
-
-def update_case(case: QuestionnaireCase, owner_user_id: uuid.UUID, payload: dict[str, Any]) -> dict[str, Any]:
-    ensure_case_owner(case, owner_user_id)
-    if "private_label" in payload and payload.get("private_label") is not None:
-        private_label = str(payload.get("private_label") or "").strip()
-        if not private_label:
-            raise ValueError("case_label_invalid")
-        case.private_label = _encrypt_text(private_label, "questionnaire_case.private_label") or private_label
-    if "status" in payload and payload.get("status") is not None:
-        status = str(payload.get("status") or "").strip().lower()
-        if status not in CASE_STATUSES:
-            raise ValueError("case_update_validation_error")
-        case.status = status
-    case.updated_at = _utcnow()
-    db.session.add(case)
-    _audit(None, owner_user_id, "case_updated", {"case_id": str(case.id), "status": case.status})
-    db.session.commit()
-    return {"case": _case_payload(case, viewer_user_id=owner_user_id)}
-
-
-def get_case_detail(case: QuestionnaireCase, owner_user_id: uuid.UUID) -> dict[str, Any]:
-    ensure_case_owner(case, owner_user_id)
-    sessions = (
-        QuestionnaireSession.query.filter_by(case_id=case.id)
-        .order_by(QuestionnaireSession.created_at.desc())
-        .all()
-    )
-    session_ids = [session.id for session in sessions]
-    domain_rows = []
-    if session_ids:
-        domain_rows = (
-            QuestionnaireSessionResultDomain.query.filter(QuestionnaireSessionResultDomain.session_id.in_(session_ids))
-            .all()
-        )
-    domains_by_session: dict[uuid.UUID, list[QuestionnaireSessionResultDomain]] = defaultdict(list)
-    for row in domain_rows:
-        domains_by_session[row.session_id].append(row)
-
-    domain_summary: dict[str, dict[str, Any]] = {}
-    trend: list[dict[str, Any]] = []
-    for session in sessions:
-        session_domains = domains_by_session.get(session.id, [])
-        trend.append(
-            {
-                "date": (session.processed_at or session.created_at or _utcnow()).date().isoformat(),
-                "session_id": str(session.id),
-                "domains": [
-                    {
-                        "domain": row.domain,
-                        "probability": row.probability,
-                        "alert_level": row.alert_level,
-                    }
-                    for row in sorted(session_domains, key=lambda x: x.domain)
-                ],
-            }
-        )
-        for row in session_domains:
-            item = domain_summary.setdefault(
-                row.domain,
-                {
-                    "domain": row.domain,
-                    "latest_probability": row.probability,
-                    "latest_alert_level": row.alert_level,
-                    "max_probability": row.probability,
-                    "sessions_with_alert": 0,
-                },
-            )
-            item["max_probability"] = max(float(item["max_probability"]), float(row.probability))
-            if row.alert_level in {"elevated", "high", "critical_review"}:
-                item["sessions_with_alert"] += 1
-
-    return {
-        "case": _case_payload(case, viewer_user_id=owner_user_id),
-        "sessions": [get_session_payload(session, viewer_user_id=owner_user_id) for session in sessions],
-        "domain_summary": list(domain_summary.values()),
-        "trend": trend,
-    }
-
-
-def guardian_dashboard(
-    owner_user_id: uuid.UUID,
-    months: int = 3,
-    date_from: date | None = None,
-    date_to: date | None = None,
-    case_id: uuid.UUID | None = None,
-    case_public_id: str | None = None,
-) -> dict[str, Any]:
-    end_date = date_to or _utcnow().date()
-    start_date = date_from or (end_date - timedelta(days=max(1, int(months)) * 30))
-    case_filter: QuestionnaireCase | None = None
-    if case_id:
-        case_filter = get_case_or_404(case_id)
-    elif case_public_id:
-        case_filter = get_case_by_public_id_or_404(case_public_id)
-    if case_filter:
-        ensure_case_owner(case_filter, owner_user_id)
-
-    case_query = QuestionnaireCase.query.filter_by(owner_user_id=owner_user_id)
-    if case_filter:
-        case_query = case_query.filter(QuestionnaireCase.id == case_filter.id)
-    cases = case_query.order_by(QuestionnaireCase.updated_at.desc()).all()
-    case_ids = [row.id for row in cases]
-
-    session_query = QuestionnaireSession.query.filter(QuestionnaireSession.owner_user_id == owner_user_id)
-    session_query = session_query.filter(
-        func.date(QuestionnaireSession.created_at) >= start_date,
-        func.date(QuestionnaireSession.created_at) <= end_date,
-    )
-    if case_filter:
-        session_query = session_query.filter(QuestionnaireSession.case_id == case_filter.id)
-    sessions = session_query.order_by(QuestionnaireSession.created_at.desc()).all()
-    session_ids = [row.id for row in sessions]
-    domains = []
-    if session_ids:
-        domains = QuestionnaireSessionResultDomain.query.filter(
-            QuestionnaireSessionResultDomain.session_id.in_(session_ids)
-        ).all()
-    domains_by_session: dict[uuid.UUID, list[QuestionnaireSessionResultDomain]] = defaultdict(list)
-    for row in domains:
-        domains_by_session[row.session_id].append(row)
-
-    case_items: list[dict[str, Any]] = []
-    highest_alert = "low"
-    alert_rank = {"low": 0, "moderate": 1, "elevated": 2, "high": 3, "critical_review": 4}
-    needs_review_case_count = 0
-    sessions_by_case: dict[uuid.UUID, list[QuestionnaireSession]] = defaultdict(list)
-    for session in sessions:
-        if session.case_id:
-            sessions_by_case[session.case_id].append(session)
-
-    for case_row in cases:
-        case_sessions = sessions_by_case.get(case_row.id, [])
-        if not case_sessions:
-            continue
-        latest = case_sessions[0]
-        domain_breakdown: dict[str, dict[str, Any]] = {}
-        trend = []
-        has_review_case = False
-        for session in case_sessions:
-            session_domains = domains_by_session.get(session.id, [])
-            trend.append(
-                {
-                    "date": (session.processed_at or session.created_at or _utcnow()).date().isoformat(),
-                    "session_id": str(session.id),
-                    "domains": [
-                        {"domain": row.domain, "probability": row.probability, "alert_level": row.alert_level}
-                        for row in sorted(session_domains, key=lambda x: x.domain)
-                    ],
-                }
-            )
-            for row in session_domains:
-                cur_rank = alert_rank.get(row.alert_level, 0)
-                if cur_rank > alert_rank.get(highest_alert, 0):
-                    highest_alert = row.alert_level
-                item = domain_breakdown.setdefault(
-                    row.domain,
-                    {
-                        "domain": row.domain,
-                        "latest_probability": row.probability,
-                        "latest_alert_level": row.alert_level,
-                        "max_probability": row.probability,
-                        "sessions_with_alert": 0,
-                    },
-                )
-                item["max_probability"] = max(float(item["max_probability"]), float(row.probability))
-                if row.alert_level in {"elevated", "high", "critical_review"}:
-                    item["sessions_with_alert"] += 1
-                    has_review_case = True
-        if has_review_case:
-            needs_review_case_count += 1
-        case_items.append(
-            {
-                "case": _case_payload(case_row, viewer_user_id=owner_user_id),
-                "sessions_count": len(case_sessions),
-                "latest_session": {
-                    "session_id": str(latest.id),
-                    "status": latest.status,
-                    "processed_at": latest.processed_at.isoformat() if latest.processed_at else None,
-                    "needs_professional_review": has_review_case,
-                },
-                "domain_breakdown": list(domain_breakdown.values()),
-                "trend": trend,
-                "chart_data": {"domain_series": trend},
-            }
-        )
-
-    return {
-        "period": {
-            "months": months,
-            "date_from": start_date.isoformat(),
-            "date_to": end_date.isoformat(),
-        },
-        "summary": {
-            "total_cases": len(case_ids) if case_ids else len(cases),
-            "total_sessions": len(sessions),
-            "processed_sessions": sum(1 for row in sessions if row.status == "processed"),
-            "cases_needing_professional_review": needs_review_case_count,
-            "highest_alert_level": highest_alert,
-        },
-        "cases": case_items,
-        "warnings": [],
-    }
-
-
-def psychologist_dashboard(
-    psychologist_user_id: uuid.UUID,
-    q: str | None = None,
-    case_public_id: str | None = None,
-    date_from: date | None = None,
-    date_to: date | None = None,
-    domain: str | None = None,
-    alert_level: str | None = None,
-    review_status: str | None = None,
-    page: int = 1,
-    page_size: int = 20,
-) -> dict[str, Any]:
-    grants = QuestionnaireAccessGrant.query.filter_by(grantee_user_id=psychologist_user_id).filter(
-        QuestionnaireAccessGrant.revoked_at.is_(None),
-        QuestionnaireAccessGrant.can_view.is_(True),
-    )
-    now = _utcnow()
-    grants = grants.filter(or_(QuestionnaireAccessGrant.expires_at.is_(None), QuestionnaireAccessGrant.expires_at > now))
-    session_ids = [row.session_id for row in grants.all()]
-    if not session_ids:
-        return {
-            "filters": {
-                "q": q,
-                "case_public_id": case_public_id,
-                "date_from": date_from.isoformat() if date_from else None,
-                "date_to": date_to.isoformat() if date_to else None,
-                "domain": domain,
-                "alert_level": alert_level,
-                "review_status": review_status,
-            },
-            "summary": {
-                "total_shared_sessions": 0,
-                "total_cases": 0,
-                "pending_reviews": 0,
-                "reviewed_cases": 0,
-                "cases_needing_professional_review": 0,
-                "highest_alert_level": "low",
-            },
-            "aggregates": {"by_domain": [], "by_alert_level": [], "by_review_status": []},
-            "items": [],
-            "pagination": {"page": page, "page_size": page_size, "total": 0, "pages": 1},
-        }
-
-    query = QuestionnaireSession.query.filter(QuestionnaireSession.id.in_(session_ids))
-    if date_from:
-        query = query.filter(func.date(QuestionnaireSession.created_at) >= date_from)
-    if date_to:
-        query = query.filter(func.date(QuestionnaireSession.created_at) <= date_to)
-    if case_public_id:
-        case = QuestionnaireCase.query.filter_by(case_public_id=str(case_public_id).strip().upper()).first()
-        if case:
-            query = query.filter(QuestionnaireSession.case_id == case.id)
-        else:
-            query = query.filter(False)
-    if q:
-        text = f"%{q.strip()}%"
-        query = query.join(AppUser, QuestionnaireSession.owner_user_id == AppUser.id).filter(
-            or_(AppUser.username.ilike(text), AppUser.email.ilike(text), AppUser.full_name.ilike(text))
-        )
-    total = query.count()
-    rows = (
-        query.order_by(QuestionnaireSession.created_at.desc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-        .all()
-    )
-
-    row_ids = [row.id for row in rows]
-    domain_rows = []
-    if row_ids:
-        dquery = QuestionnaireSessionResultDomain.query.filter(QuestionnaireSessionResultDomain.session_id.in_(row_ids))
-        if domain:
-            dquery = dquery.filter(QuestionnaireSessionResultDomain.domain == domain)
-        if alert_level:
-            dquery = dquery.filter(QuestionnaireSessionResultDomain.alert_level == alert_level)
-        domain_rows = dquery.all()
-    domains_by_session: dict[uuid.UUID, list[QuestionnaireSessionResultDomain]] = defaultdict(list)
-    for drow in domain_rows:
-        domains_by_session[drow.session_id].append(drow)
-
-    review_rows = QuestionnaireProfessionalReview.query.filter(
-        QuestionnaireProfessionalReview.session_id.in_(row_ids),
-        QuestionnaireProfessionalReview.psychologist_user_id == psychologist_user_id,
-    ).all() if row_ids else []
-    review_by_session = {row.session_id: row for row in review_rows}
-
-    alert_counter: dict[str, int] = defaultdict(int)
-    domain_counter: dict[str, list[float]] = defaultdict(list)
-    review_counter: dict[str, int] = defaultdict(int)
-    items = []
-    highest_alert = "low"
-    rank = {"low": 0, "moderate": 1, "elevated": 2, "high": 3, "critical_review": 4}
-
-    for row in rows:
-        case = db.session.get(QuestionnaireCase, row.case_id) if row.case_id else None
-        domains_payload = []
-        needs_review = False
-        for drow in sorted(domains_by_session.get(row.id, []), key=lambda item: item.domain):
-            domains_payload.append(
-                {
-                    "domain": drow.domain,
-                    "probability": drow.probability,
-                    "alert_level": drow.alert_level,
-                }
-            )
-            domain_counter[drow.domain].append(float(drow.probability))
-            alert_counter[drow.alert_level] += 1
-            if rank.get(drow.alert_level, 0) > rank.get(highest_alert, 0):
-                highest_alert = drow.alert_level
-            if drow.alert_level in {"elevated", "high", "critical_review"}:
-                needs_review = True
-
-        review = review_by_session.get(row.id)
-        review_state = review.review_status if review else "pending"
-        if review_status and review_state != review_status:
-            continue
-        review_counter[review_state] += 1
-
-        guardian = db.session.get(AppUser, row.owner_user_id)
-        items.append(
-            {
-                "session_id": str(row.id),
-                "case_public_id": case.case_public_id if case else None,
-                "status": row.status,
-                "processed_at": row.processed_at.isoformat() if row.processed_at else None,
-                "guardian": {
-                    "user_id": str(row.owner_user_id),
-                    "display_name": _safe_display_name(guardian),
-                },
-                "domains": domains_payload,
-                "needs_professional_review": needs_review,
-                "review_status": review_state,
-                "latest_review": _professional_review_payload(review, viewer_user_id=psychologist_user_id) if review else None,
-                "can_review": True,
-                "can_download_pdf": _can_download_pdf(row, psychologist_user_id),
-            }
-        )
-
-    return {
-        "filters": {
-            "q": q,
-            "case_public_id": case_public_id,
-            "date_from": date_from.isoformat() if date_from else None,
-            "date_to": date_to.isoformat() if date_to else None,
-            "domain": domain,
-            "alert_level": alert_level,
-            "review_status": review_status,
-        },
-        "summary": {
-            "total_shared_sessions": total,
-            "total_cases": len({item.get("case_public_id") for item in items if item.get("case_public_id")}),
-            "pending_reviews": review_counter.get("pending", 0),
-            "reviewed_cases": review_counter.get("reviewed", 0),
-            "cases_needing_professional_review": sum(1 for item in items if item["needs_professional_review"]),
-            "highest_alert_level": highest_alert,
-        },
-        "aggregates": {
-            "by_domain": [
-                {"domain": key, "count": len(values), "max_probability": max(values) if values else 0.0}
-                for key, values in sorted(domain_counter.items())
-            ],
-            "by_alert_level": [{"alert_level": key, "count": value} for key, value in sorted(alert_counter.items())],
-            "by_review_status": [{"review_status": key, "count": value} for key, value in sorted(review_counter.items())],
-        },
-        "items": items,
-        "pagination": {
-            "page": page,
-            "page_size": page_size,
-            "total": len(items) if review_status else total,
-            "pages": max(1, ((len(items) if review_status else total) + page_size - 1) // page_size),
-        },
-    }
-
-
-def search_psychologists(q: str | None = None, location: str | None = None, page: int = 1, page_size: int = 20) -> dict[str, Any]:
-    query = AppUser.query.filter(
-        AppUser.user_type == "psychologist",
-        AppUser.is_active.is_(True),
-    )
-    if q:
-        text = f"%{q.strip()}%"
-        query = query.filter(
-            or_(
-                AppUser.username.ilike(text),
-                AppUser.email.ilike(text),
-                AppUser.full_name.ilike(text),
-            )
-        )
-    if location:
-        ltext = f"%{location.strip()}%"
-        query = query.filter(
-            or_(
-                AppUser.professional_location.ilike(ltext),
-                AppUser.professional_city.ilike(ltext),
-                AppUser.professional_department.ilike(ltext),
-            )
-        )
-    total = query.count()
-    rows = (
-        query.order_by(AppUser.full_name.asc().nullslast(), AppUser.username.asc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-        .all()
-    )
-    items = [
-        {
-            "user_id": str(row.id),
-            "username": row.username,
-            "full_name": row.full_name,
-            "email": row.email,
-            "professional_location": row.professional_location
-            or ", ".join([part for part in [row.professional_city, row.professional_department] if part])
-            or None,
-            "colpsic_verified": bool(row.colpsic_verified),
-        }
-        for row in rows
-    ]
-    return {
-        "items": items,
-        "pagination": {
-            "page": page,
-            "page_size": page_size,
-            "total": total,
-            "pages": max(1, (total + page_size - 1) // page_size),
-        },
-    }
-
-
-def _professional_review_payload(
-    row: QuestionnaireProfessionalReview,
-    viewer_user_id: uuid.UUID | None = None,
-) -> dict[str, Any]:
-    is_owner = bool(viewer_user_id and viewer_user_id == row.owner_user_id)
-    initial_concept = _decrypt_text(row.initial_concept, "questionnaire_professional_review.initial_concept")
-    recommendation = _decrypt_text(row.recommendation, "questionnaire_professional_review.recommendation")
-    if is_owner and not row.visible_to_guardian:
-        initial_concept = None
-        recommendation = None
-    return {
-        "review_id": str(row.id),
-        "session_id": str(row.session_id),
-        "case_id": str(row.case_id) if row.case_id else None,
-        "owner_user_id": str(row.owner_user_id),
-        "psychologist_user_id": str(row.psychologist_user_id),
-        "review_status": row.review_status,
-        "initial_concept": initial_concept,
-        "recommendation": recommendation,
-        "visible_to_guardian": bool(row.visible_to_guardian),
-        "is_diagnostic": False,
-        "created_at": row.created_at.isoformat() if row.created_at else None,
-        "updated_at": row.updated_at.isoformat() if row.updated_at else None,
-    }
-
-
-def list_professional_reviews(session: QuestionnaireSession, user_id: uuid.UUID) -> list[dict[str, Any]]:
-    ensure_view_access(session, user_id)
-    rows = QuestionnaireProfessionalReview.query.filter_by(session_id=session.id).order_by(
-        QuestionnaireProfessionalReview.created_at.asc()
-    ).all()
-    if session.owner_user_id == user_id:
-        rows = [row for row in rows if bool(row.visible_to_guardian)]
-    return [_professional_review_payload(row, viewer_user_id=user_id) for row in rows]
-
-
-def upsert_professional_review(
-    session: QuestionnaireSession,
-    psychologist_user_id: uuid.UUID,
-    payload: dict[str, Any],
-) -> dict[str, Any]:
-    psychologist = db.session.get(AppUser, psychologist_user_id)
-    if not psychologist or psychologist.user_type != "psychologist":
-        raise PermissionError("professional_review_requires_psychologist")
-    ensure_view_access(session, psychologist_user_id)
-    if session.owner_user_id == psychologist_user_id:
-        raise PermissionError("professional_review_requires_psychologist")
-    status = str(payload.get("review_status") or "").strip()
-    if status not in PROFESSIONAL_REVIEW_STATUSES:
-        raise ValueError("professional_review_status_invalid")
-    review = QuestionnaireProfessionalReview.query.filter_by(
-        session_id=session.id,
-        psychologist_user_id=psychologist_user_id,
-    ).first()
-    if not review:
-        review = QuestionnaireProfessionalReview(
-            session_id=session.id,
-            case_id=session.case_id,
-            owner_user_id=session.owner_user_id,
-            psychologist_user_id=psychologist_user_id,
-        )
-    review.review_status = status
-    review.initial_concept = _encrypt_text(
-        str(payload.get("initial_concept") or ""),
-        "questionnaire_professional_review.initial_concept",
-    )
-    review.recommendation = _encrypt_text(
-        str(payload.get("recommendation") or ""),
-        "questionnaire_professional_review.recommendation",
-    )
-    review.visible_to_guardian = bool(payload.get("visible_to_guardian", True))
-    review.is_diagnostic = False
-    review.updated_at = _utcnow()
-    db.session.add(review)
-    _audit(session.id, psychologist_user_id, "professional_review_created", {"review_status": status})
-    db.session.commit()
-    return _professional_review_payload(review, viewer_user_id=psychologist_user_id)
-
-
-def update_professional_review(
-    session: QuestionnaireSession,
-    review_id: uuid.UUID,
-    psychologist_user_id: uuid.UUID,
-    payload: dict[str, Any],
-) -> dict[str, Any]:
-    psychologist = db.session.get(AppUser, psychologist_user_id)
-    if not psychologist or psychologist.user_type != "psychologist":
-        raise PermissionError("professional_review_requires_psychologist")
-    review = QuestionnaireProfessionalReview.query.filter_by(id=review_id, session_id=session.id).first()
-    if not review:
-        raise LookupError("professional_review_not_found")
-    if review.psychologist_user_id != psychologist_user_id:
-        raise PermissionError("professional_review_forbidden")
-    if "review_status" in payload and payload.get("review_status") is not None:
-        status = str(payload.get("review_status") or "").strip()
-        if status not in PROFESSIONAL_REVIEW_STATUSES:
-            raise ValueError("professional_review_status_invalid")
-        review.review_status = status
-    if "initial_concept" in payload and payload.get("initial_concept") is not None:
-        review.initial_concept = _encrypt_text(
-            str(payload.get("initial_concept") or ""),
-            "questionnaire_professional_review.initial_concept",
-        )
-    if "recommendation" in payload:
-        review.recommendation = _encrypt_text(
-            str(payload.get("recommendation") or ""),
-            "questionnaire_professional_review.recommendation",
-        )
-    if "visible_to_guardian" in payload and payload.get("visible_to_guardian") is not None:
-        review.visible_to_guardian = bool(payload.get("visible_to_guardian"))
-    review.is_diagnostic = False
-    review.updated_at = _utcnow()
-    db.session.add(review)
-    _audit(session.id, psychologist_user_id, "professional_review_updated", {"review_id": str(review.id)})
-    db.session.commit()
-    return _professional_review_payload(review, viewer_user_id=psychologist_user_id)
-
-
-def get_report_preview_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID) -> dict[str, Any]:
-    ensure_view_access(session, viewer_user_id)
-    result_payload = get_results_payload(session, viewer_user_id=viewer_user_id)
-    session_payload = get_session_payload(session, include_answers=True, viewer_user_id=viewer_user_id)
-    latest_pdf_row = latest_pdf(session.id)
-    reviews = list_professional_reviews(session, viewer_user_id)
-    _audit(session.id, viewer_user_id, "report_preview_viewed", {})
-    db.session.commit()
-    return {
-        "session": session_payload,
-        "result": result_payload.get("result"),
-        "domains": result_payload.get("domains"),
-        "comorbidity": result_payload.get("comorbidity"),
-        "answers": session_payload.get("answers", []),
-        "professional_reviews": reviews,
-        "pdf": {
-            "available": bool(latest_pdf_row),
-            "file_name": latest_pdf_row.file_name if latest_pdf_row else None,
-            "download_url": f"/api/v2/questionnaires/history/{session.id}/pdf/download" if latest_pdf_row else None,
-        },
-        "disclaimer": CLINICAL_SUMMARY_DISCLAIMER,
     }
 
 
@@ -2848,16 +2076,9 @@ def create_share(session: QuestionnaireSession, user_id: uuid.UUID, payload: dic
     db.session.flush()
 
     grantee_id = payload.get("grantee_user_id")
-    grantee_user: AppUser | None = None
-    grant: QuestionnaireAccessGrant | None = None
     if grantee_id:
-        grantee_user = db.session.get(AppUser, grantee_id)
-        if not grantee_user:
-            raise LookupError("share_grantee_not_found")
-        if str(grantee_user.user_type or "").strip().lower() != "psychologist":
-            raise ValueError("share_target_not_psychologist")
-        if not bool(grantee_user.is_active):
-            raise ValueError("share_grantee_inactive")
+        if not db.session.get(AppUser, grantee_id):
+            raise ValueError("grantee_not_found")
         grant = QuestionnaireAccessGrant.query.filter_by(session_id=session.id, grantee_user_id=grantee_id).first()
         if not grant:
             grant = QuestionnaireAccessGrant(session_id=session.id, owner_user_id=user_id, grantee_user_id=grantee_id)
@@ -2870,45 +2091,15 @@ def create_share(session: QuestionnaireSession, user_id: uuid.UUID, payload: dic
         grant.updated_at = _utcnow()
         db.session.add(grant)
 
-    audit_payload = {"share_code_id": str(row.id)}
-    if grantee_user:
-        audit_payload["grantee_user_id"] = str(grantee_user.id)
-        audit_payload["share_scope"] = payload.get("share_scope") or "session"
-    _audit(session.id, user_id, "share_created", audit_payload)
-    if grantee_user:
-        _audit(session.id, user_id, "share_created_for_psychologist", audit_payload)
+    _audit(session.id, user_id, "share_created", {"share_code_id": str(row.id)})
     db.session.commit()
 
-    result = {
+    return {
         "questionnaire_id": session.questionnaire_public_id,
         "share_code": raw_code,
         "share_code_id": str(row.id),
         "expires_at": expires_at.isoformat() if expires_at else None,
     }
-    if session.case_id:
-        case = db.session.get(QuestionnaireCase, session.case_id)
-        if case:
-            result["case"] = {"case_public_id": case.case_public_id}
-    if grantee_user:
-        result["grantee"] = {
-            "user_id": str(grantee_user.id),
-            "username": grantee_user.username,
-            "full_name": grantee_user.full_name,
-            "email": grantee_user.email,
-            "professional_location": grantee_user.professional_location
-            or ", ".join(
-                [part for part in [grantee_user.professional_city, grantee_user.professional_department] if part]
-            )
-            or None,
-        }
-    if grant:
-        result["grant"] = {
-            "grant_id": str(grant.id),
-            "can_view": bool(grant.can_view),
-            "can_download_pdf": bool(grant.can_download_pdf),
-            "can_tag": bool(grant.can_tag),
-        }
-    return result
 
 
 def get_shared_session(questionnaire_id: str, share_code: str) -> QuestionnaireSession:
