@@ -8,15 +8,7 @@ from sqlalchemy.exc import DBAPIError, OperationalError, SQLAlchemyError
 from api.decorators import roles_required
 from api.extensions import limiter
 from api.schemas.questionnaire_v2_schema import (
-    CaseCreateSchema,
-    CaseListQuerySchema,
-    CaseUpdateSchema,
     DashboardQuerySchema,
-    GuardianDashboardQuerySchema,
-    ProfessionalReviewCreateSchema,
-    ProfessionalReviewUpdateSchema,
-    PsychologistDashboardQuerySchema,
-    PsychologistSearchQuerySchema,
     ReportRequestSchema,
     SessionAnswersPatchSchema,
     SessionCreateSchema,
@@ -186,130 +178,13 @@ def create_session():
 
     try:
         session = service.create_session(owner_user_id=user_id, payload=payload)
-    except LookupError as exc:
-        db.session.rollback()
-        if str(exc) == "session_case_not_found":
-            return _error("session_case_not_found", "session_case_not_found", 404)
-        return _error("not_found", str(exc), 404)
-    except PermissionError as exc:
-        db.session.rollback()
-        if str(exc) == "session_case_forbidden":
-            return _error("session_case_forbidden", "session_case_forbidden", 403)
-        return _error("forbidden", str(exc), 403)
     except ValueError as exc:
         db.session.rollback()
         return _error("validation_error", str(exc), 400)
     except Exception as exc:
         return _handle_backend_failure(exc, "session_create_failed")
 
-    return _sensitive_json_response(
-        {"session": service.get_session_payload(session, viewer_user_id=user_id)},
-        201,
-        transport_context,
-    )
-
-
-@questionnaire_v2_bp.post("/questionnaires/cases")
-@jwt_required()
-def create_case():
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    schema = CaseCreateSchema()
-    try:
-        raw_payload, transport_context = _decode_sensitive_payload()
-        payload = schema.load(raw_payload or {})
-    except transport_crypto.TransportCryptoError as exc:
-        return _error(exc.message, exc.code, exc.status_code)
-    except ValidationError as exc:
-        return _error("case_validation_error", "case_validation_error", 400, exc.messages)
-    try:
-        result = service.create_case(owner_user_id=user_id, payload=payload)
-    except ValueError as exc:
-        return _error(str(exc), str(exc), 400)
-    except RuntimeError as exc:
-        if str(exc) == "case_public_id_conflict":
-            return _error("case_public_id_conflict", "case_public_id_conflict", 409)
-        return _handle_backend_failure(exc, "case_create_failed", "case_create_failed")
-    except Exception as exc:
-        return _handle_backend_failure(exc, "case_create_failed", "case_create_failed")
-    return _sensitive_json_response(result, 201, transport_context)
-
-
-@questionnaire_v2_bp.get("/questionnaires/cases")
-@jwt_required()
-def list_cases():
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    schema = CaseListQuerySchema()
-    try:
-        params = schema.load(request.args)
-    except ValidationError as exc:
-        return _error("validation_error", "validation_error", 400, exc.messages)
-    try:
-        payload = service.list_cases(
-            owner_user_id=user_id,
-            status=params.get("status"),
-            page=params["page"],
-            page_size=params["page_size"],
-        )
-    except Exception as exc:
-        return _handle_backend_failure(exc, "cases_list_failed", "cases_list_failed")
-    return jsonify(payload), 200
-
-
-@questionnaire_v2_bp.get("/questionnaires/cases/<case_id>")
-@jwt_required()
-def get_case_detail(case_id: str):
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    cid = _parse_uuid(case_id)
-    if not cid:
-        return _error("invalid_case_id", "invalid_case_id", 400)
-    try:
-        case = service.get_case_or_404(cid)
-        payload = service.get_case_detail(case, owner_user_id=user_id)
-    except LookupError:
-        return _error("case_not_found", "case_not_found", 404)
-    except PermissionError:
-        return _error("case_forbidden", "case_forbidden", 403)
-    except Exception as exc:
-        return _handle_backend_failure(exc, "case_detail_failed", "case_detail_failed")
-    return jsonify(payload), 200
-
-
-@questionnaire_v2_bp.patch("/questionnaires/cases/<case_id>")
-@jwt_required()
-def patch_case(case_id: str):
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    cid = _parse_uuid(case_id)
-    if not cid:
-        return _error("invalid_case_id", "invalid_case_id", 400)
-    schema = CaseUpdateSchema()
-    try:
-        raw_payload, transport_context = _decode_sensitive_payload()
-        payload = schema.load(raw_payload or {})
-    except transport_crypto.TransportCryptoError as exc:
-        return _error(exc.message, exc.code, exc.status_code)
-    except ValidationError as exc:
-        return _error("case_update_validation_error", "case_update_validation_error", 400, exc.messages)
-
-    try:
-        case = service.get_case_or_404(cid)
-        result = service.update_case(case, owner_user_id=user_id, payload=payload)
-    except LookupError:
-        return _error("case_not_found", "case_not_found", 404)
-    except PermissionError:
-        return _error("case_forbidden", "case_forbidden", 403)
-    except ValueError:
-        return _error("case_update_validation_error", "case_update_validation_error", 400)
-    except Exception as exc:
-        return _handle_backend_failure(exc, "case_update_failed", "case_update_failed")
-    return _sensitive_json_response(result, 200, transport_context)
+    return _sensitive_json_response({"session": service.get_session_payload(session)}, 201, transport_context)
 
 
 @questionnaire_v2_bp.get("/questionnaires/sessions/<session_id>")
@@ -329,7 +204,7 @@ def get_session(session_id: str):
     except PermissionError as exc:
         return _error("forbidden", str(exc), 403)
 
-    payload = service.get_session_payload(session, include_answers=True, viewer_user_id=user_id)
+    payload = service.get_session_payload(session, include_answers=True)
     payload["tags"] = service.list_session_tags(session.id)
     response = jsonify(payload)
     response.status_code = 200
@@ -359,7 +234,7 @@ def get_session_secure(session_id: str):
     except PermissionError as exc:
         return _error("forbidden", str(exc), 403)
 
-    payload = service.get_session_payload(session, include_answers=True, viewer_user_id=user_id)
+    payload = service.get_session_payload(session, include_answers=True)
     payload["tags"] = service.list_session_tags(session.id)
     return _sensitive_json_response(payload, 200, transport_context)
 
@@ -466,97 +341,6 @@ def patch_answers(session_id: str):
         return _handle_backend_failure(exc, "save_failed")
 
     return _sensitive_json_response(result, 200, transport_context)
-
-
-@questionnaire_v2_bp.get("/questionnaires/guardian/dashboard")
-@jwt_required()
-def guardian_dashboard():
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    schema = GuardianDashboardQuerySchema()
-    try:
-        params = schema.load(request.args)
-    except ValidationError as exc:
-        return _error("guardian_dashboard_invalid_period", "guardian_dashboard_invalid_period", 400, exc.messages)
-    try:
-        payload = service.guardian_dashboard(
-            owner_user_id=user_id,
-            months=params.get("months", 3),
-            date_from=params.get("date_from"),
-            date_to=params.get("date_to"),
-            case_id=params.get("case_id"),
-            case_public_id=params.get("case_public_id"),
-        )
-    except LookupError:
-        return _error("guardian_dashboard_case_not_found", "guardian_dashboard_case_not_found", 404)
-    except PermissionError:
-        return _error("guardian_dashboard_forbidden", "guardian_dashboard_forbidden", 403)
-    except ValueError:
-        return _error("guardian_dashboard_invalid_period", "guardian_dashboard_invalid_period", 400)
-    except Exception as exc:
-        return _handle_backend_failure(exc, "guardian_dashboard_failed", "guardian_dashboard_failed")
-    return jsonify(payload), 200
-
-
-@questionnaire_v2_bp.get("/questionnaires/psychologist/dashboard")
-@jwt_required()
-def psychologist_dashboard():
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    if str(user.user_type or "").strip().lower() != "psychologist":
-        return _error(
-            "psychologist_dashboard_requires_psychologist",
-            "psychologist_dashboard_requires_psychologist",
-            403,
-        )
-    schema = PsychologistDashboardQuerySchema()
-    try:
-        params = schema.load(request.args)
-    except ValidationError as exc:
-        return _error("psychologist_dashboard_invalid_filter", "psychologist_dashboard_invalid_filter", 400, exc.messages)
-    try:
-        payload = service.psychologist_dashboard(
-            psychologist_user_id=user_id,
-            q=params.get("q"),
-            case_public_id=params.get("case_public_id"),
-            date_from=params.get("date_from"),
-            date_to=params.get("date_to"),
-            domain=params.get("domain"),
-            alert_level=params.get("alert_level"),
-            review_status=params.get("review_status"),
-            page=params["page"],
-            page_size=params["page_size"],
-        )
-    except ValueError:
-        return _error("psychologist_dashboard_invalid_filter", "psychologist_dashboard_invalid_filter", 400)
-    except Exception as exc:
-        return _handle_backend_failure(exc, "psychologist_dashboard_failed", "psychologist_dashboard_failed")
-    return jsonify(payload), 200
-
-
-@questionnaire_v2_bp.get("/psychologists/search")
-@jwt_required()
-def search_psychologists():
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    schema = PsychologistSearchQuerySchema()
-    try:
-        params = schema.load(request.args)
-    except ValidationError as exc:
-        return _error("psychologist_search_invalid_query", "psychologist_search_invalid_query", 400, exc.messages)
-    try:
-        payload = service.search_psychologists(
-            q=params.get("q"),
-            location=params.get("location"),
-            page=params["page"],
-            page_size=params["page_size"],
-        )
-    except Exception as exc:
-        return _handle_backend_failure(exc, "psychologist_search_failed", "psychologist_search_failed")
-    return jsonify(payload), 200
 
 
 @questionnaire_v2_bp.post("/questionnaires/sessions/<session_id>/submit")
@@ -668,7 +452,7 @@ def history_results(session_id: str):
     except PermissionError as exc:
         return _error("forbidden", str(exc), 403)
 
-    response = jsonify(service.get_results_payload(session, viewer_user_id=user_id))
+    response = jsonify(service.get_results_payload(session))
     response.status_code = 200
     return _legacy_plaintext_response(
         response,
@@ -689,7 +473,7 @@ def history_results_secure(session_id: str):
     try:
         _, transport_context = _decode_sensitive_payload()
         session = _load_session_for_user(sid, user_id)
-        payload = service.get_results_payload(session, viewer_user_id=user_id)
+        payload = service.get_results_payload(session)
     except transport_crypto.TransportCryptoError as exc:
         return _error(exc.message, exc.code, exc.status_code)
     except LookupError as exc:
@@ -813,16 +597,12 @@ def share(session_id: str):
     try:
         session = service.get_session_or_404(sid)
         if session.owner_user_id != user_id:
-            return _error("share_owner_required", "share_owner_required", 403)
+            return _error("forbidden", "owner_required", 403)
         result = service.create_share(session=session, user_id=user_id, payload=payload)
     except LookupError as exc:
-        if str(exc) == "share_grantee_not_found":
-            return _error("share_grantee_not_found", "share_grantee_not_found", 404)
         return _error("not_found", str(exc), 404)
     except ValueError as exc:
-        if str(exc) in {"share_target_not_psychologist", "share_grantee_inactive"}:
-            return _error(str(exc), str(exc), 400)
-        return _error("share_validation_error", "share_validation_error", 400, {"reason": str(exc)})
+        return _error("validation_error", str(exc), 400)
     except Exception as exc:
         return _handle_backend_failure(exc, "share_failed")
 
@@ -1019,150 +799,6 @@ def pdf_download(session_id: str):
         response,
         "/api/v2/questionnaires/history/{session_id}/pdf/secure",
     )
-
-
-@questionnaire_v2_bp.get("/questionnaires/history/<session_id>/professional-reviews")
-@jwt_required()
-def professional_reviews(session_id: str):
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    sid = _parse_uuid(session_id)
-    if not sid:
-        return _error("invalid_session_id", "invalid_session_id", 400)
-    try:
-        session = _load_session_for_user(sid, user_id)
-        payload = {"items": service.list_professional_reviews(session, user_id=user_id)}
-    except LookupError:
-        return _error("professional_reviews_session_not_found", "professional_reviews_session_not_found", 404)
-    except PermissionError:
-        return _error("professional_reviews_forbidden", "professional_reviews_forbidden", 403)
-    except Exception as exc:
-        return _handle_backend_failure(exc, "professional_reviews_failed", "professional_reviews_failed")
-    return jsonify(payload), 200
-
-
-@questionnaire_v2_bp.post("/questionnaires/history/<session_id>/professional-reviews")
-@jwt_required()
-def create_professional_review(session_id: str):
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    sid = _parse_uuid(session_id)
-    if not sid:
-        return _error("invalid_session_id", "invalid_session_id", 400)
-    schema = ProfessionalReviewCreateSchema()
-    try:
-        raw_payload, transport_context = _decode_sensitive_payload()
-        payload = schema.load(raw_payload or {})
-    except transport_crypto.TransportCryptoError as exc:
-        return _error(exc.message, exc.code, exc.status_code)
-    except ValidationError as exc:
-        return _error("professional_review_validation_error", "professional_review_validation_error", 400, exc.messages)
-    try:
-        session = service.get_session_or_404(sid)
-        review = service.upsert_professional_review(session, psychologist_user_id=user_id, payload=payload)
-    except LookupError:
-        return _error("professional_review_session_not_found", "professional_review_session_not_found", 404)
-    except PermissionError as exc:
-        code = str(exc)
-        if code == "professional_review_requires_psychologist":
-            return _error("professional_review_requires_psychologist", "professional_review_requires_psychologist", 403)
-        return _error("professional_review_forbidden", "professional_review_forbidden", 403)
-    except ValueError as exc:
-        return _error(str(exc), str(exc), 400)
-    except Exception as exc:
-        return _handle_backend_failure(exc, "professional_review_failed", "professional_review_failed")
-    return _sensitive_json_response({"review": review}, 201, transport_context)
-
-
-@questionnaire_v2_bp.patch("/questionnaires/history/<session_id>/professional-reviews/<review_id>")
-@jwt_required()
-def patch_professional_review(session_id: str, review_id: str):
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    sid = _parse_uuid(session_id)
-    rid = _parse_uuid(review_id)
-    if not sid or not rid:
-        return _error("invalid_id", "invalid_id", 400)
-    schema = ProfessionalReviewUpdateSchema()
-    try:
-        raw_payload, transport_context = _decode_sensitive_payload()
-        payload = schema.load(raw_payload or {})
-    except transport_crypto.TransportCryptoError as exc:
-        return _error(exc.message, exc.code, exc.status_code)
-    except ValidationError as exc:
-        return _error(
-            "professional_review_update_validation_error",
-            "professional_review_update_validation_error",
-            400,
-            exc.messages,
-        )
-    try:
-        session = service.get_session_or_404(sid)
-        review = service.update_professional_review(
-            session=session,
-            review_id=rid,
-            psychologist_user_id=user_id,
-            payload=payload,
-        )
-    except LookupError:
-        return _error("professional_review_not_found", "professional_review_not_found", 404)
-    except PermissionError as exc:
-        if str(exc) == "professional_review_requires_psychologist":
-            return _error("professional_review_requires_psychologist", "professional_review_requires_psychologist", 403)
-        return _error("professional_review_forbidden", "professional_review_forbidden", 403)
-    except ValueError as exc:
-        return _error(str(exc), str(exc), 400)
-    except Exception as exc:
-        return _handle_backend_failure(exc, "professional_review_update_failed", "professional_review_update_failed")
-    return _sensitive_json_response({"review": review}, 200, transport_context)
-
-
-@questionnaire_v2_bp.get("/questionnaires/history/<session_id>/report-preview")
-@jwt_required()
-def report_preview(session_id: str):
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    sid = _parse_uuid(session_id)
-    if not sid:
-        return _error("invalid_session_id", "invalid_session_id", 400)
-    try:
-        session = _load_session_for_user(sid, user_id)
-        payload = service.get_report_preview_payload(session, viewer_user_id=user_id)
-    except LookupError:
-        return _error("report_preview_session_not_found", "report_preview_session_not_found", 404)
-    except PermissionError:
-        return _error("report_preview_forbidden", "report_preview_forbidden", 403)
-    except Exception as exc:
-        return _handle_backend_failure(exc, "report_preview_failed", "report_preview_failed")
-    return jsonify(payload), 200
-
-
-@questionnaire_v2_bp.post("/questionnaires/history/<session_id>/report-preview/secure")
-@jwt_required()
-def report_preview_secure(session_id: str):
-    user_id, user = _current_user()
-    if not user_id or not user:
-        return _error("invalid_user", "invalid_user", 401)
-    sid = _parse_uuid(session_id)
-    if not sid:
-        return _error("invalid_session_id", "invalid_session_id", 400)
-    try:
-        _, transport_context = _decode_sensitive_payload()
-        session = _load_session_for_user(sid, user_id)
-        payload = service.get_report_preview_payload(session, viewer_user_id=user_id)
-    except transport_crypto.TransportCryptoError as exc:
-        return _error(exc.message, exc.code, exc.status_code)
-    except LookupError:
-        return _error("report_preview_session_not_found", "report_preview_session_not_found", 404)
-    except PermissionError:
-        return _error("report_preview_forbidden", "report_preview_forbidden", 403)
-    except Exception as exc:
-        return _handle_backend_failure(exc, "report_preview_failed", "report_preview_failed")
-    return _sensitive_json_response(payload, 200, transport_context)
 
 
 @questionnaire_v2_bp.get("/dashboard/adoption-history")

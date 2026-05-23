@@ -16,9 +16,6 @@ class SessionCreateSchema(BaseSchema):
     role = fields.String(required=True, validate=validate.OneOf(ROLES))
     child_age_years = fields.Integer(required=False, validate=validate.Range(min=6, max=11))
     child_sex_assigned_at_birth = fields.String(required=False, validate=validate.Length(min=1, max=40))
-    case_id = fields.UUID(required=False)
-    case_public_id = fields.String(required=False, validate=validate.Length(min=3, max=40))
-    case_label = fields.String(required=False, validate=validate.Length(min=1, max=160))
     metadata = fields.Dict(required=False)
 
 
@@ -50,7 +47,6 @@ class ShareCreateSchema(BaseSchema):
     grantee_user_id = fields.UUID(required=False)
     grant_can_tag = fields.Boolean(load_default=True)
     grant_can_download_pdf = fields.Boolean(load_default=True)
-    share_scope = fields.String(required=False, validate=validate.OneOf(["session", "case"]))
 
 
 class TagAssignSchema(BaseSchema):
@@ -61,85 +57,6 @@ class TagAssignSchema(BaseSchema):
 
 class DashboardQuerySchema(BaseSchema):
     months = fields.Integer(load_default=12, validate=validate.Range(min=1, max=120))
-    date_from = fields.Date(required=False)
-    date_to = fields.Date(required=False)
-
-    @validates_schema
-    def validate_period(self, data, **kwargs):
-        start = data.get("date_from")
-        end = data.get("date_to")
-        if start and end and start > end:
-            raise ValidationError("invalid_period_range")
-
-
-class GuardianDashboardQuerySchema(DashboardQuerySchema):
-    case_id = fields.UUID(required=False)
-    case_public_id = fields.String(required=False, validate=validate.Length(min=3, max=40))
-
-
-class PsychologistDashboardQuerySchema(BaseSchema):
-    q = fields.String(required=False, validate=validate.Length(min=1, max=160))
-    case_public_id = fields.String(required=False, validate=validate.Length(min=3, max=40))
-    date_from = fields.Date(required=False)
-    date_to = fields.Date(required=False)
-    domain = fields.String(required=False, validate=validate.Length(min=1, max=64))
-    alert_level = fields.String(required=False, validate=validate.OneOf(ALERT_LEVELS))
-    review_status = fields.String(
-        required=False,
-        validate=validate.OneOf(["pending", "in_review", "reviewed", "orientation_recommended", "closed"]),
-    )
-    page = fields.Integer(load_default=1, validate=validate.Range(min=1))
-    page_size = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
-
-    @validates_schema
-    def validate_period(self, data, **kwargs):
-        start = data.get("date_from")
-        end = data.get("date_to")
-        if start and end and start > end:
-            raise ValidationError("invalid_period_range")
-
-
-class PsychologistSearchQuerySchema(BaseSchema):
-    q = fields.String(required=False, validate=validate.Length(min=1, max=160))
-    location = fields.String(required=False, validate=validate.Length(min=1, max=160))
-    page = fields.Integer(load_default=1, validate=validate.Range(min=1))
-    page_size = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
-
-
-class CaseCreateSchema(BaseSchema):
-    private_label = fields.String(required=True, validate=validate.Length(min=1, max=160))
-    metadata = fields.Dict(required=False)
-
-
-class CaseUpdateSchema(BaseSchema):
-    private_label = fields.String(required=False, validate=validate.Length(min=1, max=160))
-    status = fields.String(required=False, validate=validate.OneOf(["active", "archived"]))
-
-
-class CaseListQuerySchema(BaseSchema):
-    status = fields.String(required=False, validate=validate.OneOf(["active", "archived"]))
-    page = fields.Integer(load_default=1, validate=validate.Range(min=1))
-    page_size = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
-
-
-class ProfessionalReviewCreateSchema(BaseSchema):
-    review_status = fields.String(
-        required=True,
-        validate=validate.OneOf(["pending", "in_review", "reviewed", "orientation_recommended", "closed"]),
-    )
-    initial_concept = fields.String(required=True, validate=validate.Length(min=1, max=4000))
-    recommendation = fields.String(required=False, validate=validate.Length(max=4000))
-    visible_to_guardian = fields.Boolean(load_default=True)
-
-
-class ProfessionalReviewUpdateSchema(BaseSchema):
-    review_status = fields.String(
-        required=False,
-        validate=validate.OneOf(["pending", "in_review", "reviewed", "orientation_recommended", "closed"]),
-    )
-    initial_concept = fields.String(required=False, validate=validate.Length(min=1, max=4000))
-    recommendation = fields.String(required=False, validate=validate.Length(max=4000))
-    visible_to_guardian = fields.Boolean(required=False)
 
 
 class ReportRequestSchema(BaseSchema):
