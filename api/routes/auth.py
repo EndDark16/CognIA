@@ -101,7 +101,11 @@ def _build_me_payload(user: AppUser) -> dict:
         "email": user.email,
         "full_name": user.full_name,
         "user_type": user.user_type,
+        "display_role": "Administrador del sistema" if any(r == "ADMIN" for r in _get_roles(user)) else user.user_type,
         "professional_card_number": user.professional_card_number,
+        "professional_city": getattr(user, "professional_city", None),
+        "professional_department": getattr(user, "professional_department", None),
+        "professional_location": getattr(user, "professional_location", None),
         "colpsic_verified": user.colpsic_verified,
         "is_active": user.is_active,
         "roles": _get_roles(user),
@@ -282,6 +286,9 @@ def register():
     email = _normalize_email(data.get("email"))
     password = data.get("password") or ""
     full_name = (data.get("full_name") or "").strip() or None
+    professional_city = (data.get("professional_city") or "").strip() or None
+    professional_department = (data.get("professional_department") or "").strip() or None
+    professional_location = (data.get("professional_location") or "").strip() or None
     user_type = _normalize_user_type(data.get("user_type"))
     professional_card_number = _normalize_professional_card(
         data.get("professional_card_number") or data.get("colpsic_card_number")
@@ -356,6 +363,9 @@ def register():
         full_name=full_name,
         user_type=user_type,
         professional_card_number=professional_card_number,
+        professional_city=professional_city,
+        professional_department=professional_department,
+        professional_location=professional_location,
     )
 
     try:
