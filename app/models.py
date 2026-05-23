@@ -24,6 +24,9 @@ class AppUser(db.Model):
     full_name = db.Column(db.String)
     user_type = db.Column(db.String, nullable=False, default="guardian", server_default="guardian")
     professional_card_number = db.Column(db.String, unique=True)
+    city = db.Column(db.String(120))
+    department = db.Column(db.String(120))
+    location = db.Column(db.String(255))
     professional_city = db.Column(db.String(120))
     professional_department = db.Column(db.String(120))
     professional_location = db.Column(db.String(255))
@@ -1405,6 +1408,13 @@ class QuestionnaireAccessGrant(db.Model):
     owner_user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), nullable=False)
     grantee_user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), nullable=False, index=True)
     grant_type = db.Column(db.String(40), nullable=False, server_default="manual")
+    request_status = db.Column(db.String(40), nullable=False, server_default="accepted", index=True)
+    requested_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
+    responded_at = db.Column(db.DateTime(timezone=True), index=True)
+    response_message = db.Column(db.Text)
+    decision_by_user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), index=True)
+    requested_can_tag = db.Column(db.Boolean, nullable=False, server_default="true")
+    requested_can_download_pdf = db.Column(db.Boolean, nullable=False, server_default="true")
     can_view = db.Column(db.Boolean, nullable=False, server_default="true")
     can_tag = db.Column(db.Boolean, nullable=False, server_default="true")
     can_download_pdf = db.Column(db.Boolean, nullable=False, server_default="true")
@@ -1426,6 +1436,7 @@ class QuestionnaireCase(db.Model):
     case_public_id = db.Column(db.String(40), nullable=False, unique=True, index=True)
     owner_user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), nullable=False, index=True)
     private_label = db.Column(db.Text)
+    private_label_hash = db.Column(db.String(64), index=True)
     status = db.Column(db.String(40), nullable=False, server_default="active", index=True)
     metadata_json = db.Column(db.JSON)
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
@@ -1483,6 +1494,27 @@ class QuestionnaireProfessionalReview(db.Model):
             name="uq_questionnaire_professional_review_session_psychologist",
         ),
     )
+
+
+class QuestionnaireNotification(db.Model):
+    __tablename__ = "questionnaire_notifications"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), nullable=False, index=True)
+    actor_user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), index=True)
+    session_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("questionnaire_sessions.id", ondelete="SET NULL"), index=True
+    )
+    case_id = db.Column(UUID(as_uuid=True), db.ForeignKey("questionnaire_cases.id", ondelete="SET NULL"), index=True)
+    grant_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("questionnaire_access_grants.id", ondelete="SET NULL"), index=True
+    )
+    notification_type = db.Column(db.String(80), nullable=False, index=True)
+    title = db.Column(db.String(255), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    payload_json = db.Column(db.JSON)
+    read_at = db.Column(db.DateTime(timezone=True), index=True)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
 
 
 class DashboardAggregate(db.Model):

@@ -5197,6 +5197,50 @@ paths:
           description: "El backend encontr\xF3 una falla interna durante consulta, persistencia, generaci\xF3n, inferencia\
             \ o coordinaci\xF3n del flujo."
       x-contract-status: KEEP_ACTIVE
+  /api/auth/me/profile:
+    patch:
+      tags:
+      - Auth
+      summary: Actualizar ubicacion y perfil del usuario autenticado
+      description: |-
+        **Objetivo funcional**
+        Actualizar campos de ubicacion general y profesional del usuario autenticado.
+
+        **Cuando debe usarse**
+        Cuando el usuario necesite editar su ciudad/departamento/ubicacion para filtros y busqueda.
+
+        **Actor que lo consume**
+        Usuario autenticado (guardian o psicologo).
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`.
+
+        **Entrada esperada**
+        Metodo `PATCH /api/auth/me/profile` con JSON opcional: `city`, `department`, `location`, `professional_city`, `professional_department`, `professional_location`.
+
+        **Resultado exitoso**
+        Retorna `200` con `user` actualizado.
+
+        **Errores posibles y causa funcional**
+        `400 profile_update_validation_error`, `401 invalid_user`, `404 user_not_found`, `500 profile_update_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`.
+      operationId: patchAuthMeProfile
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Perfil actualizado correctamente.
+        '400':
+          description: Payload invalido.
+        '401':
+          description: No autenticado.
+        '404':
+          description: Usuario no encontrado.
+        '500':
+          description: Error interno.
+      x-contract-status: KEEP_ACTIVE
   /api/auth/password/change:
     post:
       tags:
@@ -21565,6 +21609,220 @@ paths:
           description: Usuario sin permisos para buscar psicologos.
         '500':
           description: Error interno en busqueda de psicologos.
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/psychologist/share-requests:
+    get:
+      tags:
+      - QuestionnaireV2
+      summary: Listar solicitudes de revision para psicologo
+      description: |-
+        **Objetivo funcional**
+        Entregar inbox de solicitudes de revision compartidas al psicologo.
+
+        **Cuando debe usarse**
+        Al abrir la bandeja de pendientes/aceptadas/rechazadas del psicologo.
+
+        **Actor que lo consume**
+        Psicologo autenticado.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth` y `user_type=psychologist`.
+
+        **Entrada esperada**
+        Metodo `GET /api/v2/questionnaires/psychologist/share-requests` con `status`, `q`, `date_from`, `date_to`, `page`, `page_size`.
+
+        **Resultado exitoso**
+        Retorna `200` con `items`, `summary` y `pagination`.
+
+        **Errores posibles y causa funcional**
+        `400 psychologist_share_requests_invalid_filter`, `403 psychologist_share_requests_requires_psychologist`, `500 psychologist_share_requests_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`.
+      operationId: getV2QuestionnairesPsychologistShareRequests
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Solicitudes listadas correctamente.
+        '400':
+          description: Filtro invalido.
+        '403':
+          description: Requiere usuario psicologo.
+        '500':
+          description: Error interno.
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/psychologist/share-requests/{grant_id}/accept:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Aceptar solicitud de revision compartida
+      description: |-
+        **Objetivo funcional**
+        Aceptar una solicitud pendiente de revision y habilitar acceso al caso/sesion compartidos.
+
+        **Cuando debe usarse**
+        Cuando el psicologo decide revisar formalmente una solicitud recibida.
+
+        **Actor que lo consume**
+        Psicologo autenticado propietario del grant.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`, grant vigente y estado `pending`.
+
+        **Entrada esperada**
+        Metodo `POST /api/v2/questionnaires/psychologist/share-requests/{grant_id}/accept` con `message` opcional.
+
+        **Resultado exitoso**
+        Retorna `200` con grant en `request_status=accepted`.
+
+        **Errores posibles y causa funcional**
+        `400 share_request_not_pending|share_request_message_too_long`, `403 share_request_forbidden|share_request_requires_psychologist`, `404 share_request_not_found`, `500 share_request_accept_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`.
+      operationId: postV2QuestionnairesPsychologistShareRequestsGrantIdAccept
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Solicitud aceptada.
+        '400':
+          description: Solicitud invalida o no pendiente.
+        '403':
+          description: Requiere psicologo propietario del grant.
+        '404':
+          description: Grant no encontrado.
+        '500':
+          description: Error interno.
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/questionnaires/psychologist/share-requests/{grant_id}/reject:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Rechazar solicitud de revision compartida
+      description: |-
+        **Objetivo funcional**
+        Rechazar una solicitud pendiente de revision y mantener bloqueado el acceso al caso/sesion.
+
+        **Cuando debe usarse**
+        Cuando el psicologo decide no aceptar una solicitud recibida.
+
+        **Actor que lo consume**
+        Psicologo autenticado propietario del grant.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`, grant vigente y estado `pending`.
+
+        **Entrada esperada**
+        Metodo `POST /api/v2/questionnaires/psychologist/share-requests/{grant_id}/reject` con `message` opcional.
+
+        **Resultado exitoso**
+        Retorna `200` con grant en `request_status=rejected`.
+
+        **Errores posibles y causa funcional**
+        `400 share_request_not_pending|share_request_message_too_long`, `403 share_request_forbidden|share_request_requires_psychologist`, `404 share_request_not_found`, `500 share_request_reject_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`.
+      operationId: postV2QuestionnairesPsychologistShareRequestsGrantIdReject
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Solicitud rechazada.
+        '400':
+          description: Solicitud invalida o no pendiente.
+        '403':
+          description: Requiere psicologo propietario del grant.
+        '404':
+          description: Grant no encontrado.
+        '500':
+          description: Error interno.
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/notifications:
+    get:
+      tags:
+      - QuestionnaireV2
+      summary: Listar notificaciones del usuario autenticado
+      description: |-
+        **Objetivo funcional**
+        Listar notificaciones operativas de solicitudes compartidas y revisiones.
+
+        **Cuando debe usarse**
+        Al cargar centro de notificaciones del usuario.
+
+        **Actor que lo consume**
+        Usuario autenticado (guardian o psicologo).
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`.
+
+        **Entrada esperada**
+        Metodo `GET /api/v2/notifications` con `unread_only`, `type`, `page`, `page_size`.
+
+        **Resultado exitoso**
+        Retorna `200` con `items`, `summary.unread_count` y `pagination`.
+
+        **Errores posibles y causa funcional**
+        `400 notifications_validation_error`, `500 notifications_list_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`.
+      operationId: getV2Notifications
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Notificaciones listadas correctamente.
+        '400':
+          description: Query invalida.
+        '500':
+          description: Error interno.
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/notifications/{notification_id}/read:
+    patch:
+      tags:
+      - QuestionnaireV2
+      summary: Marcar notificacion como leida
+      description: |-
+        **Objetivo funcional**
+        Marcar una notificacion del usuario como leida.
+
+        **Cuando debe usarse**
+        Al confirmar lectura de una notificacion en la bandeja.
+
+        **Actor que lo consume**
+        Usuario autenticado propietario de la notificacion.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth` y ownership de `notification_id`.
+
+        **Entrada esperada**
+        Metodo `PATCH /api/v2/notifications/{notification_id}/read`.
+
+        **Resultado exitoso**
+        Retorna `200` con `notification.read_at`.
+
+        **Errores posibles y causa funcional**
+        `400 invalid_notification_id`, `403 notification_forbidden`, `404 notification_not_found`, `500 notification_update_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`.
+      operationId: patchV2NotificationsNotificationIdRead
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Notificacion marcada como leida.
+        '400':
+          description: notification_id invalido.
+        '403':
+          description: Notificacion no pertenece al usuario.
+        '404':
+          description: Notificacion no encontrada.
+        '500':
+          description: Error interno.
       x-contract-status: KEEP_ACTIVE
   /api/v2/questionnaires/history/{session_id}/professional-reviews:
     get:

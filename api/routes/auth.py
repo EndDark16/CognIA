@@ -103,6 +103,9 @@ def _build_me_payload(user: AppUser) -> dict:
         "user_type": user.user_type,
         "display_role": "Administrador del sistema" if any(r == "ADMIN" for r in _get_roles(user)) else user.user_type,
         "professional_card_number": user.professional_card_number,
+        "city": getattr(user, "city", None),
+        "department": getattr(user, "department", None),
+        "location": getattr(user, "location", None),
         "professional_city": getattr(user, "professional_city", None),
         "professional_department": getattr(user, "professional_department", None),
         "professional_location": getattr(user, "professional_location", None),
@@ -173,6 +176,7 @@ _USERNAME_RE = re.compile(r"^[A-Za-z0-9._-]{3,32}$")
 _FULL_NAME_MAX = 120
 _EMAIL_MAX = 254
 _PASSWORD_MIN = 8
+_LOCATION_FIELD_MAX = 160
 
 
 def _normalize_user_type(raw: str | None) -> str | None:
@@ -205,6 +209,19 @@ def _normalize_email(raw: str | None) -> str | None:
     if not raw:
         return None
     return str(raw).strip().lower()
+
+
+def _clean_optional_text(value, *, max_len: int, field_name: str) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, (dict, list, tuple, set)):
+        raise ValueError(f"invalid_{field_name}")
+    text = str(value).strip()
+    if not text:
+        return None
+    if len(text) > max_len:
+        raise ValueError(f"invalid_{field_name}")
+    return text
 
 
 def _is_valid_username(username: str) -> bool:
@@ -286,6 +303,9 @@ def register():
     email = _normalize_email(data.get("email"))
     password = data.get("password") or ""
     full_name = (data.get("full_name") or "").strip() or None
+    city = (data.get("city") or "").strip() or None
+    department = (data.get("department") or "").strip() or None
+    location = (data.get("location") or "").strip() or None
     professional_city = (data.get("professional_city") or "").strip() or None
     professional_department = (data.get("professional_department") or "").strip() or None
     professional_location = (data.get("professional_location") or "").strip() or None
@@ -363,6 +383,9 @@ def register():
         full_name=full_name,
         user_type=user_type,
         professional_card_number=professional_card_number,
+        city=city,
+        department=department,
+        location=location,
         professional_city=professional_city,
         professional_department=professional_department,
         professional_location=professional_location,
@@ -806,6 +829,59 @@ def me():
     if cache_ttl > 0:
         auth_me_cache.set(str(identity), payload, ttl_seconds=cache_ttl)
     return jsonify(payload), 200
+
+
+@auth_bp.patch("/me/profile")
+@jwt_required()
+def update_me_profile():
+    claims = get_jwt()
+    if claims.get("mfa_enrollment"):
+        return _error_response("Enrollment token not allowed", "mfa_enrollment_only", 403)
+
+    identity = _parse_identity(get_jwt_identity())
+    if not identity:
+        return _error_response("Invalid user", "invalid_user", 401)
+    user = db.session.get(AppUser, identity)
+    if not user or not user.is_active:
+        return _error_response("User not found", "user_not_found", 404)
+
+    data = request.get_json(silent=True) or {}
+    try:
+        user.city = _clean_optional_text(data.get("city"), max_len=_LOCATION_FIELD_MAX, field_name="city")
+        user.department = _clean_optional_text(
+            data.get("department"),
+            max_len=_LOCATION_FIELD_MAX,
+            field_name="department",
+        )
+        user.location = _clean_optional_text(data.get("location"), max_len=255, field_name="location")
+        user.professional_city = _clean_optional_text(
+            data.get("professional_city"),
+            max_len=_LOCATION_FIELD_MAX,
+            field_name="professional_city",
+        )
+        user.professional_department = _clean_optional_text(
+            data.get("professional_department"),
+            max_len=_LOCATION_FIELD_MAX,
+            field_name="professional_department",
+        )
+        user.professional_location = _clean_optional_text(
+            data.get("professional_location"),
+            max_len=255,
+            field_name="professional_location",
+        )
+    except ValueError:
+        return _error_response("Validation error", "profile_update_validation_error", 400)
+
+    try:
+        db.session.add(user)
+        db.session.commit()
+        invalidate_user_auth_caches(user.id)
+    except Exception:
+        db.session.rollback()
+        current_app.logger.error("Unexpected error on profile update for %s", user.id, exc_info=True)
+        return _error_response("Could not update profile", "profile_update_failed", 500)
+
+    return jsonify({"user": _build_me_payload(user)}), 200
 
 
 @auth_bp.post("/password/change")
