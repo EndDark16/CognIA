@@ -24,6 +24,9 @@ class AppUser(db.Model):
     full_name = db.Column(db.String)
     user_type = db.Column(db.String, nullable=False, default="guardian", server_default="guardian")
     professional_card_number = db.Column(db.String, unique=True)
+    professional_city = db.Column(db.String(120))
+    professional_department = db.Column(db.String(120))
+    professional_location = db.Column(db.String(255))
     colpsic_verified = db.Column(db.Boolean, default=False, nullable=False)
     colpsic_verified_at = db.Column(db.DateTime(timezone=True))
     colpsic_verified_by = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"))
@@ -1154,6 +1157,9 @@ class QuestionnaireSession(db.Model):
     version_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey("questionnaire_versions.id", ondelete="RESTRICT"), nullable=False, index=True
     )
+    case_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("questionnaire_cases.id", ondelete="SET NULL"), index=True
+    )
     owner_user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), nullable=False, index=True)
     respondent_role = db.Column(db.String(40), nullable=False)
     mode = db.Column(db.String(40), nullable=False)
@@ -1413,6 +1419,21 @@ class QuestionnaireAccessGrant(db.Model):
     )
 
 
+class QuestionnaireCase(db.Model):
+    __tablename__ = "questionnaire_cases"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    case_public_id = db.Column(db.String(40), nullable=False, unique=True, index=True)
+    owner_user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), nullable=False, index=True)
+    private_label = db.Column(db.Text)
+    status = db.Column(db.String(40), nullable=False, server_default="active", index=True)
+    metadata_json = db.Column(db.JSON)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = db.Column(
+        db.DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+
 class QuestionnaireShareCode(db.Model):
     __tablename__ = "questionnaire_share_codes"
 
@@ -1430,6 +1451,37 @@ class QuestionnaireShareCode(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = db.Column(
         db.DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+
+class QuestionnaireProfessionalReview(db.Model):
+    __tablename__ = "questionnaire_professional_reviews"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("questionnaire_sessions.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    case_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("questionnaire_cases.id", ondelete="SET NULL"), index=True
+    )
+    owner_user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), nullable=False, index=True)
+    psychologist_user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("app_user.id"), nullable=False, index=True)
+    review_status = db.Column(db.String(40), nullable=False, server_default="pending", index=True)
+    initial_concept = db.Column(db.Text)
+    recommendation = db.Column(db.Text)
+    visible_to_guardian = db.Column(db.Boolean, nullable=False, server_default="true")
+    is_diagnostic = db.Column(db.Boolean, nullable=False, server_default="false")
+    metadata_json = db.Column(db.JSON)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = db.Column(
+        db.DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+    __table_args__ = (
+        db.UniqueConstraint(
+            "session_id",
+            "psychologist_user_id",
+            name="uq_questionnaire_professional_review_session_psychologist",
+        ),
     )
 
 
