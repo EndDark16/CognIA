@@ -53,6 +53,33 @@ class ShareCreateSchema(BaseSchema):
     share_scope = fields.String(required=False, validate=validate.OneOf(["session", "case"]))
 
 
+class ShareRequestListQuerySchema(BaseSchema):
+    status = fields.String(required=False, load_default="pending", validate=validate.OneOf(["pending", "accepted", "rejected", "all"]))
+    q = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    date_from = fields.Date(required=False)
+    date_to = fields.Date(required=False)
+    page = fields.Integer(load_default=1, validate=validate.Range(min=1))
+    page_size = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
+
+    @validates_schema
+    def validate_period(self, data, **kwargs):
+        start = data.get("date_from")
+        end = data.get("date_to")
+        if start and end and start > end:
+            raise ValidationError("invalid_period_range")
+
+
+class ShareRequestDecisionSchema(BaseSchema):
+    message = fields.String(required=False, validate=validate.Length(min=1, max=1000))
+
+
+class NotificationsQuerySchema(BaseSchema):
+    unread_only = fields.Boolean(load_default=False)
+    type = fields.String(required=False, validate=validate.Length(min=1, max=80))
+    page = fields.Integer(load_default=1, validate=validate.Range(min=1))
+    page_size = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
+
+
 class TagAssignSchema(BaseSchema):
     tag = fields.String(required=True, validate=validate.Length(min=1, max=120))
     color = fields.String(required=False, validate=validate.Length(min=4, max=16))

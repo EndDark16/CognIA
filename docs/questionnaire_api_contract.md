@@ -36,6 +36,18 @@ Base path: `/api/v2`
 - `POST /questionnaires/history/{id}/share`
 - `GET /questionnaires/shared/{questionnaire_id}/{share_code}`
 
+### Solicitudes de revision (psicologo)
+- `GET /questionnaires/psychologist/share-requests?status=pending|accepted|rejected|all`
+- `POST /questionnaires/psychologist/share-requests/{grant_id}/accept`
+- `POST /questionnaires/psychologist/share-requests/{grant_id}/reject`
+
+Reglas:
+- Si `POST /questionnaires/history/{id}/share` incluye `grantee_user_id`, el grant queda en `request_status=pending`.
+- Mientras el estado sea `pending`, el psicologo no tiene acceso a `session/results/report-preview/pdf` por endpoints normales.
+- Al aceptar: `request_status=accepted` y se habilitan permisos (`can_view`, `can_download_pdf`, `can_tag`) segun solicitud.
+- Al rechazar: `request_status=rejected` y permisos en `false`.
+- Sin `grantee_user_id`, el flujo `share_code` legacy se mantiene igual.
+
 ## PDF de resultados
 - `POST /questionnaires/history/{id}/pdf/generate`
 - `GET /questionnaires/history/{id}/pdf`
@@ -68,6 +80,22 @@ Base path: `/api/v2`
 
 ## Admin bootstrap
 - `POST /questionnaires/admin/bootstrap` (requiere `ADMIN`)
+
+## Notificaciones backend (usuario autenticado)
+- `GET /notifications?unread_only=true|false&type=...&page=1&page_size=20`
+- `PATCH /notifications/{notification_id}/read`
+
+Tipos actuales:
+- `questionnaire_share_requested`
+- `questionnaire_share_accepted`
+- `questionnaire_share_rejected`
+- `professional_review_created`
+
+## Perfil y ubicacion
+- `PATCH /api/auth/me/profile`
+- Campos soportados (opcionales, null para limpiar):
+  - `city`, `department`, `location`
+  - `professional_city`, `professional_department`, `professional_location`
 
 ## Compatibilidad y migracion v1 -> v2/admin
 - El flujo recomendado para integraciones nuevas es v2 (`/api/v2/questionnaires/*`).
@@ -152,7 +180,7 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 - Campos opcionales nuevos (aditivos): `case_id`, `case_public_id`, `case_label`.
 - Reglas:
   - `case_id` / `case_public_id`: deben pertenecer al owner.
-  - `case_label` sin `case_id/case_public_id`: crea caso y asocia sesión.
+  - `case_label` sin `case_id/case_public_id`: crea caso o reutiliza caso activo del owner con misma etiqueta normalizada.
   - Sin campos de caso: mantiene comportamiento previo.
 - Errores específicos: `session_case_not_found` (404), `session_case_forbidden` (403), `session_case_validation_error` (400).
 
