@@ -721,6 +721,8 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
         headers=owner_headers,
     )
     assert shared.status_code == 201
+    assert shared.json["grant"]["request_status"] == "pending"
+    grant_id = shared.json["grant"]["grant_id"]
 
     shared_payload = client.get(
         f"/api/v2/questionnaires/shared/{shared.json['questionnaire_id']}/{shared.json['share_code']}"
@@ -729,7 +731,23 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
 
     psych_history = client.get("/api/v2/questionnaires/history", headers=psych_headers)
     assert psych_history.status_code == 200
-    assert any(item["session_id"] == session_id for item in psych_history.json["items"])
+    assert not any(item["session_id"] == session_id for item in psych_history.json["items"])
+
+    inbox = client.get("/api/v2/questionnaires/psychologist/share-requests?status=pending", headers=psych_headers)
+    assert inbox.status_code == 200
+    assert any(item["grant_id"] == grant_id for item in inbox.json["items"])
+
+    accepted = client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{grant_id}/accept",
+        json={"message": "Acepto revisar"},
+        headers=psych_headers,
+    )
+    assert accepted.status_code == 200
+    assert accepted.json["grant"]["request_status"] == "accepted"
+
+    psych_history_after_accept = client.get("/api/v2/questionnaires/history", headers=psych_headers)
+    assert psych_history_after_accept.status_code == 200
+    assert any(item["session_id"] == session_id for item in psych_history_after_accept.json["items"])
 
     generated = client.post(f"/api/v2/questionnaires/history/{session_id}/pdf/generate", headers=owner_headers)
     assert generated.status_code == 201
@@ -1080,6 +1098,18 @@ def test_questionnaire_v2_share_with_psychologist_hides_private_label_for_grante
     assert shared.status_code == 201
     assert shared.json["case"]["case_public_id"].startswith("CASO-")
     assert shared.json["grantee"]["username"] == "case_share_psych_qv2"
+    grant_id = shared.json["grant"]["grant_id"]
+    assert shared.json["grant"]["request_status"] == "pending"
+
+    psych_session_before_accept = client.get(f"/api/v2/questionnaires/sessions/{session_id}", headers=psych_headers)
+    assert psych_session_before_accept.status_code == 403
+
+    accepted = client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{grant_id}/accept",
+        json={"message": "Acepto"},
+        headers=psych_headers,
+    )
+    assert accepted.status_code == 200
 
     psych_session = client.get(f"/api/v2/questionnaires/sessions/{session_id}", headers=psych_headers)
     assert psych_session.status_code == 200
@@ -1108,6 +1138,14 @@ def test_questionnaire_v2_professional_review_visibility_rules(client, app):
         headers=owner_headers,
     )
     assert shared.status_code == 201
+    grant_id = shared.json["grant"]["grant_id"]
+
+    accepted = client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{grant_id}/accept",
+        json={"message": "Acepto"},
+        headers=psych_headers,
+    )
+    assert accepted.status_code == 200
 
     review_created = client.post(
         f"/api/v2/questionnaires/history/{session_id}/professional-reviews",
@@ -1168,11 +1206,23 @@ def test_questionnaire_v2_report_preview_for_granted_psychologist_hides_private_
         headers=owner_headers,
     )
 
-    client.post(
+    shared = client.post(
         f"/api/v2/questionnaires/history/{session_id}/share",
         json={"grantee_user_id": str(psych_id)},
         headers=owner_headers,
     )
+    assert shared.status_code == 201
+    grant_id = shared.json["grant"]["grant_id"]
+
+    preview_pending = client.get(f"/api/v2/questionnaires/history/{session_id}/report-preview", headers=psych_headers)
+    assert preview_pending.status_code == 403
+
+    accepted = client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{grant_id}/accept",
+        json={"message": "Acepto revisar"},
+        headers=psych_headers,
+    )
+    assert accepted.status_code == 200
 
     preview = client.get(f"/api/v2/questionnaires/history/{session_id}/report-preview", headers=psych_headers)
     assert preview.status_code == 200
@@ -1196,11 +1246,27 @@ def test_questionnaire_v2_guardian_and_psychologist_dashboards(client, app):
     session_id = created.json["session"]["session_id"]
     case_public_id = created.json["session"]["case"]["case_public_id"]
 
-    client.post(
+    shared = client.post(
         f"/api/v2/questionnaires/history/{session_id}/share",
         json={"grantee_user_id": str(psych_id)},
         headers=owner_headers,
     )
+    assert shared.status_code == 201
+    grant_id = shared.json["grant"]["grant_id"]
+
+    psych_dashboard_pending = client.get(
+        f"/api/v2/questionnaires/psychologist/dashboard?case_public_id={case_public_id}",
+        headers=psych_headers,
+    )
+    assert psych_dashboard_pending.status_code == 200
+    assert psych_dashboard_pending.json["summary"]["total_shared_sessions"] == 0
+
+    accepted = client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{grant_id}/accept",
+        json={"message": "Acepto"},
+        headers=psych_headers,
+    )
+    assert accepted.status_code == 200
 
     guardian_dashboard = client.get("/api/v2/questionnaires/guardian/dashboard?months=3", headers=owner_headers)
     assert guardian_dashboard.status_code == 200
@@ -1212,3 +1278,192 @@ def test_questionnaire_v2_guardian_and_psychologist_dashboards(client, app):
     )
     assert psych_dashboard.status_code == 200
     assert psych_dashboard.json["summary"]["total_shared_sessions"] >= 1
+
+
+def test_questionnaire_v2_case_label_reuse_same_owner(client, app):
+    _, token = _user_token(app, "case_reuse_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    first = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "Hijo mayor", "child_age_years": 8},
+        headers=headers,
+    )
+    assert first.status_code == 201
+    first_case = first.json["session"]["case"]["case_id"]
+
+    second = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "  hijo   mayor  ", "child_age_years": 9},
+        headers=headers,
+    )
+    assert second.status_code == 201
+    second_case = second.json["session"]["case"]["case_id"]
+    assert second_case == first_case
+
+
+def test_questionnaire_v2_share_request_reject_notifies_owner_and_blocks_access(client, app):
+    _, owner_token = _user_token(app, "share_reject_owner_qv2")
+    psych_id, psych_token = _user_token(app, "share_reject_psych_qv2", user_type="psychologist")
+    owner_headers = {"Authorization": f"Bearer {owner_token}"}
+    psych_headers = {"Authorization": f"Bearer {psych_token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "Caso rechazo", "child_age_years": 9},
+        headers=owner_headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    shared = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/share",
+        json={"grantee_user_id": str(psych_id)},
+        headers=owner_headers,
+    )
+    assert shared.status_code == 201
+    grant_id = shared.json["grant"]["grant_id"]
+
+    rejected = client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{grant_id}/reject",
+        json={"message": "No puedo revisar este caso por ahora."},
+        headers=psych_headers,
+    )
+    assert rejected.status_code == 200
+    assert rejected.json["grant"]["request_status"] == "rejected"
+
+    psych_session = client.get(f"/api/v2/questionnaires/sessions/{session_id}", headers=psych_headers)
+    assert psych_session.status_code == 403
+
+    owner_notifications = client.get("/api/v2/notifications?unread_only=true", headers=owner_headers)
+    assert owner_notifications.status_code == 200
+    assert any(item["type"] == "questionnaire_share_rejected" for item in owner_notifications.json["items"])
+
+    rejected_inbox = client.get(
+        "/api/v2/questionnaires/psychologist/share-requests?status=rejected",
+        headers=psych_headers,
+    )
+    assert rejected_inbox.status_code == 200
+    assert any(item["grant_id"] == grant_id for item in rejected_inbox.json["items"])
+
+
+def test_questionnaire_v2_share_requests_and_notifications_endpoints(client, app):
+    _, guardian_token = _user_token(app, "share_requests_guardian_qv2")
+    psych_id, psych_token = _user_token(app, "share_requests_psych_qv2", user_type="psychologist")
+    guardian_headers = {"Authorization": f"Bearer {guardian_token}"}
+    psych_headers = {"Authorization": f"Bearer {psych_token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "Caso inbox", "child_age_years": 9},
+        headers=guardian_headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    shared = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/share",
+        json={"grantee_user_id": str(psych_id), "grant_can_download_pdf": True, "grant_can_tag": False},
+        headers=guardian_headers,
+    )
+    assert shared.status_code == 201
+    grant_id = shared.json["grant"]["grant_id"]
+
+    guardian_forbidden = client.get("/api/v2/questionnaires/psychologist/share-requests", headers=guardian_headers)
+    assert guardian_forbidden.status_code == 403
+
+    psych_inbox = client.get("/api/v2/questionnaires/psychologist/share-requests?status=pending", headers=psych_headers)
+    assert psych_inbox.status_code == 200
+    grant_item = next(item for item in psych_inbox.json["items"] if item["grant_id"] == grant_id)
+    assert grant_item["request_status"] == "pending"
+    assert grant_item["case"]["case_public_id"].startswith("CASO-")
+    assert "private_label" not in grant_item["case"]
+
+    psych_notifications = client.get("/api/v2/notifications?unread_only=true", headers=psych_headers)
+    assert psych_notifications.status_code == 200
+    assert any(item["type"] == "questionnaire_share_requested" for item in psych_notifications.json["items"])
+    first_notification_id = psych_notifications.json["items"][0]["notification_id"]
+
+    mark_read = client.patch(f"/api/v2/notifications/{first_notification_id}/read", headers=psych_headers)
+    assert mark_read.status_code == 200
+    assert mark_read.json["notification"]["read_at"] is not None
+
+
+def test_questionnaire_v2_share_legacy_without_grantee_keeps_compatibility(client, app):
+    _, owner_token = _user_token(app, "share_legacy_owner_qv2")
+    headers = {"Authorization": f"Bearer {owner_token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "child_age_years": 9, "child_sex_assigned_at_birth": "male"},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    shared = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/share",
+        json={"expires_in_hours": 24, "max_uses": 5},
+        headers=headers,
+    )
+    assert shared.status_code == 201
+    assert shared.json["share_code"]
+    assert "grant" not in shared.json
+
+
+def test_questionnaire_v2_pending_grant_blocks_pdf_and_professional_review(client, app):
+    _, owner_token = _user_token(app, "pending_block_owner_qv2")
+    psych_id, psych_token = _user_token(app, "pending_block_psych_qv2", user_type="psychologist")
+    owner_headers = {"Authorization": f"Bearer {owner_token}"}
+    psych_headers = {"Authorization": f"Bearer {psych_token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "Caso pending block", "child_age_years": 9},
+        headers=owner_headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=1", headers=owner_headers)
+    assert page.status_code == 200
+    question_id = page.json["pages"][0]["questions"][0]["question_id"]
+    saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={"answers": [{"question_id": question_id, "answer": 1}]},
+        headers=owner_headers,
+    )
+    assert saved.status_code == 200
+
+    submitted = client.post(
+        f"/api/v2/questionnaires/sessions/{session_id}/submit",
+        json={},
+        headers=owner_headers,
+    )
+    assert submitted.status_code == 200
+
+    shared = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/share",
+        json={"grantee_user_id": str(psych_id)},
+        headers=owner_headers,
+    )
+    assert shared.status_code == 201
+    assert shared.json["grant"]["request_status"] == "pending"
+
+    preview = client.get(f"/api/v2/questionnaires/history/{session_id}/report-preview", headers=psych_headers)
+    assert preview.status_code == 403
+
+    pdf_meta = client.get(f"/api/v2/questionnaires/history/{session_id}/pdf", headers=psych_headers)
+    assert pdf_meta.status_code == 403
+
+    review_try = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/professional-reviews",
+        json={
+            "review_status": "reviewed",
+            "initial_concept": "No debe permitir en pending",
+            "recommendation": "N/A",
+            "visible_to_guardian": True,
+        },
+        headers=psych_headers,
+    )
+    assert review_try.status_code == 403

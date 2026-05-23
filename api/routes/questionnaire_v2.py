@@ -13,11 +13,14 @@ from api.schemas.questionnaire_v2_schema import (
     CaseUpdateSchema,
     DashboardQuerySchema,
     GuardianDashboardQuerySchema,
+    NotificationsQuerySchema,
     ProfessionalReviewCreateSchema,
     ProfessionalReviewUpdateSchema,
     PsychologistDashboardQuerySchema,
     PsychologistSearchQuerySchema,
     ReportRequestSchema,
+    ShareRequestDecisionSchema,
+    ShareRequestListQuerySchema,
     SessionAnswersPatchSchema,
     SessionCreateSchema,
     SessionFilterSchema,
@@ -536,6 +539,108 @@ def psychologist_dashboard():
     return jsonify(payload), 200
 
 
+@questionnaire_v2_bp.get("/questionnaires/psychologist/share-requests")
+@jwt_required()
+def psychologist_share_requests():
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    if str(user.user_type or "").strip().lower() != "psychologist":
+        return _error(
+            "psychologist_share_requests_requires_psychologist",
+            "psychologist_share_requests_requires_psychologist",
+            403,
+        )
+    schema = ShareRequestListQuerySchema()
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("psychologist_share_requests_invalid_filter", "psychologist_share_requests_invalid_filter", 400, exc.messages)
+    try:
+        payload = service.list_psychologist_share_requests(
+            psychologist_user_id=user_id,
+            status=params["status"],
+            page=params["page"],
+            page_size=params["page_size"],
+            date_from=params.get("date_from"),
+            date_to=params.get("date_to"),
+            q=params.get("q"),
+        )
+    except ValueError:
+        return _error("psychologist_share_requests_invalid_filter", "psychologist_share_requests_invalid_filter", 400)
+    except Exception as exc:
+        return _handle_backend_failure(exc, "psychologist_share_requests_failed", "psychologist_share_requests_failed")
+    return jsonify(payload), 200
+
+
+@questionnaire_v2_bp.post("/questionnaires/psychologist/share-requests/<grant_id>/accept")
+@jwt_required()
+def accept_share_request(grant_id: str):
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    if str(user.user_type or "").strip().lower() != "psychologist":
+        return _error("share_request_requires_psychologist", "share_request_requires_psychologist", 403)
+    gid = _parse_uuid(grant_id)
+    if not gid:
+        return _error("invalid_grant_id", "invalid_grant_id", 400)
+    schema = ShareRequestDecisionSchema()
+    try:
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload or {})
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
+    except ValidationError as exc:
+        return _error("share_request_validation_error", "share_request_validation_error", 400, exc.messages)
+    try:
+        result = service.accept_share_request(gid, user_id, message=payload.get("message"))
+    except LookupError:
+        return _error("share_request_not_found", "share_request_not_found", 404)
+    except PermissionError as exc:
+        if str(exc) == "share_request_requires_psychologist":
+            return _error("share_request_requires_psychologist", "share_request_requires_psychologist", 403)
+        return _error("share_request_forbidden", "share_request_forbidden", 403)
+    except ValueError as exc:
+        return _error(str(exc), str(exc), 400)
+    except Exception as exc:
+        return _handle_backend_failure(exc, "share_request_accept_failed", "share_request_accept_failed")
+    return _sensitive_json_response(result, 200, transport_context)
+
+
+@questionnaire_v2_bp.post("/questionnaires/psychologist/share-requests/<grant_id>/reject")
+@jwt_required()
+def reject_share_request(grant_id: str):
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    if str(user.user_type or "").strip().lower() != "psychologist":
+        return _error("share_request_requires_psychologist", "share_request_requires_psychologist", 403)
+    gid = _parse_uuid(grant_id)
+    if not gid:
+        return _error("invalid_grant_id", "invalid_grant_id", 400)
+    schema = ShareRequestDecisionSchema()
+    try:
+        raw_payload, transport_context = _decode_sensitive_payload()
+        payload = schema.load(raw_payload or {})
+    except transport_crypto.TransportCryptoError as exc:
+        return _error(exc.message, exc.code, exc.status_code)
+    except ValidationError as exc:
+        return _error("share_request_validation_error", "share_request_validation_error", 400, exc.messages)
+    try:
+        result = service.reject_share_request(gid, user_id, message=payload.get("message"))
+    except LookupError:
+        return _error("share_request_not_found", "share_request_not_found", 404)
+    except PermissionError as exc:
+        if str(exc) == "share_request_requires_psychologist":
+            return _error("share_request_requires_psychologist", "share_request_requires_psychologist", 403)
+        return _error("share_request_forbidden", "share_request_forbidden", 403)
+    except ValueError as exc:
+        return _error(str(exc), str(exc), 400)
+    except Exception as exc:
+        return _handle_backend_failure(exc, "share_request_reject_failed", "share_request_reject_failed")
+    return _sensitive_json_response(result, 200, transport_context)
+
+
 @questionnaire_v2_bp.get("/psychologists/search")
 @jwt_required()
 def search_psychologists():
@@ -556,6 +661,50 @@ def search_psychologists():
         )
     except Exception as exc:
         return _handle_backend_failure(exc, "psychologist_search_failed", "psychologist_search_failed")
+    return jsonify(payload), 200
+
+
+@questionnaire_v2_bp.get("/notifications")
+@jwt_required()
+def list_notifications():
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    schema = NotificationsQuerySchema()
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("notifications_validation_error", "notifications_validation_error", 400, exc.messages)
+    try:
+        payload = service.list_notifications(
+            user_id=user_id,
+            unread_only=params.get("unread_only", False),
+            notification_type=params.get("type"),
+            page=params.get("page", 1),
+            page_size=params.get("page_size", 20),
+        )
+    except Exception as exc:
+        return _handle_backend_failure(exc, "notifications_list_failed", "notifications_list_failed")
+    return jsonify(payload), 200
+
+
+@questionnaire_v2_bp.patch("/notifications/<notification_id>/read")
+@jwt_required()
+def mark_notification_read(notification_id: str):
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    nid = _parse_uuid(notification_id)
+    if not nid:
+        return _error("invalid_notification_id", "invalid_notification_id", 400)
+    try:
+        payload = service.mark_notification_read(notification_id=nid, user_id=user_id)
+    except LookupError:
+        return _error("notification_not_found", "notification_not_found", 404)
+    except PermissionError:
+        return _error("notification_forbidden", "notification_forbidden", 403)
+    except Exception as exc:
+        return _handle_backend_failure(exc, "notification_update_failed", "notification_update_failed")
     return jsonify(payload), 200
 
 
@@ -820,7 +969,12 @@ def share(session_id: str):
             return _error("share_grantee_not_found", "share_grantee_not_found", 404)
         return _error("not_found", str(exc), 404)
     except ValueError as exc:
-        if str(exc) in {"share_target_not_psychologist", "share_grantee_inactive"}:
+        if str(exc) in {
+            "share_target_not_psychologist",
+            "share_grantee_inactive",
+            "share_request_already_pending",
+            "share_request_already_accepted",
+        }:
             return _error(str(exc), str(exc), 400)
         return _error("share_validation_error", "share_validation_error", 400, {"reason": str(exc)})
     except Exception as exc:
