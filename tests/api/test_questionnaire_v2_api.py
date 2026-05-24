@@ -1047,9 +1047,8 @@ def test_questionnaire_v2_psychologist_search_filters_active_psychologists(clien
                 user_type="psychologist",
                 is_active=True,
                 full_name="Psicologo Uno",
-                professional_city="Facatativa",
-                professional_department="Cundinamarca",
-                professional_location="Facatativa, Cundinamarca",
+                city="Facatativa",
+                department="Cundinamarca",
             )
             db.session.add(psych)
         guardian = AppUser(
@@ -1059,15 +1058,20 @@ def test_questionnaire_v2_psychologist_search_filters_active_psychologists(clien
             user_type="guardian",
             is_active=True,
             full_name="Guardian Uno",
+            city="Bogota",
+            department="Bogota D.C.",
         )
         db.session.add(guardian)
         db.session.commit()
 
-    resp = client.get("/api/v2/psychologists/search?q=psicologo&location=Cundinamarca", headers=headers)
+    resp = client.get("/api/v2/psychologists/search?q=psicologo&department=Cundinamarca&city=Facatativa", headers=headers)
     assert resp.status_code == 200
     usernames = {item["username"] for item in resp.json["items"]}
     assert "search_psych_qv2" in usernames
     assert "search_guardian_qv2" not in usernames
+    assert resp.json["items"][0]["department"] == "Cundinamarca"
+    assert resp.json["items"][0]["city"] == "Facatativa"
+    assert "professional_location" not in resp.json["items"][0]
 
 
 def test_questionnaire_v2_share_with_psychologist_hides_private_label_for_grantee(client, app):
@@ -1098,6 +1102,9 @@ def test_questionnaire_v2_share_with_psychologist_hides_private_label_for_grante
     assert shared.status_code == 201
     assert shared.json["case"]["case_public_id"].startswith("CASO-")
     assert shared.json["grantee"]["username"] == "case_share_psych_qv2"
+    assert "department" in shared.json["grantee"]
+    assert "city" in shared.json["grantee"]
+    assert "professional_location" not in shared.json["grantee"]
     grant_id = shared.json["grant"]["grant_id"]
     assert shared.json["grant"]["request_status"] == "pending"
 
@@ -1116,6 +1123,72 @@ def test_questionnaire_v2_share_with_psychologist_hides_private_label_for_grante
     case_payload = psych_session.json.get("case") or {}
     assert case_payload.get("case_public_id", "").startswith("CASO-")
     assert "private_label" not in case_payload
+
+
+def test_questionnaire_v2_locations_catalog(client):
+    resp = client.get("/api/v2/locations/colombia")
+    assert resp.status_code == 200
+    assert resp.json["country"] == "Colombia"
+    assert any(item["department"] == "Cundinamarca" for item in resp.json["departments"])
+
+    cities = client.get("/api/v2/locations/colombia/cities?department=Cundinamarca")
+    assert cities.status_code == 200
+    assert "Facatativa" in cities.json["cities"]
+
+    missing = client.get("/api/v2/locations/colombia/cities?department=Invalido")
+    assert missing.status_code == 404
+    assert missing.json.get("error") == "location_department_not_found"
+
+
+def test_questionnaire_v2_psychologist_search_same_location_recommendation(client, app):
+    _, requester_token = _user_token(app, "search_same_location_requester_qv2")
+    headers = {"Authorization": f"Bearer {requester_token}"}
+
+    with app.app_context():
+        requester = AppUser.query.filter_by(username="search_same_location_requester_qv2").first()
+        requester.department = "Cundinamarca"
+        requester.city = "Facatativa"
+        db.session.add(requester)
+
+        psych_same = AppUser(
+            username="search_same_loc_psych_qv2",
+            email="search_same_loc_psych_qv2@example.com",
+            password="hashed",
+            user_type="psychologist",
+            is_active=True,
+            full_name="Psicologo Mismo Lugar",
+            city="Facatativa",
+            department="Cundinamarca",
+        )
+        psych_other = AppUser(
+            username="search_other_loc_psych_qv2",
+            email="search_other_loc_psych_qv2@example.com",
+            password="hashed",
+            user_type="psychologist",
+            is_active=True,
+            full_name="Psicologo Otra Ciudad",
+            city="Bogota",
+            department="Bogota D.C.",
+        )
+        db.session.add(psych_same)
+        db.session.add(psych_other)
+        db.session.commit()
+
+    resp = client.get("/api/v2/psychologists/search?same_location=true&page=1&page_size=20", headers=headers)
+    assert resp.status_code == 200
+    assert resp.json["recommendation"]["basis"] == "same_location"
+    assert resp.json["recommendation"]["department"] == "Cundinamarca"
+    assert resp.json["recommendation"]["city"] == "Facatativa"
+    assert resp.json["items"][0]["same_city"] is True
+    assert resp.json["items"][0]["username"] == "search_same_loc_psych_qv2"
+
+
+def test_questionnaire_v2_psychologist_search_same_location_without_user_location_warns(client, app):
+    _, requester_token = _user_token(app, "search_missing_location_requester_qv2")
+    headers = {"Authorization": f"Bearer {requester_token}"}
+    resp = client.get("/api/v2/psychologists/search?same_location=true&page=1&page_size=10", headers=headers)
+    assert resp.status_code == 200
+    assert "user_location_missing" in resp.json.get("warnings", [])
 
 
 def test_questionnaire_v2_professional_review_visibility_rules(client, app):
