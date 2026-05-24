@@ -26,6 +26,13 @@ from api.cache import (
 )
 from api.security import check_password, hash_password
 from api.services import crypto_service
+from api.services.colombia_locations import (
+    canonical_city,
+    canonical_department,
+    infer_department_city_from_text,
+    normalized_location_match_tokens,
+    resolve_department_city,
+)
 from api.services import questionnaire_v2_loader_service as loader
 from app.models import (
     AppUser,
@@ -2695,7 +2702,60 @@ def psychologist_dashboard(
     }
 
 
-def search_psychologists(q: str | None = None, location: str | None = None, page: int = 1, page_size: int = 20) -> dict[str, Any]:
+def _resolved_user_department_city(user: AppUser | None) -> tuple[str | None, str | None]:
+    if user is None:
+        return None, None
+    try:
+        return resolve_department_city(
+            department=user.department,
+            city=user.city,
+            legacy_department=user.professional_department,
+            legacy_city=user.professional_city,
+            legacy_location=user.location or user.professional_location,
+        )
+    except Exception:
+        return canonical_department(user.department), canonical_city(user.department, user.city)
+
+
+def search_psychologists(
+    q: str | None = None,
+    location: str | None = None,
+    *,
+    requester_user: AppUser | None = None,
+    department: str | None = None,
+    city: str | None = None,
+    same_location: bool = False,
+    page: int = 1,
+    page_size: int = 20,
+) -> dict[str, Any]:
+    warnings: list[str] = []
+    recommended_department: str | None = None
+    recommended_city: str | None = None
+    recommendation_basis = "query"
+
+    query_department = department.strip() if isinstance(department, str) and department.strip() else None
+    query_city = city.strip() if isinstance(city, str) and city.strip() else None
+
+    if location and (not query_department and not query_city):
+        inferred_dep, inferred_city = infer_department_city_from_text(location)
+        query_department = inferred_dep or query_department
+        query_city = inferred_city or query_city
+        if inferred_dep or inferred_city:
+            recommendation_basis = "legacy_location"
+
+    if same_location and (not query_department and not query_city):
+        requester_department, requester_city = _resolved_user_department_city(requester_user)
+        if not requester_department and not requester_city:
+            warnings.append("user_location_missing")
+            recommendation_basis = "none"
+        else:
+            query_department = requester_department
+            query_city = requester_city
+            recommendation_basis = "same_location"
+
+    recommended_department = query_department
+    recommended_city = query_city
+
     query = AppUser.query.filter(
         AppUser.user_type == "psychologist",
         AppUser.is_active.is_(True),
@@ -2709,43 +2769,68 @@ def search_psychologists(q: str | None = None, location: str | None = None, page
                 AppUser.full_name.ilike(text),
             )
         )
-    if location:
-        ltext = f"%{location.strip()}%"
-        query = query.filter(
-            or_(
-                AppUser.professional_location.ilike(ltext),
-                AppUser.professional_city.ilike(ltext),
-                AppUser.professional_department.ilike(ltext),
+
+    scored_items: list[tuple[int, dict[str, Any]]] = []
+    requester_department, requester_city = _resolved_user_department_city(requester_user)
+    requester_dep_token, requester_city_token = normalized_location_match_tokens(
+        requester_department, requester_city
+    )
+    target_dep_token, target_city_token = normalized_location_match_tokens(
+        query_department,
+        query_city,
+    )
+
+    for row in query.order_by(AppUser.full_name.asc().nullslast(), AppUser.username.asc()).all():
+        row_department, row_city = _resolved_user_department_city(row)
+        row_dep_token, row_city_token = normalized_location_match_tokens(row_department, row_city)
+
+        if target_dep_token and row_dep_token != target_dep_token:
+            continue
+        if target_city_token and row_city_token != target_city_token:
+            continue
+
+        same_dep = bool(requester_dep_token and row_dep_token == requester_dep_token)
+        same_cty = bool(requester_city_token and row_city_token == requester_city_token and same_dep)
+        score = 0
+        if same_cty:
+            score = 2
+        elif same_dep:
+            score = 1
+        scored_items.append(
+            (
+                -score,
+                {
+                    "user_id": str(row.id),
+                    "username": row.username,
+                    "full_name": row.full_name,
+                    "email": row.email,
+                    "department": row_department,
+                    "city": row_city,
+                    "same_department": same_dep,
+                    "same_city": same_cty,
+                    "colpsic_verified": bool(row.colpsic_verified),
+                },
             )
         )
-    total = query.count()
-    rows = (
-        query.order_by(AppUser.full_name.asc().nullslast(), AppUser.username.asc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-        .all()
-    )
-    items = [
-        {
-            "user_id": str(row.id),
-            "username": row.username,
-            "full_name": row.full_name,
-            "email": row.email,
-            "professional_location": row.professional_location
-            or ", ".join([part for part in [row.professional_city, row.professional_department] if part])
-            or None,
-            "colpsic_verified": bool(row.colpsic_verified),
-        }
-        for row in rows
-    ]
+
+    scored_items.sort(key=lambda item: (item[0], (item[1].get("full_name") or ""), item[1].get("username") or ""))
+    total = len(scored_items)
+    page_items = [item for _, item in scored_items[(page - 1) * page_size : page * page_size]]
+
     return {
-        "items": items,
+        "items": page_items,
         "pagination": {
             "page": page,
             "page_size": page_size,
             "total": total,
             "pages": max(1, (total + page_size - 1) // page_size),
         },
+        "recommendation": {
+            "basis": recommendation_basis,
+            "department": recommended_department,
+            "city": recommended_city,
+        },
+        "warnings": warnings,
     }
 
 
@@ -3129,16 +3214,14 @@ def create_share(session: QuestionnaireSession, user_id: uuid.UUID, payload: dic
         if case:
             result["case"] = {"case_public_id": case.case_public_id}
     if grantee_user:
+        grantee_department, grantee_city = _resolved_user_department_city(grantee_user)
         result["grantee"] = {
             "user_id": str(grantee_user.id),
             "username": grantee_user.username,
             "full_name": grantee_user.full_name,
             "email": grantee_user.email,
-            "professional_location": grantee_user.professional_location
-            or ", ".join(
-                [part for part in [grantee_user.professional_city, grantee_user.professional_department] if part]
-            )
-            or None,
+            "department": grantee_department,
+            "city": grantee_city,
         }
     if grant:
         result["grant"] = {
