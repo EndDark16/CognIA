@@ -128,9 +128,16 @@ class PsychologistDashboardQuerySchema(BaseSchema):
 
 class PsychologistSearchQuerySchema(BaseSchema):
     q = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    department = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    city = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    same_location = fields.Boolean(load_default=False)
     location = fields.String(required=False, validate=validate.Length(min=1, max=160))
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
     page_size = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
+
+
+class ColombiaCitiesQuerySchema(BaseSchema):
+    department = fields.String(required=True, validate=validate.Length(min=1, max=160))
 
 
 class CaseCreateSchema(BaseSchema):

@@ -5201,22 +5201,23 @@ paths:
     patch:
       tags:
       - Auth
-      summary: Actualizar ubicacion y perfil del usuario autenticado
+      summary: Actualizar perfil del usuario autenticado
       description: |-
         **Objetivo funcional**
-        Actualizar campos de ubicacion general y profesional del usuario autenticado.
+        Actualizar datos editables del perfil del usuario autenticado, incluyendo ubicacion estandarizada.
 
         **Cuando debe usarse**
-        Cuando el usuario necesite editar su ciudad/departamento/ubicacion para filtros y busqueda.
+        Cuando el usuario necesite actualizar su perfil (por ejemplo `full_name`, `username`, `email`) y su ubicacion (`department`, `city`).
 
         **Actor que lo consume**
-        Usuario autenticado (guardian o psicologo).
+        Usuario autenticado.
 
         **Seguridad aplicable**
         Requiere `bearerAuth`.
 
         **Entrada esperada**
-        Metodo `PATCH /api/auth/me/profile` con JSON opcional: `city`, `department`, `location`, `professional_city`, `professional_department`, `professional_location`.
+        Metodo `PATCH /api/auth/me/profile` con JSON opcional: `username`, `email`, `full_name`, `department`, `city`.
+        Los campos `location`, `professional_city`, `professional_department`, `professional_location` se aceptan solo como fallback legacy interno y no forman parte del contrato publico.
 
         **Resultado exitoso**
         Retorna `200` con `user` actualizado.
@@ -21568,6 +21569,82 @@ paths:
         '500':
           description: Error interno al construir dashboard del psicologo.
       x-contract-status: KEEP_ACTIVE
+  /api/v2/locations/colombia:
+    get:
+      tags:
+      - QuestionnaireV2
+      summary: Catalogo canonico de departamentos y ciudades de Colombia
+      description: |-
+        **Objetivo funcional**
+        Entregar el catalogo de ubicaciones canonicas para formularios de registro/perfil.
+
+        **Cuando debe usarse**
+        Antes de renderizar selectores de departamento y ciudad.
+
+        **Actor que lo consume**
+        Frontend autenticado o publico segun politica de despliegue.
+
+        **Seguridad aplicable**
+        Endpoint de solo lectura sin datos sensibles.
+
+        **Entrada esperada**
+        Metodo `GET /api/v2/locations/colombia` sin parametros.
+
+        **Resultado exitoso**
+        Retorna `200` con `country` y `departments[]`.
+
+        **Errores posibles y causa funcional**
+        `500 locations_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`.
+      operationId: getV2LocationsColombia
+      responses:
+        '200':
+          description: Catalogo de ubicaciones retornado correctamente.
+        '500':
+          description: Error interno.
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/locations/colombia/cities:
+    get:
+      tags:
+      - QuestionnaireV2
+      summary: Listar ciudades canonicas por departamento
+      description: |-
+        **Objetivo funcional**
+        Entregar ciudades canonicas de un departamento de Colombia.
+
+        **Cuando debe usarse**
+        Cuando el frontend ya selecciono departamento y requiere poblar ciudades.
+
+        **Actor que lo consume**
+        Frontend autenticado o publico segun politica de despliegue.
+
+        **Seguridad aplicable**
+        Endpoint de solo lectura sin datos sensibles.
+
+        **Entrada esperada**
+        Metodo `GET /api/v2/locations/colombia/cities` con query `department`.
+
+        **Resultado exitoso**
+        Retorna `200` con `department` y `cities`.
+
+        **Errores posibles y causa funcional**
+        `400 location_invalid_query`, `404 location_department_not_found`, `500 locations_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`.
+      operationId: getV2LocationsColombiaCities
+      responses:
+        '200':
+          description: Ciudades retornadas correctamente.
+        '400':
+          description: Query invalida.
+        '404':
+          description: Departamento no encontrado.
+        '500':
+          description: Error interno.
+      x-contract-status: KEEP_ACTIVE
   /api/v2/psychologists/search:
     get:
       tags:
@@ -21575,7 +21652,7 @@ paths:
       summary: Buscar psicologos activos registrados
       description: |-
         **Objetivo funcional**
-        Buscar psicologos activos por nombre, usuario, correo y ubicacion profesional.
+        Buscar psicologos activos por nombre/usuario/correo y recomendar coincidencias por ubicacion estandarizada (`department`, `city`).
 
         **Cuando debe usarse**
         Al seleccionar destinatario psicologo para compartir sesiones o casos.
@@ -21587,10 +21664,11 @@ paths:
         Requiere `bearerAuth`; solo retorna cuentas activas con `user_type=psychologist`.
 
         **Entrada esperada**
-        Metodo `GET /api/v2/psychologists/search` con `q`, `location`, `page`, `page_size`.
+        Metodo `GET /api/v2/psychologists/search` con `q`, `department`, `city`, `same_location`, `page`, `page_size`.
+        `location` permanece como parametro legacy opcional para compatibilidad.
 
         **Resultado exitoso**
-        Responde `200` con lista paginada de psicologos y ubicacion profesional.
+        Responde `200` con lista paginada de psicologos, `department`, `city`, banderas `same_department`/`same_city`, `recommendation` y `warnings`.
 
         **Errores posibles y causa funcional**
         `400 psychologist_search_invalid_query`, `403 psychologist_search_forbidden`, `500 psychologist_search_failed`.
