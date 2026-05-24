@@ -92,6 +92,7 @@ def test_register_and_login(client):
 
     assert resp_reg.status_code == 201
     assert "user_id" in resp_reg.json
+    assert "password" not in resp_reg.json
 
     resp_login = client.post(
         "/api/auth/login",
@@ -102,6 +103,7 @@ def test_register_and_login(client):
     data = resp_login.json
     assert "access_token" in data
     assert "expires_in" in data
+    assert "password" not in data
 
     set_cookie_headers = resp_login.headers.getlist("Set-Cookie")
     assert any("refresh_token=" in c for c in set_cookie_headers)
@@ -896,6 +898,12 @@ def test_auth_me_returns_profile(client):
     assert resp_me.status_code == 200
     assert resp_me.json["username"] == username
     assert resp_me.json["email"] == email
+    assert "password" not in resp_me.json
+    assert "password_hash" not in resp_me.json
+    assert "professional_location" not in resp_me.json
+    assert "professional_city" not in resp_me.json
+    assert "professional_department" not in resp_me.json
+    assert "location" not in resp_me.json
 
 
 def test_auth_profile_update_location_fields(client):
@@ -918,21 +926,23 @@ def test_auth_profile_update_location_fields(client):
         json={
             "city": "Facatativa",
             "department": "Cundinamarca",
-            "location": "Facatativa, Cundinamarca",
-            "professional_city": "Bogota",
-            "professional_department": "Cundinamarca",
-            "professional_location": "Bogota, Cundinamarca",
+            "full_name": "Usuario Perfil Editado",
         },
     )
     assert update_resp.status_code == 200
     assert update_resp.json["user"]["city"] == "Facatativa"
-    assert update_resp.json["user"]["location"] == "Facatativa, Cundinamarca"
-    assert update_resp.json["user"]["professional_location"] == "Bogota, Cundinamarca"
+    assert update_resp.json["user"]["department"] == "Cundinamarca"
+    assert update_resp.json["user"]["full_name"] == "Usuario Perfil Editado"
+    assert "location" not in update_resp.json["user"]
+    assert "professional_location" not in update_resp.json["user"]
 
     me_resp = client.get("/api/auth/me", headers={"Authorization": f"Bearer {access_token}"})
     assert me_resp.status_code == 200
     assert me_resp.json["city"] == "Facatativa"
     assert me_resp.json["department"] == "Cundinamarca"
+    assert me_resp.json["full_name"] == "Usuario Perfil Editado"
+    assert "location" not in me_resp.json
+    assert "professional_location" not in me_resp.json
 
     invalid_resp = client.patch(
         "/api/auth/me/profile",
@@ -1000,11 +1010,61 @@ def test_auth_profile_update_location_fields_psychologist(client):
         "/api/auth/me/profile",
         headers={"Authorization": f"Bearer {access_token}"},
         json={
-            "professional_city": "Madrid",
-            "professional_department": "Cundinamarca",
-            "professional_location": "Madrid, Cundinamarca",
+            "city": "Madrid",
+            "department": "Cundinamarca",
         },
     )
     assert update_resp.status_code == 200
-    assert update_resp.json["user"]["professional_city"] == "Madrid"
-    assert update_resp.json["user"]["professional_location"] == "Madrid, Cundinamarca"
+    assert update_resp.json["user"]["city"] == "Madrid"
+    assert update_resp.json["user"]["department"] == "Cundinamarca"
+    assert "professional_location" not in update_resp.json["user"]
+
+
+def test_auth_register_accepts_department_city(client):
+    username = f"profile_dept_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+
+    resp_reg = client.post(
+        "/api/auth/register",
+        json={
+            "username": username,
+            "email": email,
+            "password": password,
+            "full_name": "User Department City",
+            "user_type": "guardian",
+            "department": "Cundinamarca",
+            "city": "Facatativa",
+        },
+    )
+    assert resp_reg.status_code == 201
+    assert "password" not in resp_reg.json
+
+    resp_login = client.post("/api/auth/login", json={"username": username, "password": password})
+    assert resp_login.status_code == 200
+    assert "password" not in resp_login.json
+    token = resp_login.json["access_token"]
+    me_resp = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me_resp.status_code == 200
+    assert me_resp.json["department"] == "Cundinamarca"
+    assert me_resp.json["city"] == "Facatativa"
+
+
+def test_auth_profile_update_rejects_city_not_in_department(client):
+    username = f"profile_bad_city_{uuid.uuid4().hex[:8]}"
+    email = f"{username}@example.com"
+    password = "StrongPassword123!"
+    reg = client.post(
+        "/api/auth/register",
+        json={"username": username, "email": email, "password": password, "full_name": "Bad City", "user_type": "guardian"},
+    )
+    assert reg.status_code == 201
+    login = client.post("/api/auth/login", json={"username": username, "password": password})
+    token = login.json["access_token"]
+    resp = client.patch(
+        "/api/auth/me/profile",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"department": "Bogota D.C.", "city": "Facatativa"},
+    )
+    assert resp.status_code == 400
+    assert resp.json.get("error") == "profile_update_validation_error"
