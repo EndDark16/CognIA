@@ -94,8 +94,14 @@ Tipos actuales:
 ## Perfil y ubicacion
 - `PATCH /api/auth/me/profile`
 - Campos soportados (opcionales, null para limpiar):
-  - `city`, `department`, `location`
-  - `professional_city`, `professional_department`, `professional_location`
+  - `username`, `email`, `full_name`
+  - `city`, `department`
+- Campos legacy aceptados solo como fallback interno (no contrato publico): `location`, `professional_city`, `professional_department`, `professional_location`.
+- `GET /api/auth/me` retorna ubicacion publica unificada (`department`, `city`) para todos los roles.
+
+## Catalogo Colombia
+- `GET /api/v2/locations/colombia`
+- `GET /api/v2/locations/colombia/cities?department=Cundinamarca`
 
 ## Compatibilidad y migracion v1 -> v2/admin
 - El flujo recomendado para integraciones nuevas es v2 (`/api/v2/questionnaires/*`).
@@ -219,8 +225,9 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 
 #### GET `/psychologists/search`
 - Permiso: JWT requerido.
-- Query: `q` (username/email/full_name), `location`, `page`, `page_size`.
-- Response `200`: usuarios activos `user_type=psychologist` con `professional_location` y `colpsic_verified`.
+- Query oficial: `q`, `department`, `city`, `same_location`, `page`, `page_size`.
+- Query legacy aceptada como fallback: `location`.
+- Response `200`: usuarios activos `user_type=psychologist` con `department`, `city`, `same_department`, `same_city`, `colpsic_verified`, `recommendation` y `warnings`.
 - Errores: `psychologist_search_forbidden` (403), `psychologist_search_invalid_query` (400), `psychologist_search_failed` (500).
 
 ### 6) Compartir sesión con psicólogo registrado
@@ -238,6 +245,7 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 }
 ```
 - Response `201`: mantiene `share_code` y agrega `case.case_public_id`, `grantee` y `grant`.
+- `grantee` expone `department` y `city` (no expone `professional_location` en contrato publico).
 - Errores: `share_session_not_found` (404), `share_owner_required` (403), `share_grantee_not_found` (404), `share_target_not_psychologist` (400), `share_grantee_inactive` (400), `share_validation_error` (400), `share_failed` (500).
 
 ### 7) Concepto inicial no diagnóstico
@@ -288,6 +296,7 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 - Guardado por página: `PATCH /api/v2/questionnaires/sessions/{id}/answers` o `/answers/bulk`.
 - Dashboard guardian: `GET /api/v2/questionnaires/guardian/dashboard`.
 - Buscar psicólogos: `GET /api/v2/psychologists/search?q=...`.
+- Recomendación por ubicación: `GET /api/v2/psychologists/search?same_location=true`.
 - Compartir a psicólogo: `POST /api/v2/questionnaires/history/{id}/share`.
 - Dashboard psicólogo: `GET /api/v2/questionnaires/psychologist/dashboard`.
 - Registrar concepto no diagnóstico: `POST /api/v2/questionnaires/history/{id}/professional-reviews`.

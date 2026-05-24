@@ -34,6 +34,7 @@ from api.services.password_reset_service import (
     lookup_valid_token,
     mark_token_used,
 )
+from api.services.colombia_locations import canonical_city, resolve_department_city
 from api.schemas.password_schema import (
     PasswordChangeSchema,
     PasswordForgotSchema,
@@ -105,10 +106,6 @@ def _build_me_payload(user: AppUser) -> dict:
         "professional_card_number": user.professional_card_number,
         "city": getattr(user, "city", None),
         "department": getattr(user, "department", None),
-        "location": getattr(user, "location", None),
-        "professional_city": getattr(user, "professional_city", None),
-        "professional_department": getattr(user, "professional_department", None),
-        "professional_location": getattr(user, "professional_location", None),
         "colpsic_verified": user.colpsic_verified,
         "is_active": user.is_active,
         "roles": _get_roles(user),
@@ -177,6 +174,7 @@ _FULL_NAME_MAX = 120
 _EMAIL_MAX = 254
 _PASSWORD_MIN = 8
 _LOCATION_FIELD_MAX = 160
+_PROFILE_KEYS = {"username", "email", "full_name", "department", "city"}
 
 
 def _normalize_user_type(raw: str | None) -> str | None:
@@ -305,10 +303,10 @@ def register():
     full_name = (data.get("full_name") or "").strip() or None
     city = (data.get("city") or "").strip() or None
     department = (data.get("department") or "").strip() or None
-    location = (data.get("location") or "").strip() or None
-    professional_city = (data.get("professional_city") or "").strip() or None
-    professional_department = (data.get("professional_department") or "").strip() or None
-    professional_location = (data.get("professional_location") or "").strip() or None
+    legacy_location = (data.get("location") or "").strip() or None
+    legacy_city = (data.get("professional_city") or "").strip() or None
+    legacy_department = (data.get("professional_department") or "").strip() or None
+    legacy_professional_location = (data.get("professional_location") or "").strip() or None
     user_type = _normalize_user_type(data.get("user_type"))
     professional_card_number = _normalize_professional_card(
         data.get("professional_card_number") or data.get("colpsic_card_number")
@@ -339,6 +337,17 @@ def register():
 
     if full_name and len(full_name) > _FULL_NAME_MAX:
         return _error_response("Full name too long", "invalid_full_name", 400)
+
+    try:
+        resolved_department, resolved_city = resolve_department_city(
+            department=department,
+            city=city,
+            legacy_department=legacy_department,
+            legacy_city=legacy_city,
+            legacy_location=legacy_location or legacy_professional_location,
+        )
+    except ValueError:
+        return _error_response("Invalid location", "profile_update_validation_error", 400)
 
     if not user_type:
         return _error_response("Missing or invalid user_type", "invalid_user_type", 400)
@@ -383,12 +392,8 @@ def register():
         full_name=full_name,
         user_type=user_type,
         professional_card_number=professional_card_number,
-        city=city,
-        department=department,
-        location=location,
-        professional_city=professional_city,
-        professional_department=professional_department,
-        professional_location=professional_location,
+        city=resolved_city,
+        department=resolved_department,
     )
 
     try:
@@ -846,29 +851,99 @@ def update_me_profile():
         return _error_response("User not found", "user_not_found", 404)
 
     data = request.get_json(silent=True) or {}
+    if not isinstance(data, dict):
+        return _error_response("Validation error", "profile_update_validation_error", 400)
+
     try:
-        user.city = _clean_optional_text(data.get("city"), max_len=_LOCATION_FIELD_MAX, field_name="city")
-        user.department = _clean_optional_text(
-            data.get("department"),
-            max_len=_LOCATION_FIELD_MAX,
-            field_name="department",
-        )
-        user.location = _clean_optional_text(data.get("location"), max_len=255, field_name="location")
-        user.professional_city = _clean_optional_text(
-            data.get("professional_city"),
-            max_len=_LOCATION_FIELD_MAX,
-            field_name="professional_city",
-        )
-        user.professional_department = _clean_optional_text(
-            data.get("professional_department"),
-            max_len=_LOCATION_FIELD_MAX,
-            field_name="professional_department",
-        )
-        user.professional_location = _clean_optional_text(
-            data.get("professional_location"),
-            max_len=255,
-            field_name="professional_location",
-        )
+        if "full_name" in data:
+            user.full_name = _clean_optional_text(
+                data.get("full_name"),
+                max_len=_FULL_NAME_MAX,
+                field_name="full_name",
+            )
+
+        if "username" in data:
+            username = _normalize_username(data.get("username"))
+            if not username or not _is_valid_username(username):
+                raise ValueError("invalid_username")
+            conflict = AppUser.query.filter(AppUser.username == username, AppUser.id != user.id).first()
+            if conflict:
+                raise ValueError("user_exists")
+            user.username = username
+
+        if "email" in data:
+            email = _normalize_email(data.get("email"))
+            if not email or not _is_valid_email(email):
+                raise ValueError("invalid_email")
+            conflict = AppUser.query.filter(AppUser.email == email, AppUser.id != user.id).first()
+            if conflict:
+                raise ValueError("user_exists")
+            user.email = email
+
+        location_payload_keys = {
+            "department",
+            "city",
+            "location",
+            "professional_city",
+            "professional_department",
+            "professional_location",
+        }
+        if any(key in data for key in location_payload_keys):
+            department = (
+                _clean_optional_text(data.get("department"), max_len=_LOCATION_FIELD_MAX, field_name="department")
+                if "department" in data
+                else None
+            )
+            city = (
+                _clean_optional_text(data.get("city"), max_len=_LOCATION_FIELD_MAX, field_name="city")
+                if "city" in data
+                else None
+            )
+            legacy_department = _clean_optional_text(
+                data.get("professional_department"),
+                max_len=_LOCATION_FIELD_MAX,
+                field_name="professional_department",
+            )
+            legacy_city = _clean_optional_text(
+                data.get("professional_city"),
+                max_len=_LOCATION_FIELD_MAX,
+                field_name="professional_city",
+            )
+            legacy_location = _clean_optional_text(data.get("location"), max_len=255, field_name="location")
+            legacy_professional_location = _clean_optional_text(
+                data.get("professional_location"),
+                max_len=255,
+                field_name="professional_location",
+            )
+
+            department_for_validation = department
+            if city and not department_for_validation:
+                department_for_validation = user.department
+
+            resolved_department, resolved_city = resolve_department_city(
+                department=department_for_validation,
+                city=city,
+                legacy_department=legacy_department,
+                legacy_city=legacy_city,
+                legacy_location=legacy_location or legacy_professional_location,
+            )
+
+            if "department" in data:
+                user.department = resolved_department
+                if resolved_department is None:
+                    user.city = None
+                elif user.city and canonical_city(resolved_department, user.city) is None and "city" not in data:
+                    user.city = None
+
+            if "city" in data:
+                user.city = resolved_city
+                if resolved_city and not user.department:
+                    user.department = resolved_department
+
+            if ("department" not in data) and ("city" not in data):
+                if resolved_department is not None or resolved_city is not None:
+                    user.department = resolved_department
+                    user.city = resolved_city
     except ValueError:
         return _error_response("Validation error", "profile_update_validation_error", 400)
 

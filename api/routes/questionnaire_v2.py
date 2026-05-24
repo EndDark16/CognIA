@@ -8,6 +8,7 @@ from sqlalchemy.exc import DBAPIError, OperationalError, SQLAlchemyError
 from api.decorators import roles_required
 from api.extensions import limiter
 from api.schemas.questionnaire_v2_schema import (
+    ColombiaCitiesQuerySchema,
     CaseCreateSchema,
     CaseListQuerySchema,
     CaseUpdateSchema,
@@ -30,6 +31,7 @@ from api.schemas.questionnaire_v2_schema import (
     SharedAccessSchema,
     TagAssignSchema,
 )
+from api.services import colombia_locations
 from api.services import questionnaire_v2_loader_service as loader_service
 from api.services import questionnaire_v2_service as service
 from api.services import transport_crypto_service as transport_crypto
@@ -655,6 +657,10 @@ def search_psychologists():
     try:
         payload = service.search_psychologists(
             q=params.get("q"),
+            requester_user=user,
+            department=params.get("department"),
+            city=params.get("city"),
+            same_location=params.get("same_location", False),
             location=params.get("location"),
             page=params["page"],
             page_size=params["page_size"],
@@ -662,6 +668,24 @@ def search_psychologists():
     except Exception as exc:
         return _handle_backend_failure(exc, "psychologist_search_failed", "psychologist_search_failed")
     return jsonify(payload), 200
+
+
+@questionnaire_v2_bp.get("/locations/colombia")
+def list_colombia_locations():
+    return jsonify(colombia_locations.catalog_payload()), 200
+
+
+@questionnaire_v2_bp.get("/locations/colombia/cities")
+def list_colombia_cities():
+    schema = ColombiaCitiesQuerySchema()
+    try:
+        params = schema.load(request.args)
+    except ValidationError as exc:
+        return _error("location_invalid_query", "location_invalid_query", 400, exc.messages)
+    cities = colombia_locations.cities_for_department(params.get("department"))
+    if cities is None:
+        return _error("location_department_not_found", "location_department_not_found", 404)
+    return jsonify({"department": colombia_locations.canonical_department(params["department"]), "cities": cities}), 200
 
 
 @questionnaire_v2_bp.get("/notifications")
