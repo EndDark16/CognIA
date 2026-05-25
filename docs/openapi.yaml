@@ -735,7 +735,7 @@ paths:
 
         - Parametros de ruta: no aplica.
 
-        - Query params: no aplica.
+        - Query params: `status`, `case_id`, `case_public_id`, `case_label`, `tag`, `q`, `date_from`, `date_to`, `domain`, `alert_level`, `needs_professional_review`, `page`, `page_size`.
 
         - Headers adicionales: no aplica.
 
@@ -21377,7 +21377,7 @@ paths:
         Requiere `bearerAuth`; solo retorna casos del owner autenticado.
 
         **Entrada esperada**
-        Metodo `GET /api/v2/questionnaires/cases` con filtros opcionales `status`, `page`, `page_size`.
+        Metodo `GET /api/v2/questionnaires/cases` con filtros opcionales `status`, `q`, `label`, `case_public_id`, `has_sessions`, `latest_alert_level`, `date_from`, `date_to`, `page`, `page_size`.
 
         **Resultado exitoso**
         Responde `200` con `items` paginados y metadata de cada caso.
@@ -21502,10 +21502,10 @@ paths:
         Requiere `bearerAuth`; solo considera sesiones y casos del owner autenticado.
 
         **Entrada esperada**
-        Metodo `GET /api/v2/questionnaires/guardian/dashboard` con `months` o rango `date_from`/`date_to`, y filtros opcionales por caso.
+        Metodo `GET /api/v2/questionnaires/guardian/dashboard` con `months` o rango `date_from`/`date_to`, y filtros opcionales `case_id`, `case_public_id`, `case_label`, `q`, `domain`, `alert_level`.
 
         **Resultado exitoso**
-        Responde `200` con `summary`, `cases` y `period`.
+        Responde `200` con `summary`, `charts`, `cases`, `period` y `filters`.
 
         **Errores posibles y causa funcional**
         `400 guardian_dashboard_invalid_period`, `403 guardian_dashboard_forbidden`, `404 guardian_dashboard_case_not_found`, `500 guardian_dashboard_failed`.
@@ -21549,7 +21549,10 @@ paths:
         Metodo `GET /api/v2/questionnaires/psychologist/dashboard` con filtros opcionales (`q`, `case_public_id`, periodo, dominio, alerta, review_status, paginacion).
 
         **Resultado exitoso**
-        Responde `200` con `summary`, `aggregates`, `items` y `pagination`.
+        Responde `200` con `summary`, `aggregates`, `charts`, `items`, `pagination` y `warnings`.
+
+        **Regla de agregacion**
+        Los filtros de `domain` y `alert_level` se aplican antes de paginacion; `summary` y `aggregates` se calculan sobre el conjunto completo filtrado.
 
         **Errores posibles y causa funcional**
         `400 psychologist_dashboard_invalid_period|psychologist_dashboard_invalid_filter`, `403 psychologist_dashboard_requires_psychologist`, `500 psychologist_dashboard_failed`.
