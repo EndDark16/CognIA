@@ -203,6 +203,8 @@ def create_session():
         return _error("forbidden", str(exc), 403)
     except ValueError as exc:
         db.session.rollback()
+        if str(exc) == "session_case_validation_error":
+            return _error("session_case_validation_error", "session_case_validation_error", 400)
         return _error("validation_error", str(exc), 400)
     except Exception as exc:
         return _handle_backend_failure(exc, "session_create_failed")
@@ -256,6 +258,13 @@ def list_cases():
         payload = service.list_cases(
             owner_user_id=user_id,
             status=params.get("status"),
+            q=params.get("q"),
+            label=params.get("label"),
+            case_public_id=params.get("case_public_id"),
+            has_sessions=params.get("has_sessions"),
+            latest_alert_level=params.get("latest_alert_level"),
+            date_from=params.get("date_from"),
+            date_to=params.get("date_to"),
             page=params["page"],
             page_size=params["page_size"],
         )
@@ -492,6 +501,10 @@ def guardian_dashboard():
             date_to=params.get("date_to"),
             case_id=params.get("case_id"),
             case_public_id=params.get("case_public_id"),
+            case_label=params.get("case_label"),
+            q=params.get("q"),
+            domain=params.get("domain"),
+            alert_level=params.get("alert_level"),
         )
     except LookupError:
         return _error("guardian_dashboard_case_not_found", "guardian_dashboard_case_not_found", 404)
@@ -783,6 +796,16 @@ def history():
     payload = service.list_history(
         user_id=user_id,
         status=params.get("status"),
+        case_id=params.get("case_id"),
+        case_public_id=params.get("case_public_id"),
+        case_label=params.get("case_label"),
+        tag=params.get("tag"),
+        q=params.get("q"),
+        date_from=params.get("date_from"),
+        date_to=params.get("date_to"),
+        domain=params.get("domain"),
+        alert_level=params.get("alert_level"),
+        needs_professional_review=params.get("needs_professional_review"),
         page=params["page"],
         page_size=params["page_size"],
     )
@@ -813,6 +836,16 @@ def history_secure():
     payload = service.list_history(
         user_id=user_id,
         status=params.get("status"),
+        case_id=params.get("case_id"),
+        case_public_id=params.get("case_public_id"),
+        case_label=params.get("case_label"),
+        tag=params.get("tag"),
+        q=params.get("q"),
+        date_from=params.get("date_from"),
+        date_to=params.get("date_to"),
+        domain=params.get("domain"),
+        alert_level=params.get("alert_level"),
+        needs_professional_review=params.get("needs_professional_review"),
         page=params["page"],
         page_size=params["page_size"],
     )

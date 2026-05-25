@@ -160,8 +160,8 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 
 #### GET `/questionnaires/cases`
 - Permiso: usuario autenticado propietario.
-- Query: `status` opcional, `page`, `page_size`.
-- Response `200`: lista paginada con `case_public_id`, `private_label` (solo owner), `sessions_count`, `latest_session_id`, `latest_alert_level`.
+- Query: `status`, `q`, `label`, `case_public_id`, `has_sessions`, `latest_alert_level`, `date_from`, `date_to`, `page`, `page_size`.
+- Response `200`: lista paginada con `case_public_id`, `private_label` (solo owner), `sessions_count`, `processed_sessions_count`, `draft_sessions_count`, `in_progress_sessions_count`, `latest_session_id`, `latest_processed_at`, `latest_alert_level`, `latest_domain`, `tags`.
 - Errores: `cases_list_forbidden` (403), `cases_list_failed` (500).
 
 #### GET `/questionnaires/cases/{case_id}`
@@ -194,17 +194,29 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 
 #### GET `/questionnaires/guardian/dashboard`
 - Permiso: owner autenticado.
-- Query: `months` (default 3), `date_from`, `date_to`, `case_id`, `case_public_id`.
+- Query: `months` (default 3), `date_from`, `date_to`, `case_id`, `case_public_id`, `case_label`, `q`, `domain`, `alert_level`.
 - Response `200`:
 ```json
 {
   "period": { "months": 3, "date_from": "2026-03-01", "date_to": "2026-05-22" },
+  "filters": {},
   "summary": {
     "total_cases": 2,
     "total_sessions": 5,
     "processed_sessions": 4,
+    "draft_sessions": 1,
+    "in_progress_sessions": 0,
+    "cases_with_alerts": 1,
     "cases_needing_professional_review": 1,
-    "highest_alert_level": "elevated"
+    "highest_alert_level": "elevated",
+    "most_frequent_domain": "anxiety"
+  },
+  "charts": {
+    "alerts_by_month": [],
+    "alerts_by_domain": [],
+    "alerts_by_level": [],
+    "sessions_by_case": [],
+    "cases_by_alert_level": []
   },
   "cases": []
 }
@@ -217,7 +229,8 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 - Permiso: solo `user_type=psychologist`.
 - Fuente: solo sesiones compartidas mediante grant vigente.
 - Query: `q`, `case_public_id`, `date_from`, `date_to`, `domain`, `alert_level`, `review_status`, `page`, `page_size`.
-- Response `200`: incluye `summary`, `aggregates`, `items`, `pagination`.
+- Response `200`: incluye `summary`, `aggregates`, `charts`, `items`, `pagination`, `warnings`.
+- Garantia operativa: `domain` y `alert_level` se aplican antes de paginación y los agregados se calculan sobre todo el conjunto filtrado.
 - Privacidad: nunca expone `private_label` del guardian.
 - Errores: `psychologist_dashboard_requires_psychologist` (403), `psychologist_dashboard_invalid_period` (400), `psychologist_dashboard_invalid_filter` (400), `psychologist_dashboard_failed` (500).
 
@@ -284,6 +297,8 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 - `private_label` es visible solo para el owner.
 - Para psicólogos se expone `case_public_id` y etiqueta de presentación basada en id público.
 - Los endpoints de dashboard/reporte/reviews aplican esta regla.
+- `case_label` identifica y agrupa casos de un guardian (ej: `Hijo 1`).
+- `tags` (`QuestionnaireTag`) son etiquetas adicionales de sesión (ej: `seguimiento escolar`); no reemplazan el `case_label`.
 
 ## Texto visible de rol administrativo
 - Se mantiene rol interno `admin`/`ADMIN` para autorización.
@@ -294,6 +309,7 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 - Crear sesión asociada: `POST /api/v2/questionnaires/sessions` con `case_id` o `case_public_id` o `case_label`.
 - Reanudar borrador completo: `GET /api/v2/questionnaires/sessions/{id}`.
 - Guardado por página: `PATCH /api/v2/questionnaires/sessions/{id}/answers` o `/answers/bulk`.
+- Historial filtrable: `GET /api/v2/questionnaires/history` con `case_id`, `case_public_id`, `case_label`, `tag`, `domain`, `alert_level`, `needs_professional_review`, rango de fechas y texto libre.
 - Dashboard guardian: `GET /api/v2/questionnaires/guardian/dashboard`.
 - Buscar psicólogos: `GET /api/v2/psychologists/search?q=...`.
 - Recomendación por ubicación: `GET /api/v2/psychologists/search?same_location=true`.
@@ -302,3 +318,12 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 - Registrar concepto no diagnóstico: `POST /api/v2/questionnaires/history/{id}/professional-reviews`.
 - Vista previa in-app: `GET /api/v2/questionnaires/history/{id}/report-preview`.
 - Descarga PDF: mantener endpoints actuales `/pdf/generate`, `/pdf`, `/pdf/download`.
+
+## Operación de calidad de datos para dashboard
+- Script: `scripts/audit_and_repair_questionnaire_dashboard_data.py`.
+- Modo seguro por defecto: `--dry-run`.
+- Reparaciones opcionales (solo con `--execute`): agrupación de sesiones por etiqueta de caso, archivado de borradores excesivos seguros, redistribución temporal de datos sintéticos.
+- Uso recomendado inicial:
+```bash
+python scripts/audit_and_repair_questionnaire_dashboard_data.py --dry-run --only-synthetic --limit 10
+```

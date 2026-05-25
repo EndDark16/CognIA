@@ -102,6 +102,10 @@ class DashboardQuerySchema(BaseSchema):
 class GuardianDashboardQuerySchema(DashboardQuerySchema):
     case_id = fields.UUID(required=False)
     case_public_id = fields.String(required=False, validate=validate.Length(min=3, max=40))
+    case_label = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    q = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    domain = fields.String(required=False, validate=validate.Length(min=1, max=64))
+    alert_level = fields.String(required=False, validate=validate.OneOf(ALERT_LEVELS))
 
 
 class PsychologistDashboardQuerySchema(BaseSchema):
@@ -152,8 +156,22 @@ class CaseUpdateSchema(BaseSchema):
 
 class CaseListQuerySchema(BaseSchema):
     status = fields.String(required=False, validate=validate.OneOf(["active", "archived"]))
+    q = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    label = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    case_public_id = fields.String(required=False, validate=validate.Length(min=3, max=40))
+    has_sessions = fields.Boolean(required=False)
+    latest_alert_level = fields.String(required=False, validate=validate.OneOf(ALERT_LEVELS))
+    date_from = fields.Date(required=False)
+    date_to = fields.Date(required=False)
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
     page_size = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
+
+    @validates_schema
+    def validate_period(self, data, **kwargs):
+        start = data.get("date_from")
+        end = data.get("date_to")
+        if start and end and start > end:
+            raise ValidationError("invalid_period_range")
 
 
 class ProfessionalReviewCreateSchema(BaseSchema):
@@ -226,8 +244,25 @@ class SessionFilterSchema(BaseSchema):
         required=False,
         validate=validate.OneOf(["draft", "in_progress", "submitted", "processed", "failed", "archived"]),
     )
+    case_id = fields.UUID(required=False)
+    case_public_id = fields.String(required=False, validate=validate.Length(min=3, max=40))
+    case_label = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    tag = fields.String(required=False, validate=validate.Length(min=1, max=120))
+    q = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    date_from = fields.Date(required=False)
+    date_to = fields.Date(required=False)
+    domain = fields.String(required=False, validate=validate.Length(min=1, max=64))
+    alert_level = fields.String(required=False, validate=validate.OneOf(ALERT_LEVELS))
+    needs_professional_review = fields.Boolean(required=False)
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
     page_size = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
+
+    @validates_schema
+    def validate_period(self, data, **kwargs):
+        start = data.get("date_from")
+        end = data.get("date_to")
+        if start and end and start > end:
+            raise ValidationError("invalid_period_range")
 
 
 class SharedAccessSchema(BaseSchema):
