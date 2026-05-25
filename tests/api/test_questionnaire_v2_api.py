@@ -24,6 +24,7 @@ from app.models import (
     AppUser,
     QuestionnaireQuestion,
     QuestionnaireSession,
+    QuestionnaireSessionResultDomain,
     db,
 )
 from config.settings import TestingConfig
@@ -1540,3 +1541,184 @@ def test_questionnaire_v2_pending_grant_blocks_pdf_and_professional_review(clien
         headers=psych_headers,
     )
     assert review_try.status_code == 403
+
+
+def test_questionnaire_v2_case_label_reuse_with_accents_and_separators(client, app):
+    _, token = _user_token(app, "case_reuse_accent_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    first = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "Híjo-1", "child_age_years": 8},
+        headers=headers,
+    )
+    assert first.status_code == 201
+    first_case = first.json["session"]["case"]["case_id"]
+
+    second = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "hijo 1", "child_age_years": 9},
+        headers=headers,
+    )
+    assert second.status_code == 201
+    assert second.json["session"]["case"]["case_id"] == first_case
+
+
+def test_questionnaire_v2_cases_filters_and_metrics(client, app):
+    _, token = _user_token(app, "cases_filters_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    c1 = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "Hijo 1", "child_age_years": 8},
+        headers=headers,
+    )
+    assert c1.status_code == 201
+    case_public_id = c1.json["session"]["case"]["case_public_id"]
+
+    c2 = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "Seguimiento escolar", "child_age_years": 10},
+        headers=headers,
+    )
+    assert c2.status_code == 201
+
+    all_cases = client.get("/api/v2/questionnaires/cases?page=1&page_size=20", headers=headers)
+    assert all_cases.status_code == 200
+    assert all_cases.json["pagination"]["total"] >= 2
+    first_item = all_cases.json["items"][0]
+    assert "processed_sessions_count" in first_item
+    assert "draft_sessions_count" in first_item
+    assert "in_progress_sessions_count" in first_item
+
+    by_public = client.get(f"/api/v2/questionnaires/cases?case_public_id={case_public_id}", headers=headers)
+    assert by_public.status_code == 200
+    assert by_public.json["pagination"]["total"] == 1
+
+    by_label = client.get("/api/v2/questionnaires/cases?label=hijo 1", headers=headers)
+    assert by_label.status_code == 200
+    assert by_label.json["pagination"]["total"] == 1
+
+    by_q = client.get("/api/v2/questionnaires/cases?q=seguimiento", headers=headers)
+    assert by_q.status_code == 200
+    assert by_q.json["pagination"]["total"] >= 1
+
+
+def test_questionnaire_v2_history_filters_by_case_label_tag_domain_and_alert(client, app):
+    _, token = _user_token(app, "history_filters_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "Hijo 2", "child_age_years": 9},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+    case_public_id = created.json["session"]["case"]["case_public_id"]
+
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=5", headers=headers)
+    question_id = page.json["pages"][0]["questions"][0]["question_id"]
+    saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={"answers": [{"question_id": question_id, "answer": 1}]},
+        headers=headers,
+    )
+    assert saved.status_code == 200
+    submitted = client.post(f"/api/v2/questionnaires/sessions/{session_id}/submit", json={}, headers=headers)
+    assert submitted.status_code == 200
+
+    tagged = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/tags",
+        json={"tag": "seguimiento escolar", "color": "#114499", "visibility": "private"},
+        headers=headers,
+    )
+    assert tagged.status_code == 200
+
+    base = client.get("/api/v2/questionnaires/history?page=1&page_size=20", headers=headers)
+    assert base.status_code == 200
+    assert any(item["session_id"] == session_id for item in base.json["items"])
+
+    by_case_label = client.get("/api/v2/questionnaires/history?case_label=hijo 2", headers=headers)
+    assert by_case_label.status_code == 200
+    assert any(item["session_id"] == session_id for item in by_case_label.json["items"])
+
+    by_case_public = client.get(f"/api/v2/questionnaires/history?case_public_id={case_public_id}", headers=headers)
+    assert by_case_public.status_code == 200
+    assert any(item["session_id"] == session_id for item in by_case_public.json["items"])
+
+    by_tag = client.get("/api/v2/questionnaires/history?tag=seguimiento escolar", headers=headers)
+    assert by_tag.status_code == 200
+    assert any(item["session_id"] == session_id for item in by_tag.json["items"])
+
+    by_domain = client.get("/api/v2/questionnaires/history?domain=anxiety", headers=headers)
+    assert by_domain.status_code == 200
+    assert any(item["session_id"] == session_id for item in by_domain.json["items"])
+
+    by_alert = client.get("/api/v2/questionnaires/history?alert_level=low", headers=headers)
+    assert by_alert.status_code == 200
+    assert any(item["session_id"] == session_id for item in by_alert.json["items"])
+
+
+def test_questionnaire_v2_psychologist_dashboard_aggregates_use_full_filtered_set(client, app):
+    _, owner_token = _user_token(app, "psych_agg_owner_qv2")
+    psych_id, psych_token = _user_token(app, "psych_agg_psych_qv2", user_type="psychologist")
+    owner_headers = {"Authorization": f"Bearer {owner_token}"}
+    psych_headers = {"Authorization": f"Bearer {psych_token}"}
+
+    created_ids = []
+    for idx in range(2):
+        created = client.post(
+            "/api/v2/questionnaires/sessions",
+            json={"mode": "short", "role": "guardian", "case_label": f"Caso agg {idx}", "child_age_years": 9},
+            headers=owner_headers,
+        )
+        assert created.status_code == 201
+        session_id = created.json["session"]["session_id"]
+        created_ids.append(session_id)
+        page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=1", headers=owner_headers)
+        qid = page.json["pages"][0]["questions"][0]["question_id"]
+        assert client.patch(
+            f"/api/v2/questionnaires/sessions/{session_id}/answers",
+            json={"answers": [{"question_id": qid, "answer": 1}]},
+            headers=owner_headers,
+        ).status_code == 200
+        assert client.post(
+            f"/api/v2/questionnaires/sessions/{session_id}/submit",
+            json={},
+            headers=owner_headers,
+        ).status_code == 200
+        shared = client.post(
+            f"/api/v2/questionnaires/history/{session_id}/share",
+            json={"grantee_user_id": str(psych_id)},
+            headers=owner_headers,
+        )
+        assert shared.status_code == 201
+        grant_id = shared.json["grant"]["grant_id"]
+        assert client.post(
+            f"/api/v2/questionnaires/psychologist/share-requests/{grant_id}/accept",
+            json={},
+            headers=psych_headers,
+        ).status_code == 200
+
+    with app.app_context():
+        target = QuestionnaireSession.query.filter_by(id=uuid.UUID(created_ids[0])).first()
+        assert target is not None
+        rows = QuestionnaireSessionResultDomain.query.filter_by(session_id=target.id).all()
+        assert rows
+        for row in rows:
+            if row.domain == "anxiety":
+                row.alert_level = "high"
+            else:
+                row.alert_level = "low"
+        db.session.commit()
+
+    dashboard = client.get(
+        "/api/v2/questionnaires/psychologist/dashboard?domain=anxiety&page=1&page_size=1",
+        headers=psych_headers,
+    )
+    assert dashboard.status_code == 200
+    assert dashboard.json["pagination"]["total"] == 2
+    assert len(dashboard.json["items"]) == 1
+    assert dashboard.json["summary"]["total_shared_sessions"] == 2
+    assert any(item["domain"] == "anxiety" for item in dashboard.json["aggregates"]["by_domain"])
