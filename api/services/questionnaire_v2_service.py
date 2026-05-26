@@ -144,6 +144,48 @@ def _decrypt_text(value: str | None, purpose: str) -> str | None:
     return crypto_service.decrypt_text(value, purpose=purpose)
 
 
+def _decrypt_json_safe(value: Any, purpose: str, default: Any = None) -> Any:
+    """Best-effort decrypt for read/display paths. Never raises."""
+    if value is None:
+        return default
+    try:
+        return _decrypt_json(value, purpose)
+    except Exception:
+        # Legacy/plain values should still be consumable.
+        if isinstance(value, (dict, list, int, float, bool)):
+            return value
+        if isinstance(value, str):
+            text = value.strip()
+            if not text:
+                return default
+            try:
+                return json.loads(text)
+            except Exception:
+                return text
+        return default
+
+
+def _decrypt_text_safe(value: str | None, purpose: str, default: str | None = None) -> str | None:
+    """Best-effort decrypt for read/display paths. Never raises."""
+    if value is None:
+        return default
+    try:
+        return _decrypt_text(value, purpose)
+    except Exception:
+        # Legacy/plain values should still be consumable.
+        if isinstance(value, str) and value.strip():
+            text = value.strip()
+            if text.startswith("{"):
+                try:
+                    parsed = json.loads(text)
+                    if isinstance(parsed, dict) and parsed.get(crypto_service.FIELD_ENVELOPE_MARKER):
+                        return default
+                except Exception:
+                    pass
+            return value
+        return default
+
+
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
@@ -221,12 +263,12 @@ def _safe_display_name(user: AppUser | None) -> str:
 
 def _case_display_label(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None) -> str:
     if viewer_user_id and viewer_user_id == case.owner_user_id and case.private_label:
-        return str(case.private_label)
+        return _decrypt_text_safe(case.private_label, "questionnaire_case.private_label") or f"Caso {case.case_public_id}"
     return f"Caso {case.case_public_id}"
 
 
 def _case_payload(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None = None) -> dict[str, Any]:
-    private_label = _decrypt_text(case.private_label, "questionnaire_case.private_label") if case.private_label else None
+    private_label = _decrypt_text_safe(case.private_label, "questionnaire_case.private_label") if case.private_label else None
     payload: dict[str, Any] = {
         "case_id": str(case.id),
         "case_public_id": case.case_public_id,
@@ -1162,6 +1204,27 @@ def _build_answer_resume_payload(
     }
 
 
+def _build_answer_resume_payload_safe(
+    question: QuestionnaireQuestion,
+    section: QuestionnaireSection | None,
+    answer_row: QuestionnaireSessionAnswer,
+) -> dict[str, Any]:
+    return {
+        "question_id": str(question.id),
+        "question_code": question.question_code,
+        "section": section.title if section else None,
+        "answer": _decrypt_json_safe(
+            answer_row.answer_raw,
+            "questionnaire_session_answer.answer_raw",
+        ),
+        "answer_value": _decrypt_text_safe(
+            answer_row.answer_normalized,
+            "questionnaire_session_answer.answer_normalized",
+        ),
+        "updated_at": answer_row.updated_at.isoformat() if answer_row.updated_at else None,
+    }
+
+
 def _build_saved_answers_payload(
     session: QuestionnaireSession,
     saved_question_ids: list[uuid.UUID],
@@ -1186,7 +1249,7 @@ def _build_saved_answers_payload(
     payload: list[dict[str, Any]] = []
     for answer_row, question, section in rows:
         if answer_row and answer_row.answer_raw is not None:
-            payload.append(_build_answer_resume_payload(question, section, answer_row))
+            payload.append(_build_answer_resume_payload_safe(question, section, answer_row))
     return payload
 
 
@@ -1220,7 +1283,7 @@ def get_session_payload(
     if include_answers:
         rows = _session_answer_rows(session)
         answers = [
-            _build_answer_resume_payload(question, section, answer_row)
+            _build_answer_resume_payload_safe(question, section, answer_row)
             for _item, question, answer_row, section in rows
             if answer_row and answer_row.answer_raw is not None
         ]
@@ -1289,11 +1352,11 @@ def get_session_page_payload(session: QuestionnaireSession, page: int, page_size
             answer_value = None
             answer_updated_at = None
             if answer_row and answer_row.answer_raw is not None:
-                answer = _decrypt_json(
+                answer = _decrypt_json_safe(
                     answer_row.answer_raw,
                     "questionnaire_session_answer.answer_raw",
                 )
-                answer_value = _decrypt_text(
+                answer_value = _decrypt_text_safe(
                     answer_row.answer_normalized,
                     "questionnaire_session_answer.answer_normalized",
                 )
@@ -1895,11 +1958,11 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
     comorbidity = QuestionnaireSessionResultComorbidity.query.filter_by(session_id=session.id).all()
 
     if result:
-        result_summary = _decrypt_text(
+        result_summary = _decrypt_text_safe(
             result.summary_text,
             "questionnaire_session_result.summary_text",
         )
-        result_recommendation = _decrypt_text(
+        result_recommendation = _decrypt_text_safe(
             result.operational_recommendation,
             "questionnaire_session_result.operational_recommendation",
         )
@@ -1928,7 +1991,7 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
                 "mode": row.mode,
                 "operational_class": row.operational_class,
                 "operational_caveat": row.operational_caveat,
-                "result_summary": _decrypt_text(
+                "result_summary": _decrypt_text_safe(
                     row.result_summary,
                     "questionnaire_session_result_domain.result_summary",
                 ),
@@ -1939,13 +2002,13 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
         "comorbidity": [
             {
                 "coexistence_key": row.coexistence_key,
-                "domains": _decrypt_json(
+                "domains": _decrypt_json_safe(
                     row.domains_json,
                     "questionnaire_session_result_comorbidity.domains_json",
                 ),
                 "combined_risk_score": row.combined_risk_score,
                 "coexistence_level": row.coexistence_level,
-                "summary": _decrypt_text(
+                "summary": _decrypt_text_safe(
                     row.summary,
                     "questionnaire_session_result_comorbidity.summary",
                 ),
@@ -2287,7 +2350,7 @@ def list_history(
             if str(row.owner_user_id) == str(user_id) and row.case_id:
                 case_row = db.session.get(QuestionnaireCase, row.case_id)
                 if case_row and case_row.private_label:
-                    private_label = _decrypt_text(case_row.private_label, "questionnaire_case.private_label") or ""
+                    private_label = _decrypt_text_safe(case_row.private_label, "questionnaire_case.private_label") or ""
                     if token in private_label.lower():
                         filtered_rows.append(row)
                         continue
@@ -2696,7 +2759,7 @@ def guardian_dashboard(
     if q_token:
         q_cases: list[QuestionnaireCase] = []
         for row in all_cases:
-            private_label = _decrypt_text(row.private_label, "questionnaire_case.private_label") if row.private_label else ""
+            private_label = _decrypt_text_safe(row.private_label, "questionnaire_case.private_label") if row.private_label else ""
             values = [
                 str(row.case_public_id or "").lower(),
                 str(private_label or "").lower(),
@@ -3309,8 +3372,8 @@ def _professional_review_payload(
     viewer_user_id: uuid.UUID | None = None,
 ) -> dict[str, Any]:
     is_owner = bool(viewer_user_id and viewer_user_id == row.owner_user_id)
-    initial_concept = _decrypt_text(row.initial_concept, "questionnaire_professional_review.initial_concept")
-    recommendation = _decrypt_text(row.recommendation, "questionnaire_professional_review.recommendation")
+    initial_concept = _decrypt_text_safe(row.initial_concept, "questionnaire_professional_review.initial_concept")
+    recommendation = _decrypt_text_safe(row.recommendation, "questionnaire_professional_review.recommendation")
     if is_owner and not row.visible_to_guardian:
         initial_concept = None
         recommendation = None
@@ -4108,7 +4171,7 @@ def _session_pdf_question_rows(session_id: uuid.UUID) -> list[dict[str, Any]]:
     for idx, (item, question, answer, section) in enumerate(rows, start=1):
         prompt = question.caregiver_question or question.psychologist_question or question.question_text_primary or "N/A"
         raw = (
-            _decrypt_json(
+            _decrypt_json_safe(
                 answer.answer_raw,
                 "questionnaire_session_answer.answer_raw",
             )
@@ -4116,7 +4179,7 @@ def _session_pdf_question_rows(session_id: uuid.UUID) -> list[dict[str, Any]]:
             else None
         )
         normalized = (
-            _decrypt_text(
+            _decrypt_text_safe(
                 answer.answer_normalized,
                 "questionnaire_session_answer.answer_normalized",
             )
@@ -4477,7 +4540,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
 
     role = _normalize_role(session.respondent_role)
     generated_at = _utcnow()
-    metadata = _decrypt_json(session.metadata_json, "questionnaire_session.metadata_json") or {}
+    metadata = _decrypt_json_safe(session.metadata_json, "questionnaire_session.metadata_json") or {}
     metadata_extra = metadata.get("metadata") if isinstance(metadata, dict) else {}
     if not isinstance(metadata_extra, dict):
         metadata_extra = {}

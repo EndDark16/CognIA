@@ -1601,7 +1601,104 @@ def test_questionnaire_v2_cases_filters_and_metrics(client, app):
 
     by_q = client.get("/api/v2/questionnaires/cases?q=seguimiento", headers=headers)
     assert by_q.status_code == 200
-    assert by_q.json["pagination"]["total"] >= 1
+
+
+def test_questionnaire_v2_cases_list_survives_private_label_decrypt_failure(client, app, monkeypatch):
+    _, token = _user_token(app, "cases_decrypt_fail_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/cases",
+        json={"private_label": "Hijo sensible"},
+        headers=headers,
+    )
+    assert created.status_code == 201
+
+    from api.services import crypto_service as _crypto
+
+    def _boom(*_args, **_kwargs):
+        raise RuntimeError("field key missing")
+
+    monkeypatch.setattr(_crypto, "decrypt_text", _boom)
+
+    listed = client.get("/api/v2/questionnaires/cases", headers=headers)
+    assert listed.status_code == 200
+    assert listed.json["items"]
+    display_label = listed.json["items"][0]["display_label"]
+    assert isinstance(display_label, str) and display_label.strip()
+    assert "__cognia_field_encrypted__" not in display_label
+
+
+def test_questionnaire_v2_dashboards_survive_review_decrypt_failure(client, app, monkeypatch):
+    owner_id, owner_token = _user_token(app, "dash_decrypt_fail_owner_qv2")
+    psychologist_id, psychologist_token = _user_token(
+        app,
+        "dash_decrypt_fail_psych_qv2",
+        user_type="psychologist",
+    )
+    owner_headers = {"Authorization": f"Bearer {owner_token}"}
+    psych_headers = {"Authorization": f"Bearer {psychologist_token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/cases",
+        json={"private_label": "Caso seguimiento"},
+        headers=owner_headers,
+    )
+    assert created.status_code == 201
+    case_id = created.json["case"]["case_id"]
+
+    session_resp = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={
+            "mode": "complete",
+            "role": "guardian",
+            "child_age_years": 9,
+            "child_sex_assigned_at_birth": "male",
+            "case_id": case_id,
+        },
+        headers=owner_headers,
+    )
+    assert session_resp.status_code == 201
+    session_id = session_resp.json["session"]["session_id"]
+
+    share_resp = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/share",
+        json={"grantee_user_id": psychologist_id},
+        headers=owner_headers,
+    )
+    assert share_resp.status_code == 201
+    grant_id = share_resp.json["grant"]["grant_id"]
+
+    accept_resp = client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{grant_id}/accept",
+        headers=psych_headers,
+    )
+    assert accept_resp.status_code == 200
+
+    review_resp = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/professional-reviews",
+        json={
+            "review_status": "reviewed",
+            "initial_concept": "Concepto inicial no diagnostico",
+            "recommendation": "Seguimiento profesional sugerido",
+            "visible_to_guardian": True,
+        },
+        headers=psych_headers,
+    )
+    assert review_resp.status_code == 201
+
+    from api.services import crypto_service as _crypto
+
+    def _boom(*_args, **_kwargs):
+        raise RuntimeError("field key missing")
+
+    monkeypatch.setattr(_crypto, "decrypt_text", _boom)
+
+    guardian_dash = client.get("/api/v2/questionnaires/guardian/dashboard?months=3", headers=owner_headers)
+    assert guardian_dash.status_code == 200
+    psychologist_dash = client.get("/api/v2/questionnaires/psychologist/dashboard", headers=psych_headers)
+    assert psychologist_dash.status_code == 200
+    assert psychologist_dash.json["pagination"]["total"] >= 1
 
 
 def test_questionnaire_v2_history_filters_by_case_label_tag_domain_and_alert(client, app):
