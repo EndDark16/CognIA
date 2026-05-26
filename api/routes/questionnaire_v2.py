@@ -1,6 +1,6 @@
 import uuid
 
-from flask import Blueprint, current_app, jsonify, request, send_file
+from flask import Blueprint, current_app, g, jsonify, request, send_file
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 from sqlalchemy.exc import DBAPIError, OperationalError, SQLAlchemyError
@@ -49,7 +49,19 @@ def _parse_uuid(value: str | None) -> uuid.UUID | None:
 
 
 def _error(message: str, error: str, code: int, details=None):
-    payload = {"msg": message, "error": error}
+    request_id = getattr(g, "request_id", None)
+    payload = {
+        "msg": message,
+        "error": error,
+        "request_id": request_id,
+        "error_detail": {
+            "code": error,
+            "message": message,
+            "details": details or {},
+            "request_id": request_id,
+            "retryable": code in {429, 500, 503},
+        },
+    }
     if details is not None:
         payload["details"] = details
     return jsonify(payload), code
