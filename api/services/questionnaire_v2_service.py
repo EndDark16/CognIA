@@ -17,6 +17,7 @@ from typing import Any
 import joblib
 import pandas as pd
 from flask import current_app
+from flask import g
 from sqlalchemy import and_, case, func, or_
 
 from api.cache import (
@@ -235,6 +236,23 @@ def _pick_highest_alert(levels: list[str]) -> str | None:
     if not levels:
         return None
     return max(levels, key=_alert_rank)
+
+
+def _dashboard_request_id() -> str | None:
+    try:
+        return getattr(g, "request_id", None)
+    except Exception:
+        return None
+
+
+def _dashboard_empty_state(*, total_items: int, context: str) -> dict[str, Any] | None:
+    if total_items > 0:
+        return None
+    return {
+        "code": "no_data",
+        "title": "No hay datos para mostrar",
+        "message": f"No se encontraron datos para {context} con los filtros actuales.",
+    }
 
 
 def _session_dominant_domain(domains: list["QuestionnaireSessionResultDomain"]) -> str | None:
@@ -2937,7 +2955,109 @@ def guardian_dashboard(
     if summary_domain_counter:
         most_frequent_domain = summary_domain_counter.most_common(1)[0][0]
 
+    summary_payload = {
+        "total_cases": len(all_cases),
+        "total_sessions": len(filtered_sessions),
+        "processed_sessions": sum(1 for row in filtered_sessions if row.status == "processed"),
+        "draft_sessions": sum(1 for row in filtered_sessions if row.status == "draft"),
+        "in_progress_sessions": sum(1 for row in filtered_sessions if row.status == "in_progress"),
+        "cases_with_alerts": len(cases_with_alerts),
+        "cases_needing_professional_review": len(cases_needing_review),
+        "highest_alert_level": highest_alert,
+        "most_frequent_domain": most_frequent_domain,
+    }
+    dashboard_warnings: list[str] = []
+    if summary_payload["total_sessions"] > 0 and not alerts_by_month:
+        dashboard_warnings.append("alerts_by_month_empty_with_nonzero_sessions")
+    if summary_payload["processed_sessions"] > 0 and not alerts_by_domain:
+        dashboard_warnings.append("alerts_by_domain_empty_with_processed_sessions")
+
+    time_series_payload = {
+        "alerts_by_period": alerts_by_month,
+        "questionnaires_by_period": [
+            {"month": item["month"], "count": int(item.get("total_alerts", 0))}
+            for item in alerts_by_month
+        ],
+        "processed_by_period": [
+            {
+                "month": month,
+                "count": sum(
+                    1
+                    for row in filtered_sessions
+                    if row.status == "processed"
+                    and (row.processed_at or row.created_at or _utcnow()).strftime("%Y-%m") == month
+                ),
+            }
+            for month in sorted({item["month"] for item in alerts_by_month})
+        ],
+    }
+
+    breakdowns_payload = {
+        "alerts_by_domain": alerts_by_domain,
+        "alerts_by_level": alerts_by_level,
+        "questionnaires_by_status": [
+            {"status": "processed", "count": summary_payload["processed_sessions"]},
+            {"status": "draft", "count": summary_payload["draft_sessions"]},
+            {"status": "in_progress", "count": summary_payload["in_progress_sessions"]},
+        ],
+    }
+
+    rankings_payload = {
+        "priority_cases": sorted(
+            [
+                {
+                    "case_id": item["case"]["case_id"],
+                    "case_public_id": item["case"]["case_public_id"],
+                    "display_label": item["case"].get("display_label"),
+                    "highest_alert_level": item["summary"]["highest_alert_level"],
+                    "sessions_count": item["summary"]["sessions_count"],
+                }
+                for item in case_items
+            ],
+            key=lambda row: (_alert_rank(row["highest_alert_level"]), row["sessions_count"]),
+            reverse=True,
+        )[:10],
+        "activity_by_case": sessions_by_case_chart,
+    }
+
+    matrix_payload = {
+        "case_by_domain": [
+            {
+                "case_id": item["case"]["case_id"],
+                "case_public_id": item["case"]["case_public_id"],
+                "domains": [
+                    {
+                        "domain": slot.get("domain"),
+                        "max_probability": slot.get("max_probability"),
+                        "latest_alert_level": slot.get("latest_alert_level"),
+                    }
+                    for slot in item.get("domain_breakdown", [])
+                ],
+            }
+            for item in case_items
+        ]
+    }
+
     return {
+        "meta": {
+            "generated_at": _utcnow().isoformat(),
+            "period": {
+                "from": start_date.isoformat(),
+                "to": end_date.isoformat(),
+                "preset": f"last_{months}_months",
+            },
+            "filters_applied": {
+                "case_id": str(case_id) if case_id else None,
+                "case_public_id": case_public_id,
+                "case_label": case_label,
+                "q": q,
+                "domain": domain,
+                "alert_level": alert_level,
+            },
+            "data_freshness": "live",
+            "request_id": _dashboard_request_id(),
+            "warnings": dashboard_warnings,
+        },
         "period": {
             "months": months,
             "date_from": start_date.isoformat(),
@@ -2951,17 +3071,11 @@ def guardian_dashboard(
             "domain": domain,
             "alert_level": alert_level,
         },
-        "summary": {
-            "total_cases": len(all_cases),
-            "total_sessions": len(filtered_sessions),
-            "processed_sessions": sum(1 for row in filtered_sessions if row.status == "processed"),
-            "draft_sessions": sum(1 for row in filtered_sessions if row.status == "draft"),
-            "in_progress_sessions": sum(1 for row in filtered_sessions if row.status == "in_progress"),
-            "cases_with_alerts": len(cases_with_alerts),
-            "cases_needing_professional_review": len(cases_needing_review),
-            "highest_alert_level": highest_alert,
-            "most_frequent_domain": most_frequent_domain,
-        },
+        "summary": summary_payload,
+        "time_series": time_series_payload,
+        "breakdowns": breakdowns_payload,
+        "rankings": rankings_payload,
+        "matrix": matrix_payload,
         "charts": {
             "alerts_by_month": alerts_by_month,
             "alerts_by_domain": alerts_by_domain,
@@ -2969,8 +3083,19 @@ def guardian_dashboard(
             "sessions_by_case": sessions_by_case_chart,
             "cases_by_alert_level": cases_by_alert_level,
         },
+        "items": [item["case"] | {"summary": item["summary"]} for item in case_items],
+        "pagination": {"page": 1, "page_size": len(case_items), "total": len(case_items), "pages": 1},
+        "permissions": {
+            "can_create_case": True,
+            "can_archive_case": True,
+            "can_share_with_psychologist": True,
+            "can_request_review": True,
+            "can_generate_pdf": True,
+            "can_manage_tags": True,
+        },
+        "empty_state": _dashboard_empty_state(total_items=len(case_items), context="dashboard de casos"),
         "cases": case_items,
-        "warnings": [],
+        "warnings": dashboard_warnings,
     }
 
 
@@ -3145,16 +3270,96 @@ def psychologist_dashboard(
     by_date = [{"month": key, "count": int(value)} for key, value in sorted(aggregate_date_counter.items())]
     by_case = [{"case_public_id": key, "count": int(value)} for key, value in sorted(aggregate_case_counter.items())]
 
+    summary_payload = {
+        "total_shared_sessions": total,
+        "total_cases": len({item.get("case_public_id") for item in item_rows if item.get("case_public_id")}),
+        "pending_reviews": int(review_status_counter.get("pending", 0)),
+        "reviewed_cases": int(review_status_counter.get("reviewed", 0)),
+        "cases_needing_professional_review": sum(1 for item in item_rows if item["needs_professional_review"]),
+        "highest_alert_level": highest_alert,
+    }
+    dashboard_warnings: list[str] = []
+    if summary_payload["total_shared_sessions"] > 0 and not by_domain:
+        dashboard_warnings.append("alerts_by_domain_empty_with_shared_sessions")
+    if summary_payload["total_shared_sessions"] > 0 and not by_date:
+        dashboard_warnings.append("alerts_by_date_empty_with_shared_sessions")
+
+    time_series_payload = {
+        "alerts_by_period": by_date,
+        "questionnaires_by_period": by_date,
+        "processed_by_period": [
+            {
+                "month": slot["month"],
+                "count": sum(
+                    1
+                    for row in filtered_rows
+                    if row.status == "processed"
+                    and (row.processed_at or row.created_at or _utcnow()).strftime("%Y-%m") == slot["month"]
+                ),
+            }
+            for slot in by_date
+        ],
+    }
+
+    breakdowns_payload = {
+        "alerts_by_domain": by_domain,
+        "alerts_by_level": by_alert_level,
+        "reviews_by_status": by_review_status,
+        "questionnaires_by_status": [
+            {"status": status, "count": sum(1 for row in filtered_rows if row.status == status)}
+            for status in sorted({row.status for row in filtered_rows})
+        ],
+    }
+
+    rankings_payload = {
+        "priority_cases": sorted(
+            [
+                {
+                    "case_public_id": item.get("case_public_id"),
+                    "highest_alert_level": item.get("highest_alert_level"),
+                    "needs_professional_review": item.get("needs_professional_review"),
+                }
+                for item in item_rows
+                if item.get("case_public_id")
+            ],
+            key=lambda row: (_alert_rank(str(row.get("highest_alert_level") or "low")), bool(row.get("needs_professional_review"))),
+            reverse=True,
+        )[:20],
+        "activity_by_case": by_case,
+    }
+
+    matrix_payload = {
+        "domain_by_alert_level": [
+            {
+                "domain": slot.get("domain"),
+                "alerts": [
+                    {"alert_level": al["alert_level"], "count": al["count"]}
+                    for al in by_alert_level
+                ],
+            }
+            for slot in by_domain
+        ]
+    }
+
     return {
-        "filters": base_filters,
-        "summary": {
-            "total_shared_sessions": total,
-            "total_cases": len({item.get("case_public_id") for item in item_rows if item.get("case_public_id")}),
-            "pending_reviews": int(review_status_counter.get("pending", 0)),
-            "reviewed_cases": int(review_status_counter.get("reviewed", 0)),
-            "cases_needing_professional_review": sum(1 for item in item_rows if item["needs_professional_review"]),
-            "highest_alert_level": highest_alert,
+        "meta": {
+            "generated_at": _utcnow().isoformat(),
+            "period": {
+                "from": (date_from.isoformat() if date_from else None),
+                "to": (date_to.isoformat() if date_to else None),
+                "preset": "custom" if (date_from or date_to) else "all_time",
+            },
+            "filters_applied": base_filters,
+            "data_freshness": "live",
+            "request_id": _dashboard_request_id(),
+            "warnings": dashboard_warnings,
         },
+        "filters": base_filters,
+        "summary": summary_payload,
+        "time_series": time_series_payload,
+        "breakdowns": breakdowns_payload,
+        "rankings": rankings_payload,
+        "matrix": matrix_payload,
         "aggregates": {
             "by_domain": by_domain,
             "by_alert_level": by_alert_level,
@@ -3176,7 +3381,14 @@ def psychologist_dashboard(
             "total": total,
             "pages": max(1, (total + page_size - 1) // page_size),
         },
-        "warnings": [],
+        "permissions": {
+            "can_review": True,
+            "can_download_pdf": True,
+            "can_accept_share_request": True,
+            "can_reject_share_request": True,
+        },
+        "empty_state": _dashboard_empty_state(total_items=total, context="dashboard de evaluaciones compartidas"),
+        "warnings": dashboard_warnings,
     }
 
 
