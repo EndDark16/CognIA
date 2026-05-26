@@ -17,6 +17,7 @@ from typing import Any
 import joblib
 import pandas as pd
 from flask import current_app
+from flask import g
 from sqlalchemy import and_, case, func, or_
 
 from api.cache import (
@@ -144,6 +145,48 @@ def _decrypt_text(value: str | None, purpose: str) -> str | None:
     return crypto_service.decrypt_text(value, purpose=purpose)
 
 
+def _decrypt_json_safe(value: Any, purpose: str, default: Any = None) -> Any:
+    """Best-effort decrypt for read/display paths. Never raises."""
+    if value is None:
+        return default
+    try:
+        return _decrypt_json(value, purpose)
+    except Exception:
+        # Legacy/plain values should still be consumable.
+        if isinstance(value, (dict, list, int, float, bool)):
+            return value
+        if isinstance(value, str):
+            text = value.strip()
+            if not text:
+                return default
+            try:
+                return json.loads(text)
+            except Exception:
+                return text
+        return default
+
+
+def _decrypt_text_safe(value: str | None, purpose: str, default: str | None = None) -> str | None:
+    """Best-effort decrypt for read/display paths. Never raises."""
+    if value is None:
+        return default
+    try:
+        return _decrypt_text(value, purpose)
+    except Exception:
+        # Legacy/plain values should still be consumable.
+        if isinstance(value, str) and value.strip():
+            text = value.strip()
+            if text.startswith("{"):
+                try:
+                    parsed = json.loads(text)
+                    if isinstance(parsed, dict) and parsed.get(crypto_service.FIELD_ENVELOPE_MARKER):
+                        return default
+                except Exception:
+                    pass
+            return value
+        return default
+
+
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
@@ -195,6 +238,23 @@ def _pick_highest_alert(levels: list[str]) -> str | None:
     return max(levels, key=_alert_rank)
 
 
+def _dashboard_request_id() -> str | None:
+    try:
+        return getattr(g, "request_id", None)
+    except Exception:
+        return None
+
+
+def _dashboard_empty_state(*, total_items: int, context: str) -> dict[str, Any] | None:
+    if total_items > 0:
+        return None
+    return {
+        "code": "no_data",
+        "title": "No hay datos para mostrar",
+        "message": f"No se encontraron datos para {context} con los filtros actuales.",
+    }
+
+
 def _session_dominant_domain(domains: list["QuestionnaireSessionResultDomain"]) -> str | None:
     if not domains:
         return None
@@ -221,12 +281,12 @@ def _safe_display_name(user: AppUser | None) -> str:
 
 def _case_display_label(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None) -> str:
     if viewer_user_id and viewer_user_id == case.owner_user_id and case.private_label:
-        return str(case.private_label)
+        return _decrypt_text_safe(case.private_label, "questionnaire_case.private_label") or f"Caso {case.case_public_id}"
     return f"Caso {case.case_public_id}"
 
 
 def _case_payload(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None = None) -> dict[str, Any]:
-    private_label = _decrypt_text(case.private_label, "questionnaire_case.private_label") if case.private_label else None
+    private_label = _decrypt_text_safe(case.private_label, "questionnaire_case.private_label") if case.private_label else None
     payload: dict[str, Any] = {
         "case_id": str(case.id),
         "case_public_id": case.case_public_id,
@@ -1162,6 +1222,27 @@ def _build_answer_resume_payload(
     }
 
 
+def _build_answer_resume_payload_safe(
+    question: QuestionnaireQuestion,
+    section: QuestionnaireSection | None,
+    answer_row: QuestionnaireSessionAnswer,
+) -> dict[str, Any]:
+    return {
+        "question_id": str(question.id),
+        "question_code": question.question_code,
+        "section": section.title if section else None,
+        "answer": _decrypt_json_safe(
+            answer_row.answer_raw,
+            "questionnaire_session_answer.answer_raw",
+        ),
+        "answer_value": _decrypt_text_safe(
+            answer_row.answer_normalized,
+            "questionnaire_session_answer.answer_normalized",
+        ),
+        "updated_at": answer_row.updated_at.isoformat() if answer_row.updated_at else None,
+    }
+
+
 def _build_saved_answers_payload(
     session: QuestionnaireSession,
     saved_question_ids: list[uuid.UUID],
@@ -1186,7 +1267,7 @@ def _build_saved_answers_payload(
     payload: list[dict[str, Any]] = []
     for answer_row, question, section in rows:
         if answer_row and answer_row.answer_raw is not None:
-            payload.append(_build_answer_resume_payload(question, section, answer_row))
+            payload.append(_build_answer_resume_payload_safe(question, section, answer_row))
     return payload
 
 
@@ -1220,7 +1301,7 @@ def get_session_payload(
     if include_answers:
         rows = _session_answer_rows(session)
         answers = [
-            _build_answer_resume_payload(question, section, answer_row)
+            _build_answer_resume_payload_safe(question, section, answer_row)
             for _item, question, answer_row, section in rows
             if answer_row and answer_row.answer_raw is not None
         ]
@@ -1289,11 +1370,11 @@ def get_session_page_payload(session: QuestionnaireSession, page: int, page_size
             answer_value = None
             answer_updated_at = None
             if answer_row and answer_row.answer_raw is not None:
-                answer = _decrypt_json(
+                answer = _decrypt_json_safe(
                     answer_row.answer_raw,
                     "questionnaire_session_answer.answer_raw",
                 )
-                answer_value = _decrypt_text(
+                answer_value = _decrypt_text_safe(
                     answer_row.answer_normalized,
                     "questionnaire_session_answer.answer_normalized",
                 )
@@ -1895,11 +1976,11 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
     comorbidity = QuestionnaireSessionResultComorbidity.query.filter_by(session_id=session.id).all()
 
     if result:
-        result_summary = _decrypt_text(
+        result_summary = _decrypt_text_safe(
             result.summary_text,
             "questionnaire_session_result.summary_text",
         )
-        result_recommendation = _decrypt_text(
+        result_recommendation = _decrypt_text_safe(
             result.operational_recommendation,
             "questionnaire_session_result.operational_recommendation",
         )
@@ -1928,7 +2009,7 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
                 "mode": row.mode,
                 "operational_class": row.operational_class,
                 "operational_caveat": row.operational_caveat,
-                "result_summary": _decrypt_text(
+                "result_summary": _decrypt_text_safe(
                     row.result_summary,
                     "questionnaire_session_result_domain.result_summary",
                 ),
@@ -1939,13 +2020,13 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
         "comorbidity": [
             {
                 "coexistence_key": row.coexistence_key,
-                "domains": _decrypt_json(
+                "domains": _decrypt_json_safe(
                     row.domains_json,
                     "questionnaire_session_result_comorbidity.domains_json",
                 ),
                 "combined_risk_score": row.combined_risk_score,
                 "coexistence_level": row.coexistence_level,
-                "summary": _decrypt_text(
+                "summary": _decrypt_text_safe(
                     row.summary,
                     "questionnaire_session_result_comorbidity.summary",
                 ),
@@ -2287,7 +2368,7 @@ def list_history(
             if str(row.owner_user_id) == str(user_id) and row.case_id:
                 case_row = db.session.get(QuestionnaireCase, row.case_id)
                 if case_row and case_row.private_label:
-                    private_label = _decrypt_text(case_row.private_label, "questionnaire_case.private_label") or ""
+                    private_label = _decrypt_text_safe(case_row.private_label, "questionnaire_case.private_label") or ""
                     if token in private_label.lower():
                         filtered_rows.append(row)
                         continue
@@ -2696,7 +2777,7 @@ def guardian_dashboard(
     if q_token:
         q_cases: list[QuestionnaireCase] = []
         for row in all_cases:
-            private_label = _decrypt_text(row.private_label, "questionnaire_case.private_label") if row.private_label else ""
+            private_label = _decrypt_text_safe(row.private_label, "questionnaire_case.private_label") if row.private_label else ""
             values = [
                 str(row.case_public_id or "").lower(),
                 str(private_label or "").lower(),
@@ -2874,7 +2955,109 @@ def guardian_dashboard(
     if summary_domain_counter:
         most_frequent_domain = summary_domain_counter.most_common(1)[0][0]
 
+    summary_payload = {
+        "total_cases": len(all_cases),
+        "total_sessions": len(filtered_sessions),
+        "processed_sessions": sum(1 for row in filtered_sessions if row.status == "processed"),
+        "draft_sessions": sum(1 for row in filtered_sessions if row.status == "draft"),
+        "in_progress_sessions": sum(1 for row in filtered_sessions if row.status == "in_progress"),
+        "cases_with_alerts": len(cases_with_alerts),
+        "cases_needing_professional_review": len(cases_needing_review),
+        "highest_alert_level": highest_alert,
+        "most_frequent_domain": most_frequent_domain,
+    }
+    dashboard_warnings: list[str] = []
+    if summary_payload["total_sessions"] > 0 and not alerts_by_month:
+        dashboard_warnings.append("alerts_by_month_empty_with_nonzero_sessions")
+    if summary_payload["processed_sessions"] > 0 and not alerts_by_domain:
+        dashboard_warnings.append("alerts_by_domain_empty_with_processed_sessions")
+
+    time_series_payload = {
+        "alerts_by_period": alerts_by_month,
+        "questionnaires_by_period": [
+            {"month": item["month"], "count": int(item.get("total_alerts", 0))}
+            for item in alerts_by_month
+        ],
+        "processed_by_period": [
+            {
+                "month": month,
+                "count": sum(
+                    1
+                    for row in filtered_sessions
+                    if row.status == "processed"
+                    and (row.processed_at or row.created_at or _utcnow()).strftime("%Y-%m") == month
+                ),
+            }
+            for month in sorted({item["month"] for item in alerts_by_month})
+        ],
+    }
+
+    breakdowns_payload = {
+        "alerts_by_domain": alerts_by_domain,
+        "alerts_by_level": alerts_by_level,
+        "questionnaires_by_status": [
+            {"status": "processed", "count": summary_payload["processed_sessions"]},
+            {"status": "draft", "count": summary_payload["draft_sessions"]},
+            {"status": "in_progress", "count": summary_payload["in_progress_sessions"]},
+        ],
+    }
+
+    rankings_payload = {
+        "priority_cases": sorted(
+            [
+                {
+                    "case_id": item["case"]["case_id"],
+                    "case_public_id": item["case"]["case_public_id"],
+                    "display_label": item["case"].get("display_label"),
+                    "highest_alert_level": item["summary"]["highest_alert_level"],
+                    "sessions_count": item["summary"]["sessions_count"],
+                }
+                for item in case_items
+            ],
+            key=lambda row: (_alert_rank(row["highest_alert_level"]), row["sessions_count"]),
+            reverse=True,
+        )[:10],
+        "activity_by_case": sessions_by_case_chart,
+    }
+
+    matrix_payload = {
+        "case_by_domain": [
+            {
+                "case_id": item["case"]["case_id"],
+                "case_public_id": item["case"]["case_public_id"],
+                "domains": [
+                    {
+                        "domain": slot.get("domain"),
+                        "max_probability": slot.get("max_probability"),
+                        "latest_alert_level": slot.get("latest_alert_level"),
+                    }
+                    for slot in item.get("domain_breakdown", [])
+                ],
+            }
+            for item in case_items
+        ]
+    }
+
     return {
+        "meta": {
+            "generated_at": _utcnow().isoformat(),
+            "period": {
+                "from": start_date.isoformat(),
+                "to": end_date.isoformat(),
+                "preset": f"last_{months}_months",
+            },
+            "filters_applied": {
+                "case_id": str(case_id) if case_id else None,
+                "case_public_id": case_public_id,
+                "case_label": case_label,
+                "q": q,
+                "domain": domain,
+                "alert_level": alert_level,
+            },
+            "data_freshness": "live",
+            "request_id": _dashboard_request_id(),
+            "warnings": dashboard_warnings,
+        },
         "period": {
             "months": months,
             "date_from": start_date.isoformat(),
@@ -2888,17 +3071,11 @@ def guardian_dashboard(
             "domain": domain,
             "alert_level": alert_level,
         },
-        "summary": {
-            "total_cases": len(all_cases),
-            "total_sessions": len(filtered_sessions),
-            "processed_sessions": sum(1 for row in filtered_sessions if row.status == "processed"),
-            "draft_sessions": sum(1 for row in filtered_sessions if row.status == "draft"),
-            "in_progress_sessions": sum(1 for row in filtered_sessions if row.status == "in_progress"),
-            "cases_with_alerts": len(cases_with_alerts),
-            "cases_needing_professional_review": len(cases_needing_review),
-            "highest_alert_level": highest_alert,
-            "most_frequent_domain": most_frequent_domain,
-        },
+        "summary": summary_payload,
+        "time_series": time_series_payload,
+        "breakdowns": breakdowns_payload,
+        "rankings": rankings_payload,
+        "matrix": matrix_payload,
         "charts": {
             "alerts_by_month": alerts_by_month,
             "alerts_by_domain": alerts_by_domain,
@@ -2906,8 +3083,19 @@ def guardian_dashboard(
             "sessions_by_case": sessions_by_case_chart,
             "cases_by_alert_level": cases_by_alert_level,
         },
+        "items": [item["case"] | {"summary": item["summary"]} for item in case_items],
+        "pagination": {"page": 1, "page_size": len(case_items), "total": len(case_items), "pages": 1},
+        "permissions": {
+            "can_create_case": True,
+            "can_archive_case": True,
+            "can_share_with_psychologist": True,
+            "can_request_review": True,
+            "can_generate_pdf": True,
+            "can_manage_tags": True,
+        },
+        "empty_state": _dashboard_empty_state(total_items=len(case_items), context="dashboard de casos"),
         "cases": case_items,
-        "warnings": [],
+        "warnings": dashboard_warnings,
     }
 
 
@@ -3082,16 +3270,96 @@ def psychologist_dashboard(
     by_date = [{"month": key, "count": int(value)} for key, value in sorted(aggregate_date_counter.items())]
     by_case = [{"case_public_id": key, "count": int(value)} for key, value in sorted(aggregate_case_counter.items())]
 
+    summary_payload = {
+        "total_shared_sessions": total,
+        "total_cases": len({item.get("case_public_id") for item in item_rows if item.get("case_public_id")}),
+        "pending_reviews": int(review_status_counter.get("pending", 0)),
+        "reviewed_cases": int(review_status_counter.get("reviewed", 0)),
+        "cases_needing_professional_review": sum(1 for item in item_rows if item["needs_professional_review"]),
+        "highest_alert_level": highest_alert,
+    }
+    dashboard_warnings: list[str] = []
+    if summary_payload["total_shared_sessions"] > 0 and not by_domain:
+        dashboard_warnings.append("alerts_by_domain_empty_with_shared_sessions")
+    if summary_payload["total_shared_sessions"] > 0 and not by_date:
+        dashboard_warnings.append("alerts_by_date_empty_with_shared_sessions")
+
+    time_series_payload = {
+        "alerts_by_period": by_date,
+        "questionnaires_by_period": by_date,
+        "processed_by_period": [
+            {
+                "month": slot["month"],
+                "count": sum(
+                    1
+                    for row in filtered_rows
+                    if row.status == "processed"
+                    and (row.processed_at or row.created_at or _utcnow()).strftime("%Y-%m") == slot["month"]
+                ),
+            }
+            for slot in by_date
+        ],
+    }
+
+    breakdowns_payload = {
+        "alerts_by_domain": by_domain,
+        "alerts_by_level": by_alert_level,
+        "reviews_by_status": by_review_status,
+        "questionnaires_by_status": [
+            {"status": status, "count": sum(1 for row in filtered_rows if row.status == status)}
+            for status in sorted({row.status for row in filtered_rows})
+        ],
+    }
+
+    rankings_payload = {
+        "priority_cases": sorted(
+            [
+                {
+                    "case_public_id": item.get("case_public_id"),
+                    "highest_alert_level": item.get("highest_alert_level"),
+                    "needs_professional_review": item.get("needs_professional_review"),
+                }
+                for item in item_rows
+                if item.get("case_public_id")
+            ],
+            key=lambda row: (_alert_rank(str(row.get("highest_alert_level") or "low")), bool(row.get("needs_professional_review"))),
+            reverse=True,
+        )[:20],
+        "activity_by_case": by_case,
+    }
+
+    matrix_payload = {
+        "domain_by_alert_level": [
+            {
+                "domain": slot.get("domain"),
+                "alerts": [
+                    {"alert_level": al["alert_level"], "count": al["count"]}
+                    for al in by_alert_level
+                ],
+            }
+            for slot in by_domain
+        ]
+    }
+
     return {
-        "filters": base_filters,
-        "summary": {
-            "total_shared_sessions": total,
-            "total_cases": len({item.get("case_public_id") for item in item_rows if item.get("case_public_id")}),
-            "pending_reviews": int(review_status_counter.get("pending", 0)),
-            "reviewed_cases": int(review_status_counter.get("reviewed", 0)),
-            "cases_needing_professional_review": sum(1 for item in item_rows if item["needs_professional_review"]),
-            "highest_alert_level": highest_alert,
+        "meta": {
+            "generated_at": _utcnow().isoformat(),
+            "period": {
+                "from": (date_from.isoformat() if date_from else None),
+                "to": (date_to.isoformat() if date_to else None),
+                "preset": "custom" if (date_from or date_to) else "all_time",
+            },
+            "filters_applied": base_filters,
+            "data_freshness": "live",
+            "request_id": _dashboard_request_id(),
+            "warnings": dashboard_warnings,
         },
+        "filters": base_filters,
+        "summary": summary_payload,
+        "time_series": time_series_payload,
+        "breakdowns": breakdowns_payload,
+        "rankings": rankings_payload,
+        "matrix": matrix_payload,
         "aggregates": {
             "by_domain": by_domain,
             "by_alert_level": by_alert_level,
@@ -3113,7 +3381,14 @@ def psychologist_dashboard(
             "total": total,
             "pages": max(1, (total + page_size - 1) // page_size),
         },
-        "warnings": [],
+        "permissions": {
+            "can_review": True,
+            "can_download_pdf": True,
+            "can_accept_share_request": True,
+            "can_reject_share_request": True,
+        },
+        "empty_state": _dashboard_empty_state(total_items=total, context="dashboard de evaluaciones compartidas"),
+        "warnings": dashboard_warnings,
     }
 
 
@@ -3309,8 +3584,8 @@ def _professional_review_payload(
     viewer_user_id: uuid.UUID | None = None,
 ) -> dict[str, Any]:
     is_owner = bool(viewer_user_id and viewer_user_id == row.owner_user_id)
-    initial_concept = _decrypt_text(row.initial_concept, "questionnaire_professional_review.initial_concept")
-    recommendation = _decrypt_text(row.recommendation, "questionnaire_professional_review.recommendation")
+    initial_concept = _decrypt_text_safe(row.initial_concept, "questionnaire_professional_review.initial_concept")
+    recommendation = _decrypt_text_safe(row.recommendation, "questionnaire_professional_review.recommendation")
     if is_owner and not row.visible_to_guardian:
         initial_concept = None
         recommendation = None
@@ -4108,7 +4383,7 @@ def _session_pdf_question_rows(session_id: uuid.UUID) -> list[dict[str, Any]]:
     for idx, (item, question, answer, section) in enumerate(rows, start=1):
         prompt = question.caregiver_question or question.psychologist_question or question.question_text_primary or "N/A"
         raw = (
-            _decrypt_json(
+            _decrypt_json_safe(
                 answer.answer_raw,
                 "questionnaire_session_answer.answer_raw",
             )
@@ -4116,7 +4391,7 @@ def _session_pdf_question_rows(session_id: uuid.UUID) -> list[dict[str, Any]]:
             else None
         )
         normalized = (
-            _decrypt_text(
+            _decrypt_text_safe(
                 answer.answer_normalized,
                 "questionnaire_session_answer.answer_normalized",
             )
@@ -4477,7 +4752,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
 
     role = _normalize_role(session.respondent_role)
     generated_at = _utcnow()
-    metadata = _decrypt_json(session.metadata_json, "questionnaire_session.metadata_json") or {}
+    metadata = _decrypt_json_safe(session.metadata_json, "questionnaire_session.metadata_json") or {}
     metadata_extra = metadata.get("metadata") if isinstance(metadata, dict) else {}
     if not isinstance(metadata_extra, dict):
         metadata_extra = {}
