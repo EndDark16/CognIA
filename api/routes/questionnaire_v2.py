@@ -487,6 +487,8 @@ def patch_answers(session_id: str):
     except PermissionError as exc:
         return _error("forbidden", str(exc), 403)
     except ValueError as exc:
+        if str(exc).startswith("clinical_consistency_error:"):
+            return _error(str(exc), "clinical_consistency_error", 422)
         return _error("validation_error", str(exc), 400)
     except Exception as exc:
         return _handle_backend_failure(exc, "save_failed")
@@ -785,6 +787,8 @@ def submit_session(session_id: str):
     except PermissionError as exc:
         return _error("forbidden", str(exc), 403)
     except ValueError as exc:
+        if str(exc).startswith("clinical_consistency_error:"):
+            return _error(str(exc), "clinical_consistency_error", 422)
         return _error("validation_error", str(exc), 400)
     except Exception as exc:
         return _handle_backend_failure(exc, "submit_failed")

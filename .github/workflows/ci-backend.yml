@@ -43,6 +43,10 @@ jobs:
         run: |
           ruff check --select F api tests
 
+      - name: Repository hygiene guard
+        run: |
+          python scripts/check_clean_worktree.py
+
       - name: Compile sanity check
         run: |
           python -m compileall -q api app config core scripts run.py
