@@ -17946,9 +17946,9 @@ paths:
                     generated_at: '2026-05-02T13:20:11Z'
                     overall_risk_level: relevante
                     simulated_diagnostic_text:
-                      sintesis_general: Patron general de tamizaje con mayor compatibilidad en ADHD y ANXIETY.
-                      niveles_de_compatibilidad: ADHD relevante; CONDUCT intermedia; ELIMINATION baja.
-                      indicadores_principales_observados: ADHD adhd_symptom_01 3.0
+                      sintesis_general: Patron general de tamizaje con mayor compatibilidad en TDAH y Ansiedad.
+                      niveles_de_compatibilidad: TDAH relevante; Conducta intermedia; Eliminacion baja.
+                      indicadores_principales_observados: TDAH adhd_symptom_01 3.0
                       impacto_funcional: El patron observado puede asociarse con impacto funcional.
                       recomendacion_profesional: Recomendacion de valoracion profesional pronta.
                       aclaracion_importante: Este resultado no constituye un diagnostico clinico.
@@ -22510,18 +22510,46 @@ components:
           type: string
           minLength: 1
           maxLength: 40
+        completed_by_role:
+          type: string
+          maxLength: 80
+          description: Rol declarado de quien diligencia el cuestionario.
+        completed_by_professional_role:
+          type: string
+          maxLength: 80
+          nullable: true
+          description: Rol profesional si aplica.
+        respondent_relationship:
+          type: string
+          maxLength: 80
+          nullable: true
+          description: Relacion con el menor/paciente.
+        applied_at:
+          type: string
+          format: date-time
+          nullable: true
+        institution_name:
+          type: string
+          maxLength: 255
+          nullable: true
+        source_channel:
+          type: string
+          maxLength: 80
+          nullable: true
         metadata:
           type: object
           additionalProperties: true
     SessionAnswerItem:
       type: object
       required:
-      - question_id
       - answer
       properties:
         question_id:
           type: string
           format: uuid
+        question_code:
+          type: string
+          description: Backward-compatible question code alternative when question_id is not available.
         answer:
           description: Raw answer value accepted by question response type.
     SessionAnswersPatchRequestPlain:
@@ -22594,6 +22622,47 @@ components:
           type: string
           format: date-time
           nullable: true
+        questionnaire:
+          type: object
+          additionalProperties: true
+          description: Product-facing questionnaire alias for session fields.
+        application_trace:
+          type: object
+          additionalProperties: true
+        completed_by_user_id:
+          type: string
+          format: uuid
+          nullable: true
+        completed_by_display_name:
+          type: string
+          nullable: true
+        completed_by_role:
+          type: string
+          nullable: true
+        completed_by_professional_role:
+          type: string
+          nullable: true
+        respondent_relationship:
+          type: string
+          nullable: true
+        applied_at:
+          type: string
+          format: date-time
+          nullable: true
+        submitted_at:
+          type: string
+          format: date-time
+          nullable: true
+        processed_at:
+          type: string
+          format: date-time
+          nullable: true
+        institution_name:
+          type: string
+          nullable: true
+        source_channel:
+          type: string
+          nullable: true
     SessionCreateResponsePlain:
       type: object
       required:
@@ -22630,6 +22699,48 @@ components:
         needs_professional_review:
           type: boolean
           nullable: true
+        safety_flags:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        urgent_referral_recommended:
+          type: boolean
+        safety_signal_level:
+          type: string
+          enum:
+          - none
+          - watch
+          - urgent
+        safety_signal_items:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        safety_note:
+          type: string
+          nullable: true
+        inconsistency_flags:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        clinical_consistency_warnings:
+          type: array
+          items:
+            type: string
+        developmental_context_notes:
+          type: array
+          items:
+            type: string
+        score_type:
+          type: string
+          example: symptom_load_index
+        score_label:
+          type: string
+          example: Indice de carga sintomatica
+        score_explanation:
+          type: string
     SessionDomainResult:
       type: object
       required:
@@ -22645,8 +22756,16 @@ components:
       properties:
         domain:
           type: string
+        domain_code:
+          type: string
+        domain_label:
+          type: string
+          example: TDAH
+        domain_description:
+          type: string
         probability:
           type: number
+          description: Technical model score retained for compatibility. UI should prefer score_* fields.
         alert_level:
           type: string
         confidence_pct:
@@ -22671,6 +22790,14 @@ components:
           nullable: true
         needs_professional_review:
           type: boolean
+        score_value:
+          type: number
+        score_type:
+          type: string
+        score_label:
+          type: string
+        score_explanation:
+          type: string
     SessionComorbidityResult:
       type: object
       required:
@@ -22712,6 +22839,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SessionComorbidityResult'
+        data_quality:
+          type: object
+          additionalProperties: true
     ClinicalSummaryNarrative:
       type: object
       required:
