@@ -20294,6 +20294,78 @@ paths:
                     msg: internal failure while processing docs
                     error: server_error
       x-contract-status: KEEP_ACTIVE
+  /api/docs:
+    get:
+      tags:
+      - Docs
+      summary: Abrir la interfaz Swagger UI del backend por alias bajo /api
+      description: '**Objetivo funcional**
+
+        Este endpoint permite consultar la interfaz Swagger UI por un alias bajo `/api`.
+
+
+        **Cuando debe usarse**
+
+        Usalo cuando el gateway solo enrute `/api/*` al backend y se requiera discovery de contrato.
+
+
+        **Actor que lo consume**
+
+        Integradores, QA y desarrollo para discovery de contrato.
+
+
+        **Seguridad aplicable**
+
+        - Endpoint publico; no requiere token JWT.
+
+
+        **Entrada esperada**
+
+        - Metodo y ruta: `GET /api/docs`.
+
+        - Parametros de ruta: no aplica.
+
+        - Query params: no aplica.
+
+        - Headers adicionales: no aplica.
+
+        - Body: no aplica.
+
+
+        **Resultado exitoso**
+
+        - Codigos de exito documentados: 200.
+
+        - Sirve la interfaz Swagger UI apuntando a `/api/openapi.yaml`.
+
+
+        **Errores posibles y causa funcional**
+
+        - `500`: Error interno del servidor sin exposicion de detalles sensibles.
+
+
+        **Estado contractual**
+
+        - `KEEP_ACTIVE`
+
+        - Motivo: Alias documental compatible con gateways `/api`.
+
+        - Accion OpenAPI: mantener visible'
+      operationId: getApiDocs
+      responses:
+        '200':
+          description: La interfaz Swagger UI fue servida correctamente.
+          content:
+            text/html:
+              schema:
+                type: string
+        '500':
+          description: "La aplicaci\xF3n no pudo servir la interfaz Swagger UI."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-contract-status: KEEP_ACTIVE
   /healthz:
     get:
       tags:
@@ -20556,6 +20628,81 @@ paths:
                   value:
                     msg: internal failure while processing openapi_yaml
                     error: server_error
+      x-contract-status: KEEP_ACTIVE
+  /api/openapi.yaml:
+    get:
+      tags:
+      - Docs
+      summary: Descargar la especificacion OpenAPI publica por alias bajo /api
+      description: '**Objetivo funcional**
+
+        Este endpoint permite descargar la especificacion OpenAPI por un alias bajo `/api`.
+
+
+        **Cuando debe usarse**
+
+        Usalo cuando el gateway solo enrute `/api/*` al backend y se requiera validar el contrato desplegado.
+
+
+        **Actor que lo consume**
+
+        Integradores, QA, frontend y operaciones para discovery de contrato.
+
+
+        **Seguridad aplicable**
+
+        - Endpoint publico; no requiere token JWT.
+
+
+        **Entrada esperada**
+
+        - Metodo y ruta: `GET /api/openapi.yaml`.
+
+        - Parametros de ruta: no aplica.
+
+        - Query params: no aplica.
+
+        - Headers adicionales: no aplica.
+
+        - Body: no aplica.
+
+
+        **Resultado exitoso**
+
+        - Codigos de exito documentados: 200.
+
+        - Sirve el archivo YAML del contrato OpenAPI vigente.
+
+
+        **Errores posibles y causa funcional**
+
+        - `500`: Error interno del servidor sin exposicion de detalles sensibles.
+
+
+        **Estado contractual**
+
+        - `KEEP_ACTIVE`
+
+        - Motivo: Alias documental compatible con gateways `/api`.
+
+        - Accion OpenAPI: mantener visible'
+      operationId: getApiOpenapiYaml
+      responses:
+        '200':
+          description: El archivo OpenAPI YAML fue servido correctamente.
+          content:
+            application/yaml:
+              schema:
+                type: string
+            text/yaml:
+              schema:
+                type: string
+        '500':
+          description: "La aplicaci\xF3n no pudo servir la especificaci\xF3n OpenAPI."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       x-contract-status: KEEP_ACTIVE
   /readyz:
     get:
