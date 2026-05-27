@@ -6,10 +6,7 @@ docs_bp = Blueprint("docs", __name__)
 
 
 def _enabled() -> bool:
-    return bool(
-        current_app.config.get("SWAGGER_ENABLED", True)
-        and current_app.config.get("OPENAPI_PUBLIC_ENABLED", True)
-    )
+    return bool(current_app.config.get("SWAGGER_ENABLED", True))
 
 
 @docs_bp.get("/openapi.yaml")
