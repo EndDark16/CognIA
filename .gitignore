@@ -44,10 +44,12 @@ sonar_issues.json
 *.log
 *.tmp
 *.temp
+*.pdf.tmp
 tmp/
 temp/
 *.bak
 *.orig
+screenshots/
 
 # -----------------------------
 # OS / IDE
@@ -100,7 +102,17 @@ artifacts/inference_v5/
 artifacts/runtime_reports/
 artifacts/problem_reports/uploads/
 artifacts/**/uploads/
+artifacts/local_*.json
+artifacts/tmp/
+artifacts/generated/
 catboost_info/
+
+# Report outputs generated during local validation (curated tracked reports remain versioned)
+reports/generated/
+reports/tmp/
+reports/ops/
+reports/**/*.tmp
+reports/**/*.log
 
 # -----------------------------
 # Heavy generated data/intermediates

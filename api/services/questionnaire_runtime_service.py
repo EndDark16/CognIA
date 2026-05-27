@@ -740,11 +740,11 @@ def _build_default_questionnaire_version(version: QRQuestionnaireVersion) -> Non
     feature_set = set(features)
     section_defs = [
         ("contexto", "Contexto base", "Datos minimos para iniciar la evaluacion."),
-        ("dominio_adhd", "Dominio ADHD", "Seccion de senales relacionadas con atencion e impulsividad."),
-        ("dominio_conduct", "Dominio Conduct", "Seccion de comportamiento disruptivo y regulacion conductual."),
-        ("dominio_elimination", "Dominio Elimination", "Seccion de senales de eliminacion con cautela clinica."),
-        ("dominio_anxiety", "Dominio Anxiety", "Seccion de ansiedad y evitacion."),
-        ("dominio_depression", "Dominio Depression", "Seccion de animo y sintomas depresivos."),
+        ("dominio_adhd", "Dominio TDAH", "Seccion de senales relacionadas con atencion e impulsividad."),
+        ("dominio_conduct", "Dominio conducta", "Seccion de comportamiento disruptivo y regulacion conductual."),
+        ("dominio_elimination", "Dominio eliminacion", "Seccion de senales de eliminacion con cautela clinica."),
+        ("dominio_anxiety", "Dominio ansiedad", "Seccion de ansiedad y evitacion."),
+        ("dominio_depression", "Dominio depresion", "Seccion de animo y sintomas depresivos."),
         ("dominio_general", "Senales generales", "Indicadores transversales de apoyo al modelo."),
     ]
     section_map: dict[str, QRQuestionnaireSection] = {}

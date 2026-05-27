@@ -17,6 +17,7 @@ from typing import Any
 import joblib
 import pandas as pd
 from flask import current_app
+from flask import g
 from sqlalchemy import and_, case, func, or_
 
 from api.cache import (
@@ -69,6 +70,38 @@ from app.models import (
 
 
 DOMAIN_ORDER = ["adhd", "conduct", "elimination", "anxiety", "depression"]
+DOMAIN_DISPLAY = {
+    "adhd": {
+        "label": "TDAH",
+        "description": "Trastorno por Deficit de Atencion e Hiperactividad",
+    },
+    "conduct": {
+        "label": "Conducta",
+        "description": "Senales relacionadas con conducta disruptiva u oposicionista",
+    },
+    "elimination": {
+        "label": "Eliminacion",
+        "description": "Senales relacionadas con control de esfinteres y eliminacion",
+    },
+    "anxiety": {
+        "label": "Ansiedad",
+        "description": "Senales relacionadas con ansiedad",
+    },
+    "depression": {
+        "label": "Depresion",
+        "description": "Senales relacionadas con estado de animo depresivo",
+    },
+}
+SCORE_TYPE = "symptom_load_index"
+SCORE_LABEL = "Indice de carga sintomatica"
+SCORE_EXPLANATION = (
+    "Este valor resume la carga de senales reportadas frente al instrumento; "
+    "no representa probabilidad diagnostica."
+)
+SAFETY_NOTE = (
+    "Se identifico una respuesta que requiere revision prioritaria por un profesional cualificado. "
+    "Este reporte no constituye diagnostico ni atencion de emergencia."
+)
 ROLE_ALIAS_TO_CANONICAL = {
     "guardian": "guardian",
     "caregiver": "guardian",
@@ -144,6 +177,48 @@ def _decrypt_text(value: str | None, purpose: str) -> str | None:
     return crypto_service.decrypt_text(value, purpose=purpose)
 
 
+def _decrypt_json_safe(value: Any, purpose: str, default: Any = None) -> Any:
+    """Best-effort decrypt for read/display paths. Never raises."""
+    if value is None:
+        return default
+    try:
+        return _decrypt_json(value, purpose)
+    except Exception:
+        # Legacy/plain values should still be consumable.
+        if isinstance(value, (dict, list, int, float, bool)):
+            return value
+        if isinstance(value, str):
+            text = value.strip()
+            if not text:
+                return default
+            try:
+                return json.loads(text)
+            except Exception:
+                return text
+        return default
+
+
+def _decrypt_text_safe(value: str | None, purpose: str, default: str | None = None) -> str | None:
+    """Best-effort decrypt for read/display paths. Never raises."""
+    if value is None:
+        return default
+    try:
+        return _decrypt_text(value, purpose)
+    except Exception:
+        # Legacy/plain values should still be consumable.
+        if isinstance(value, str) and value.strip():
+            text = value.strip()
+            if text.startswith("{"):
+                try:
+                    parsed = json.loads(text)
+                    if isinstance(parsed, dict) and parsed.get(crypto_service.FIELD_ENVELOPE_MARKER):
+                        return default
+                except Exception:
+                    pass
+            return value
+        return default
+
+
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
@@ -195,6 +270,23 @@ def _pick_highest_alert(levels: list[str]) -> str | None:
     return max(levels, key=_alert_rank)
 
 
+def _dashboard_request_id() -> str | None:
+    try:
+        return getattr(g, "request_id", None)
+    except Exception:
+        return None
+
+
+def _dashboard_empty_state(*, total_items: int, context: str) -> dict[str, Any] | None:
+    if total_items > 0:
+        return None
+    return {
+        "code": "no_data",
+        "title": "No hay datos para mostrar",
+        "message": f"No se encontraron datos para {context} con los filtros actuales.",
+    }
+
+
 def _session_dominant_domain(domains: list["QuestionnaireSessionResultDomain"]) -> str | None:
     if not domains:
         return None
@@ -221,12 +313,12 @@ def _safe_display_name(user: AppUser | None) -> str:
 
 def _case_display_label(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None) -> str:
     if viewer_user_id and viewer_user_id == case.owner_user_id and case.private_label:
-        return str(case.private_label)
+        return _decrypt_text_safe(case.private_label, "questionnaire_case.private_label") or f"Caso {case.case_public_id}"
     return f"Caso {case.case_public_id}"
 
 
 def _case_payload(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None = None) -> dict[str, Any]:
-    private_label = _decrypt_text(case.private_label, "questionnaire_case.private_label") if case.private_label else None
+    private_label = _decrypt_text_safe(case.private_label, "questionnaire_case.private_label") if case.private_label else None
     payload: dict[str, Any] = {
         "case_id": str(case.id),
         "case_public_id": case.case_public_id,
@@ -247,6 +339,218 @@ def _to_float(value: Any, default: float | None = None) -> float | None:
         return float(value)
     except Exception:
         return default
+
+
+def _domain_label(domain: str | None) -> str:
+    code = str(domain or "").strip().lower()
+    return DOMAIN_DISPLAY.get(code, {}).get("label") or code.upper()
+
+
+def _domain_description(domain: str | None) -> str:
+    code = str(domain or "").strip().lower()
+    return DOMAIN_DISPLAY.get(code, {}).get("description") or "Dominio de tamizaje"
+
+
+def _domain_payload_fields(domain: str | None) -> dict[str, str]:
+    code = str(domain or "").strip().lower()
+    return {
+        "domain_code": code,
+        "domain_label": _domain_label(code),
+        "domain_description": _domain_description(code),
+    }
+
+
+def _score_payload(probability: float | None) -> dict[str, Any]:
+    return {
+        "score_value": round(float(probability or 0.0) * 100.0, 1),
+        "score_type": SCORE_TYPE,
+        "score_label": SCORE_LABEL,
+        "score_explanation": SCORE_EXPLANATION,
+    }
+
+
+def _text_tokens(*parts: Any) -> str:
+    text = " ".join(str(part or "") for part in parts)
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    return text.lower()
+
+
+def _answer_positive(value: Any, max_value: float | None = None) -> bool:
+    numeric = _to_float(value)
+    if numeric is not None:
+        if max_value is not None:
+            return numeric >= max_value
+        return numeric > 0
+    return str(value or "").strip().lower() in {"si", "sí", "true", "yes", "y", "1"}
+
+
+def _application_trace_payload(session: QuestionnaireSession) -> dict[str, Any]:
+    return {
+        "completed_by_user_id": str(session.completed_by_user_id) if session.completed_by_user_id else None,
+        "completed_by_display_name": session.completed_by_display_name or "No registrado",
+        "completed_by_role": session.completed_by_role,
+        "completed_by_professional_role": session.completed_by_professional_role,
+        "respondent_relationship": session.respondent_relationship,
+        "applied_at": session.applied_at.isoformat() if session.applied_at else None,
+        "submitted_at": session.submitted_at.isoformat() if session.submitted_at else None,
+        "processed_at": session.processed_at.isoformat() if session.processed_at else None,
+        "institution_name": session.institution_name,
+        "source_channel": session.source_channel,
+    }
+
+
+def _answer_records(session: QuestionnaireSession) -> list[dict[str, Any]]:
+    rows = (
+        db.session.query(QuestionnaireSessionAnswer, QuestionnaireQuestion)
+        .join(QuestionnaireQuestion, QuestionnaireSessionAnswer.question_id == QuestionnaireQuestion.id)
+        .filter(QuestionnaireSessionAnswer.session_id == session.id)
+        .all()
+    )
+    records: list[dict[str, Any]] = []
+    for answer, question in rows:
+        raw = _decrypt_json_safe(answer.answer_raw, "questionnaire_session_answer.answer_raw")
+        records.append(
+            {
+                "question_id": str(question.id),
+                "question_code": question.question_code,
+                "feature_key": question.feature_key,
+                "domain": question.domain,
+                "prompt": question.caregiver_question or question.psychologist_question or question.question_text_primary,
+                "answer": raw,
+                "numeric": _to_float(raw),
+                "min_value": question.min_value,
+                "max_value": question.max_value,
+            }
+        )
+    return records
+
+
+def _detect_safety_and_consistency(session: QuestionnaireSession, feature_map: dict[str, Any] | None = None) -> dict[str, Any]:
+    records = _answer_records(session)
+    safety_items: list[dict[str, Any]] = []
+    inconsistency_flags: list[dict[str, Any]] = []
+
+    for record in records:
+        tokens = _text_tokens(record.get("feature_key"), record.get("prompt"), record.get("question_code"))
+        is_safety_item = any(
+            marker in tokens
+            for marker in (
+                "muerte",
+                "morir",
+                "desaparecer",
+                "hacerse dano",
+                "hacerse daño",
+                "autoles",
+                "suicid",
+                "self harm",
+                "death",
+                "harm",
+            )
+        )
+        max_value = _to_float(record.get("max_value"))
+        if is_safety_item and _answer_positive(record.get("answer"), max_value=max_value):
+            safety_items.append(
+                {
+                    "question_id": record.get("question_id"),
+                    "question_code": record.get("question_code"),
+                    "feature_key": record.get("feature_key"),
+                    "domain": record.get("domain"),
+                    "answer": record.get("answer"),
+                    "level": "urgent",
+                    "message": SAFETY_NOTE,
+                }
+            )
+
+    never_continence = [
+        record
+        for record in records
+        if "contin" in _text_tokens(record.get("feature_key"), record.get("prompt"))
+        and "nunca" in _text_tokens(record.get("feature_key"), record.get("prompt"))
+        and _answer_positive(record.get("answer"), _to_float(record.get("max_value")))
+    ]
+    after_continence = [
+        record
+        for record in records
+        if "contin" in _text_tokens(record.get("feature_key"), record.get("prompt"))
+        and any(marker in _text_tokens(record.get("feature_key"), record.get("prompt")) for marker in ("despues", "periodo", "previo"))
+        and _answer_positive(record.get("answer"), _to_float(record.get("max_value")))
+    ]
+    if never_continence and after_continence:
+        inconsistency_flags.append(
+            {
+                "code": "continence_mutually_exclusive",
+                "severity": "blocking",
+                "message": "No puede marcarse simultaneamente que nunca hubo continencia y que el problema aparecio despues de un periodo de continencia.",
+            }
+        )
+
+    duration_records = [
+        record
+        for record in records
+        if any(marker in _text_tokens(record.get("feature_key"), record.get("prompt")) for marker in ("duracion", "meses", "months"))
+        and any(marker in _text_tokens(record.get("feature_key"), record.get("prompt")) for marker in ("orina", "enures", "escape", "elimin"))
+    ]
+    frequency_records = [
+        record
+        for record in records
+        if any(marker in _text_tokens(record.get("feature_key"), record.get("prompt")) for marker in ("frecuencia", "seman", "veces", "frequency"))
+        and any(marker in _text_tokens(record.get("feature_key"), record.get("prompt")) for marker in ("orina", "enures", "escape", "elimin"))
+    ]
+    if any(float(record.get("numeric") or 0) > 0 for record in duration_records) and any(
+        float(record.get("numeric") or 0) == 0 for record in frequency_records
+    ):
+        inconsistency_flags.append(
+            {
+                "code": "elimination_duration_without_frequency",
+                "severity": "warning",
+                "message": "Se reporta duracion de escapes, pero frecuencia semanal igual a cero; interpretar con cautela.",
+            }
+        )
+    if any(float(record.get("numeric") or 0) > 0 for record in frequency_records) and any(
+        float(record.get("numeric") or 0) == 0 for record in duration_records
+    ):
+        inconsistency_flags.append(
+            {
+                "code": "elimination_frequency_without_duration",
+                "severity": "warning",
+                "message": "Se reporta frecuencia de escapes, pero duracion igual a cero; interpretar con cautela.",
+            }
+        )
+
+    urgent = bool(safety_items)
+    return {
+        "safety_flags": [
+            {
+                "code": "self_harm_or_death_item_positive",
+                "level": "urgent",
+                "message": SAFETY_NOTE,
+            }
+        ]
+        if urgent
+        else [],
+        "urgent_referral_recommended": urgent,
+        "safety_signal_level": "urgent" if urgent else "none",
+        "safety_signal_items": safety_items,
+        "safety_note": SAFETY_NOTE if urgent else None,
+        "inconsistency_flags": inconsistency_flags,
+        "clinical_consistency_warnings": [
+            item["message"] for item in inconsistency_flags if item.get("severity") != "blocking"
+        ],
+        "developmental_context_notes": _developmental_context_notes(session, feature_map or {}),
+    }
+
+
+def _developmental_context_notes(session: QuestionnaireSession, feature_map: dict[str, Any]) -> list[str]:
+    notes: list[str] = []
+    age = _to_float(feature_map.get("age_years"))
+    has_elimination_signal = any("elimin" in str(key).lower() or "enures" in str(key).lower() for key in feature_map)
+    if has_elimination_signal or age is not None:
+        notes.append(
+            "En ninos de esta edad, algunos eventos de enuresis nocturna pueden presentarse sin implicar por si solos un trastorno. "
+            "La interpretacion debe considerar frecuencia, duracion, impacto funcional y contexto clinico."
+        )
+    return notes
 
 
 def _default_feature_value(feature: str) -> Any:
@@ -1022,6 +1326,10 @@ def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> Questio
     mode_key = _get_mode_key(role, mode)
     version = _active_version()
     linked_case = _resolve_case_for_session_creation(owner_user_id, payload)
+    completed_by_user = db.session.get(AppUser, owner_user_id)
+    completed_by_display = None
+    if completed_by_user:
+        completed_by_display = completed_by_user.full_name or completed_by_user.username or completed_by_user.email
 
     session_metadata = {
         "child_age_years": payload.get("child_age_years"),
@@ -1034,6 +1342,14 @@ def create_session(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> Questio
         case_id=linked_case.id if linked_case else None,
         version_id=version.id,
         owner_user_id=owner_user_id,
+        completed_by_user_id=owner_user_id,
+        completed_by_display_name=completed_by_display,
+        completed_by_role=payload.get("completed_by_role") or role,
+        completed_by_professional_role=payload.get("completed_by_professional_role"),
+        respondent_relationship=payload.get("respondent_relationship") or ("profesional" if role == "psychologist" else "padre"),
+        applied_at=payload.get("applied_at") or _utcnow(),
+        institution_name=payload.get("institution_name"),
+        source_channel=payload.get("source_channel") or "web",
         respondent_role=role,
         mode=mode,
         mode_key=mode_key,
@@ -1162,6 +1478,27 @@ def _build_answer_resume_payload(
     }
 
 
+def _build_answer_resume_payload_safe(
+    question: QuestionnaireQuestion,
+    section: QuestionnaireSection | None,
+    answer_row: QuestionnaireSessionAnswer,
+) -> dict[str, Any]:
+    return {
+        "question_id": str(question.id),
+        "question_code": question.question_code,
+        "section": section.title if section else None,
+        "answer": _decrypt_json_safe(
+            answer_row.answer_raw,
+            "questionnaire_session_answer.answer_raw",
+        ),
+        "answer_value": _decrypt_text_safe(
+            answer_row.answer_normalized,
+            "questionnaire_session_answer.answer_normalized",
+        ),
+        "updated_at": answer_row.updated_at.isoformat() if answer_row.updated_at else None,
+    }
+
+
 def _build_saved_answers_payload(
     session: QuestionnaireSession,
     saved_question_ids: list[uuid.UUID],
@@ -1186,7 +1523,7 @@ def _build_saved_answers_payload(
     payload: list[dict[str, Any]] = []
     for answer_row, question, section in rows:
         if answer_row and answer_row.answer_raw is not None:
-            payload.append(_build_answer_resume_payload(question, section, answer_row))
+            payload.append(_build_answer_resume_payload_safe(question, section, answer_row))
     return payload
 
 
@@ -1206,6 +1543,24 @@ def get_session_payload(
         "version": session.questionnaire_version_label,
         "created_at": session.created_at.isoformat() if session.created_at else None,
         "updated_at": session.updated_at.isoformat() if session.updated_at else None,
+        "questionnaire": {
+            "questionnaire_id": session.questionnaire_public_id,
+            "status": session.status,
+            "mode": session.mode,
+            "role": _normalize_role(session.respondent_role),
+            "display_label": session.questionnaire_public_id,
+        },
+        "application_trace": _application_trace_payload(session),
+        "completed_by_user_id": str(session.completed_by_user_id) if session.completed_by_user_id else None,
+        "completed_by_display_name": session.completed_by_display_name or "No registrado",
+        "completed_by_role": session.completed_by_role,
+        "completed_by_professional_role": session.completed_by_professional_role,
+        "respondent_relationship": session.respondent_relationship,
+        "applied_at": session.applied_at.isoformat() if session.applied_at else None,
+        "submitted_at": session.submitted_at.isoformat() if session.submitted_at else None,
+        "processed_at": session.processed_at.isoformat() if session.processed_at else None,
+        "institution_name": session.institution_name,
+        "source_channel": session.source_channel,
     }
     if session.case_id:
         case_row = db.session.get(QuestionnaireCase, session.case_id)
@@ -1220,7 +1575,7 @@ def get_session_payload(
     if include_answers:
         rows = _session_answer_rows(session)
         answers = [
-            _build_answer_resume_payload(question, section, answer_row)
+            _build_answer_resume_payload_safe(question, section, answer_row)
             for _item, question, answer_row, section in rows
             if answer_row and answer_row.answer_raw is not None
         ]
@@ -1289,11 +1644,11 @@ def get_session_page_payload(session: QuestionnaireSession, page: int, page_size
             answer_value = None
             answer_updated_at = None
             if answer_row and answer_row.answer_raw is not None:
-                answer = _decrypt_json(
+                answer = _decrypt_json_safe(
                     answer_row.answer_raw,
                     "questionnaire_session_answer.answer_raw",
                 )
-                answer_value = _decrypt_text(
+                answer_value = _decrypt_text_safe(
                     answer_row.answer_normalized,
                     "questionnaire_session_answer.answer_normalized",
                 )
@@ -1471,6 +1826,15 @@ def save_answers(
             hidden.updated_at = _utcnow()
             db.session.add(hidden)
 
+    db.session.flush()
+    consistency = _detect_safety_and_consistency(session)
+    blocking_flags = [
+        item for item in consistency.get("inconsistency_flags", []) if item.get("severity") == "blocking"
+    ]
+    if blocking_flags:
+        db.session.rollback()
+        raise ValueError(f"clinical_consistency_error:{blocking_flags[0]['code']}")
+
     progress_stats = _recompute_progress(session)
     _audit(session.id, user_id, "answers_saved", {"count": len(answers), "mark_final": mark_final})
     db.session.commit()
@@ -1509,12 +1873,12 @@ def _answers_to_feature_map(session: QuestionnaireSession) -> dict[str, Any]:
 
     feature_map: dict[str, Any] = {}
     for answer, question in rows:
-        feature_map[question.feature_key] = _decrypt_json(
+        feature_map[question.feature_key] = _decrypt_json_safe(
             answer.answer_raw,
             "questionnaire_session_answer.answer_raw",
         )
 
-    meta = _decrypt_json(session.metadata_json, "questionnaire_session.metadata_json") or {}
+    meta = _decrypt_json_safe(session.metadata_json, "questionnaire_session.metadata_json") or {}
     if meta.get("child_age_years") is not None:
         feature_map.setdefault("age_years", float(meta["child_age_years"]))
     if meta.get("child_sex_assigned_at_birth"):
@@ -1750,6 +2114,7 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
 
     feature_map = _answers_to_feature_map(session)
     feature_map = _derive_internal_features(session, feature_map)
+    clinical_signals = _detect_safety_and_consistency(session, feature_map)
 
     QuestionnaireSessionResultDomain.query.filter_by(session_id=session.id).delete(synchronize_session=False)
     QuestionnaireSessionResultComorbidity.query.filter_by(session_id=session.id).delete(synchronize_session=False)
@@ -1773,11 +2138,15 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
         alert = _alert_level(probability)
         confidence_pct, confidence_band, operational_class = _confidence_for_activation(activation.id)
         caveat = _caveat_for_activation(activation.id)
-        needs_review = alert in {"elevated", "high", "critical_review"} or confidence_band in {"limited", "low"}
+        needs_review = (
+            alert in {"elevated", "high", "critical_review"}
+            or confidence_band in {"limited", "low"}
+            or bool(clinical_signals.get("urgent_referral_recommended"))
+        )
 
         summary = (
-            f"{domain.upper()}: probabilidad {round(probability * 100, 2)}%, alerta {alert}. "
-            "Salida para apoyo de screening en entorno simulado; no diagnostico automatico."
+            f"{_domain_label(domain)}: {SCORE_LABEL.lower()} {round(probability * 100, 2)}%, alerta {alert}. "
+            "Salida para apoyo de screening; no diagnostico automatico."
         )
 
         row_payload = {
@@ -1797,6 +2166,14 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
         domain_rows.append(row_payload)
 
     overall_summary, recommendation, needs_review = _summary_from_domains(domain_rows)
+    if clinical_signals.get("urgent_referral_recommended"):
+        overall_summary = f"{overall_summary} {SAFETY_NOTE}"
+        recommendation = f"Priorizar revision profesional cualificada. {recommendation}"
+        needs_review = True
+    if clinical_signals.get("inconsistency_flags"):
+        recommendation = (
+            f"{recommendation} Revisar advertencias de consistencia clinica antes de interpretar los resultados."
+        )
 
     result.summary_text = _encrypt_text(
         overall_summary,
@@ -1808,7 +2185,7 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
     ) or ""
     result.completion_quality_score = round(float(session.progress_pct or 0) / 100.0, 4)
     result.missingness_score = round(1.0 - float(result.completion_quality_score or 0.0), 4)
-    result.inconsistency_flags_json = {}
+    result.inconsistency_flags_json = clinical_signals.get("inconsistency_flags") or []
     result.needs_professional_review = needs_review
     result.runtime_ms = None
     result.model_bundle_version = _active_model_pipeline_version()
@@ -1819,6 +2196,10 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
             "mode": session.mode,
             "mode_key": session.mode_key,
             "role": role_for_lookup,
+            **clinical_signals,
+            "score_type": SCORE_TYPE,
+            "score_label": SCORE_LABEL,
+            "score_explanation": SCORE_EXPLANATION,
         },
         "questionnaire_session_result.metadata_json",
     )
@@ -1848,7 +2229,11 @@ def submit_session(session: QuestionnaireSession, user_id: uuid.UUID, force_repr
                 ) or "",
                 needs_professional_review=domain_row["needs_professional_review"],
                 metadata_json=_encrypt_json(
-                    {"source": "runtime_v2"},
+                    {
+                        "source": "runtime_v2",
+                        **_domain_payload_fields(domain_row["domain"]),
+                        **_score_payload(domain_row["probability"]),
+                    },
                     "questionnaire_session_result_domain.metadata_json",
                 ),
             )
@@ -1895,17 +2280,22 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
     comorbidity = QuestionnaireSessionResultComorbidity.query.filter_by(session_id=session.id).all()
 
     if result:
-        result_summary = _decrypt_text(
+        result_summary = _decrypt_text_safe(
             result.summary_text,
             "questionnaire_session_result.summary_text",
         )
-        result_recommendation = _decrypt_text(
+        result_recommendation = _decrypt_text_safe(
             result.operational_recommendation,
             "questionnaire_session_result.operational_recommendation",
         )
+        result_metadata = _decrypt_json_safe(
+            result.metadata_json,
+            "questionnaire_session_result.metadata_json",
+        ) or {}
     else:
         result_summary = None
         result_recommendation = None
+        result_metadata = {}
 
     return {
         "session": get_session_payload(session, viewer_user_id=viewer_user_id),
@@ -1915,10 +2305,22 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
             "completion_quality_score": result.completion_quality_score if result else None,
             "missingness_score": result.missingness_score if result else None,
             "needs_professional_review": result.needs_professional_review if result else None,
+            "safety_flags": result_metadata.get("safety_flags", []),
+            "urgent_referral_recommended": bool(result_metadata.get("urgent_referral_recommended", False)),
+            "safety_signal_level": result_metadata.get("safety_signal_level", "none"),
+            "safety_signal_items": result_metadata.get("safety_signal_items", []),
+            "safety_note": result_metadata.get("safety_note"),
+            "inconsistency_flags": result_metadata.get("inconsistency_flags", []),
+            "clinical_consistency_warnings": result_metadata.get("clinical_consistency_warnings", []),
+            "developmental_context_notes": result_metadata.get("developmental_context_notes", []),
+            "score_type": result_metadata.get("score_type", SCORE_TYPE),
+            "score_label": result_metadata.get("score_label", SCORE_LABEL),
+            "score_explanation": result_metadata.get("score_explanation", SCORE_EXPLANATION),
         },
         "domains": [
             {
                 "domain": row.domain,
+                **_domain_payload_fields(row.domain),
                 "probability": row.probability,
                 "alert_level": row.alert_level,
                 "confidence_pct": row.confidence_pct,
@@ -1928,30 +2330,36 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
                 "mode": row.mode,
                 "operational_class": row.operational_class,
                 "operational_caveat": row.operational_caveat,
-                "result_summary": _decrypt_text(
+                "result_summary": _decrypt_text_safe(
                     row.result_summary,
                     "questionnaire_session_result_domain.result_summary",
                 ),
                 "needs_professional_review": row.needs_professional_review,
+                **_score_payload(row.probability),
             }
             for row in domains
         ],
         "comorbidity": [
             {
                 "coexistence_key": row.coexistence_key,
-                "domains": _decrypt_json(
+                "domains": _decrypt_json_safe(
                     row.domains_json,
                     "questionnaire_session_result_comorbidity.domains_json",
                 ),
                 "combined_risk_score": row.combined_risk_score,
                 "coexistence_level": row.coexistence_level,
-                "summary": _decrypt_text(
+                "summary": _decrypt_text_safe(
                     row.summary,
                     "questionnaire_session_result_comorbidity.summary",
                 ),
             }
             for row in comorbidity
         ],
+        "data_quality": {
+            "warnings": result_metadata.get("clinical_consistency_warnings", []),
+            "inconsistency_flags": result_metadata.get("inconsistency_flags", []),
+            "safety_flags": result_metadata.get("safety_flags", []),
+        },
     }
 
 
@@ -2029,7 +2437,9 @@ def get_clinical_summary_payload(session: QuestionnaireSession) -> dict[str, Any
         domains.append(
             {
                 "domain": str(raw.get("domain")),
+                **_domain_payload_fields(raw.get("domain")),
                 "probability": probability,
+                **_score_payload(probability),
                 "compatibility_level": risk_level,
                 "risk_level": risk_level,
                 "confidence_pct": raw.get("confidence_pct"),
@@ -2056,7 +2466,7 @@ def get_clinical_summary_payload(session: QuestionnaireSession) -> dict[str, Any
 
     if top_domains:
         top_phrase = ", ".join(
-            f"{item['domain'].upper()} ({item['risk_level']})"
+            f"{item.get('domain_label') or _domain_label(item['domain'])} ({item['risk_level']})"
             for item in top_domains[:3]
         )
     else:
@@ -2090,7 +2500,7 @@ def get_clinical_summary_payload(session: QuestionnaireSession) -> dict[str, Any
     )
 
     niveles_text = "; ".join(
-        f"{item['domain'].upper()}: prob={item['probability']:.3f}, riesgo={item['risk_level']}"
+        f"{item.get('domain_label') or _domain_label(item['domain'])}: indice={item['probability']:.3f}, riesgo={item['risk_level']}"
         for item in ordered_domains
     ) or "Sin dominios disponibles."
 
@@ -2098,7 +2508,7 @@ def get_clinical_summary_payload(session: QuestionnaireSession) -> dict[str, Any
     for item in ordered_domains:
         if item["risk_level"] in {"intermedia", "relevante", "alta"}:
             indicator_lines.append(
-                f"{item['domain'].upper()}: " + ", ".join(item["main_indicators"][:3])
+                f"{item.get('domain_label') or _domain_label(item['domain'])}: " + ", ".join(item["main_indicators"][:3])
             )
     if not indicator_lines:
         indicator_lines.append(
@@ -2287,7 +2697,7 @@ def list_history(
             if str(row.owner_user_id) == str(user_id) and row.case_id:
                 case_row = db.session.get(QuestionnaireCase, row.case_id)
                 if case_row and case_row.private_label:
-                    private_label = _decrypt_text(case_row.private_label, "questionnaire_case.private_label") or ""
+                    private_label = _decrypt_text_safe(case_row.private_label, "questionnaire_case.private_label") or ""
                     if token in private_label.lower():
                         filtered_rows.append(row)
                         continue
@@ -2696,7 +3106,7 @@ def guardian_dashboard(
     if q_token:
         q_cases: list[QuestionnaireCase] = []
         for row in all_cases:
-            private_label = _decrypt_text(row.private_label, "questionnaire_case.private_label") if row.private_label else ""
+            private_label = _decrypt_text_safe(row.private_label, "questionnaire_case.private_label") if row.private_label else ""
             values = [
                 str(row.case_public_id or "").lower(),
                 str(private_label or "").lower(),
@@ -2874,7 +3284,109 @@ def guardian_dashboard(
     if summary_domain_counter:
         most_frequent_domain = summary_domain_counter.most_common(1)[0][0]
 
+    summary_payload = {
+        "total_cases": len(all_cases),
+        "total_sessions": len(filtered_sessions),
+        "processed_sessions": sum(1 for row in filtered_sessions if row.status == "processed"),
+        "draft_sessions": sum(1 for row in filtered_sessions if row.status == "draft"),
+        "in_progress_sessions": sum(1 for row in filtered_sessions if row.status == "in_progress"),
+        "cases_with_alerts": len(cases_with_alerts),
+        "cases_needing_professional_review": len(cases_needing_review),
+        "highest_alert_level": highest_alert,
+        "most_frequent_domain": most_frequent_domain,
+    }
+    dashboard_warnings: list[str] = []
+    if summary_payload["total_sessions"] > 0 and not alerts_by_month:
+        dashboard_warnings.append("alerts_by_month_empty_with_nonzero_sessions")
+    if summary_payload["processed_sessions"] > 0 and not alerts_by_domain:
+        dashboard_warnings.append("alerts_by_domain_empty_with_processed_sessions")
+
+    time_series_payload = {
+        "alerts_by_period": alerts_by_month,
+        "questionnaires_by_period": [
+            {"month": item["month"], "count": int(item.get("total_alerts", 0))}
+            for item in alerts_by_month
+        ],
+        "processed_by_period": [
+            {
+                "month": month,
+                "count": sum(
+                    1
+                    for row in filtered_sessions
+                    if row.status == "processed"
+                    and (row.processed_at or row.created_at or _utcnow()).strftime("%Y-%m") == month
+                ),
+            }
+            for month in sorted({item["month"] for item in alerts_by_month})
+        ],
+    }
+
+    breakdowns_payload = {
+        "alerts_by_domain": alerts_by_domain,
+        "alerts_by_level": alerts_by_level,
+        "questionnaires_by_status": [
+            {"status": "processed", "count": summary_payload["processed_sessions"]},
+            {"status": "draft", "count": summary_payload["draft_sessions"]},
+            {"status": "in_progress", "count": summary_payload["in_progress_sessions"]},
+        ],
+    }
+
+    rankings_payload = {
+        "priority_cases": sorted(
+            [
+                {
+                    "case_id": item["case"]["case_id"],
+                    "case_public_id": item["case"]["case_public_id"],
+                    "display_label": item["case"].get("display_label"),
+                    "highest_alert_level": item["summary"]["highest_alert_level"],
+                    "sessions_count": item["summary"]["sessions_count"],
+                }
+                for item in case_items
+            ],
+            key=lambda row: (_alert_rank(row["highest_alert_level"]), row["sessions_count"]),
+            reverse=True,
+        )[:10],
+        "activity_by_case": sessions_by_case_chart,
+    }
+
+    matrix_payload = {
+        "case_by_domain": [
+            {
+                "case_id": item["case"]["case_id"],
+                "case_public_id": item["case"]["case_public_id"],
+                "domains": [
+                    {
+                        "domain": slot.get("domain"),
+                        "max_probability": slot.get("max_probability"),
+                        "latest_alert_level": slot.get("latest_alert_level"),
+                    }
+                    for slot in item.get("domain_breakdown", [])
+                ],
+            }
+            for item in case_items
+        ]
+    }
+
     return {
+        "meta": {
+            "generated_at": _utcnow().isoformat(),
+            "period": {
+                "from": start_date.isoformat(),
+                "to": end_date.isoformat(),
+                "preset": f"last_{months}_months",
+            },
+            "filters_applied": {
+                "case_id": str(case_id) if case_id else None,
+                "case_public_id": case_public_id,
+                "case_label": case_label,
+                "q": q,
+                "domain": domain,
+                "alert_level": alert_level,
+            },
+            "data_freshness": "live",
+            "request_id": _dashboard_request_id(),
+            "warnings": dashboard_warnings,
+        },
         "period": {
             "months": months,
             "date_from": start_date.isoformat(),
@@ -2888,17 +3400,11 @@ def guardian_dashboard(
             "domain": domain,
             "alert_level": alert_level,
         },
-        "summary": {
-            "total_cases": len(all_cases),
-            "total_sessions": len(filtered_sessions),
-            "processed_sessions": sum(1 for row in filtered_sessions if row.status == "processed"),
-            "draft_sessions": sum(1 for row in filtered_sessions if row.status == "draft"),
-            "in_progress_sessions": sum(1 for row in filtered_sessions if row.status == "in_progress"),
-            "cases_with_alerts": len(cases_with_alerts),
-            "cases_needing_professional_review": len(cases_needing_review),
-            "highest_alert_level": highest_alert,
-            "most_frequent_domain": most_frequent_domain,
-        },
+        "summary": summary_payload,
+        "time_series": time_series_payload,
+        "breakdowns": breakdowns_payload,
+        "rankings": rankings_payload,
+        "matrix": matrix_payload,
         "charts": {
             "alerts_by_month": alerts_by_month,
             "alerts_by_domain": alerts_by_domain,
@@ -2906,8 +3412,24 @@ def guardian_dashboard(
             "sessions_by_case": sessions_by_case_chart,
             "cases_by_alert_level": cases_by_alert_level,
         },
+        "items": [item["case"] | {"summary": item["summary"]} for item in case_items],
+        "pagination": {"page": 1, "page_size": len(case_items), "total": len(case_items), "pages": 1},
+        "permissions": {
+            "can_create_case": True,
+            "can_archive_case": True,
+            "can_share_with_psychologist": True,
+            "can_request_review": True,
+            "can_generate_pdf": True,
+            "can_manage_tags": True,
+        },
+        "empty_state": _dashboard_empty_state(total_items=len(case_items), context="dashboard de casos"),
+        "data_quality": {
+            "warnings": dashboard_warnings,
+            "inconsistency_flags": [],
+            "safety_flags": [],
+        },
         "cases": case_items,
-        "warnings": [],
+        "warnings": dashboard_warnings,
     }
 
 
@@ -3082,16 +3604,96 @@ def psychologist_dashboard(
     by_date = [{"month": key, "count": int(value)} for key, value in sorted(aggregate_date_counter.items())]
     by_case = [{"case_public_id": key, "count": int(value)} for key, value in sorted(aggregate_case_counter.items())]
 
+    summary_payload = {
+        "total_shared_sessions": total,
+        "total_cases": len({item.get("case_public_id") for item in item_rows if item.get("case_public_id")}),
+        "pending_reviews": int(review_status_counter.get("pending", 0)),
+        "reviewed_cases": int(review_status_counter.get("reviewed", 0)),
+        "cases_needing_professional_review": sum(1 for item in item_rows if item["needs_professional_review"]),
+        "highest_alert_level": highest_alert,
+    }
+    dashboard_warnings: list[str] = []
+    if summary_payload["total_shared_sessions"] > 0 and not by_domain:
+        dashboard_warnings.append("alerts_by_domain_empty_with_shared_sessions")
+    if summary_payload["total_shared_sessions"] > 0 and not by_date:
+        dashboard_warnings.append("alerts_by_date_empty_with_shared_sessions")
+
+    time_series_payload = {
+        "alerts_by_period": by_date,
+        "questionnaires_by_period": by_date,
+        "processed_by_period": [
+            {
+                "month": slot["month"],
+                "count": sum(
+                    1
+                    for row in filtered_rows
+                    if row.status == "processed"
+                    and (row.processed_at or row.created_at or _utcnow()).strftime("%Y-%m") == slot["month"]
+                ),
+            }
+            for slot in by_date
+        ],
+    }
+
+    breakdowns_payload = {
+        "alerts_by_domain": by_domain,
+        "alerts_by_level": by_alert_level,
+        "reviews_by_status": by_review_status,
+        "questionnaires_by_status": [
+            {"status": status, "count": sum(1 for row in filtered_rows if row.status == status)}
+            for status in sorted({row.status for row in filtered_rows})
+        ],
+    }
+
+    rankings_payload = {
+        "priority_cases": sorted(
+            [
+                {
+                    "case_public_id": item.get("case_public_id"),
+                    "highest_alert_level": item.get("highest_alert_level"),
+                    "needs_professional_review": item.get("needs_professional_review"),
+                }
+                for item in item_rows
+                if item.get("case_public_id")
+            ],
+            key=lambda row: (_alert_rank(str(row.get("highest_alert_level") or "low")), bool(row.get("needs_professional_review"))),
+            reverse=True,
+        )[:20],
+        "activity_by_case": by_case,
+    }
+
+    matrix_payload = {
+        "domain_by_alert_level": [
+            {
+                "domain": slot.get("domain"),
+                "alerts": [
+                    {"alert_level": al["alert_level"], "count": al["count"]}
+                    for al in by_alert_level
+                ],
+            }
+            for slot in by_domain
+        ]
+    }
+
     return {
-        "filters": base_filters,
-        "summary": {
-            "total_shared_sessions": total,
-            "total_cases": len({item.get("case_public_id") for item in item_rows if item.get("case_public_id")}),
-            "pending_reviews": int(review_status_counter.get("pending", 0)),
-            "reviewed_cases": int(review_status_counter.get("reviewed", 0)),
-            "cases_needing_professional_review": sum(1 for item in item_rows if item["needs_professional_review"]),
-            "highest_alert_level": highest_alert,
+        "meta": {
+            "generated_at": _utcnow().isoformat(),
+            "period": {
+                "from": (date_from.isoformat() if date_from else None),
+                "to": (date_to.isoformat() if date_to else None),
+                "preset": "custom" if (date_from or date_to) else "all_time",
+            },
+            "filters_applied": base_filters,
+            "data_freshness": "live",
+            "request_id": _dashboard_request_id(),
+            "warnings": dashboard_warnings,
         },
+        "filters": base_filters,
+        "summary": summary_payload,
+        "time_series": time_series_payload,
+        "breakdowns": breakdowns_payload,
+        "rankings": rankings_payload,
+        "matrix": matrix_payload,
         "aggregates": {
             "by_domain": by_domain,
             "by_alert_level": by_alert_level,
@@ -3113,7 +3715,19 @@ def psychologist_dashboard(
             "total": total,
             "pages": max(1, (total + page_size - 1) // page_size),
         },
-        "warnings": [],
+        "permissions": {
+            "can_review": True,
+            "can_download_pdf": True,
+            "can_accept_share_request": True,
+            "can_reject_share_request": True,
+        },
+        "empty_state": _dashboard_empty_state(total_items=total, context="dashboard de evaluaciones compartidas"),
+        "data_quality": {
+            "warnings": dashboard_warnings,
+            "inconsistency_flags": [],
+            "safety_flags": [],
+        },
+        "warnings": dashboard_warnings,
     }
 
 
@@ -3309,8 +3923,8 @@ def _professional_review_payload(
     viewer_user_id: uuid.UUID | None = None,
 ) -> dict[str, Any]:
     is_owner = bool(viewer_user_id and viewer_user_id == row.owner_user_id)
-    initial_concept = _decrypt_text(row.initial_concept, "questionnaire_professional_review.initial_concept")
-    recommendation = _decrypt_text(row.recommendation, "questionnaire_professional_review.recommendation")
+    initial_concept = _decrypt_text_safe(row.initial_concept, "questionnaire_professional_review.initial_concept")
+    recommendation = _decrypt_text_safe(row.recommendation, "questionnaire_professional_review.recommendation")
     if is_owner and not row.visible_to_guardian:
         initial_concept = None
         recommendation = None
@@ -3448,6 +4062,7 @@ def get_report_preview_payload(session: QuestionnaireSession, viewer_user_id: uu
         "result": result_payload.get("result"),
         "domains": result_payload.get("domains"),
         "comorbidity": result_payload.get("comorbidity"),
+        "data_quality": result_payload.get("data_quality"),
         "answers": session_payload.get("answers", []),
         "professional_reviews": reviews,
         "pdf": {
@@ -4108,7 +4723,7 @@ def _session_pdf_question_rows(session_id: uuid.UUID) -> list[dict[str, Any]]:
     for idx, (item, question, answer, section) in enumerate(rows, start=1):
         prompt = question.caregiver_question or question.psychologist_question or question.question_text_primary or "N/A"
         raw = (
-            _decrypt_json(
+            _decrypt_json_safe(
                 answer.answer_raw,
                 "questionnaire_session_answer.answer_raw",
             )
@@ -4116,7 +4731,7 @@ def _session_pdf_question_rows(session_id: uuid.UUID) -> list[dict[str, Any]]:
             else None
         )
         normalized = (
-            _decrypt_text(
+            _decrypt_text_safe(
                 answer.answer_normalized,
                 "questionnaire_session_answer.answer_normalized",
             )
@@ -4230,7 +4845,8 @@ def _domain_interpretation(domain_row: dict[str, Any], domain_stats: dict[str, d
     high_half = int(stats.get("high_half", 0))
 
     base = (
-        f"Resultado de screening en {domain.upper()}: {prob_pct}% con nivel {_pdf_alert_label(alert_level).lower()}. "
+        f"Resultado de screening en {_domain_label(domain)}: {prob_pct}% como {SCORE_LABEL.lower()} "
+        f"con nivel {_pdf_alert_label(alert_level).lower()}. {SCORE_EXPLANATION} "
         f"Se respondieron {answered}/{total} items vinculados al dominio"
     )
     if total > 0:
@@ -4251,7 +4867,7 @@ def _domain_interpretation(domain_row: dict[str, Any], domain_stats: dict[str, d
 
 def _domain_chart_png(domains: list[dict[str, Any]]) -> BytesIO:
     sorted_rows = sorted(domains, key=lambda row: float(row.get("probability") or 0.0), reverse=True)
-    labels = [str(row.get("domain") or "").upper() for row in sorted_rows]
+    labels = [_domain_label(row.get("domain")) for row in sorted_rows]
     values = [float(row.get("probability") or 0.0) * 100.0 for row in sorted_rows]
     colors_by_alert = {
         "critical_review": "#8B0000",
@@ -4266,8 +4882,8 @@ def _domain_chart_png(domains: list[dict[str, Any]]) -> BytesIO:
     fig, ax = plt.subplots(figsize=(10.5, 3.8))
     bars = ax.bar(labels, values, color=bar_colors)
     ax.set_ylim(0, 100)
-    ax.set_ylabel("Probabilidad (%)")
-    ax.set_title("Probabilidades por dominio (screening/apoyo profesional)")
+    ax.set_ylabel(f"{SCORE_LABEL} (%)")
+    ax.set_title("Indice orientativo por dominio (screening/apoyo profesional)")
     ax.grid(axis="y", linestyle="--", alpha=0.25)
     for bar, value in zip(bars, values):
         ax.text(
@@ -4298,7 +4914,7 @@ def _operational_recommendation_for_pdf(domains: list[dict[str, Any]], default_r
     if not top:
         return default_recommendation or "No hay informacion suficiente para emitir recomendacion operativa."
     top_alert = str(top.get("alert_level") or "").lower()
-    top_domain = str(top.get("domain") or "").upper()
+    top_domain = _domain_label(top.get("domain"))
     if top_alert in {"critical_review", "high"}:
         return (
             f"Priorizar revision profesional focal en {top_domain}, validar consistencia de respuestas "
@@ -4352,14 +4968,14 @@ def _build_pdf_table(rows: list[list[Any]], col_widths: list[float], font_size: 
 
 def _write_legacy_pdf(file_path: Path, session: QuestionnaireSession, result_payload: dict[str, Any], domains: list[dict[str, Any]]) -> None:
     probabilities = [float(item["probability"]) * 100.0 for item in domains]
-    labels = [item["domain"].upper() for item in domains]
+    labels = [_domain_label(item.get("domain")) for item in domains]
     plt, PdfPages = _pdf_plot_backend()
 
     with PdfPages(file_path) as pdf:
         fig, ax = plt.subplots(figsize=(11, 8.5))
         ax.barh(labels, probabilities, color="#2E6F95")
         ax.set_xlim(0, 100)
-        ax.set_xlabel("Probabilidad (%)")
+        ax.set_xlabel(f"{SCORE_LABEL} (%)")
         ax.set_title("Resultados por dominio (screening no diagnostico)")
         for idx, val in enumerate(probabilities):
             ax.text(val + 1, idx, f"{val:.1f}%", va="center", fontsize=9)
@@ -4477,7 +5093,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
 
     role = _normalize_role(session.respondent_role)
     generated_at = _utcnow()
-    metadata = _decrypt_json(session.metadata_json, "questionnaire_session.metadata_json") or {}
+    metadata = _decrypt_json_safe(session.metadata_json, "questionnaire_session.metadata_json") or {}
     metadata_extra = metadata.get("metadata") if isinstance(metadata, dict) else {}
     if not isinstance(metadata_extra, dict):
         metadata_extra = {}
@@ -4507,6 +5123,13 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
 
     cover_rows = [
         ["Fecha de generacion", generated_at.isoformat()],
+        ["Diligenciado por", session.completed_by_display_name or "No registrado"],
+        ["Rol de quien diligencia", session.completed_by_role or "No registrado"],
+        ["Rol profesional", session.completed_by_professional_role or "No registrado"],
+        ["Relacion con el menor/paciente", session.respondent_relationship or "No registrado"],
+        ["Fecha de aplicacion", session.applied_at.isoformat() if session.applied_at else "No registrado"],
+        ["Institucion", session.institution_name or "No registrado"],
+        ["Canal de origen", session.source_channel or "No registrado"],
         ["Questionnaire ID", session.questionnaire_public_id],
         ["Session ID", str(session.id)],
         ["Modo aplicado", f"{session.mode} ({session.mode_key})"],
@@ -4533,7 +5156,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
     story.append(Spacer(1, 0.12 * inch))
 
     story.append(Paragraph("Resultados por dominio", h1_style))
-    domain_table = [["Dominio", "Probabilidad", "Alerta", "Confianza", "Modelo/version", "Caveat operativo"]]
+    domain_table = [["Dominio", SCORE_LABEL, "Alerta", "Confianza", "Modelo/version", "Caveat operativo"]]
     sorted_domains = sorted(domains, key=lambda item: float(item.get("probability") or 0.0), reverse=True)
     for row in sorted_domains:
         conf_pct = row.get("confidence_pct")
@@ -4545,7 +5168,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
         model_text = f"{row.get('model_id') or 'N/A'} / {row.get('model_version') or 'N/A'}"
         domain_table.append(
             [
-                str(row.get("domain") or "").upper(),
+                row.get("domain_label") or _domain_label(row.get("domain")),
                 f"{round(float(row.get('probability') or 0.0) * 100.0, 1)}%",
                 _pdf_alert_label(row.get("alert_level")),
                 conf_text,
@@ -4564,7 +5187,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
 
     for row in sorted_domains:
         interp = _domain_interpretation(row, domain_stats)
-        story.append(Paragraph(f"<b>{_pdf_paragraph_safe(str(row.get('domain') or '').upper())}:</b> {_pdf_paragraph_safe(interp)}", small_style))
+        story.append(Paragraph(f"<b>{_pdf_paragraph_safe(row.get('domain_label') or _domain_label(row.get('domain')))}:</b> {_pdf_paragraph_safe(interp)}", small_style))
         story.append(Spacer(1, 0.05 * inch))
 
     story.append(Spacer(1, 0.08 * inch))
@@ -4578,7 +5201,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
     if comorbidity_rows:
         comorb_table = [["Par de dominios", "Riesgo combinado", "Nivel", "Resumen"]]
         for row in comorbidity_rows:
-            domains_pair = ", ".join([str(item).upper() for item in (row.get("domains") or [])])
+            domains_pair = ", ".join([_domain_label(item) for item in (row.get("domains") or [])])
             comorb_table.append(
                 [
                     domains_pair or "N/A",
@@ -4607,6 +5230,19 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
             pattern_text = "No se observan pares con comorbilidad operativa elevada en esta corrida."
         story.append(Paragraph(_pdf_paragraph_safe(pattern_text), body_style))
     story.append(Spacer(1, 0.12 * inch))
+
+    safety_flags = result_payload["result"].get("safety_flags") or []
+    inconsistency_flags = result_payload["result"].get("inconsistency_flags") or []
+    developmental_notes = result_payload["result"].get("developmental_context_notes") or []
+    if safety_flags or inconsistency_flags or developmental_notes:
+        story.append(Paragraph("Senales de seguridad y consistencia", h1_style))
+        if safety_flags:
+            story.append(Paragraph(_pdf_paragraph_safe(SAFETY_NOTE), body_style))
+        for item in inconsistency_flags:
+            story.append(Paragraph(_pdf_paragraph_safe(f"- {item.get('message') or item.get('code')}"), body_style))
+        for note in developmental_notes:
+            story.append(Paragraph(_pdf_paragraph_safe(f"- {note}"), body_style))
+        story.append(Spacer(1, 0.12 * inch))
 
     story.append(Paragraph("Recomendacion operativa", h1_style))
     recommendation = _operational_recommendation_for_pdf(
@@ -4639,7 +5275,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
             [
                 str(row["index"]),
                 Paragraph(_pdf_paragraph_safe(f"P{row['page_number']} - {row['section_title']}"), small_style),
-                Paragraph(_pdf_paragraph_safe(str(row["domain"] or "general").upper()), small_style),
+                Paragraph(_pdf_paragraph_safe(_domain_label(row["domain"] or "general")), small_style),
                 Paragraph(_pdf_paragraph_safe(row["question_code"]), small_style),
                 Paragraph(_pdf_paragraph_safe(row["prompt"]), small_style),
                 Paragraph(_pdf_paragraph_safe(row["response_type"]), small_style),
@@ -4692,13 +5328,16 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
     )
     story.append(Spacer(1, 0.1 * inch))
 
+    story.append(PageBreak())
     story.append(Paragraph("Limitaciones y uso responsable", h1_style))
     limitations = [
         "Este reporte corresponde a screening/apoyo profesional en entorno simulado.",
         "No equivale a diagnostico clinico automatico ni reemplaza evaluacion profesional.",
+        SCORE_EXPLANATION,
         synthetic_note,
         "Los dominios con confianza baja o caveats operativos requieren cautela interpretativa.",
         "Se recomienda triangulacion con entrevista y contexto funcional.",
+        "Las senales de autolesion, muerte o deseo de desaparecer requieren revision prioritaria por un profesional cualificado.",
     ]
     for idx, item in enumerate(limitations, start=1):
         story.append(Paragraph(_pdf_paragraph_safe(f"{idx}. {item}"), body_style))
