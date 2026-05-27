@@ -66,7 +66,9 @@ def validate(allow_dirty: bool = False) -> list[str]:
     if protected_changes:
         errors.append("protected_files_modified:" + ",".join(sorted(protected_changes)))
 
-    generated_changes = [path for _, path in entries if _is_generated(path)]
+    generated_changes = [
+        path for status, path in entries if _is_generated(path) and (status.startswith("??") or "A" in status)
+    ]
     if generated_changes:
         errors.append("generated_outputs_present:" + ",".join(sorted(generated_changes)))
 
