@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, current_app, send_file, Response
+from flask import Blueprint, current_app, request, send_file, Response
 
 
 docs_bp = Blueprint("docs", __name__)
@@ -13,6 +13,7 @@ def _enabled() -> bool:
 
 
 @docs_bp.get("/openapi.yaml")
+@docs_bp.get("/api/openapi.yaml")
 def openapi_yaml():
     if not _enabled():
         return Response("Not found", status=404)
@@ -26,9 +27,11 @@ def openapi_yaml():
 
 
 @docs_bp.get("/docs")
+@docs_bp.get("/api/docs")
 def swagger_ui():
     if not _enabled():
         return Response("Not found", status=404)
+    openapi_url = "/api/openapi.yaml" if request.path.startswith("/api/") else "/openapi.yaml"
     html = """
 <!doctype html>
 <html>
@@ -45,7 +48,7 @@ def swagger_ui():
     <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
     <script>
       window.ui = SwaggerUIBundle({
-        url: "/openapi.yaml",
+        url: "__OPENAPI_URL__",
         dom_id: "#swagger-ui",
         presets: [SwaggerUIBundle.presets.apis],
         layout: "BaseLayout"
@@ -53,5 +56,5 @@ def swagger_ui():
     </script>
   </body>
 </html>
-""".strip()
+""".strip().replace("__OPENAPI_URL__", openapi_url)
     return Response(html, mimetype="text/html")
