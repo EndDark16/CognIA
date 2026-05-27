@@ -64,13 +64,13 @@ def _build_small_source_dir(tmp_path: Path) -> Path:
         {
             "questionnaire_item_id": "Q001",
             "feature": "adhd_symptom_01",
-            "question_text_primary": "Pregunta ADHD 1",
-            "caregiver_question": "Pregunta ADHD 1",
-            "psychologist_question": "Pregunta ADHD 1",
+            "question_text_primary": "Pregunta TDAH 1",
+            "caregiver_question": "Pregunta TDAH 1",
+            "psychologist_question": "Pregunta TDAH 1",
             "section_name": "Atencion",
-            "subsection_name": "ADHD",
+            "subsection_name": "TDAH",
             "questionnaire_section_suggested": "Atencion",
-            "questionnaire_subsection_suggested": "ADHD",
+            "questionnaire_subsection_suggested": "TDAH",
             "layer": "dsm5",
             "domain": "adhd",
             "domains_final": "adhd|conduct",
@@ -217,6 +217,266 @@ def _build_small_source_dir(tmp_path: Path) -> Path:
             "reuse_answer_from_question_id": "Q001",
             "question_audit_status": "audited_v16_4",
         },
+        {
+            "questionnaire_item_id": "Q004",
+            "feature": "depression_self_harm_ideas",
+            "question_text_primary": "Ideas frecuentes sobre muerte, querer desaparecer o hacerse dano",
+            "caregiver_question": "Ideas frecuentes sobre muerte, querer desaparecer o hacerse dano",
+            "psychologist_question": "Ideas frecuentes sobre muerte, querer desaparecer o hacerse dano",
+            "section_name": "Seguridad",
+            "subsection_name": "Riesgo",
+            "questionnaire_section_suggested": "Seguridad",
+            "questionnaire_subsection_suggested": "Riesgo",
+            "layer": "dsm5",
+            "domain": "depression",
+            "domains_final": "depression",
+            "module": "safety",
+            "criterion_ref": "SAFETY",
+            "instrument_or_source": "dsm5",
+            "feature_type": "safety_item",
+            "feature_role": "model_input",
+            "respondent_expected": "caregiver_or_psychologist",
+            "administered_by": "caregiver_or_psychologist",
+            "response_type": "single_choice",
+            "scale_id": "FREQ_0_3",
+            "response_options_json": '[{"value": 0, "label": "Nunca"}, {"value": 1, "label": "A veces"}, {"value": 2, "label": "Frecuente"}, {"value": 3, "label": "Muy frecuente"}]',
+            "min_value": 0,
+            "max_value": 3,
+            "unit": "",
+            "visible_question_yes_no": "yes",
+            "generated_input_yes_no": "no",
+            "show_in_questionnaire_yes_no": "yes",
+            "is_transparent_derived": "no",
+            "requires_internal_scoring": "no",
+            "requires_exact_item_wording": "no",
+            "requires_clinician_administration": "no",
+            "requires_child_self_report": "no",
+            "include_caregiver_1_3": "yes",
+            "include_caregiver_2_3": "yes",
+            "include_caregiver_full": "yes",
+            "include_psychologist_1_3": "yes",
+            "include_psychologist_2_3": "yes",
+            "include_psychologist_full": "yes",
+            "caregiver_rank": 4,
+            "psychologist_rank": 4,
+            "caregiver_priority_bucket": "alta",
+            "psychologist_priority_bucket": "alta",
+            "derived_from_features": "",
+            "internal_scoring_formula_summary": "",
+            "help_text": "",
+            "notes": "safety_critical",
+            "canonical_question_id": "",
+            "reuse_answer_from_question_id": "",
+            "question_audit_status": "audited_v16_4",
+        },
+        {
+            "questionnaire_item_id": "Q005",
+            "feature": "elimination_never_established_continence",
+            "question_text_primary": "Nunca establecio continencia",
+            "caregiver_question": "Nunca establecio continencia",
+            "psychologist_question": "Nunca establecio continencia",
+            "section_name": "Eliminacion",
+            "subsection_name": "Continencia",
+            "questionnaire_section_suggested": "Eliminacion",
+            "questionnaire_subsection_suggested": "Continencia",
+            "layer": "dsm5",
+            "domain": "elimination",
+            "domains_final": "elimination",
+            "module": "continence",
+            "criterion_ref": "E1",
+            "instrument_or_source": "dsm5",
+            "feature_type": "symptom",
+            "feature_role": "model_input",
+            "respondent_expected": "caregiver_or_psychologist",
+            "administered_by": "caregiver_or_psychologist",
+            "response_type": "single_choice",
+            "scale_id": "YES_NO",
+            "response_options_json": '[{"value": 0, "label": "No"}, {"value": 1, "label": "Si"}]',
+            "min_value": 0,
+            "max_value": 1,
+            "unit": "",
+            "visible_question_yes_no": "yes",
+            "generated_input_yes_no": "no",
+            "show_in_questionnaire_yes_no": "yes",
+            "is_transparent_derived": "no",
+            "requires_internal_scoring": "no",
+            "requires_exact_item_wording": "no",
+            "requires_clinician_administration": "no",
+            "requires_child_self_report": "no",
+            "include_caregiver_1_3": "yes",
+            "include_caregiver_2_3": "yes",
+            "include_caregiver_full": "yes",
+            "include_psychologist_1_3": "yes",
+            "include_psychologist_2_3": "yes",
+            "include_psychologist_full": "yes",
+            "caregiver_rank": 5,
+            "psychologist_rank": 5,
+            "caregiver_priority_bucket": "media",
+            "psychologist_priority_bucket": "media",
+            "derived_from_features": "",
+            "internal_scoring_formula_summary": "",
+            "help_text": "",
+            "notes": "",
+            "canonical_question_id": "",
+            "reuse_answer_from_question_id": "",
+            "question_audit_status": "audited_v16_4",
+        },
+        {
+            "questionnaire_item_id": "Q006",
+            "feature": "elimination_after_previous_continence_period",
+            "question_text_primary": "El problema aparecio despues de un periodo previo de continencia",
+            "caregiver_question": "El problema aparecio despues de un periodo previo de continencia",
+            "psychologist_question": "El problema aparecio despues de un periodo previo de continencia",
+            "section_name": "Eliminacion",
+            "subsection_name": "Continencia",
+            "questionnaire_section_suggested": "Eliminacion",
+            "questionnaire_subsection_suggested": "Continencia",
+            "layer": "dsm5",
+            "domain": "elimination",
+            "domains_final": "elimination",
+            "module": "continence",
+            "criterion_ref": "E2",
+            "instrument_or_source": "dsm5",
+            "feature_type": "symptom",
+            "feature_role": "model_input",
+            "respondent_expected": "caregiver_or_psychologist",
+            "administered_by": "caregiver_or_psychologist",
+            "response_type": "single_choice",
+            "scale_id": "YES_NO",
+            "response_options_json": '[{"value": 0, "label": "No"}, {"value": 1, "label": "Si"}]',
+            "min_value": 0,
+            "max_value": 1,
+            "unit": "",
+            "visible_question_yes_no": "yes",
+            "generated_input_yes_no": "no",
+            "show_in_questionnaire_yes_no": "yes",
+            "is_transparent_derived": "no",
+            "requires_internal_scoring": "no",
+            "requires_exact_item_wording": "no",
+            "requires_clinician_administration": "no",
+            "requires_child_self_report": "no",
+            "include_caregiver_1_3": "yes",
+            "include_caregiver_2_3": "yes",
+            "include_caregiver_full": "yes",
+            "include_psychologist_1_3": "yes",
+            "include_psychologist_2_3": "yes",
+            "include_psychologist_full": "yes",
+            "caregiver_rank": 6,
+            "psychologist_rank": 6,
+            "caregiver_priority_bucket": "media",
+            "psychologist_priority_bucket": "media",
+            "derived_from_features": "",
+            "internal_scoring_formula_summary": "",
+            "help_text": "",
+            "notes": "",
+            "canonical_question_id": "",
+            "reuse_answer_from_question_id": "",
+            "question_audit_status": "audited_v16_4",
+        },
+        {
+            "questionnaire_item_id": "Q007",
+            "feature": "elimination_orina_escape_duracion_meses",
+            "question_text_primary": "Duracion en meses de escapes de orina",
+            "caregiver_question": "Duracion en meses de escapes de orina",
+            "psychologist_question": "Duracion en meses de escapes de orina",
+            "section_name": "Eliminacion",
+            "subsection_name": "Frecuencia",
+            "questionnaire_section_suggested": "Eliminacion",
+            "questionnaire_subsection_suggested": "Frecuencia",
+            "layer": "dsm5",
+            "domain": "elimination",
+            "domains_final": "elimination",
+            "module": "frequency",
+            "criterion_ref": "E3",
+            "instrument_or_source": "dsm5",
+            "feature_type": "duration",
+            "feature_role": "model_input",
+            "respondent_expected": "caregiver_or_psychologist",
+            "administered_by": "caregiver_or_psychologist",
+            "response_type": "number",
+            "scale_id": "FREQ_0_3",
+            "response_options_json": "[]",
+            "min_value": 0,
+            "max_value": 12,
+            "unit": "meses",
+            "visible_question_yes_no": "yes",
+            "generated_input_yes_no": "no",
+            "show_in_questionnaire_yes_no": "yes",
+            "is_transparent_derived": "no",
+            "requires_internal_scoring": "no",
+            "requires_exact_item_wording": "no",
+            "requires_clinician_administration": "no",
+            "requires_child_self_report": "no",
+            "include_caregiver_1_3": "yes",
+            "include_caregiver_2_3": "yes",
+            "include_caregiver_full": "yes",
+            "include_psychologist_1_3": "yes",
+            "include_psychologist_2_3": "yes",
+            "include_psychologist_full": "yes",
+            "caregiver_rank": 7,
+            "psychologist_rank": 7,
+            "caregiver_priority_bucket": "media",
+            "psychologist_priority_bucket": "media",
+            "derived_from_features": "",
+            "internal_scoring_formula_summary": "",
+            "help_text": "",
+            "notes": "",
+            "canonical_question_id": "",
+            "reuse_answer_from_question_id": "",
+            "question_audit_status": "audited_v16_4",
+        },
+        {
+            "questionnaire_item_id": "Q008",
+            "feature": "elimination_orina_escape_frecuencia_semanal",
+            "question_text_primary": "Frecuencia semanal de escapes de orina",
+            "caregiver_question": "Frecuencia semanal de escapes de orina",
+            "psychologist_question": "Frecuencia semanal de escapes de orina",
+            "section_name": "Eliminacion",
+            "subsection_name": "Frecuencia",
+            "questionnaire_section_suggested": "Eliminacion",
+            "questionnaire_subsection_suggested": "Frecuencia",
+            "layer": "dsm5",
+            "domain": "elimination",
+            "domains_final": "elimination",
+            "module": "frequency",
+            "criterion_ref": "E4",
+            "instrument_or_source": "dsm5",
+            "feature_type": "frequency",
+            "feature_role": "model_input",
+            "respondent_expected": "caregiver_or_psychologist",
+            "administered_by": "caregiver_or_psychologist",
+            "response_type": "number",
+            "scale_id": "FREQ_0_3",
+            "response_options_json": "[]",
+            "min_value": 0,
+            "max_value": 7,
+            "unit": "veces/semana",
+            "visible_question_yes_no": "yes",
+            "generated_input_yes_no": "no",
+            "show_in_questionnaire_yes_no": "yes",
+            "is_transparent_derived": "no",
+            "requires_internal_scoring": "no",
+            "requires_exact_item_wording": "no",
+            "requires_clinician_administration": "no",
+            "requires_child_self_report": "no",
+            "include_caregiver_1_3": "yes",
+            "include_caregiver_2_3": "yes",
+            "include_caregiver_full": "yes",
+            "include_psychologist_1_3": "yes",
+            "include_psychologist_2_3": "yes",
+            "include_psychologist_full": "yes",
+            "caregiver_rank": 8,
+            "psychologist_rank": 8,
+            "caregiver_priority_bucket": "media",
+            "psychologist_priority_bucket": "media",
+            "derived_from_features": "",
+            "internal_scoring_formula_summary": "",
+            "help_text": "",
+            "notes": "",
+            "canonical_question_id": "",
+            "reuse_answer_from_question_id": "",
+            "question_audit_status": "audited_v16_4",
+        },
     ]
 
     frame = pd.DataFrame(rows)
@@ -325,6 +585,103 @@ def test_questionnaire_v2_session_flow(client, app):
 
     domain_keys = {item["domain"] for item in submitted.json["domains"]}
     assert domain_keys == {"adhd", "conduct", "elimination", "anxiety", "depression"}
+    adhd = next(item for item in submitted.json["domains"] if item["domain"] == "adhd")
+    assert adhd["domain_label"] == "TDAH"
+    assert adhd["score_type"] == "symptom_load_index"
+    assert "probabilidad diagnostica" in adhd["score_explanation"]
+    assert submitted.json["session"]["completed_by_user_id"]
+    assert submitted.json["session"]["applied_at"]
+
+
+def test_questionnaire_v2_safety_item_sets_urgent_flag(client, app):
+    _, token = _user_token(app, "safety_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={
+            "mode": "short",
+            "role": "guardian",
+            "child_age_years": 9,
+            "child_sex_assigned_at_birth": "male",
+            "completed_by_role": "madre",
+            "respondent_relationship": "madre",
+            "source_channel": "web",
+        },
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=50", headers=headers)
+    questions = {q["question_code"]: q for section in page.json["pages"] for q in section["questions"]}
+
+    saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={"answers": [{"question_id": questions["Q004"]["question_id"], "answer": 3}]},
+        headers=headers,
+    )
+    assert saved.status_code == 200
+    submitted = client.post(f"/api/v2/questionnaires/sessions/{session_id}/submit", json={}, headers=headers)
+    assert submitted.status_code == 200
+    assert submitted.json["result"]["urgent_referral_recommended"] is True
+    assert submitted.json["result"]["safety_signal_level"] == "urgent"
+    assert submitted.json["result"]["safety_flags"][0]["code"] == "self_harm_or_death_item_positive"
+    assert submitted.json["data_quality"]["safety_flags"]
+
+
+def test_questionnaire_v2_blocks_mutually_exclusive_continence_answers(client, app):
+    _, token = _user_token(app, "continence_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "child_age_years": 8, "child_sex_assigned_at_birth": "female"},
+        headers=headers,
+    )
+    session_id = created.json["session"]["session_id"]
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=50", headers=headers)
+    questions = {q["question_code"]: q for section in page.json["pages"] for q in section["questions"]}
+
+    resp = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={
+            "answers": [
+                {"question_id": questions["Q005"]["question_id"], "answer": 1},
+                {"question_id": questions["Q006"]["question_id"], "answer": 1},
+            ]
+        },
+        headers=headers,
+    )
+    assert resp.status_code == 422
+    assert resp.json["error"] == "clinical_consistency_error"
+
+
+def test_questionnaire_v2_elimination_duration_frequency_warning(client, app):
+    _, token = _user_token(app, "elimination_warning_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "child_age_years": 7, "child_sex_assigned_at_birth": "male"},
+        headers=headers,
+    )
+    session_id = created.json["session"]["session_id"]
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=50", headers=headers)
+    questions = {q["question_code"]: q for section in page.json["pages"] for q in section["questions"]}
+
+    saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={
+            "answers": [
+                {"question_id": questions["Q007"]["question_id"], "answer": 5},
+                {"question_id": questions["Q008"]["question_id"], "answer": 0},
+            ]
+        },
+        headers=headers,
+    )
+    assert saved.status_code == 200
+    submitted = client.post(f"/api/v2/questionnaires/sessions/{session_id}/submit", json={}, headers=headers)
+    assert submitted.status_code == 200
+    flags = submitted.json["result"]["inconsistency_flags"]
+    assert any(item["code"] == "elimination_duration_without_frequency" for item in flags)
+    assert submitted.json["result"]["developmental_context_notes"]
 
 
 def test_questionnaire_v2_bulk_answers_alias_accepts_question_code(client, app):
@@ -699,6 +1056,8 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
     for q in questions:
         options = q.get("response_options") or []
         val = options[-1]["value"] if options and isinstance(options[0], dict) else 1
+        if q.get("question_code") in {"Q005", "Q008"}:
+            val = 0
         answers.append({"question_id": q["question_id"], "answer": val})
 
     client.patch(
@@ -767,6 +1126,8 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
         assert "Resultados por dominio" in pdf_text
         assert "Preguntas y respuestas respondidas" in pdf_text
         assert "Resumen por secciones" in pdf_text
+        assert "Limitaciones y uso responsable" in pdf_text
+        assert "Indice de carga sintomatica" in pdf_text
         assert "Anexo tecnico" in pdf_text
 
     adoption = client.get("/api/v2/dashboard/adoption-history?months=6", headers=owner_headers)

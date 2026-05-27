@@ -15,6 +15,31 @@ Base path: `/api/v2`
 - `PATCH /questionnaires/sessions/{id}/answers/bulk`
 - `POST /questionnaires/sessions/{id}/submit`
 
+### Trazabilidad de aplicacion y validaciones clinicas
+- `POST /questionnaires/sessions` acepta campos opcionales de trazabilidad:
+  - `completed_by_role`, `completed_by_professional_role`, `respondent_relationship`
+  - `applied_at`, `institution_name`, `source_channel`
+- Si no se envian, backend usa valores compatibles hacia atras:
+  - `completed_by_user_id = owner_user_id`
+  - `completed_by_role = role`
+  - `respondent_relationship = padre|profesional`
+  - `applied_at = now()`
+- Las respuestas historicas sin estos datos devuelven `null` o `No registrado` en DTO/PDF.
+- `PATCH /questionnaires/sessions/{id}/answers` bloquea contradicciones fuertes de continencia con `422 clinical_consistency_error`.
+- `POST /questionnaires/sessions/{id}/submit` no diagnostica; devuelve:
+  - `safety_flags`, `urgent_referral_recommended`, `safety_signal_level`, `safety_signal_items`
+  - `inconsistency_flags`, `clinical_consistency_warnings`
+  - `developmental_context_notes`
+  - `score_type`, `score_label`, `score_explanation`
+
+### Dominios y puntajes visibles
+- El codigo tecnico `adhd` se mantiene por compatibilidad.
+- Todo payload human-readable debe incluir:
+  - `domain_code: adhd`
+  - `domain_label: TDAH`
+  - `domain_description: Trastorno por Deficit de Atencion e Hiperactividad`
+- El porcentaje se presenta como `Indice de carga sintomatica`, no como probabilidad diagnostica.
+
 ### Continuacion de borrador (resume)
 - `GET /questionnaires/sessions/{id}` devuelve estado reanudable para el duenio autorizado:
   - `session_id`, `status`, `mode`, `role`, `progress_pct`
@@ -52,6 +77,9 @@ Reglas:
 - `POST /questionnaires/history/{id}/pdf/generate`
 - `GET /questionnaires/history/{id}/pdf`
 - `GET /questionnaires/history/{id}/pdf/download`
+- El PDF muestra quien diligencio el formato, rol, relacion con el menor, fecha de aplicacion y fecha de generacion.
+- La seccion `Limitaciones y uso responsable` inicia en pagina propia para evitar cortes.
+- Si hay item de autolesion/muerte/desaparicion en umbral critico, el PDF muestra nota prioritaria diferenciada.
 
 ## Dashboards
 - `GET /dashboard/adoption-history`
@@ -68,6 +96,10 @@ Reglas:
 - `GET /dashboard/equity`
 - `GET /dashboard/human-review`
 - `GET /dashboard/executive-summary`
+- `GET /questionnaires/guardian/dashboard` y `GET /questionnaires/psychologist/dashboard` preservan campos legacy y agregan:
+  - `meta`, `summary`, `time_series`, `breakdowns`, `rankings`, `matrix`, `items`, `pagination`, `permissions`, `empty_state`, `data_quality`
+- Si no hay datos, responden `200` con `empty_state`, no `500`.
+- `data_quality` concentra `warnings`, `inconsistency_flags` y `safety_flags`.
 
 ## Reportes
 - `POST /reports/jobs`
