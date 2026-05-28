@@ -21692,6 +21692,91 @@ paths:
         '500':
           description: Error interno al listar casos.
       x-contract-status: KEEP_ACTIVE
+  /api/v2/cases:
+    post:
+      tags:
+      - QuestionnaireV2
+      summary: Crear caso del guardian (alias frontend)
+      description: |-
+        **Objetivo funcional**
+        Crear un caso del guardian usando el alias compacto consumido por el frontend.
+
+        **Cuando debe usarse**
+        Cuando el frontend de casos envia `label`, `display_label`, `name`, `case_label` o `private_label`.
+
+        **Actor que lo consume**
+        Guardian/padre/tutor autenticado.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`; solo usuarios guardian pueden crear casos propios.
+
+        **Entrada esperada**
+        Metodo `POST /api/v2/cases` con `label` o equivalente, `description`, `tags` y `metadata` opcionales.
+
+        **Resultado exitoso**
+        Responde `201` con el caso en forma plana y anidada (`case`), `display_label`, `compact_label`, `latest_activity_at` y `permissions`.
+
+        **Errores posibles y causa funcional**
+        `400 case_validation_error|case_label_invalid`, `403 case_create_forbidden`, `409 case_public_id_conflict`, `500 case_create_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`, alias vigente para compatibilidad frontend.
+      operationId: postV2Cases
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Caso creado correctamente con DTO compatible para frontend.
+        '400':
+          description: Solicitud invalida para crear el caso.
+        '403':
+          description: Usuario autenticado sin permisos para crear casos.
+        '409':
+          description: Conflicto de unicidad en identificador publico del caso.
+        '500':
+          description: Error interno al crear el caso.
+      x-contract-status: KEEP_ACTIVE
+    get:
+      tags:
+      - QuestionnaireV2
+      summary: Listar casos del guardian (alias frontend)
+      description: |-
+        **Objetivo funcional**
+        Listar casos del guardian usando el alias compacto consumido por el frontend.
+
+        **Cuando debe usarse**
+        Al cargar la vista de casos con filtros server-side.
+
+        **Actor que lo consume**
+        Guardian/padre/tutor autenticado.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`; solo retorna casos del owner autenticado.
+
+        **Entrada esperada**
+        Metodo `GET /api/v2/cases` con filtros `status`, `q`, `label`, `case_public_id`, `has_sessions`, `latest_alert_level`, `date_from`, `date_to`, `page`, `page_size`.
+
+        **Resultado exitoso**
+        Responde `200` con `items`, labels compactos, conteos, permisos y paginacion.
+
+        **Errores posibles y causa funcional**
+        `400 validation_error`, `403 cases_list_forbidden`, `500 cases_list_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`, alias vigente para compatibilidad frontend.
+      operationId: getV2Cases
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Casos listados correctamente para el usuario autenticado.
+        '400':
+          description: Filtros invalidos.
+        '403':
+          description: Usuario sin permiso para consultar casos.
+        '500':
+          description: Error interno al listar casos.
+      x-contract-status: KEEP_ACTIVE
   /api/v2/questionnaires/cases/{case_id}:
     get:
       tags:
@@ -21763,6 +21848,93 @@ paths:
         **Estado contractual**
         `KEEP_ACTIVE`, endpoint vigente y recomendado para frontend.
       operationId: patchV2QuestionnairesCasesCaseId
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Caso actualizado correctamente.
+        '400':
+          description: Datos invalidos para actualizar el caso.
+        '403':
+          description: Usuario sin permisos para actualizar el caso.
+        '404':
+          description: Caso no encontrado.
+        '500':
+          description: Error interno al actualizar el caso.
+      x-contract-status: KEEP_ACTIVE
+  /api/v2/cases/{case_id}:
+    get:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener detalle de caso (alias frontend)
+      description: |-
+        **Objetivo funcional**
+        Obtener detalle de caso desde el alias compacto consumido por el frontend.
+
+        **Cuando debe usarse**
+        Al abrir un caso especifico para revisar cuestionarios, tags, tendencias y permisos.
+
+        **Actor que lo consume**
+        Guardian/padre/tutor autenticado propietario del caso.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`; valida ownership estricto del `case_id`.
+
+        **Entrada esperada**
+        Metodo `GET /api/v2/cases/{case_id}` con `case_id` UUID valido.
+
+        **Resultado exitoso**
+        Responde `200` con `case`, `sessions`, `domain_summary`, `trend`, tags y permisos.
+
+        **Errores posibles y causa funcional**
+        `400 invalid_case_id`, `403 case_forbidden`, `404 case_not_found`, `500 case_detail_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`, alias vigente para compatibilidad frontend.
+      operationId: getV2CasesCaseId
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Detalle del caso retornado correctamente.
+        '400':
+          description: Identificador de caso invalido.
+        '403':
+          description: Usuario sin permisos para ver el caso solicitado.
+        '404':
+          description: Caso no encontrado.
+        '500':
+          description: Error interno al obtener detalle del caso.
+      x-contract-status: KEEP_ACTIVE
+    patch:
+      tags:
+      - QuestionnaireV2
+      summary: Actualizar caso (alias frontend)
+      description: |-
+        **Objetivo funcional**
+        Actualizar etiqueta privada o estado del caso desde el alias compacto.
+
+        **Cuando debe usarse**
+        Cuando el guardian archiva, reactiva o reorganiza sus casos.
+
+        **Actor que lo consume**
+        Guardian/padre/tutor autenticado propietario del caso.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth`; valida ownership estricto del `case_id`.
+
+        **Entrada esperada**
+        Metodo `PATCH /api/v2/cases/{case_id}` con `private_label` y/o `status`.
+
+        **Resultado exitoso**
+        Responde `200` con el caso actualizado y labels humanos.
+
+        **Errores posibles y causa funcional**
+        `400 case_update_validation_error|invalid_case_id`, `403 case_forbidden`, `404 case_not_found`, `500 case_update_failed`.
+
+        **Estado contractual**
+        `KEEP_ACTIVE`, alias vigente para compatibilidad frontend.
+      operationId: patchV2CasesCaseId
       security:
       - bearerAuth: []
       responses:

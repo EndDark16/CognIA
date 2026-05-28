@@ -317,17 +317,46 @@ def _case_display_label(case: QuestionnaireCase, viewer_user_id: uuid.UUID | Non
     return f"Caso {case.case_public_id}"
 
 
+def _compact_case_label(label: str | None, *, max_len: int = 34) -> str:
+    text = re.sub(r"\s+", " ", str(label or "").strip())
+    text = re.sub(r"^QA\s+Dashboard\s*[·:\-]\s*", "", text, flags=re.IGNORECASE)
+    if not text:
+        return "Caso"
+    return text if len(text) <= max_len else f"{text[: max_len - 1].rstrip()}…"
+
+
+def _case_permissions(is_owner: bool) -> dict[str, bool]:
+    return {
+        "can_view_detail": bool(is_owner),
+        "can_archive": bool(is_owner),
+        "can_reactivate": bool(is_owner),
+        "can_share": bool(is_owner),
+        "can_request_review": bool(is_owner),
+        "can_generate_pdf": bool(is_owner),
+        "can_manage_tags": bool(is_owner),
+    }
+
+
 def _case_payload(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None = None) -> dict[str, Any]:
     private_label = _decrypt_text_safe(case.private_label, "questionnaire_case.private_label") if case.private_label else None
+    is_owner = bool(viewer_user_id and viewer_user_id == case.owner_user_id)
+    display_label = private_label if (is_owner and private_label) else f"Caso {case.case_public_id}"
     payload: dict[str, Any] = {
         "case_id": str(case.id),
         "case_public_id": case.case_public_id,
         "status": case.status,
-        "display_label": private_label if (viewer_user_id and viewer_user_id == case.owner_user_id and private_label) else f"Caso {case.case_public_id}",
+        "display_label": display_label,
+        "label": display_label,
+        "compact_label": _compact_case_label(display_label),
+        "full_label": f"{display_label} · {case.case_public_id}",
         "created_at": case.created_at.isoformat() if case.created_at else None,
         "updated_at": case.updated_at.isoformat() if case.updated_at else None,
+        "latest_activity_at": (case.updated_at or case.created_at).isoformat() if (case.updated_at or case.created_at) else None,
+        "questionnaire_count": 0,
+        "processed_count": 0,
+        "permissions": _case_permissions(is_owner),
     }
-    if viewer_user_id and viewer_user_id == case.owner_user_id:
+    if is_owner:
         payload["private_label"] = private_label
     return payload
 
@@ -2812,8 +2841,22 @@ def ensure_case_owner(case: QuestionnaireCase, user_id: uuid.UUID) -> None:
         raise PermissionError("case_forbidden")
 
 
+def _case_label_from_payload(payload: dict[str, Any]) -> str:
+    for key in ("private_label", "label", "display_label", "name", "case_label"):
+        value = str(payload.get(key) or "").strip()
+        if value:
+            return value
+    return ""
+
+
+def _case_create_response(case_payload: dict[str, Any], *, reused: bool = False) -> dict[str, Any]:
+    response = {"case": case_payload, "reused": reused}
+    response.update(case_payload)
+    return response
+
+
 def create_case(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> dict[str, Any]:
-    private_label = str(payload.get("private_label") or "").strip()
+    private_label = _case_label_from_payload(payload)
     if not private_label:
         raise ValueError("case_label_invalid")
     label_hash = _hash_case_label(private_label)
@@ -2831,14 +2874,23 @@ def create_case(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> dict[str, 
             case_payload = _case_payload(existing, viewer_user_id=owner_user_id)
             sessions_count = QuestionnaireSession.query.filter_by(case_id=existing.id).count()
             case_payload["sessions_count"] = sessions_count
-            return {"case": case_payload, "reused": True}
+            case_payload["questionnaire_count"] = sessions_count
+            return _case_create_response(case_payload, reused=True)
+    metadata = payload.get("metadata") or {}
+    if not isinstance(metadata, dict):
+        metadata = {}
+    metadata = {
+        **metadata,
+        "description": payload.get("description") or metadata.get("description"),
+        "requested_tags": payload.get("tags") or metadata.get("requested_tags") or [],
+    }
     row = QuestionnaireCase(
         case_public_id=_generate_case_public_id(),
         owner_user_id=owner_user_id,
         private_label=_encrypt_text(private_label, "questionnaire_case.private_label") or private_label,
         private_label_hash=label_hash or None,
         status="active",
-        metadata_json=payload.get("metadata") or {},
+        metadata_json=metadata,
     )
     db.session.add(row)
     db.session.flush()
@@ -2846,7 +2898,7 @@ def create_case(owner_user_id: uuid.UUID, payload: dict[str, Any]) -> dict[str, 
     db.session.commit()
     case_payload = _case_payload(row, viewer_user_id=owner_user_id)
     case_payload["sessions_count"] = 0
-    return {"case": case_payload}
+    return _case_create_response(case_payload, reused=False)
 
 
 def list_cases(
@@ -2921,11 +2973,18 @@ def list_cases(
         item = {
             **case_payload,
             "sessions_count": len(sessions),
+            "questionnaire_count": len(sessions),
             "processed_sessions_count": int(counts.get("processed", 0)),
+            "processed_count": int(counts.get("processed", 0)),
             "draft_sessions_count": int(counts.get("draft", 0)),
             "in_progress_sessions_count": int(counts.get("in_progress", 0)),
             "latest_session_id": str(latest.id) if latest else None,
             "latest_processed_at": latest.processed_at.isoformat() if latest and latest.processed_at else None,
+            "latest_activity_at": (
+                (latest.processed_at or latest.submitted_at or latest.updated_at or latest.created_at).isoformat()
+                if latest
+                else case_payload.get("latest_activity_at")
+            ),
             "latest_alert_level": latest_alert,
             "latest_domain": dominant_domain,
             "tags": session_tags,
@@ -3267,15 +3326,22 @@ def guardian_dashboard(
         for dom, values in sorted(by_domain_counter.items())
     ]
     alerts_by_level = [{"alert_level": key, "count": int(value)} for key, value in sorted(by_level_counter.items())]
-    sessions_by_case_chart = [
-        {
-            "case_id": str(case_row.id),
-            "case_public_id": case_row.case_public_id,
-            "display_label": _case_display_label(case_row, owner_user_id),
-            "sessions_count": len(sessions_by_case.get(case_row.id, [])),
-        }
-        for case_row in all_cases
-    ]
+    all_sessions_by_case_chart = []
+    for case_row in all_cases:
+        display_label = _case_display_label(case_row, owner_user_id)
+        session_count = len(sessions_by_case.get(case_row.id, []))
+        all_sessions_by_case_chart.append(
+            {
+                "case_id": str(case_row.id),
+                "case_public_id": case_row.case_public_id,
+                "label": _compact_case_label(display_label),
+                "display_label": _compact_case_label(display_label),
+                "full_label": f"{display_label} · {case_row.case_public_id}",
+                "value": session_count,
+                "sessions_count": session_count,
+            }
+        )
+    sessions_by_case_chart = sorted(all_sessions_by_case_chart, key=lambda item: item["value"], reverse=True)[:10]
     cases_by_alert_level = [
         {"alert_level": level, "count": int(count)}
         for level, count in sorted(case_alert_level_counter.items(), key=lambda item: _alert_rank(item[0]))
