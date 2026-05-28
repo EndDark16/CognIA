@@ -173,9 +173,27 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
   }
 }
 ```
+- Tambien acepta `label`, `display_label`, `name` o `case_label` como alias de `private_label`.
+- Alias frontend equivalente: `POST /api/v2/cases`.
 - Response `201`:
 ```json
 {
+  "case_id": "4f695935-c87b-4286-af5f-ef74ea74fb75",
+  "case_public_id": "CASO-8F2K7A",
+  "display_label": "Hijo mayor",
+  "compact_label": "Hijo mayor",
+  "latest_activity_at": "2026-05-22T23:00:00Z",
+  "questionnaire_count": 0,
+  "processed_count": 0,
+  "permissions": {
+    "can_view_detail": true,
+    "can_archive": true,
+    "can_reactivate": true,
+    "can_share": true,
+    "can_request_review": true,
+    "can_generate_pdf": true,
+    "can_manage_tags": true
+  },
   "case": {
     "case_id": "4f695935-c87b-4286-af5f-ef74ea74fb75",
     "case_public_id": "CASO-8F2K7A",
@@ -193,16 +211,19 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 #### GET `/questionnaires/cases`
 - Permiso: usuario autenticado propietario.
 - Query: `status`, `q`, `label`, `case_public_id`, `has_sessions`, `latest_alert_level`, `date_from`, `date_to`, `page`, `page_size`.
-- Response `200`: lista paginada con `case_public_id`, `private_label` (solo owner), `sessions_count`, `processed_sessions_count`, `draft_sessions_count`, `in_progress_sessions_count`, `latest_session_id`, `latest_processed_at`, `latest_alert_level`, `latest_domain`, `tags`.
+- Alias frontend equivalente: `GET /api/v2/cases`.
+- Response `200`: lista paginada con `case_public_id`, `private_label` (solo owner), `display_label`, `compact_label`, `full_label`, `latest_activity_at`, `permissions`, `sessions_count`, `processed_sessions_count`, `draft_sessions_count`, `in_progress_sessions_count`, `latest_session_id`, `latest_processed_at`, `latest_alert_level`, `latest_domain`, `tags`.
 - Errores: `cases_list_forbidden` (403), `cases_list_failed` (500).
 
 #### GET `/questionnaires/cases/{case_id}`
 - Permiso: solo owner.
+- Alias frontend equivalente: `GET /api/v2/cases/{case_id}`.
 - Response `200`: `{ case, sessions, domain_summary, trend }`.
 - Errores: `case_not_found` (404), `case_forbidden` (403), `case_detail_failed` (500).
 
 #### PATCH `/questionnaires/cases/{case_id}`
 - Permiso: solo owner.
+- Alias frontend equivalente: `PATCH /api/v2/cases/{case_id}`.
 - Request:
 ```json
 {

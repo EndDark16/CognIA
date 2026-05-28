@@ -229,11 +229,14 @@ def create_session():
 
 
 @questionnaire_v2_bp.post("/questionnaires/cases")
+@questionnaire_v2_bp.post("/cases")
 @jwt_required()
 def create_case():
     user_id, user = _current_user()
     if not user_id or not user:
         return _error("invalid_user", "invalid_user", 401)
+    if str(getattr(user, "user_type", "") or "").lower() != "guardian":
+        return _error("case_create_forbidden", "case_create_forbidden", 403)
     schema = CaseCreateSchema()
     try:
         raw_payload, transport_context = _decode_sensitive_payload()
@@ -256,6 +259,7 @@ def create_case():
 
 
 @questionnaire_v2_bp.get("/questionnaires/cases")
+@questionnaire_v2_bp.get("/cases")
 @jwt_required()
 def list_cases():
     user_id, user = _current_user()
@@ -286,6 +290,7 @@ def list_cases():
 
 
 @questionnaire_v2_bp.get("/questionnaires/cases/<case_id>")
+@questionnaire_v2_bp.get("/cases/<case_id>")
 @jwt_required()
 def get_case_detail(case_id: str):
     user_id, user = _current_user()
@@ -307,6 +312,7 @@ def get_case_detail(case_id: str):
 
 
 @questionnaire_v2_bp.patch("/questionnaires/cases/<case_id>")
+@questionnaire_v2_bp.patch("/cases/<case_id>")
 @jwt_required()
 def patch_case(case_id: str):
     user_id, user = _current_user()

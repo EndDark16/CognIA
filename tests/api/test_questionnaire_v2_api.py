@@ -1374,6 +1374,51 @@ def test_questionnaire_v2_cases_create_list_update_and_session_association(clien
     assert session_created.json["session"]["case"]["case_id"] == case["case_id"]
 
 
+def test_questionnaire_v2_cases_alias_accepts_frontend_label_payload(client, app):
+    _, token = _user_token(app, "case_alias_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created_case = client.post(
+        "/api/v2/cases",
+        json={
+            "label": "QA Dashboard · Caso prueba",
+            "description": "Caso sintetico para validacion frontend",
+            "tags": ["QA · Seguimiento escolar"],
+        },
+        headers=headers,
+    )
+    assert created_case.status_code == 201
+    payload = created_case.json
+    assert payload["case_id"] == payload["case"]["case_id"]
+    assert payload["case_public_id"].startswith("CASO-")
+    assert payload["display_label"] == "QA Dashboard · Caso prueba"
+    assert payload["compact_label"] == "Caso prueba"
+    assert payload["latest_activity_at"]
+    assert payload["permissions"]["can_view_detail"] is True
+    assert payload["permissions"]["can_generate_pdf"] is True
+
+    listed = client.get("/api/v2/cases", headers=headers)
+    assert listed.status_code == 200
+    assert any(item["case_id"] == payload["case_id"] for item in listed.json["items"])
+
+
+def test_questionnaire_v2_cases_alias_rejects_invalid_or_forbidden(client, app):
+    _, guardian_token = _user_token(app, "case_alias_invalid_qv2")
+    _, psychologist_token = _user_token(app, "case_alias_psych_qv2", user_type="psychologist", roles=["PSYCHOLOGIST"])
+
+    invalid = client.post("/api/v2/cases", json={"label": " "}, headers={"Authorization": f"Bearer {guardian_token}"})
+    assert invalid.status_code == 400
+    assert invalid.json["error"] == "case_validation_error"
+
+    forbidden = client.post(
+        "/api/v2/cases",
+        json={"label": "Caso no permitido"},
+        headers={"Authorization": f"Bearer {psychologist_token}"},
+    )
+    assert forbidden.status_code == 403
+    assert forbidden.json["error"] == "case_create_forbidden"
+
+
 def test_questionnaire_v2_create_session_with_case_label_creates_case(client, app):
     _, token = _user_token(app, "case_label_owner_qv2")
     headers = {"Authorization": f"Bearer {token}"}

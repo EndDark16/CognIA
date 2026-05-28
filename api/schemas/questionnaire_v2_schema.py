@@ -151,8 +151,19 @@ class ColombiaCitiesQuerySchema(BaseSchema):
 
 
 class CaseCreateSchema(BaseSchema):
-    private_label = fields.String(required=True, validate=validate.Length(min=1, max=160))
+    private_label = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    label = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    display_label = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    name = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    case_label = fields.String(required=False, validate=validate.Length(min=1, max=160))
+    description = fields.String(required=False, validate=validate.Length(max=500))
+    tags = fields.List(fields.String(validate=validate.Length(min=1, max=120)), required=False)
     metadata = fields.Dict(required=False)
+
+    @validates_schema
+    def validate_label(self, data, **kwargs):
+        if not any(str(data.get(key) or "").strip() for key in ("private_label", "label", "display_label", "name", "case_label")):
+            raise ValidationError("case_label_required")
 
 
 class CaseUpdateSchema(BaseSchema):
