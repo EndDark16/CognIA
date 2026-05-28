@@ -301,12 +301,17 @@ def _ensure_user(spec: dict[str, Any], *, apply: bool, rotate_credentials: bool,
     if user and spec["needs_mfa"]:
         secret = None
         mfa = UserMFA.query.filter_by(user_id=user.id).first()
-        if not mfa:
+        if not mfa or rotate_credentials:
             stats.users_repaired += 1
             if apply:
                 secret = generate_totp_secret()
-                mfa = UserMFA(user_id=user.id, method="totp", secret_encrypted=encrypt_mfa_secret(secret))
-                db.session.add(mfa)
+                if mfa:
+                    mfa.secret_encrypted = encrypt_mfa_secret(secret)
+                    mfa.method = "totp"
+                    mfa.updated_at = _now()
+                else:
+                    mfa = UserMFA(user_id=user.id, method="totp", secret_encrypted=encrypt_mfa_secret(secret))
+                    db.session.add(mfa)
         if apply:
             user.mfa_enabled = True
             user.mfa_confirmed_at = user.mfa_confirmed_at or _now()
