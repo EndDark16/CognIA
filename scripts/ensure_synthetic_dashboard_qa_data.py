@@ -92,6 +92,17 @@ TAG_BLUEPRINTS = [
     ("QA - Revision profesional", "#6C757D"),
     ("QA - Monitoreo reciente", "#198754"),
 ]
+PHASES = (
+    "all",
+    "users",
+    "guardian-data",
+    "psychologist-data",
+    "admin-data",
+    "reports",
+    "audit",
+    "validate",
+    "credentials",
+)
 
 
 @dataclass
@@ -602,7 +613,35 @@ def _ensure_notification(user_id: uuid.UUID, actor_id: uuid.UUID, session: Quest
         )
 
 
-def _ensure_reports_and_audit(user: AppUser, session: QuestionnaireSession | None, *, apply: bool, stats: Stats) -> None:
+def _ensure_audit(user: AppUser, session: QuestionnaireSession | None, *, apply: bool, stats: Stats) -> None:
+    if not session:
+        return
+    for action in ("case_created", "tag_assigned", "share_requested", "pdf_generated"):
+        if not QuestionnaireAuditEvent.query.filter_by(session_id=session.id, actor_user_id=user.id, event_type=f"qa_{action}").first():
+            stats.audit_events_created += 1
+            if apply:
+                db.session.add(
+                    QuestionnaireAuditEvent(
+                        session_id=session.id,
+                        actor_user_id=user.id,
+                        event_type=f"qa_{action}",
+                        payload_json={"synthetic": True, "created_for": "dashboard_qa"},
+                    )
+                )
+        if not AuditLog.query.filter_by(user_id=user.id, action=f"QA_{action.upper()}").first():
+            stats.audit_events_created += 1
+            if apply:
+                db.session.add(
+                    AuditLog(
+                        user_id=user.id,
+                        action=f"QA_{action.upper()}",
+                        section="dashboard_qa",
+                        details={"synthetic": True, "created_for": "dashboard_qa"},
+                    )
+                )
+
+
+def _ensure_reports(user: AppUser, session: QuestionnaireSession | None, *, apply: bool, stats: Stats) -> None:
     if not session:
         return
     if not ReportJob.query.filter_by(requested_by_user_id=user.id, job_type="dashboard_qa_summary").first():
@@ -640,28 +679,11 @@ def _ensure_reports_and_audit(user: AppUser, session: QuestionnaireSession | Non
                     metadata_json={"synthetic": True, "created_for": "dashboard_qa"},
                 )
             )
-    for action in ("case_created", "tag_assigned", "share_requested", "pdf_generated"):
-        if not QuestionnaireAuditEvent.query.filter_by(session_id=session.id, actor_user_id=user.id, event_type=f"qa_{action}").first():
-            stats.audit_events_created += 1
-            if apply:
-                db.session.add(
-                    QuestionnaireAuditEvent(
-                        session_id=session.id,
-                        actor_user_id=user.id,
-                        event_type=f"qa_{action}",
-                        payload_json={"synthetic": True, "created_for": "dashboard_qa"},
-                    )
-                )
-        if not AuditLog.query.filter_by(user_id=user.id, action=f"QA_{action.upper()}").first():
-            if apply:
-                db.session.add(
-                    AuditLog(
-                        user_id=user.id,
-                        action=f"QA_{action.upper()}",
-                        section="dashboard_qa",
-                        details={"synthetic": True, "created_for": "dashboard_qa"},
-                    )
-                )
+
+
+def _ensure_reports_and_audit(user: AppUser, session: QuestionnaireSession | None, *, apply: bool, stats: Stats) -> None:
+    _ensure_reports(user, session, apply=apply, stats=stats)
+    _ensure_audit(user, session, apply=apply, stats=stats)
 
 
 def _ensure_aggregate(*, apply: bool) -> None:
@@ -681,31 +703,77 @@ def _ensure_aggregate(*, apply: bool) -> None:
     )
 
 
-def ensure_dashboard_data(*, apply: bool, rotate_credentials: bool, credentials_dir: Path) -> dict[str, Any]:
-    stats = Stats()
+def _load_users() -> dict[str, AppUser]:
+    usernames = [spec["username"] for spec in _all_user_specs()]
+    return {row.username: row for row in AppUser.query.filter(AppUser.username.in_(usernames)).all()}
+
+
+def _primary_guardians(users: dict[str, AppUser]) -> list[AppUser]:
+    return [users[name] for name in PRIMARY_USERS["guardian"] if name in users]
+
+
+def _primary_psychologists(users: dict[str, AppUser]) -> list[AppUser]:
+    return [users[name] for name in PRIMARY_USERS["psychologist"] if name in users]
+
+
+def _qa_sessions_for_guardians(users: dict[str, AppUser]) -> list[QuestionnaireSession]:
+    guardian_ids = [row.id for row in _primary_guardians(users)]
+    if not guardian_ids:
+        return []
+    return (
+        QuestionnaireSession.query.filter(
+            QuestionnaireSession.owner_user_id.in_(guardian_ids),
+            QuestionnaireSession.questionnaire_public_id.like("QV2-QA-%"),
+        )
+        .order_by(QuestionnaireSession.created_at.asc())
+        .all()
+    )
+
+
+def _write_credentials(credential_rows: list[dict[str, Any]], credentials_dir: Path, stats: Stats) -> None:
+    if not credential_rows:
+        return
+    path = _credential_path(credentials_dir)
+    with path.open("w", encoding="utf-8") as fh:
+        fh.write("CognIA synthetic dashboard QA credentials\n")
+        fh.write("Sensitive. Do not commit. Do not upload to CI artifacts.\n\n")
+        for row in credential_rows:
+            spec = row["spec"]
+            fh.write(f"role={spec['role']}\n")
+            fh.write(f"display_name={spec['full_name']}\n")
+            fh.write(f"username={spec['username']}\n")
+            fh.write(f"email={spec['email']}\n")
+            fh.write(f"password={row['password']}\n")
+            fh.write(f"mfa_required={spec['needs_mfa']}\n")
+            fh.write(f"totp_secret={row.get('totp_secret') or '<existing-or-not-required>'}\n")
+            fh.write("status=active\n\n")
+    stats.credentials_written = len(credential_rows)
+    stats.warnings.append(f"credentials_file={path}")
+
+
+def _phase_users(*, apply: bool, rotate_credentials: bool, credentials_dir: Path, stats: Stats) -> None:
     credential_rows: list[dict[str, Any]] = []
-    specs = _all_user_specs()
-    users: dict[str, AppUser] = {}
-    for spec in specs:
-        user = _ensure_user(spec, apply=apply, rotate_credentials=rotate_credentials, credential_rows=credential_rows, stats=stats)
-        if user:
-            users[spec["username"]] = user
+    for spec in _all_user_specs():
+        _progress(f"users username={spec['username']}", apply=apply)
+        _ensure_user(spec, apply=apply, rotate_credentials=rotate_credentials, credential_rows=credential_rows, stats=stats)
     if apply:
+        if rotate_credentials:
+            _write_credentials(credential_rows, credentials_dir, stats)
         db.session.commit()
         _progress("users phase committed", apply=apply)
 
+
+def _phase_guardian_data(*, apply: bool, stats: Stats) -> None:
+    users = _load_users()
     version = _ensure_version() if apply else QuestionnaireVersion.query.filter_by(is_active=True).first()
     if apply:
-        db.session.commit()
-        _progress("questionnaire version phase committed", apply=apply)
-    guardians = [users.get(username) for username in PRIMARY_USERS["guardian"] + EXTRA_GUARDIANS]
-    psychologists = [users.get(username) for username in PRIMARY_USERS["psychologist"] + EXTRA_PSYCHOLOGISTS]
-    psychologists = [row for row in psychologists if row is not None]
-    share_cycle = ["pending", "accepted", "accepted", "rejected", "accepted"]
-
-    for guardian_idx, guardian in enumerate([row for row in guardians if row is not None], start=1):
+        db.session.flush()
+    guardians = _primary_guardians(users)
+    if not guardians:
+        stats.warnings.append("guardians_missing_run_users_phase_first")
+    for guardian_idx, guardian in enumerate(guardians, start=1):
+        _progress(f"guardian-data username={guardian.username}", apply=apply)
         tags = [_ensure_tag(guardian, name, color, apply=apply, stats=stats) for name, color in TAG_BLUEPRINTS]
-        sessions: list[QuestionnaireSession | None] = []
         for case_idx, (label, domain, alert) in enumerate(CASE_BLUEPRINTS, start=1):
             status = "archived" if case_idx == len(CASE_BLUEPRINTS) else "active"
             case = _ensure_case(guardian, f"QA Dashboard · {label}", status, apply=apply, stats=stats)
@@ -722,47 +790,160 @@ def ensure_dashboard_data(*, apply: bool, rotate_credentials: bool, credentials_
                     apply=apply,
                     stats=stats,
                 )
-                sessions.append(session)
                 _link_tag(session, tags[(case_idx + q_idx) % len(tags)] if tags else None, guardian, apply=apply, stats=stats)
-                if psychologists:
-                    psych = psychologists[(guardian_idx + case_idx + q_idx) % len(psychologists)]
-                    share_status = share_cycle[(guardian_idx + case_idx + q_idx) % len(share_cycle)]
-                    grant = _ensure_share(session, psych, share_status, apply=apply, stats=stats)
-                    _ensure_review(session, psych, "reviewed" if share_status == "accepted" and q_idx % 2 == 0 else share_status, apply=apply, stats=stats)
-                    _ensure_notification(psych.id, guardian.id, session, grant, "questionnaire_share_requested", apply=apply, stats=stats)
-                    if share_status in {"accepted", "rejected"}:
-                        _ensure_notification(guardian.id, psych.id, session, grant, f"questionnaire_share_{share_status}", apply=apply, stats=stats)
-                _ensure_reports_and_audit(guardian, session, apply=apply, stats=stats)
         if apply:
             db.session.commit()
-            _progress(f"guardian phase committed username={guardian.username}", apply=apply)
+            _progress(f"guardian-data committed username={guardian.username}", apply=apply)
 
-    _ensure_aggregate(apply=apply)
-    if credential_rows and apply:
-        path = _credential_path(credentials_dir)
-        with path.open("w", encoding="utf-8") as fh:
-            fh.write("CognIA synthetic dashboard QA credentials\n")
-            fh.write("Sensitive. Do not commit. Do not upload to CI artifacts.\n\n")
-            for row in credential_rows:
-                spec = row["spec"]
-                fh.write(f"role={spec['role']}\n")
-                fh.write(f"display_name={spec['full_name']}\n")
-                fh.write(f"username={spec['username']}\n")
-                fh.write(f"email={spec['email']}\n")
-                fh.write(f"password={row['password']}\n")
-                fh.write(f"mfa_required={spec['needs_mfa']}\n")
-                fh.write(f"totp_secret={row.get('totp_secret') or '<existing-or-not-required>'}\n")
-                fh.write("status=active\n\n")
-        stats.credentials_written = len(credential_rows)
-        stats.warnings.append(f"credentials_file={path}")
+
+def _phase_psychologist_data(*, apply: bool, stats: Stats) -> None:
+    users = _load_users()
+    psychologists = _primary_psychologists(users)
+    sessions = _qa_sessions_for_guardians(users)
+    share_cycle = ["pending", "accepted", "accepted", "rejected", "accepted"]
+    if not psychologists:
+        stats.warnings.append("psychologists_missing_run_users_phase_first")
+    if not sessions:
+        stats.warnings.append("qa_sessions_missing_run_guardian_data_phase_first")
+    for idx, session in enumerate(sessions, start=1):
+        if not psychologists:
+            break
+        psych = psychologists[idx % len(psychologists)]
+        share_status = share_cycle[idx % len(share_cycle)]
+        _progress(f"psychologist-data session={session.questionnaire_public_id} status={share_status}", apply=apply)
+        grant = _ensure_share(session, psych, share_status, apply=apply, stats=stats)
+        _ensure_review(session, psych, "reviewed" if share_status == "accepted" and idx % 2 == 0 else share_status, apply=apply, stats=stats)
+        _ensure_notification(psych.id, session.owner_user_id, session, grant, "questionnaire_share_requested", apply=apply, stats=stats)
+        if share_status in {"accepted", "rejected"}:
+            _ensure_notification(session.owner_user_id, psych.id, session, grant, f"questionnaire_share_{share_status}", apply=apply, stats=stats)
     if apply:
         db.session.commit()
-        _progress("final phase committed", apply=apply)
-    else:
+        _progress("psychologist-data phase committed", apply=apply)
+
+
+def _phase_reports(*, apply: bool, stats: Stats) -> None:
+    users = _load_users()
+    user_by_id = {row.id: row for row in users.values()}
+    sessions = _qa_sessions_for_guardians(users)
+    if not sessions:
+        stats.warnings.append("qa_sessions_missing_run_guardian_data_phase_first")
+    for session in sessions:
+        owner = user_by_id.get(session.owner_user_id)
+        if owner:
+            _progress(f"reports session={session.questionnaire_public_id}", apply=apply)
+            _ensure_reports(owner, session, apply=apply, stats=stats)
+    if apply:
+        db.session.commit()
+        _progress("reports phase committed", apply=apply)
+
+
+def _phase_audit(*, apply: bool, stats: Stats) -> None:
+    users = _load_users()
+    user_by_id = {row.id: row for row in users.values()}
+    sessions = _qa_sessions_for_guardians(users)
+    if not sessions:
+        stats.warnings.append("qa_sessions_missing_run_guardian_data_phase_first")
+    for session in sessions:
+        owner = user_by_id.get(session.owner_user_id)
+        if owner:
+            _progress(f"audit session={session.questionnaire_public_id}", apply=apply)
+            _ensure_audit(owner, session, apply=apply, stats=stats)
+    if apply:
+        db.session.commit()
+        _progress("audit phase committed", apply=apply)
+
+
+def _phase_admin_data(*, apply: bool, stats: Stats) -> None:
+    _progress("admin-data aggregate", apply=apply)
+    _ensure_aggregate(apply=apply)
+    if apply:
+        db.session.commit()
+        _progress("admin-data phase committed", apply=apply)
+
+
+def _phase_validate(stats: Stats) -> dict[str, Any]:
+    users = _load_users()
+    guardian_ids = [row.id for row in _primary_guardians(users)]
+    psych_ids = [row.id for row in _primary_psychologists(users)]
+    sessions = _qa_sessions_for_guardians(users)
+    case_count = QuestionnaireCase.query.filter(QuestionnaireCase.owner_user_id.in_(guardian_ids)).count() if guardian_ids else 0
+    tag_count = QuestionnaireTag.query.filter(QuestionnaireTag.owner_user_id.in_(guardian_ids)).count() if guardian_ids else 0
+    grants_by_status = Counter()
+    if psych_ids:
+        for status, count in db.session.query(QuestionnaireAccessGrant.request_status, db.func.count(QuestionnaireAccessGrant.id)).filter(QuestionnaireAccessGrant.grantee_user_id.in_(psych_ids)).group_by(QuestionnaireAccessGrant.request_status).all():
+            grants_by_status[str(status)] = int(count)
+    validation = {
+        "synthetic_scope": {
+            "allowed_email_domain": "@cognia-synthetic.test",
+            "allowed_usernames": [spec["username"] for spec in _all_user_specs()],
+            "qa_prefix": "QA Dashboard",
+            "metadata_marker": {"synthetic": True, "created_for": "dashboard_qa"},
+        },
+        "users_total": len(users),
+        "guardians_primary": len(_primary_guardians(users)),
+        "psychologists_primary": len(_primary_psychologists(users)),
+        "cases_total": int(case_count),
+        "sessions_total": len(sessions),
+        "tags_total": int(tag_count),
+        "shares_by_status": dict(grants_by_status),
+        "reviews_total": QuestionnaireProfessionalReview.query.filter(QuestionnaireProfessionalReview.psychologist_user_id.in_(psych_ids)).count() if psych_ids else 0,
+        "reports_total": ReportJob.query.filter_by(job_type="dashboard_qa_summary").count(),
+        "pdf_exports_total": QuestionnaireSessionPdfExport.query.join(QuestionnaireSession, QuestionnaireSession.id == QuestionnaireSessionPdfExport.session_id).filter(QuestionnaireSession.questionnaire_public_id.like("QV2-QA-%")).count(),
+        "audit_events_total": QuestionnaireAuditEvent.query.join(QuestionnaireSession, QuestionnaireSession.id == QuestionnaireAuditEvent.session_id).filter(QuestionnaireSession.questionnaire_public_id.like("QV2-QA-%")).count(),
+    }
+    stats.share_status.update(grants_by_status)
+    return validation
+
+
+def _credentials_plan(*, apply: bool, rotate_credentials: bool, credentials_dir: Path, stats: Stats) -> None:
+    if not rotate_credentials:
+        stats.warnings.append(f"credentials_output_plan={credentials_dir}")
+        stats.warnings.append("credentials_phase_requires_rotate_credentials_to_write")
+        return
+    _phase_users(apply=apply, rotate_credentials=True, credentials_dir=credentials_dir, stats=stats)
+
+
+def ensure_dashboard_data(*, apply: bool, rotate_credentials: bool, credentials_dir: Path, phase: str = "all") -> dict[str, Any]:
+    if phase not in PHASES:
+        raise ValueError("invalid_phase")
+    stats = Stats()
+    validation: dict[str, Any] | None = None
+    phases = ["users", "guardian-data", "psychologist-data", "admin-data", "reports", "audit", "validate"] if phase == "all" else [phase]
+    try:
+        for current_phase in phases:
+            if current_phase == "users":
+                _phase_users(apply=apply, rotate_credentials=False, credentials_dir=credentials_dir, stats=stats)
+            elif current_phase == "guardian-data":
+                _phase_guardian_data(apply=apply, stats=stats)
+            elif current_phase == "psychologist-data":
+                _phase_psychologist_data(apply=apply, stats=stats)
+            elif current_phase == "admin-data":
+                _phase_admin_data(apply=apply, stats=stats)
+            elif current_phase == "reports":
+                _phase_reports(apply=apply, stats=stats)
+            elif current_phase == "audit":
+                _phase_audit(apply=apply, stats=stats)
+            elif current_phase == "validate":
+                validation = _phase_validate(stats)
+            elif current_phase == "credentials":
+                _credentials_plan(apply=apply, rotate_credentials=rotate_credentials, credentials_dir=credentials_dir, stats=stats)
+        if not apply:
+            db.session.rollback()
+    except Exception:
         db.session.rollback()
+        raise
     summary = stats.as_dict()
     summary["mode"] = "apply" if apply else "dry-run"
+    summary["phase"] = phase
+    summary["phases_available"] = list(PHASES)
     summary["primary_users"] = {key: list(value) for key, value in PRIMARY_USERS.items()}
+    summary["safety_scope"] = {
+        "touches_real_users": False,
+        "allowed_email_domain": "@cognia-synthetic.test",
+        "allowed_usernames": [spec["username"] for spec in _all_user_specs()],
+        "metadata_marker": {"synthetic": True, "created_for": "dashboard_qa"},
+        "prints_passwords_or_totp": False,
+    }
     summary["planned_minimums"] = {
         "synthetic_users_total": len(_all_user_specs()),
         "primary_users_total": sum(len(value) for value in PRIMARY_USERS.values()),
@@ -772,6 +953,8 @@ def ensure_dashboard_data(*, apply: bool, rotate_credentials: bool, credentials_
         "global_share_requests_minimum": 15,
         "professional_reviews_minimum": 6,
     }
+    if validation is not None:
+        summary["validation"] = validation
     return summary
 
 
@@ -781,6 +964,7 @@ def parse_args() -> argparse.Namespace:
     mode.add_argument("--dry-run", action="store_true", help="Preview changes without writing. Default.")
     mode.add_argument("--apply", action="store_true", help="Write synthetic QA data.")
     parser.add_argument("--env", default=os.getenv("APP_ENV", "local"), choices=["local", "staging", "production"])
+    parser.add_argument("--phase", default="all", choices=PHASES)
     parser.add_argument("--rotate-credentials", action="store_true", help="Rotate synthetic user passwords and write them externally.")
     parser.add_argument(
         "--credentials-dir",
@@ -801,6 +985,7 @@ def main() -> int:
             apply=bool(args.apply),
             rotate_credentials=bool(args.rotate_credentials),
             credentials_dir=credentials_dir,
+            phase=args.phase,
         )
     summary["env"] = args.env
     _safe_print(summary)

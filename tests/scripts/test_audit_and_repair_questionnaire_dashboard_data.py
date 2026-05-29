@@ -42,7 +42,8 @@ def test_ensure_synthetic_dashboard_qa_data_apply_idempotent(tmp_path):
     with app.app_context():
         db.create_all()
 
-        first = ensure_dashboard_data(apply=True, rotate_credentials=True, credentials_dir=tmp_path)
+        first = ensure_dashboard_data(apply=True, rotate_credentials=False, credentials_dir=tmp_path)
+        credentials = ensure_dashboard_data(apply=True, rotate_credentials=True, credentials_dir=tmp_path, phase="credentials")
         second = ensure_dashboard_data(apply=True, rotate_credentials=False, credentials_dir=tmp_path)
 
         assert first["users_created"] >= 9
@@ -51,6 +52,7 @@ def test_ensure_synthetic_dashboard_qa_data_apply_idempotent(tmp_path):
         assert AppUser.query.filter_by(username="syn_psych_dashboard_01").first().colpsic_verified is True
         assert QuestionnaireCase.query.count() >= 15
         assert QuestionnaireSession.query.filter_by(status="processed").count() >= 12
+        assert credentials["credentials_written"] >= 9
         assert list(tmp_path.glob("dashboard_qa_credentials_*.txt"))
 
         db.session.remove()
