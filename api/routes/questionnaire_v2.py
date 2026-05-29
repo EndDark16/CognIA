@@ -106,9 +106,14 @@ def _has_admin_role_from_jwt() -> bool:
     return any(str(role).strip().upper() == "ADMIN" for role in roles)
 
 
-def _decode_sensitive_payload() -> tuple[dict, transport_crypto.TransportContext]:
+def _decode_sensitive_payload(*, allow_legacy_plaintext: bool = False) -> tuple[dict, transport_crypto.TransportContext]:
     raw_payload = request.get_json(silent=True) or {}
-    return transport_crypto.decode_sensitive_request_payload(raw_payload)
+    try:
+        return transport_crypto.decode_sensitive_request_payload(raw_payload)
+    except transport_crypto.TransportCryptoError as exc:
+        if allow_legacy_plaintext and exc.code == "plaintext_not_allowed":
+            return raw_payload, transport_crypto.TransportContext(request_encrypted=False)
+        raise
 
 
 def _sensitive_json_response(payload: dict, status_code: int, context: transport_crypto.TransportContext):
@@ -239,7 +244,7 @@ def create_case():
         return _error("case_create_forbidden", "case_create_forbidden", 403)
     schema = CaseCreateSchema()
     try:
-        raw_payload, transport_context = _decode_sensitive_payload()
+        raw_payload, transport_context = _decode_sensitive_payload(allow_legacy_plaintext=True)
         payload = schema.load(raw_payload or {})
     except transport_crypto.TransportCryptoError as exc:
         return _error(exc.message, exc.code, exc.status_code)
@@ -323,7 +328,7 @@ def patch_case(case_id: str):
         return _error("invalid_case_id", "invalid_case_id", 400)
     schema = CaseUpdateSchema()
     try:
-        raw_payload, transport_context = _decode_sensitive_payload()
+        raw_payload, transport_context = _decode_sensitive_payload(allow_legacy_plaintext=True)
         payload = schema.load(raw_payload or {})
     except transport_crypto.TransportCryptoError as exc:
         return _error(exc.message, exc.code, exc.status_code)
@@ -621,7 +626,7 @@ def accept_share_request(grant_id: str):
         return _error("invalid_grant_id", "invalid_grant_id", 400)
     schema = ShareRequestDecisionSchema()
     try:
-        raw_payload, transport_context = _decode_sensitive_payload()
+        raw_payload, transport_context = _decode_sensitive_payload(allow_legacy_plaintext=True)
         payload = schema.load(raw_payload or {})
     except transport_crypto.TransportCryptoError as exc:
         return _error(exc.message, exc.code, exc.status_code)
@@ -655,7 +660,7 @@ def reject_share_request(grant_id: str):
         return _error("invalid_grant_id", "invalid_grant_id", 400)
     schema = ShareRequestDecisionSchema()
     try:
-        raw_payload, transport_context = _decode_sensitive_payload()
+        raw_payload, transport_context = _decode_sensitive_payload(allow_legacy_plaintext=True)
         payload = schema.load(raw_payload or {})
     except transport_crypto.TransportCryptoError as exc:
         return _error(exc.message, exc.code, exc.status_code)
@@ -969,7 +974,7 @@ def add_tag(session_id: str):
         return _error("invalid_session_id", "invalid_session_id", 400)
     schema = TagAssignSchema()
     try:
-        raw_payload, transport_context = _decode_sensitive_payload()
+        raw_payload, transport_context = _decode_sensitive_payload(allow_legacy_plaintext=True)
         payload = schema.load(raw_payload)
     except transport_crypto.TransportCryptoError as exc:
         return _error(exc.message, exc.code, exc.status_code)
@@ -1031,7 +1036,7 @@ def share(session_id: str):
 
     schema = ShareCreateSchema()
     try:
-        raw_payload, transport_context = _decode_sensitive_payload()
+        raw_payload, transport_context = _decode_sensitive_payload(allow_legacy_plaintext=True)
         payload = schema.load(raw_payload)
     except transport_crypto.TransportCryptoError as exc:
         return _error(exc.message, exc.code, exc.status_code)
@@ -1128,7 +1133,7 @@ def pdf_generate(session_id: str):
         return _error("invalid_session_id", "invalid_session_id", 400)
 
     try:
-        _, transport_context = _decode_sensitive_payload()
+        _, transport_context = _decode_sensitive_payload(allow_legacy_plaintext=True)
         session = _load_session_for_user(sid, user_id)
         service.ensure_pdf_access(session, user_id)
         export = service.generate_pdf(session, user_id)
@@ -1286,7 +1291,7 @@ def create_professional_review(session_id: str):
         return _error("invalid_session_id", "invalid_session_id", 400)
     schema = ProfessionalReviewCreateSchema()
     try:
-        raw_payload, transport_context = _decode_sensitive_payload()
+        raw_payload, transport_context = _decode_sensitive_payload(allow_legacy_plaintext=True)
         payload = schema.load(raw_payload or {})
     except transport_crypto.TransportCryptoError as exc:
         return _error(exc.message, exc.code, exc.status_code)
@@ -1321,7 +1326,7 @@ def patch_professional_review(session_id: str, review_id: str):
         return _error("invalid_id", "invalid_id", 400)
     schema = ProfessionalReviewUpdateSchema()
     try:
-        raw_payload, transport_context = _decode_sensitive_payload()
+        raw_payload, transport_context = _decode_sensitive_payload(allow_legacy_plaintext=True)
         payload = schema.load(raw_payload or {})
     except transport_crypto.TransportCryptoError as exc:
         return _error(exc.message, exc.code, exc.status_code)
