@@ -557,6 +557,7 @@ paths:
         - Codigos de exito documentados: 200.
 
         - La respuesta representa el estado procesado por el backend y mantiene compatibilidad con el esquema documentado.
+        Para flujo directo se envia `grantee_user_id` o alias `psychologist_user_id`, `recipient_user_id`, `grantee_id`; esto crea `grant.request_status=pending`, notificacion al psicologo y no requiere usar `share_code`.
 
 
         **Errores posibles y causa funcional**
@@ -22137,7 +22138,8 @@ paths:
         `location` permanece como parametro legacy opcional para compatibilidad.
 
         **Resultado exitoso**
-        Responde `200` con lista paginada de psicologos, `department`, `city`, banderas `same_department`/`same_city`, `recommendation` y `warnings`.
+        Responde `200` con lista paginada de psicologos, `display_name`, `department`, `city`, banderas `same_department`/`same_city`, `recommendation_reason`, `recommendation`, `warnings` y `empty_state`.
+        `q` busca por username, nombre, email y matricula/COLPSIC. `same_location=true` recomienda primero psicologos cercanos.
 
         **Errores posibles y causa funcional**
         `400 psychologist_search_invalid_query`, `403 psychologist_search_forbidden`, `500 psychologist_search_failed`.
@@ -22179,7 +22181,7 @@ paths:
         Metodo `GET /api/v2/questionnaires/psychologist/share-requests` con `status`, `q`, `date_from`, `date_to`, `page`, `page_size`.
 
         **Resultado exitoso**
-        Retorna `200` con `items`, `summary` y `pagination`.
+        Retorna `200` con `items`, `summary` y `pagination`. Cada item incluye `request_status_label` y permisos efectivos para ver, descargar PDF o etiquetar tras aceptar.
 
         **Errores posibles y causa funcional**
         `400 psychologist_share_requests_invalid_filter`, `403 psychologist_share_requests_requires_psychologist`, `500 psychologist_share_requests_failed`.
@@ -22393,7 +22395,7 @@ paths:
         Metodo `GET /api/v2/questionnaires/history/{session_id}/professional-reviews` con `session_id` UUID.
 
         **Resultado exitoso**
-        Responde `200` con lista de revisiones visibles.
+        Responde `200` con `items`, `permissions` y `empty_state`. El guardian solo recibe revisiones con `visible_to_guardian=true`; cada item incluye `review_status_label`, `psychologist.display_name`, `disclaimer`, `initial_concept` y `recommendation` cuando son visibles.
 
         **Errores posibles y causa funcional**
         `403 professional_reviews_forbidden`, `404 professional_reviews_session_not_found`, `500 professional_reviews_failed`.
@@ -22434,7 +22436,7 @@ paths:
         Metodo `POST /api/v2/questionnaires/history/{session_id}/professional-reviews` con `review_status`, `initial_concept`, `recommendation` y `visible_to_guardian`.
 
         **Resultado exitoso**
-        Responde `201` con la revision profesional creada/actualizada.
+        Responde `201` con la revision profesional creada/actualizada. Si `visible_to_guardian=true`, crea notificacion `professional_review_created` para el guardian.
 
         **Errores posibles y causa funcional**
         `400 professional_review_status_invalid|professional_review_text_too_long|professional_review_validation_error`, `403 professional_review_requires_psychologist|professional_review_forbidden`, `404 professional_review_session_not_found`, `500 professional_review_failed`.

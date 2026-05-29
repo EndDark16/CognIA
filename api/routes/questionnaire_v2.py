@@ -1270,7 +1270,17 @@ def professional_reviews(session_id: str):
         return _error("invalid_session_id", "invalid_session_id", 400)
     try:
         session = _load_session_for_user(sid, user_id)
-        payload = {"items": service.list_professional_reviews(session, user_id=user_id)}
+        items = service.list_professional_reviews(session, user_id=user_id)
+        payload = {
+            "items": items,
+            "permissions": {"can_view_professional_reviews": True},
+            "empty_state": None
+            if items
+            else {
+                "title": "Sin revision profesional visible",
+                "message": "Aun no hay comentarios profesionales compartidos para este cuestionario.",
+            },
+        }
     except LookupError:
         return _error("professional_reviews_session_not_found", "professional_reviews_session_not_found", 404)
     except PermissionError:

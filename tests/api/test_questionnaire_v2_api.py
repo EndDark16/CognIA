@@ -1478,7 +1478,13 @@ def test_questionnaire_v2_psychologist_search_filters_active_psychologists(clien
     assert "search_guardian_qv2" not in usernames
     assert resp.json["items"][0]["department"] == "Cundinamarca"
     assert resp.json["items"][0]["city"] == "Facatativa"
+    assert resp.json["items"][0]["display_name"]
+    assert "recommendation_reason" in resp.json["items"][0]
     assert "professional_location" not in resp.json["items"][0]
+
+    by_email = client.get("/api/v2/psychologists/search?q=search_psych_qv2@example.com", headers=headers)
+    assert by_email.status_code == 200
+    assert any(item["username"] == "search_psych_qv2" for item in by_email.json["items"])
 
 
 def test_questionnaire_v2_share_with_psychologist_hides_private_label_for_grantee(client, app):
@@ -1503,17 +1509,23 @@ def test_questionnaire_v2_share_with_psychologist_hides_private_label_for_grante
 
     shared = client.post(
         f"/api/v2/questionnaires/history/{session_id}/share",
-        json={"grantee_user_id": str(psych_id), "grant_can_tag": False, "grant_can_download_pdf": True},
+        json={"psychologist_user_id": str(psych_id), "grant_can_tag": False, "grant_can_download_pdf": True},
         headers=owner_headers,
     )
     assert shared.status_code == 201
     assert shared.json["case"]["case_public_id"].startswith("CASO-")
     assert shared.json["grantee"]["username"] == "case_share_psych_qv2"
+    assert shared.json["grantee"]["display_name"]
+    assert "colpsic_verified" in shared.json["grantee"]
     assert "department" in shared.json["grantee"]
     assert "city" in shared.json["grantee"]
     assert "professional_location" not in shared.json["grantee"]
     grant_id = shared.json["grant"]["grant_id"]
     assert shared.json["grant"]["request_status"] == "pending"
+    assert shared.json["grant"]["request_status_label"]
+    assert shared.json["grant"]["can_view"] is False
+    assert shared.json["notification"]["created"] is True
+    assert shared.json["questionnaire"]["session_id"] == session_id
 
     psych_session_before_accept = client.get(f"/api/v2/questionnaires/sessions/{session_id}", headers=psych_headers)
     assert psych_session_before_accept.status_code == 403
@@ -1524,12 +1536,14 @@ def test_questionnaire_v2_share_with_psychologist_hides_private_label_for_grante
         headers=psych_headers,
     )
     assert accepted.status_code == 200
+    assert accepted.json["grant"]["request_status_label"] == "Aceptada"
 
     psych_session = client.get(f"/api/v2/questionnaires/sessions/{session_id}", headers=psych_headers)
     assert psych_session.status_code == 200
     case_payload = psych_session.json.get("case") or {}
     assert case_payload.get("case_public_id", "").startswith("CASO-")
     assert "private_label" not in case_payload
+    assert psych_session.json["professional_flow"]["latest_share_request_status"] == "accepted"
 
 
 def test_questionnaire_v2_locations_catalog(client):
@@ -1646,6 +1660,8 @@ def test_questionnaire_v2_professional_review_visibility_rules(client, app):
     )
     assert owner_list.status_code == 200
     assert owner_list.json["items"] == []
+    assert owner_list.json["permissions"]["can_view_professional_reviews"] is True
+    assert owner_list.json["empty_state"]["title"]
 
     review_updated = client.patch(
         f"/api/v2/questionnaires/history/{session_id}/professional-reviews/{review_id}",
@@ -1660,7 +1676,33 @@ def test_questionnaire_v2_professional_review_visibility_rules(client, app):
     )
     assert owner_list_visible.status_code == 200
     assert len(owner_list_visible.json["items"]) == 1
-    assert owner_list_visible.json["items"][0]["is_diagnostic"] is False
+    visible_item = owner_list_visible.json["items"][0]
+    assert visible_item["is_diagnostic"] is False
+    assert visible_item["review_status_label"] == "Revisado"
+    assert visible_item["psychologist"]["display_name"]
+    assert visible_item["disclaimer"]
+
+    visible_created = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/professional-reviews",
+        json={
+            "review_status": "closed",
+            "initial_concept": "Concepto actualizado visible",
+            "recommendation": "Seguimiento visible",
+            "visible_to_guardian": True,
+        },
+        headers=psych_headers,
+    )
+    assert visible_created.status_code == 201
+
+    owner_notifications = client.get("/api/v2/notifications?type=professional_review_created", headers=owner_headers)
+    assert owner_notifications.status_code == 200
+    assert any(item["type"] == "professional_review_created" for item in owner_notifications.json["items"])
+
+    owner_detail = client.get(f"/api/v2/questionnaires/sessions/{session_id}", headers=owner_headers)
+    assert owner_detail.status_code == 200
+    flow = owner_detail.json["professional_flow"]
+    assert flow["professional_reviews_count"] >= 1
+    assert flow["professional_review_status_label"]
 
 
 def test_questionnaire_v2_report_preview_for_granted_psychologist_hides_private_label(client, app):

@@ -972,6 +972,47 @@ def _notification_payload(row: QuestionnaireNotification, viewer_user_id: uuid.U
     }
 
 
+SHARE_REQUEST_STATUS_LABELS = {
+    "pending": "Pendiente de aceptacion",
+    "accepted": "Aceptada",
+    "rejected": "Rechazada",
+}
+
+PROFESSIONAL_REVIEW_STATUS_LABELS = {
+    "pending": "Pendiente",
+    "in_review": "En revision",
+    "reviewed": "Revisado",
+    "orientation_recommended": "Orientacion recomendada",
+    "closed": "Cerrada",
+}
+
+PROFESSIONAL_REVIEW_DISCLAIMER = (
+    "Esta revision es una orientacion profesional y no constituye diagnostico definitivo."
+)
+
+
+def _status_label(status: str | None, labels: dict[str, str]) -> str:
+    key = str(status or "").strip().lower()
+    return labels.get(key, key or "No registrado")
+
+
+def _public_user_payload(user: AppUser | None) -> dict[str, Any] | None:
+    if not user:
+        return None
+    department, city = _resolved_user_department_city(user)
+    return {
+        "user_id": str(user.id),
+        "username": user.username,
+        "display_name": _safe_display_name(user),
+        "full_name": user.full_name,
+        "email": user.email,
+        "department": department,
+        "city": city,
+        "professional_card": user.professional_card_number,
+        "colpsic_verified": bool(user.colpsic_verified),
+    }
+
+
 def _confidence_for_activation(activation_id: uuid.UUID) -> tuple[float, str, str | None]:
     row = ModelConfidenceRegistry.query.filter_by(activation_id=activation_id).order_by(
         ModelConfidenceRegistry.created_at.desc()
@@ -1601,6 +1642,8 @@ def get_session_payload(
             payload["case_display_label"] = case_payload.get("display_label")
             if "private_label" in case_payload:
                 payload["case_private_label"] = case_payload.get("private_label")
+    if viewer_user_id:
+        payload["professional_flow"] = _professional_flow_payload(session, viewer_user_id)
     if include_answers:
         rows = _session_answer_rows(session)
         answers = [
@@ -1613,6 +1656,59 @@ def get_session_payload(
         payload["progress_percent"] = float(session.progress_pct or 0)
         payload["answers"] = answers
     return payload
+
+
+def _professional_flow_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID) -> dict[str, Any]:
+    grants = (
+        QuestionnaireAccessGrant.query.filter_by(session_id=session.id)
+        .filter(QuestionnaireAccessGrant.revoked_at.is_(None))
+        .order_by(QuestionnaireAccessGrant.requested_at.desc().nullslast(), QuestionnaireAccessGrant.created_at.desc())
+        .all()
+    )
+    latest_grant = grants[0] if grants else None
+    assigned_psychologist = db.session.get(AppUser, latest_grant.grantee_user_id) if latest_grant else None
+    visible_reviews = QuestionnaireProfessionalReview.query.filter_by(session_id=session.id).all()
+    if session.owner_user_id == viewer_user_id:
+        visible_reviews = [row for row in visible_reviews if bool(row.visible_to_guardian)]
+    elif assigned_psychologist and assigned_psychologist.id == viewer_user_id:
+        visible_reviews = [row for row in visible_reviews if row.psychologist_user_id == viewer_user_id]
+    else:
+        visible_reviews = []
+    latest_review = max(visible_reviews, key=lambda row: row.updated_at or row.created_at or _utcnow(), default=None)
+    latest_preview = None
+    if latest_review:
+        latest_preview = _decrypt_text_safe(
+            latest_review.initial_concept,
+            "questionnaire_professional_review.initial_concept",
+        )
+    review_status = latest_review.review_status if latest_review else None
+    can_send = session.owner_user_id == viewer_user_id
+    can_view_reviews = session.owner_user_id == viewer_user_id or any(
+        row.psychologist_user_id == viewer_user_id for row in visible_reviews
+    )
+    return {
+        "latest_share_request_status": str(latest_grant.request_status) if latest_grant else None,
+        "latest_share_request_status_label": _status_label(
+            latest_grant.request_status if latest_grant else None,
+            SHARE_REQUEST_STATUS_LABELS,
+        )
+        if latest_grant
+        else None,
+        "assigned_psychologist": _public_user_payload(assigned_psychologist),
+        "professional_review_status": review_status,
+        "professional_review_status_label": _status_label(review_status, PROFESSIONAL_REVIEW_STATUS_LABELS)
+        if review_status
+        else None,
+        "professional_reviews_count": len(visible_reviews),
+        "latest_professional_review_at": (
+            (latest_review.updated_at or latest_review.created_at).isoformat()
+            if latest_review and (latest_review.updated_at or latest_review.created_at)
+            else None
+        ),
+        "latest_professional_review_preview": latest_preview,
+        "can_send_to_psychologist": can_send,
+        "can_view_professional_reviews": can_view_reviews,
+    }
 
 
 def get_session_page_payload(session: QuestionnaireSession, page: int, page_size: int) -> dict[str, Any]:
@@ -3830,6 +3926,7 @@ def search_psychologists(
 
     query_department = department.strip() if isinstance(department, str) and department.strip() else None
     query_city = city.strip() if isinstance(city, str) and city.strip() else None
+    explicit_location_filter = bool(query_department or query_city or location)
 
     if location and (not query_department and not query_city):
         inferred_dep, inferred_city = infer_department_city_from_text(location)
@@ -3862,6 +3959,7 @@ def search_psychologists(
                 AppUser.username.ilike(text),
                 AppUser.email.ilike(text),
                 AppUser.full_name.ilike(text),
+                AppUser.professional_card_number.ilike(text),
             )
         )
 
@@ -3879,9 +3977,9 @@ def search_psychologists(
         row_department, row_city = _resolved_user_department_city(row)
         row_dep_token, row_city_token = normalized_location_match_tokens(row_department, row_city)
 
-        if target_dep_token and row_dep_token != target_dep_token:
+        if explicit_location_filter and target_dep_token and row_dep_token != target_dep_token:
             continue
-        if target_city_token and row_city_token != target_city_token:
+        if explicit_location_filter and target_city_token and row_city_token != target_city_token:
             continue
 
         same_dep = bool(requester_dep_token and row_dep_token == requester_dep_token)
@@ -3897,6 +3995,7 @@ def search_psychologists(
                 {
                     "user_id": str(row.id),
                     "username": row.username,
+                    "display_name": _safe_display_name(row),
                     "full_name": row.full_name,
                     "email": row.email,
                     "department": row_department,
@@ -3904,6 +4003,13 @@ def search_psychologists(
                     "same_department": same_dep,
                     "same_city": same_cty,
                     "colpsic_verified": bool(row.colpsic_verified),
+                    "recommendation_reason": (
+                        "Psicologo verificado cercano a tu ubicacion"
+                        if same_cty and bool(row.colpsic_verified)
+                        else "Psicologo verificado"
+                        if bool(row.colpsic_verified)
+                        else "Psicologo disponible"
+                    ),
                 },
             )
         )
@@ -3926,6 +4032,12 @@ def search_psychologists(
             "city": recommended_city,
         },
         "warnings": warnings,
+        "empty_state": None
+        if page_items
+        else {
+            "title": "Sin psicologos disponibles",
+            "message": "No se encontraron psicologos con los filtros indicados.",
+        },
     }
 
 
@@ -3989,6 +4101,8 @@ def _professional_review_payload(
     viewer_user_id: uuid.UUID | None = None,
 ) -> dict[str, Any]:
     is_owner = bool(viewer_user_id and viewer_user_id == row.owner_user_id)
+    psychologist = db.session.get(AppUser, row.psychologist_user_id)
+    case = db.session.get(QuestionnaireCase, row.case_id) if row.case_id else None
     initial_concept = _decrypt_text_safe(row.initial_concept, "questionnaire_professional_review.initial_concept")
     recommendation = _decrypt_text_safe(row.recommendation, "questionnaire_professional_review.recommendation")
     if is_owner and not row.visible_to_guardian:
@@ -3998,15 +4112,20 @@ def _professional_review_payload(
         "review_id": str(row.id),
         "session_id": str(row.session_id),
         "case_id": str(row.case_id) if row.case_id else None,
+        "case_public_id": case.case_public_id if case else None,
         "owner_user_id": str(row.owner_user_id),
         "psychologist_user_id": str(row.psychologist_user_id),
+        "psychologist": _public_user_payload(psychologist),
         "review_status": row.review_status,
+        "review_status_label": _status_label(row.review_status, PROFESSIONAL_REVIEW_STATUS_LABELS),
         "initial_concept": initial_concept,
         "recommendation": recommendation,
         "visible_to_guardian": bool(row.visible_to_guardian),
         "is_diagnostic": False,
+        "disclaimer": PROFESSIONAL_REVIEW_DISCLAIMER,
         "created_at": row.created_at.isoformat() if row.created_at else None,
         "updated_at": row.updated_at.isoformat() if row.updated_at else None,
+        "closed_at": row.updated_at.isoformat() if row.review_status == "closed" and row.updated_at else None,
     }
 
 
@@ -4059,6 +4178,7 @@ def upsert_professional_review(
     review.is_diagnostic = False
     review.updated_at = _utcnow()
     db.session.add(review)
+    db.session.flush()
     _audit(session.id, psychologist_user_id, "professional_review_created", {"review_status": status})
     if created_new and bool(review.visible_to_guardian):
         case = db.session.get(QuestionnaireCase, session.case_id) if session.case_id else None
@@ -4068,9 +4188,14 @@ def upsert_professional_review(
             session_id=session.id,
             case_id=session.case_id,
             notification_type="professional_review_created",
-            title="Nuevo concepto profesional",
-            message=f"Se registro un concepto inicial para el caso {case.case_public_id if case else session.questionnaire_public_id}.",
-            payload_json={"case_public_id": case.case_public_id if case else None, "review_status": status},
+            title="Revision profesional disponible",
+            message="El psicologo compartio comentarios sobre el cuestionario.",
+            payload_json={
+                "review_id": str(review.id),
+                "case_public_id": case.case_public_id if case else None,
+                "questionnaire_id": session.questionnaire_public_id,
+                "review_status": status,
+            },
         )
     db.session.commit()
     return _professional_review_payload(review, viewer_user_id=psychologist_user_id)
@@ -4090,6 +4215,7 @@ def update_professional_review(
         raise LookupError("professional_review_not_found")
     if review.psychologist_user_id != psychologist_user_id:
         raise PermissionError("professional_review_forbidden")
+    was_visible_to_guardian = bool(review.visible_to_guardian)
     if "review_status" in payload and payload.get("review_status") is not None:
         status = str(payload.get("review_status") or "").strip()
         if status not in PROFESSIONAL_REVIEW_STATUSES:
@@ -4111,6 +4237,23 @@ def update_professional_review(
     review.updated_at = _utcnow()
     db.session.add(review)
     _audit(session.id, psychologist_user_id, "professional_review_updated", {"review_id": str(review.id)})
+    if bool(review.visible_to_guardian) and not was_visible_to_guardian:
+        case = db.session.get(QuestionnaireCase, session.case_id) if session.case_id else None
+        _create_notification(
+            user_id=session.owner_user_id,
+            actor_user_id=psychologist_user_id,
+            session_id=session.id,
+            case_id=session.case_id,
+            notification_type="professional_review_created",
+            title="Revision profesional disponible",
+            message="El psicologo compartio comentarios sobre el cuestionario.",
+            payload_json={
+                "review_id": str(review.id),
+                "case_public_id": case.case_public_id if case else None,
+                "questionnaire_id": session.questionnaire_public_id,
+                "review_status": review.review_status,
+            },
+        )
     db.session.commit()
     return _professional_review_payload(review, viewer_user_id=psychologist_user_id)
 
@@ -4322,19 +4465,44 @@ def create_share(session: QuestionnaireSession, user_id: uuid.UUID, payload: dic
         result["grantee"] = {
             "user_id": str(grantee_user.id),
             "username": grantee_user.username,
+            "display_name": _safe_display_name(grantee_user),
             "full_name": grantee_user.full_name,
             "email": grantee_user.email,
             "department": grantee_department,
             "city": grantee_city,
+            "colpsic_verified": bool(grantee_user.colpsic_verified),
         }
     if grant:
+        case_public_id = None
+        case_display_label = None
+        if session.case_id:
+            case = db.session.get(QuestionnaireCase, session.case_id)
+            if case:
+                case_public_id = case.case_public_id
+                case_display_label = _case_display_label(case, viewer_user_id=user_id)
         result["grant"] = {
             "grant_id": str(grant.id),
+            "session_id": str(session.id),
             "request_status": grant.request_status,
+            "request_status_label": _status_label(grant.request_status, SHARE_REQUEST_STATUS_LABELS),
             "can_view": bool(grant.can_view),
             "can_download_pdf": bool(grant.can_download_pdf),
             "can_tag": bool(grant.can_tag),
+            "created_at": grant.created_at.isoformat() if grant.created_at else None,
             "requested_at": grant.requested_at.isoformat() if grant.requested_at else None,
+            "accepted_at": grant.responded_at.isoformat() if grant.request_status == "accepted" and grant.responded_at else None,
+            "rejected_at": grant.responded_at.isoformat() if grant.request_status == "rejected" and grant.responded_at else None,
+        }
+        result["questionnaire"] = {
+            "session_id": str(session.id),
+            "questionnaire_id": session.questionnaire_public_id,
+            "case_public_id": case_public_id,
+            "display_label": case_display_label or case_public_id or session.questionnaire_public_id,
+            "processed_at": session.processed_at.isoformat() if session.processed_at else None,
+        }
+        result["notification"] = {
+            "created": True,
+            "type": "questionnaire_share_requested",
         }
     return result
 
@@ -4380,8 +4548,14 @@ def _share_request_payload(grant: QuestionnaireAccessGrant) -> dict[str, Any]:
     return {
         "grant_id": str(grant.id),
         "request_status": str(grant.request_status or "accepted"),
+        "request_status_label": _status_label(grant.request_status or "accepted", SHARE_REQUEST_STATUS_LABELS),
         "requested_at": grant.requested_at.isoformat() if grant.requested_at else None,
         "responded_at": grant.responded_at.isoformat() if grant.responded_at else None,
+        "permissions": {
+            "can_view": bool(grant.can_view),
+            "can_download_pdf": bool(grant.can_download_pdf),
+            "can_tag": bool(grant.can_tag),
+        },
         "case": {"case_public_id": case.case_public_id if case else None},
         "session": {
             "session_id": str(session.id),
@@ -4526,7 +4700,9 @@ def accept_share_request(
         "grant": {
             "grant_id": str(grant.id),
             "request_status": grant.request_status,
+            "request_status_label": _status_label(grant.request_status, SHARE_REQUEST_STATUS_LABELS),
             "responded_at": grant.responded_at.isoformat() if grant.responded_at else None,
+            "accepted_at": grant.responded_at.isoformat() if grant.responded_at else None,
             "can_view": bool(grant.can_view),
             "can_download_pdf": bool(grant.can_download_pdf),
             "can_tag": bool(grant.can_tag),
@@ -4575,7 +4751,9 @@ def reject_share_request(
         "grant": {
             "grant_id": str(grant.id),
             "request_status": grant.request_status,
+            "request_status_label": _status_label(grant.request_status, SHARE_REQUEST_STATUS_LABELS),
             "responded_at": grant.responded_at.isoformat() if grant.responded_at else None,
+            "rejected_at": grant.responded_at.isoformat() if grant.responded_at else None,
             "can_view": bool(grant.can_view),
             "can_download_pdf": bool(grant.can_download_pdf),
             "can_tag": bool(grant.can_tag),

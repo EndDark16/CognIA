@@ -293,7 +293,9 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 - Permiso: JWT requerido.
 - Query oficial: `q`, `department`, `city`, `same_location`, `page`, `page_size`.
 - Query legacy aceptada como fallback: `location`.
-- Response `200`: usuarios activos `user_type=psychologist` con `department`, `city`, `same_department`, `same_city`, `colpsic_verified`, `recommendation` y `warnings`.
+- Response `200`: usuarios activos `user_type=psychologist` con `display_name`, `department`, `city`, `same_department`, `same_city`, `colpsic_verified`, `recommendation_reason`, `recommendation`, `warnings` y `empty_state`.
+- `q` busca por `username`, `full_name`, `email` y matricula profesional/COLPSIC.
+- `same_location=true` recomienda y ordena primero psicologos con la misma ciudad/departamento del guardian; no exige enlaces ni share codes.
 - Errores: `psychologist_search_forbidden` (403), `psychologist_search_invalid_query` (400), `psychologist_search_failed` (500).
 
 ### 6) Compartir sesión con psicólogo registrado
@@ -310,7 +312,9 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
   "share_scope": "session"
 }
 ```
-- Response `201`: mantiene `share_code` y agrega `case.case_public_id`, `grantee` y `grant`.
+- Aliases aceptados para flujo directo: `psychologist_user_id`, `recipient_user_id`, `grantee_id`.
+- Response `201`: mantiene `share_code` solo como legacy y agrega `case.case_public_id`, `grantee`, `grant`, `questionnaire` y `notification`.
+- Flujo principal: `grantee_user_id` crea solicitud directa `request_status=pending`; antes de aceptar no habilita `can_view`, `can_download_pdf` ni `can_tag`.
 - `grantee` expone `department` y `city` (no expone `professional_location` en contrato publico).
 - Errores: `share_session_not_found` (404), `share_owner_required` (403), `share_grantee_not_found` (404), `share_target_not_psychologist` (400), `share_grantee_inactive` (400), `share_validation_error` (400), `share_failed` (500).
 
@@ -318,7 +322,8 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 
 #### GET `/questionnaires/history/{session_id}/professional-reviews`
 - Permiso: owner, psicólogo con grant o admin.
-- Response `200`: lista de revisiones visibles.
+- Response `200`: `items`, `permissions` y `empty_state`. El guardian solo ve revisiones con `visible_to_guardian=true`.
+- Cada item incluye `review_status_label`, `psychologist.display_name`, `disclaimer`, `initial_concept` y `recommendation` cuando son visibles.
 
 #### POST `/questionnaires/history/{session_id}/professional-reviews`
 - Permiso: solo psicólogo con grant vigente.
@@ -332,6 +337,7 @@ Nota: contrato de apoyo de screening; no diagnostico automatico.
 }
 ```
 - Errores: `professional_review_requires_psychologist` (403), `professional_review_session_not_found` (404), `professional_review_forbidden` (403), `professional_review_status_invalid` (400), `professional_review_text_too_long` (400), `professional_review_validation_error` (400), `professional_review_failed` (500).
+- Si `visible_to_guardian=true`, se crea notificación `professional_review_created` para el guardian.
 
 #### PATCH `/questionnaires/history/{session_id}/professional-reviews/{review_id}`
 - Permiso: psicólogo autorizado.
