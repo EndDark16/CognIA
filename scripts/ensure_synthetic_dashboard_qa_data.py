@@ -158,6 +158,11 @@ def _safe_print(payload: dict[str, Any]) -> None:
     print(json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True))
 
 
+def _progress(message: str, *, apply: bool) -> None:
+    if apply:
+        print(f"[synthetic-qa] {message}", flush=True)
+
+
 def _role(name: str) -> Role:
     row = Role.query.filter_by(name=name).first()
     if row:
@@ -686,9 +691,13 @@ def ensure_dashboard_data(*, apply: bool, rotate_credentials: bool, credentials_
         if user:
             users[spec["username"]] = user
     if apply:
-        db.session.flush()
+        db.session.commit()
+        _progress("users phase committed", apply=apply)
 
     version = _ensure_version() if apply else QuestionnaireVersion.query.filter_by(is_active=True).first()
+    if apply:
+        db.session.commit()
+        _progress("questionnaire version phase committed", apply=apply)
     guardians = [users.get(username) for username in PRIMARY_USERS["guardian"] + EXTRA_GUARDIANS]
     psychologists = [users.get(username) for username in PRIMARY_USERS["psychologist"] + EXTRA_PSYCHOLOGISTS]
     psychologists = [row for row in psychologists if row is not None]
@@ -724,6 +733,9 @@ def ensure_dashboard_data(*, apply: bool, rotate_credentials: bool, credentials_
                     if share_status in {"accepted", "rejected"}:
                         _ensure_notification(guardian.id, psych.id, session, grant, f"questionnaire_share_{share_status}", apply=apply, stats=stats)
                 _ensure_reports_and_audit(guardian, session, apply=apply, stats=stats)
+        if apply:
+            db.session.commit()
+            _progress(f"guardian phase committed username={guardian.username}", apply=apply)
 
     _ensure_aggregate(apply=apply)
     if credential_rows and apply:
@@ -745,6 +757,7 @@ def ensure_dashboard_data(*, apply: bool, rotate_credentials: bool, credentials_
         stats.warnings.append(f"credentials_file={path}")
     if apply:
         db.session.commit()
+        _progress("final phase committed", apply=apply)
     else:
         db.session.rollback()
     summary = stats.as_dict()
