@@ -276,6 +276,20 @@ def test_plaintext_sensitive_payload_rejected_in_production(client, app):
     assert resp.get_json()["error"] == "plaintext_not_allowed"
 
 
+def test_case_create_legacy_plaintext_allowed_in_production(client, app):
+    headers = _user_headers(app)
+    resp = client.post(
+        "/api/v2/cases",
+        json={"label": "QA Dashboard - Crear caso produccion"},
+        headers=headers,
+    )
+    assert resp.status_code == 201
+    payload = resp.get_json()
+    assert payload["case_id"]
+    assert payload["display_label"] == "QA Dashboard - Crear caso produccion"
+    assert payload["permissions"]["can_view_detail"] is True
+
+
 def test_encrypted_response_for_sensitive_endpoint(client, app):
     headers = _user_headers(app)
     key_payload = _get_transport_key(client, headers)
