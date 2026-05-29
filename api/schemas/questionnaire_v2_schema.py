@@ -54,9 +54,21 @@ class ShareCreateSchema(BaseSchema):
     expires_in_hours = fields.Integer(required=False, validate=validate.Range(min=1, max=24 * 365))
     max_uses = fields.Integer(required=False, validate=validate.Range(min=1, max=10000))
     grantee_user_id = fields.UUID(required=False)
+    psychologist_user_id = fields.UUID(required=False)
+    recipient_user_id = fields.UUID(required=False)
+    grantee_id = fields.UUID(required=False)
     grant_can_tag = fields.Boolean(load_default=True)
     grant_can_download_pdf = fields.Boolean(load_default=True)
     share_scope = fields.String(required=False, validate=validate.OneOf(["session", "case"]))
+
+    @validates_schema
+    def normalize_grantee_aliases(self, data, **kwargs):
+        if data.get("grantee_user_id"):
+            return
+        for key in ("psychologist_user_id", "recipient_user_id", "grantee_id"):
+            if data.get(key):
+                data["grantee_user_id"] = data[key]
+                return
 
 
 class ShareRequestListQuerySchema(BaseSchema):
