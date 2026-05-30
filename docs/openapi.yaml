@@ -17670,6 +17670,92 @@ paths:
       description: Identificador del recurso `session_id` en la ruta.
       schema:
         type: string
+  /api/v2/questionnaires/history/{session_id}/responses:
+    get:
+      tags:
+      - QuestionnaireV2
+      summary: Obtener respuestas detalladas de una sesion v2
+      description: |-
+        **Objetivo funcional**
+        Entrega respuestas por pregunta en formato legible para guardian o psicologo autorizado.
+
+        **Cuando debe usarse**
+        Para renderizar detalle completo de respuestas en historial de cuestionario.
+
+        **Actor que lo consume**
+        Frontend autenticado del flujo de cuestionarios v2.
+
+        **Seguridad aplicable**
+        Requiere `bearerAuth` y permisos de ownership o grant aceptado.
+
+        **Entrada esperada**
+        - Metodo y ruta: `GET /api/v2/questionnaires/history/{session_id}/responses`.
+        - Parametros de ruta: `session_id` (obligatorio, UUID).
+
+        **Resultado exitoso**
+        - Codigo de exito: `200`.
+        - Respuesta con `sections/items` y resumen de completitud.
+
+        **Errores posibles y causa funcional**
+        - `401`: No autenticado o token invalido.
+        - `403`: Sin permiso para consultar respuestas de la sesion.
+        - `404`: Sesion no encontrada.
+        - `500`: Falla interna del backend.
+
+        **Estado contractual**
+        - `KEEP_ACTIVE`
+        - Motivo: contrato operativo para detalle de respuestas en cuestionarios v2.
+        - Accion OpenAPI: mantener visible.
+      operationId: getV2QuestionnairesHistorySessionIdResponses
+      parameters:
+      - in: path
+        name: session_id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Respuestas detalladas por seccion y dominio.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: No autenticado o token invalido.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Usuario autenticado sin permiso para la sesion.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Sesion no encontrada.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Falla interna del backend.
+      x-contract-status: KEEP_ACTIVE
+    parameters:
+    - name: session_id
+      in: path
+      required: true
+      description: Identificador del recurso `session_id` en la ruta.
+      schema:
+        type: string
   /api/v2/questionnaires/history/{session_id}/results-secure:
     post:
       tags:
