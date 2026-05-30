@@ -3,6 +3,7 @@ import uuid
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import get_jwt, get_jwt_identity
 from marshmallow import ValidationError
+from sqlalchemy.orm import selectinload
 
 from api.decorators import roles_required
 from api.extensions import limiter
@@ -51,6 +52,28 @@ def _admin_id() -> uuid.UUID | None:
     return _parse_uuid(get_jwt_identity())
 
 
+def _role_label_for_user(user: AppUser) -> str:
+    role_names = {str(role.name or "").strip().upper() for role in (user.roles or [])}
+    if "ADMIN" in role_names:
+        return "Adm. Sistema"
+    if "PSYCHOLOGIST" in role_names or str(user.user_type or "").strip().lower() == "psychologist":
+        return "Psicólogo"
+    if "GUARDIAN" in role_names or str(user.user_type or "").strip().lower() == "guardian":
+        return "Padre/Tutor"
+    return "Sistema"
+
+
+def _department_label_for_user(user: AppUser) -> tuple[str, bool]:
+    department = (
+        str(user.department or "").strip()
+        or str(user.professional_department or "").strip()
+        or str(user.location or "").strip()
+    )
+    if department:
+        return department, True
+    return "Sin departamento registrado", False
+
+
 @admin_bp.get("/users")
 @roles_required("ADMIN")
 @limiter.limit(lambda: current_app.config.get("ADMIN_LIST_RATE_LIMIT", "60 per minute"))
@@ -78,6 +101,9 @@ def admin_list_users():
                     "colpsic_verified": u.colpsic_verified,
                     "is_active": u.is_active,
                     "roles": [r.name for r in u.roles],
+                    "role_label": _role_label_for_user(u),
+                    "department_label": _department_label_for_user(u)[0],
+                    "has_department": _department_label_for_user(u)[1],
                     "created_at": u.created_at.isoformat() if u.created_at else None,
                     "updated_at": u.updated_at.isoformat() if u.updated_at else None,
                 }
@@ -213,12 +239,29 @@ def admin_audit_logs():
         return _error_response("Validation error", "validation_error", 400, exc.messages)
 
     items, pagination = admin_service.list_audit_logs(params)
+    user_ids = {row.user_id for row in items if row.user_id}
+    users_by_id = {
+        row.id: row
+        for row in AppUser.query.filter(AppUser.id.in_(list(user_ids))).options(selectinload(AppUser.roles)).all()
+    } if user_ids else {}
     return jsonify(
         {
             "items": [
                 {
                     "id": str(a.id),
                     "user_id": str(a.user_id) if a.user_id else None,
+                    "actor_display_name": (
+                        users_by_id[a.user_id].full_name
+                        if a.user_id in users_by_id and users_by_id[a.user_id].full_name
+                        else users_by_id[a.user_id].username
+                        if a.user_id in users_by_id
+                        else "Sistema"
+                    ),
+                    "actor_role_label": (
+                        _role_label_for_user(users_by_id[a.user_id])
+                        if a.user_id in users_by_id
+                        else "Sistema"
+                    ),
                     "action": a.action,
                     "section": a.section,
                     "details": a.details,

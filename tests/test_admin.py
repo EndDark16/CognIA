@@ -368,6 +368,40 @@ def test_admin_audit_logs_list(client, app):
     assert "TEST_ACTION" in actions
 
 
+def test_admin_users_include_role_and_department_labels(client, app):
+    admin_id = _create_admin(app)
+    token = _admin_token(app, admin_id)
+
+    resp = client.get(
+        "/api/admin/users?page=1&page_size=20",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+    assert resp.json.get("items")
+    item = resp.json["items"][0]
+    assert "role_label" in item
+    assert "department_label" in item
+    assert "has_department" in item
+
+
+def test_admin_audit_logs_include_actor_role_label(client, app):
+    admin_id = _create_admin(app)
+    token = _admin_token(app, admin_id)
+    with app.app_context():
+        entry = AuditLog(user_id=admin_id, action="ACTOR_ROLE_TEST", section="admin", details={"ok": True})
+        db.session.add(entry)
+        db.session.commit()
+
+    resp = client.get(
+        "/api/admin/audit-logs?section=admin",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 200
+    target = next((row for row in resp.json.get("items", []) if row.get("action") == "ACTOR_ROLE_TEST"), None)
+    assert target is not None
+    assert "actor_role_label" in target
+
+
 def test_admin_roles_create_and_assign(client, app):
     admin_id = _create_admin(app)
     user_id = _create_guardian(app)
