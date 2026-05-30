@@ -2268,3 +2268,137 @@ def test_questionnaire_v2_psychologist_dashboard_aggregates_use_full_filtered_se
     assert len(dashboard.json["items"]) == 1
     assert dashboard.json["summary"]["total_shared_sessions"] == 2
     assert any(item["domain"] == "anxiety" for item in dashboard.json["aggregates"]["by_domain"])
+
+
+def test_questionnaire_v2_psychologist_share_requests_charts_use_full_filtered_set(client, app):
+    _, owner_token = _user_token(app, "share_chart_owner_qv2")
+    psych_id, psych_token = _user_token(app, "share_chart_psych_qv2", user_type="psychologist")
+    owner_headers = {"Authorization": f"Bearer {owner_token}"}
+    psych_headers = {"Authorization": f"Bearer {psych_token}"}
+
+    grants = []
+    for idx in range(3):
+        created = client.post(
+            "/api/v2/questionnaires/sessions",
+            json={"mode": "short", "role": "guardian", "case_label": f"Caso chart {idx}", "child_age_years": 9},
+            headers=owner_headers,
+        )
+        assert created.status_code == 201
+        session_id = created.json["session"]["session_id"]
+        page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=1", headers=owner_headers)
+        qid = page.json["pages"][0]["questions"][0]["question_id"]
+        assert client.patch(
+            f"/api/v2/questionnaires/sessions/{session_id}/answers",
+            json={"answers": [{"question_id": qid, "answer": 2}]},
+            headers=owner_headers,
+        ).status_code == 200
+        assert client.post(f"/api/v2/questionnaires/sessions/{session_id}/submit", json={}, headers=owner_headers).status_code == 200
+        shared = client.post(
+            f"/api/v2/questionnaires/history/{session_id}/share",
+            json={"grantee_user_id": str(psych_id)},
+            headers=owner_headers,
+        )
+        assert shared.status_code == 201
+        grants.append(shared.json["grant"]["grant_id"])
+
+    # Accept one, reject one, leave one pending.
+    assert client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{grants[0]}/accept",
+        json={},
+        headers=psych_headers,
+    ).status_code == 200
+    assert client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{grants[1]}/reject",
+        json={},
+        headers=psych_headers,
+    ).status_code == 200
+
+    response = client.get(
+        "/api/v2/questionnaires/psychologist/share-requests?status=all&page=1&page_size=1",
+        headers=psych_headers,
+    )
+    assert response.status_code == 200
+    payload = response.json
+    assert payload["pagination"]["total"] == 3
+    by_status = {row["label"]: row["value"] for row in payload["charts"]["by_status"]}
+    assert by_status.get("Pendientes", 0) >= 1
+    assert by_status.get("Aceptadas", 0) >= 1
+    assert by_status.get("Rechazadas", 0) >= 1
+
+
+def test_questionnaire_v2_case_detail_endpoint(client, app):
+    _, token = _user_token(app, "case_detail_alias_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "hijo 1", "child_age_years": 9},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    case_id = created.json["session"]["case"]["case_id"]
+    case_public_id = created.json["session"]["case"]["case_public_id"]
+
+    detail_by_id = client.get(f"/api/v2/questionnaires/cases/{case_id}", headers=headers)
+    assert detail_by_id.status_code == 200
+    assert detail_by_id.json["case"]["case_id"] == case_id
+    by_public_filter = client.get(f"/api/v2/questionnaires/cases?case_public_id={case_public_id}", headers=headers)
+    assert by_public_filter.status_code == 200
+    assert by_public_filter.json["pagination"]["total"] == 1
+
+
+def test_questionnaire_v2_history_status_in_progress_lists_partial_sessions(client, app):
+    _, token = _user_token(app, "in_progress_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "continuidad", "child_age_years": 9},
+        headers=headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=1", headers=headers)
+    qid = page.json["pages"][0]["questions"][0]["question_id"]
+    saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={"answers": [{"question_id": qid, "answer": 1}]},
+        headers=headers,
+    )
+    assert saved.status_code == 200
+
+    response = client.get("/api/v2/questionnaires/history?status=in_progress&page=1&page_size=20", headers=headers)
+    assert response.status_code == 200
+    assert any(item["session_id"] == session_id for item in response.json["items"])
+    target = next(item for item in response.json["items"] if item["session_id"] == session_id)
+    assert target["status"] in {"draft", "in_progress"}
+    assert float(target.get("progress_pct") or 0) > 0
+
+
+def test_questionnaire_v2_psychologists_search_recommended_mode(client, app):
+    guardian_id, guardian_token = _user_token(app, "psych_reco_guardian_qv2")
+    _, psych_token = _user_token(app, "psych_reco_psych_qv2", user_type="psychologist")
+    with app.app_context():
+        guardian = AppUser.query.filter_by(id=guardian_id).first()
+        psychologist = AppUser.query.filter_by(username="psych_reco_psych_qv2").first()
+        assert guardian is not None
+        assert psychologist is not None
+        guardian.city = "Bogota"
+        guardian.department = "Bogota D.C."
+        psychologist.city = "Bogota"
+        psychologist.department = "Bogota D.C."
+        psychologist.colpsic_verified = True
+        db.session.commit()
+
+    guardian_headers = {"Authorization": f"Bearer {guardian_token}"}
+    response = client.get(
+        "/api/v2/psychologists/search?recommended=true&same_location=true&page=1&page_size=10",
+        headers=guardian_headers,
+    )
+    assert response.status_code == 200
+    assert response.json["items"]
+    assert any(item["username"] == "psych_reco_psych_qv2" for item in response.json["items"])
+    assert all("can_receive_reviews" in item for item in response.json["items"])
+
+    # Psychologist endpoint still requires auth and keeps role filtering.
+    psych_headers = {"Authorization": f"Bearer {psych_token}"}
+    search = client.get("/api/v2/psychologists/search?recommended=true&q=psych_reco_psych", headers=psych_headers)
+    assert search.status_code == 200

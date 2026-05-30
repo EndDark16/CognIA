@@ -699,6 +699,7 @@ def search_psychologists():
             department=params.get("department"),
             city=params.get("city"),
             same_location=params.get("same_location", False),
+            recommended=params.get("recommended", False),
             location=params.get("location"),
             page=params["page"],
             page_size=params["page_size"],

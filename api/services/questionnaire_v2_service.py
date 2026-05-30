@@ -4008,6 +4008,7 @@ def search_psychologists(
     department: str | None = None,
     city: str | None = None,
     same_location: bool = False,
+    recommended: bool = False,
     page: int = 1,
     page_size: int = 20,
 ) -> dict[str, Any]:
@@ -4027,11 +4028,13 @@ def search_psychologists(
         if inferred_dep or inferred_city:
             recommendation_basis = "legacy_location"
 
+    if recommended and not same_location:
+        same_location = True
     if same_location and (not query_department and not query_city):
         requester_department, requester_city = _resolved_user_department_city(requester_user)
         if not requester_department and not requester_city:
             warnings.append("user_location_missing")
-            recommendation_basis = "none"
+            recommendation_basis = "recommended_fallback" if recommended else "none"
         else:
             query_department = requester_department
             query_city = requester_city
@@ -4095,6 +4098,12 @@ def search_psychologists(
                     "same_department": same_dep,
                     "same_city": same_cty,
                     "colpsic_verified": bool(row.colpsic_verified),
+                    "location_label": ", ".join(
+                        [part for part in [row_city, row_department] if part]
+                    )
+                    or "Ubicacion no registrada",
+                    "distance_label": "Cercana a tu ubicacion" if same_cty else ("Misma region" if same_dep else None),
+                    "can_receive_reviews": bool(row.is_active and row.user_type == "psychologist"),
                     "recommendation_reason": (
                         "Psicologo verificado cercano a tu ubicacion"
                         if same_cty and bool(row.colpsic_verified)
@@ -4122,6 +4131,7 @@ def search_psychologists(
             "basis": recommendation_basis,
             "department": recommended_department,
             "city": recommended_city,
+            "recommended": bool(recommended),
         },
         "warnings": warnings,
         "empty_state": None
@@ -4704,6 +4714,7 @@ def list_psychologist_share_requests(
         )
 
     total = query.count()
+    filtered_rows = query.order_by(QuestionnaireAccessGrant.requested_at.desc(), QuestionnaireAccessGrant.created_at.desc()).all()
     rows = (
         query.order_by(QuestionnaireAccessGrant.requested_at.desc(), QuestionnaireAccessGrant.created_at.desc())
         .offset((page - 1) * page_size)
@@ -4731,8 +4742,8 @@ def list_psychologist_share_requests(
     by_domain_counter: Counter = Counter()
     over_time_counter: Counter = Counter()
     pending_age_counter: Counter = Counter()
-    if rows:
-        session_ids = [row.session_id for row in rows]
+    if filtered_rows:
+        session_ids = [row.session_id for row in filtered_rows]
         domain_rows = QuestionnaireSessionResultDomain.query.filter(
             QuestionnaireSessionResultDomain.session_id.in_(session_ids)
         ).all()
@@ -4740,7 +4751,7 @@ def list_psychologist_share_requests(
         for row in domain_rows:
             by_session[row.session_id].append(row)
         now = _utcnow()
-        for grant in rows:
+        for grant in filtered_rows:
             dom_rows = by_session.get(grant.session_id, [])
             if dom_rows:
                 top = max(dom_rows, key=lambda item: float(item.probability or 0.0))
@@ -4771,6 +4782,7 @@ def list_psychologist_share_requests(
             "pending_count": counters.get("pending", 0),
             "accepted_count": counters.get("accepted", 0),
             "rejected_count": counters.get("rejected", 0),
+            "total": counters.get("pending", 0) + counters.get("accepted", 0) + counters.get("rejected", 0),
         },
         "charts": {
             "by_status": by_status,
@@ -4780,6 +4792,49 @@ def list_psychologist_share_requests(
             "pending_age": [{"label": key, "value": int(value)} for key, value in sorted(pending_age_counter.items())],
         },
     }
+
+
+def list_in_progress_sessions(
+    user_id: uuid.UUID,
+    *,
+    page: int = 1,
+    page_size: int = 20,
+) -> dict[str, Any]:
+    payload = list_history(
+        user_id=user_id,
+        status="in_progress",
+        page=page,
+        page_size=page_size,
+    )
+    items: list[dict[str, Any]] = []
+    for row in payload.get("items", []):
+        mode_value = str(row.get("mode") or "").strip().lower()
+        mode_label = {"short": "Corto", "medium": "Medio", "complete": "Completo"}.get(mode_value, mode_value or "No definido")
+        status_value = str(row.get("status") or "").strip().lower()
+        status_label = {
+            "draft": "Borrador",
+            "in_progress": "En progreso",
+            "submitted": "Enviado",
+            "processed": "Procesado",
+            "failed": "Fallido",
+            "archived": "Archivado",
+        }.get(status_value, status_value or "No definido")
+        items.append(
+            {
+                "session_id": row.get("session_id"),
+                "case": row.get("case"),
+                "mode": mode_value,
+                "mode_label": mode_label,
+                "status": status_value,
+                "status_label": status_label,
+                "progress_percentage": float(row.get("progress_pct") or 0.0),
+                "started_at": row.get("created_at"),
+                "updated_at": row.get("updated_at"),
+                "next_step": "continue_questionnaire",
+                "can_continue": status_value in {"draft", "in_progress"},
+            }
+        )
+    return {"items": items, "pagination": payload.get("pagination", {})}
 
 
 def _get_grant_for_psychologist(grant_id: uuid.UUID, psychologist_user_id: uuid.UUID) -> QuestionnaireAccessGrant:
