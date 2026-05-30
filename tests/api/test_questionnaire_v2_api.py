@@ -1122,12 +1122,19 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
     if PdfReader is not None and runtime_service._pdf_reportlab_backend() is not None:
         reader = PdfReader(BytesIO(pdf_download.data))
         pdf_text = "\n".join((page.extract_text() or "") for page in reader.pages)
-        assert "Reporte de screening / apoyo profesional" in pdf_text
+        assert "Reporte orientativo de cuestionario" in pdf_text
         assert "Resultados por dominio" in pdf_text
-        assert "Preguntas y respuestas respondidas" in pdf_text
+        assert "Respuestas registradas" in pdf_text
         assert "Resumen por secciones" in pdf_text
         assert "Limitaciones y uso responsable" in pdf_text
         assert "Indice de carga sintomatica" in pdf_text
+        assert "Este reporte es orientativo" in pdf_text
+        assert "Questionnaire ID" not in pdf_text
+        assert "Generated at" not in pdf_text
+        assert "symptom_load_index" not in pdf_text
+        assert "score_type" not in pdf_text
+        assert "urgent_referral_recommended" not in pdf_text
+        assert "adhd_hypimp_01_fidgets" not in pdf_text
         assert "Anexo tecnico" in pdf_text
 
     adoption = client.get("/api/v2/dashboard/adoption-history?months=6", headers=owner_headers)
@@ -1989,6 +1996,97 @@ def test_questionnaire_v2_pending_grant_blocks_pdf_and_professional_review(clien
         headers=psych_headers,
     )
     assert review_try.status_code == 403
+
+
+def test_questionnaire_v2_history_responses_permissions_and_shape(client, app):
+    _, owner_token = _user_token(app, "responses_owner_qv2")
+    psych_id, psych_token = _user_token(app, "responses_psych_qv2", user_type="psychologist")
+    other_psych_id, other_psych_token = _user_token(app, "responses_other_psych_qv2", user_type="psychologist")
+    _, other_guardian_token = _user_token(app, "responses_other_guard_qv2")
+    owner_headers = {"Authorization": f"Bearer {owner_token}"}
+    psych_headers = {"Authorization": f"Bearer {psych_token}"}
+    other_psych_headers = {"Authorization": f"Bearer {other_psych_token}"}
+    other_guardian_headers = {"Authorization": f"Bearer {other_guardian_token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "Caso responses", "child_age_years": 9},
+        headers=owner_headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    page = client.get(f"/api/v2/questionnaires/sessions/{session_id}/page?page=1&page_size=2", headers=owner_headers)
+    question_id = page.json["pages"][0]["questions"][0]["question_id"]
+    saved = client.patch(
+        f"/api/v2/questionnaires/sessions/{session_id}/answers",
+        json={"answers": [{"question_id": question_id, "answer": 2}]},
+        headers=owner_headers,
+    )
+    assert saved.status_code == 200
+    submitted = client.post(f"/api/v2/questionnaires/sessions/{session_id}/submit", json={}, headers=owner_headers)
+    assert submitted.status_code == 200
+
+    owner_responses = client.get(f"/api/v2/questionnaires/history/{session_id}/responses", headers=owner_headers)
+    assert owner_responses.status_code == 200
+    assert owner_responses.json["session_id"] == session_id
+    assert owner_responses.json["sections"]
+    first_item = owner_responses.json["sections"][0]["items"][0]
+    assert first_item["question_text"]
+    assert "adhd_hypimp_01_fidgets" not in str(first_item.get("question_text") or "")
+
+    shared = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/share",
+        json={"grantee_user_id": str(psych_id), "grant_can_download_pdf": True, "grant_can_tag": False},
+        headers=owner_headers,
+    )
+    assert shared.status_code == 201
+    grant_id = shared.json["grant"]["grant_id"]
+
+    pending_responses = client.get(f"/api/v2/questionnaires/history/{session_id}/responses", headers=psych_headers)
+    assert pending_responses.status_code == 403
+
+    accepted = client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{grant_id}/accept",
+        json={"message": "Acepto"},
+        headers=psych_headers,
+    )
+    assert accepted.status_code == 200
+
+    accepted_responses = client.get(f"/api/v2/questionnaires/history/{session_id}/responses", headers=psych_headers)
+    assert accepted_responses.status_code == 200
+    assert accepted_responses.json["sections"][0]["domain_label"]
+
+    forbidden_other_psych = client.get(
+        f"/api/v2/questionnaires/history/{session_id}/responses",
+        headers=other_psych_headers,
+    )
+    assert forbidden_other_psych.status_code == 403
+
+    forbidden_other_guardian = client.get(
+        f"/api/v2/questionnaires/history/{session_id}/responses",
+        headers=other_guardian_headers,
+    )
+    assert forbidden_other_guardian.status_code == 403
+
+    shared_reject = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/share",
+        json={"grantee_user_id": str(other_psych_id), "grant_can_download_pdf": True, "grant_can_tag": False},
+        headers=owner_headers,
+    )
+    assert shared_reject.status_code == 201
+    reject_grant_id = shared_reject.json["grant"]["grant_id"]
+    rejected = client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{reject_grant_id}/reject",
+        json={"message": "Rechazo"},
+        headers=other_psych_headers,
+    )
+    assert rejected.status_code == 200
+    rejected_responses = client.get(
+        f"/api/v2/questionnaires/history/{session_id}/responses",
+        headers=other_psych_headers,
+    )
+    assert rejected_responses.status_code == 403
 
 
 def test_questionnaire_v2_case_label_reuse_with_accents_and_separators(client, app):

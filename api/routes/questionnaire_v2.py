@@ -909,6 +909,32 @@ def history_results(session_id: str):
     )
 
 
+@questionnaire_v2_bp.get("/questionnaires/history/<session_id>/responses")
+@jwt_required()
+def history_responses(session_id: str):
+    user_id, user = _current_user()
+    if not user_id or not user:
+        return _error("invalid_user", "invalid_user", 401)
+    sid = _parse_uuid(session_id)
+    if not sid:
+        return _error("invalid_session_id", "invalid_session_id", 400)
+    try:
+        session = _load_session_for_user(sid, user_id)
+        payload = service.get_session_responses_payload(session)
+    except LookupError as exc:
+        return _error("not_found", str(exc), 404)
+    except PermissionError as exc:
+        return _error("forbidden", str(exc), 403)
+    except Exception as exc:
+        return _handle_backend_failure(exc, "responses_failed", "responses_failed")
+    response = jsonify(payload)
+    response.status_code = 200
+    return _legacy_plaintext_response(
+        response,
+        "/api/v2/questionnaires/history/{session_id}/responses-secure",
+    )
+
+
 @questionnaire_v2_bp.post("/questionnaires/history/<session_id>/results-secure")
 @jwt_required()
 def history_results_secure(session_id: str):

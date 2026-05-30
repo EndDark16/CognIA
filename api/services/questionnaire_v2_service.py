@@ -2422,6 +2422,49 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
         result_recommendation = None
         result_metadata = {}
 
+    domains_payload = [
+        {
+            "domain": row.domain,
+            **_domain_payload_fields(row.domain),
+            "probability": row.probability,
+            "alert_level": row.alert_level,
+            "confidence_pct": row.confidence_pct,
+            "confidence_band": row.confidence_band,
+            "model_id": row.model_id,
+            "model_version": row.model_version,
+            "mode": row.mode,
+            "operational_class": row.operational_class,
+            "operational_caveat": row.operational_caveat,
+            "result_summary": _decrypt_text_safe(
+                row.result_summary,
+                "questionnaire_session_result_domain.result_summary",
+            ),
+            "needs_professional_review": row.needs_professional_review,
+            **_score_payload(row.probability),
+        }
+        for row in domains
+    ]
+    top_domain = max(domains_payload, key=lambda item: float(item.get("probability") or 0.0), default=None)
+    observed_indicators: list[dict[str, Any]] = []
+    if top_domain and top_domain.get("domain"):
+        top_domain_code = str(top_domain.get("domain") or "").strip().lower()
+        for row in _session_pdf_question_rows(session.id):
+            if str(row.get("domain") or "").strip().lower() != top_domain_code:
+                continue
+            if not row.get("is_answered"):
+                continue
+            observed_indicators.append(
+                {
+                    "domain_code": top_domain_code,
+                    "domain_label": _domain_label(top_domain_code),
+                    "question_text": row.get("prompt"),
+                    "answer_label": row.get("raw_answer_display"),
+                    "value": row.get("numeric_answer"),
+                }
+            )
+            if len(observed_indicators) >= 8:
+                break
+
     return {
         "session": get_session_payload(session, viewer_user_id=viewer_user_id),
         "result": {
@@ -2442,28 +2485,20 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
             "score_label": result_metadata.get("score_label", SCORE_LABEL),
             "score_explanation": result_metadata.get("score_explanation", SCORE_EXPLANATION),
         },
-        "domains": [
+        "primary_domain": (
             {
-                "domain": row.domain,
-                **_domain_payload_fields(row.domain),
-                "probability": row.probability,
-                "alert_level": row.alert_level,
-                "confidence_pct": row.confidence_pct,
-                "confidence_band": row.confidence_band,
-                "model_id": row.model_id,
-                "model_version": row.model_version,
-                "mode": row.mode,
-                "operational_class": row.operational_class,
-                "operational_caveat": row.operational_caveat,
-                "result_summary": _decrypt_text_safe(
-                    row.result_summary,
-                    "questionnaire_session_result_domain.result_summary",
-                ),
-                "needs_professional_review": row.needs_professional_review,
-                **_score_payload(row.probability),
+                "code": str(top_domain.get("domain") or "").strip().lower(),
+                "label": top_domain.get("domain_label"),
+                "score": float(top_domain.get("probability") or 0.0),
+                "percentage": round(float(top_domain.get("probability") or 0.0) * 100.0, 1),
+                "risk": top_domain.get("alert_level"),
+                "risk_label": _pdf_alert_label(top_domain.get("alert_level")),
             }
-            for row in domains
-        ],
+            if top_domain
+            else None
+        ),
+        "domains": domains_payload,
+        "observed_indicators": observed_indicators,
         "comorbidity": [
             {
                 "coexistence_key": row.coexistence_key,
@@ -2484,6 +2519,63 @@ def get_results_payload(session: QuestionnaireSession, viewer_user_id: uuid.UUID
             "warnings": result_metadata.get("clinical_consistency_warnings", []),
             "inconsistency_flags": result_metadata.get("inconsistency_flags", []),
             "safety_flags": result_metadata.get("safety_flags", []),
+        },
+    }
+
+
+def get_session_responses_payload(session: QuestionnaireSession) -> dict[str, Any]:
+    rows = _session_pdf_question_rows(session.id)
+    sections_by_domain: dict[str, dict[str, Any]] = {}
+    answered_count = 0
+    for row in rows:
+        domain_code = str(row.get("domain") or "general").strip().lower()
+        section = sections_by_domain.setdefault(
+            domain_code,
+            {
+                "domain_code": domain_code,
+                "domain_label": _domain_label(domain_code),
+                "title": _domain_description(domain_code),
+                "items": [],
+            },
+        )
+        answered = bool(row.get("is_answered"))
+        if answered:
+            answered_count += 1
+        section["items"].append(
+            {
+                "question_id": row.get("question_id"),
+                "question_text": row.get("prompt"),
+                "answer_label": row.get("raw_answer_display") if answered else "Sin respuesta registrada",
+                "answer_value": row.get("numeric_answer"),
+                "scale_label": (
+                    f"{int(float(row['min_value']))} a {int(float(row['max_value']))}"
+                    if row.get("min_value") is not None and row.get("max_value") is not None
+                    else None
+                ),
+                "is_missing": not answered,
+            }
+        )
+
+    total = len(rows)
+    case_public_id = None
+    if session.case_id:
+        case_row = db.session.get(QuestionnaireCase, session.case_id)
+        case_public_id = case_row.case_public_id if case_row else None
+    respondent_role_label = "Padre/Tutor" if _normalize_role(session.respondent_role) == "guardian" else _normalize_role(session.respondent_role)
+    return {
+        "session_id": str(session.id),
+        "case_public_id": case_public_id,
+        "questionnaire": {
+            "mode": session.mode_key,
+            "mode_label": "Completo" if session.mode_key == "complete" else "Version corta",
+            "version": session.questionnaire_version_label,
+            "respondent_role_label": respondent_role_label,
+        },
+        "sections": list(sections_by_domain.values()),
+        "summary": {
+            "answered_count": answered_count,
+            "missing_count": max(0, total - answered_count),
+            "completion_percentage": round((answered_count / total) * 100.0, 1) if total else 0.0,
         },
     }
 
@@ -4630,6 +4722,43 @@ def list_psychologist_share_requests(
         .all()
     )
     counters = {str(key or "accepted"): int(value) for key, value in counts_rows}
+    by_status = [
+        {"label": "Pendientes", "value": counters.get("pending", 0)},
+        {"label": "Aceptadas", "value": counters.get("accepted", 0)},
+        {"label": "Rechazadas", "value": counters.get("rejected", 0)},
+    ]
+    by_alert_counter: Counter = Counter()
+    by_domain_counter: Counter = Counter()
+    over_time_counter: Counter = Counter()
+    pending_age_counter: Counter = Counter()
+    if rows:
+        session_ids = [row.session_id for row in rows]
+        domain_rows = QuestionnaireSessionResultDomain.query.filter(
+            QuestionnaireSessionResultDomain.session_id.in_(session_ids)
+        ).all()
+        by_session: dict[uuid.UUID, list[QuestionnaireSessionResultDomain]] = defaultdict(list)
+        for row in domain_rows:
+            by_session[row.session_id].append(row)
+        now = _utcnow()
+        for grant in rows:
+            dom_rows = by_session.get(grant.session_id, [])
+            if dom_rows:
+                top = max(dom_rows, key=lambda item: float(item.probability or 0.0))
+                by_domain_counter[_domain_label(top.domain)] += 1
+                by_alert_counter[_pdf_alert_label(top.alert_level)] += 1
+            req_at = grant.requested_at or grant.created_at or now
+            if getattr(req_at, "tzinfo", None) is None:
+                req_at = req_at.replace(tzinfo=timezone.utc)
+            over_time_counter[req_at.strftime("%Y-%m-%d")] += 1
+            if str(grant.request_status or "").lower() == "pending":
+                age_days = max(0, (now - req_at).days)
+                if age_days <= 2:
+                    pending_age_counter["0-2 dias"] += 1
+                elif age_days <= 7:
+                    pending_age_counter["3-7 dias"] += 1
+                else:
+                    pending_age_counter["8+ dias"] += 1
+
     return {
         "items": items,
         "pagination": {
@@ -4642,6 +4771,13 @@ def list_psychologist_share_requests(
             "pending_count": counters.get("pending", 0),
             "accepted_count": counters.get("accepted", 0),
             "rejected_count": counters.get("rejected", 0),
+        },
+        "charts": {
+            "by_status": by_status,
+            "by_alert_level": [{"label": key, "value": int(value)} for key, value in sorted(by_alert_counter.items())],
+            "by_domain": [{"label": key, "value": int(value)} for key, value in sorted(by_domain_counter.items())],
+            "over_time": [{"date": key, "value": int(value)} for key, value in sorted(over_time_counter.items())],
+            "pending_age": [{"label": key, "value": int(value)} for key, value in sorted(pending_age_counter.items())],
         },
     }
 
@@ -5356,17 +5492,17 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
 
     story: list[Any] = []
     story.append(Paragraph("CognIA", title_style))
-    story.append(Paragraph("Reporte de screening / apoyo profesional", h1_style))
+    story.append(Paragraph("Reporte orientativo de cuestionario", h1_style))
     story.append(
         Paragraph(
-            "Uso profesional: resultado de tamizaje en entorno simulado. No equivale a diagnostico clinico definitivo.",
+            "Este reporte es orientativo y no constituye diagnostico clinico definitivo.",
             body_style,
         )
     )
     story.append(Spacer(1, 0.15 * inch))
 
     cover_rows = [
-        ["Fecha de generacion", generated_at.isoformat()],
+        ["Generado", generated_at.isoformat()],
         ["Diligenciado por", session.completed_by_display_name or "No registrado"],
         ["Rol de quien diligencia", session.completed_by_role or "No registrado"],
         ["Rol profesional", session.completed_by_professional_role or "No registrado"],
@@ -5374,10 +5510,10 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
         ["Fecha de aplicacion", session.applied_at.isoformat() if session.applied_at else "No registrado"],
         ["Institucion", session.institution_name or "No registrado"],
         ["Canal de origen", session.source_channel or "No registrado"],
-        ["Questionnaire ID", session.questionnaire_public_id],
-        ["Session ID", str(session.id)],
-        ["Modo aplicado", f"{session.mode} ({session.mode_key})"],
-        ["Rol respondiente", role],
+        ["ID del cuestionario", session.questionnaire_public_id],
+        ["ID de sesion", str(session.id)],
+        ["Modo", "Completo" if session.mode_key == "complete" else "Version corta"],
+        ["Rol", "Padre/Tutor" if role == "guardian" else role],
         ["Version de cuestionario", session.questionnaire_version_label or "N/A"],
         ["Version de escalas", session.scales_version_label or "N/A"],
         ["Pipeline/model bundle", (result_row.model_bundle_version if result_row else None) or session.model_pipeline_version or "N/A"],
@@ -5400,7 +5536,7 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
     story.append(Spacer(1, 0.12 * inch))
 
     story.append(Paragraph("Resultados por dominio", h1_style))
-    domain_table = [["Dominio", SCORE_LABEL, "Alerta", "Confianza", "Modelo/version", "Caveat operativo"]]
+    domain_table = [["Dominio", "Indice de carga sintomatica", "Alerta", "Confianza", "Modelo/version", "Caveat operativo"]]
     sorted_domains = sorted(domains, key=lambda item: float(item.get("probability") or 0.0), reverse=True)
     for row in sorted_domains:
         conf_pct = row.get("confidence_pct")
@@ -5496,12 +5632,11 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
     story.append(Paragraph(_pdf_paragraph_safe(recommendation), body_style))
     story.append(PageBreak())
 
-    story.append(Paragraph("Preguntas y respuestas respondidas", h1_style))
+    story.append(Paragraph("Respuestas registradas", h1_style))
     qa_header = [
         "#",
         "Seccion",
         "Dominio",
-        "Codigo",
         "Pregunta",
         "Tipo",
         "Respuesta dada",
@@ -5520,7 +5655,6 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
                 str(row["index"]),
                 Paragraph(_pdf_paragraph_safe(f"P{row['page_number']} - {row['section_title']}"), small_style),
                 Paragraph(_pdf_paragraph_safe(_domain_label(row["domain"] or "general")), small_style),
-                Paragraph(_pdf_paragraph_safe(row["question_code"]), small_style),
                 Paragraph(_pdf_paragraph_safe(row["prompt"]), small_style),
                 Paragraph(_pdf_paragraph_safe(row["response_type"]), small_style),
                 Paragraph(_pdf_paragraph_safe(row["raw_answer_display"]), small_style),
@@ -5537,7 +5671,6 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
                 0.3 * inch,
                 0.9 * inch,
                 0.9 * inch,
-                1.0 * inch,
                 2.2 * inch,
                 0.8 * inch,
                 1.0 * inch,
@@ -5590,8 +5723,8 @@ def generate_pdf(session: QuestionnaireSession, user_id: uuid.UUID) -> Questionn
     story.append(Spacer(1, 0.08 * inch))
     story.append(Paragraph("Anexo tecnico", h1_style))
     annex_rows = [
-        ["Session ID", str(session.id)],
-        ["Questionnaire ID", session.questionnaire_public_id],
+        ["ID de sesion", str(session.id)],
+        ["ID del cuestionario", session.questionnaire_public_id],
         ["Version cuestionario", session.questionnaire_version_label or "N/A"],
         ["Version escalas", session.scales_version_label or "N/A"],
         ["Pipeline/model bundle", (result_row.model_bundle_version if result_row else None) or session.model_pipeline_version or "N/A"],
