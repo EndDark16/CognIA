@@ -153,6 +153,7 @@ class PsychologistSearchQuerySchema(BaseSchema):
     department = fields.String(required=False, validate=validate.Length(min=1, max=160))
     city = fields.String(required=False, validate=validate.Length(min=1, max=160))
     same_location = fields.Boolean(load_default=False)
+    recommended = fields.Boolean(load_default=False)
     location = fields.String(required=False, validate=validate.Length(min=1, max=160))
     page = fields.Integer(load_default=1, validate=validate.Range(min=1))
     page_size = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
