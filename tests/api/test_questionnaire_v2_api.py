@@ -1,6 +1,7 @@
 ﻿import os
 import sys
 import uuid
+from datetime import timedelta, timezone
 from io import BytesIO
 from pathlib import Path
 
@@ -588,7 +589,7 @@ def test_questionnaire_v2_session_flow(client, app):
     adhd = next(item for item in submitted.json["domains"] if item["domain"] == "adhd")
     assert adhd["domain_label"] == "TDAH"
     assert adhd["score_type"] == "symptom_load_index"
-    assert "probabilidad diagnostica" in adhd["score_explanation"]
+    assert "probabilidad diagnóstica" in adhd["score_explanation"]
     assert submitted.json["session"]["completed_by_user_id"]
     assert submitted.json["session"]["applied_at"]
 
@@ -1127,7 +1128,7 @@ def test_questionnaire_v2_share_tags_pdf_and_dashboards(client, app):
         assert "Respuestas registradas" in pdf_text
         assert "Resumen por secciones" in pdf_text
         assert "Limitaciones y uso responsable" in pdf_text
-        assert "Indice de carga sintomatica" in pdf_text
+        assert "Índice de carga sintomática" in pdf_text
         assert "Este reporte es orientativo" in pdf_text
         assert "Questionnaire ID" not in pdf_text
         assert "Generated at" not in pdf_text
@@ -2471,6 +2472,134 @@ def test_questionnaire_v2_case_detail_charts_are_case_scoped(client, app):
     assert trend_session_ids == set(session_ids_case_1)
     assert payload["charts"]["domain_summary"]["unit"] == "percentage"
     assert payload["charts"]["alerts_by_level"]["unit"] == "alert_count"
+
+
+def test_questionnaire_v2_guardian_dashboard_alert_semantics_and_cases_alerts(client, app):
+    _, token = _user_token(app, "guardian_alert_semantics_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created_case_alert = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "hijo 2", "child_age_years": 9},
+        headers=headers,
+    )
+    created_case_low = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "hijo 3", "child_age_years": 9},
+        headers=headers,
+    )
+    assert created_case_alert.status_code == 201
+    assert created_case_low.status_code == 201
+    alert_session_id = created_case_alert.json["session"]["session_id"]
+    low_session_id = created_case_low.json["session"]["session_id"]
+
+    for sid in (alert_session_id, low_session_id):
+        page = client.get(f"/api/v2/questionnaires/sessions/{sid}/page?page=1&page_size=1", headers=headers)
+        qid = page.json["pages"][0]["questions"][0]["question_id"]
+        assert client.patch(
+            f"/api/v2/questionnaires/sessions/{sid}/answers",
+            json={"answers": [{"question_id": qid, "answer": 2}]},
+            headers=headers,
+        ).status_code == 200
+        assert client.post(f"/api/v2/questionnaires/sessions/{sid}/submit", json={}, headers=headers).status_code == 200
+
+    with app.app_context():
+        target_alert = QuestionnaireSession.query.filter_by(id=uuid.UUID(alert_session_id)).first()
+        target_low = QuestionnaireSession.query.filter_by(id=uuid.UUID(low_session_id)).first()
+        assert target_alert and target_low
+        rows_alert = QuestionnaireSessionResultDomain.query.filter_by(session_id=target_alert.id).all()
+        rows_low = QuestionnaireSessionResultDomain.query.filter_by(session_id=target_low.id).all()
+        for row in rows_alert:
+            row.alert_level = "high" if row.domain == "anxiety" else "low"
+        for row in rows_low:
+            row.alert_level = "low"
+        db.session.commit()
+
+    guardian_dashboard = client.get("/api/v2/questionnaires/guardian/dashboard?months=6", headers=headers)
+    assert guardian_dashboard.status_code == 200
+    dashboard_payload = guardian_dashboard.json
+    assert dashboard_payload["aggregation"]["uses_current_page_only"] is False
+    assert dashboard_payload["charts"]["alerts_by_domain"]["unit"] == "alert_count"
+    assert dashboard_payload["charts"]["domain_load_summary"]["unit"] == "percentage"
+    assert dashboard_payload["charts"]["alerts_by_case"]["unit"] == "alert_count"
+    assert dashboard_payload["charts"]["activity_by_case"]["unit"] == "questionnaire_count"
+
+    domain_items = dashboard_payload["charts"]["alerts_by_domain"]["items"]
+    if domain_items:
+        anxiety_row = next((row for row in domain_items if row["code"] == "anxiety"), None)
+        assert anxiety_row is not None
+        assert int(anxiety_row["count"]) > 0
+    alert_level_codes = {row["code"] for row in dashboard_payload["charts"]["alerts_by_level"]["items"]}
+    assert "low" not in alert_level_codes
+
+    cases_payload = client.get("/api/v2/questionnaires/cases?status=active&page=1&page_size=20", headers=headers)
+    assert cases_payload.status_code == 200
+    assert cases_payload.json["charts"]["activity_by_case"]["unit"] == "questionnaire_count"
+    assert cases_payload.json["charts"]["alerts_by_case"]["unit"] == "alert_count"
+    assert all(int(row["count"]) > 0 for row in cases_payload.json["charts"]["alerts_by_case"]["items"])
+
+
+def test_questionnaire_v2_case_detail_consistency_timestamps_and_delta(client, app):
+    _, token = _user_token(app, "case_detail_timeseries_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created_one = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "hijo 1", "child_age_years": 9},
+        headers=headers,
+    )
+    created_two = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "hijo 1", "child_age_years": 9},
+        headers=headers,
+    )
+    assert created_one.status_code == 201
+    assert created_two.status_code == 201
+    session_ids = [created_one.json["session"]["session_id"], created_two.json["session"]["session_id"]]
+    case_id = created_one.json["session"]["case"]["case_id"]
+
+    for sid in session_ids:
+        page = client.get(f"/api/v2/questionnaires/sessions/{sid}/page?page=1&page_size=1", headers=headers)
+        qid = page.json["pages"][0]["questions"][0]["question_id"]
+        assert client.patch(
+            f"/api/v2/questionnaires/sessions/{sid}/answers",
+            json={"answers": [{"question_id": qid, "answer": 2}]},
+            headers=headers,
+        ).status_code == 200
+        assert client.post(f"/api/v2/questionnaires/sessions/{sid}/submit", json={}, headers=headers).status_code == 200
+
+    with app.app_context():
+        first = QuestionnaireSession.query.filter_by(id=uuid.UUID(session_ids[0])).first()
+        second = QuestionnaireSession.query.filter_by(id=uuid.UUID(session_ids[1])).first()
+        assert first and second
+        base = first.created_at.replace(tzinfo=timezone.utc) if first.created_at and first.created_at.tzinfo is None else first.created_at
+        base = base or second.created_at
+        first.applied_at = base
+        first.submitted_at = base + timedelta(minutes=10)
+        first.processed_at = base + timedelta(minutes=12)
+        second.applied_at = base + timedelta(hours=2)
+        second.submitted_at = base + timedelta(hours=2, minutes=9)
+        second.processed_at = base + timedelta(hours=2, minutes=14)
+        db.session.commit()
+
+    detail = client.get(f"/api/v2/questionnaires/cases/{case_id}", headers=headers)
+    assert detail.status_code == 200
+    payload = detail.json
+    assert payload["case"]["questionnaire_count"] == payload["summary"]["questionnaires_count"]
+    assert payload["case"]["processed_count"] == payload["summary"]["processed_count"]
+    assert payload["charts"]["trend"]["aggregation"] == "session_points"
+    trend_items = payload["charts"]["trend"]["items"]
+    assert len(trend_items) >= 2
+    assert all(item.get("processed_at") for item in trend_items)
+    assert all(item.get("label") for item in trend_items)
+    sorted_processed = sorted(item["processed_at"] for item in trend_items if item.get("processed_at"))
+    assert [item["processed_at"] for item in trend_items if item.get("processed_at")] == sorted_processed
+    domain_summary = payload["charts"]["domain_summary"]["items"]
+    assert domain_summary
+    assert all(item.get("latest_session_id") for item in domain_summary)
+    assert all(item.get("latest_processed_at") for item in domain_summary)
+    assert payload["delta_from_previous"]["available"] is True
+    assert payload["delta_from_previous"]["direction"] in {"increase", "decrease", "stable"}
 
 
 def test_questionnaire_v2_history_status_in_progress_lists_partial_sessions(client, app):

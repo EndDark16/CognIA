@@ -82,6 +82,7 @@ class Stats:
     users_repaired: int = 0
     credentials_written: int = 0
     cases_created: int = 0
+    cases_archived: int = 0
     sessions_created: int = 0
     sessions_repaired: int = 0
     shares_created: int = 0
@@ -98,6 +99,7 @@ class Stats:
             "users_repaired": self.users_repaired,
             "credentials_written": self.credentials_written,
             "cases_created": self.cases_created,
+            "cases_archived": self.cases_archived,
             "sessions_created": self.sessions_created,
             "sessions_repaired": self.sessions_repaired,
             "shares_created": self.shares_created,
@@ -337,6 +339,21 @@ def _ensure_cases(guardian: AppUser, *, apply: bool, stats: Stats) -> dict[str, 
         if row:
             out[label] = row
     return out
+
+
+def _archive_non_presentable_cases(guardian: AppUser, *, apply: bool, stats: Stats) -> None:
+    keep_hashes = {qv2._hash_case_label(label) for label in CASE_LABELS if qv2._hash_case_label(label)}
+    rows = QuestionnaireCase.query.filter_by(owner_user_id=guardian.id, status="active").all()
+    for row in rows:
+        if row.private_label_hash in keep_hashes:
+            continue
+        # synjuan is a fully synthetic user for deterministic QA scenarios.
+        # Keep only hijo 1/2/3 active to avoid dashboard contamination.
+        stats.cases_archived += 1
+        if apply:
+            row.status = "archived"
+            row.updated_at = _now()
+            db.session.add(row)
 
 
 def _existing_session_for_slot(case: QuestionnaireCase, slot_key: str) -> QuestionnaireSession | None:
@@ -622,6 +639,7 @@ def _phase_guardian_flow(*, apply: bool, stats: Stats) -> None:
         stats.warnings.append("guardian_missing_run_users_phase_first")
         return
     cases = _ensure_cases(guardian, apply=apply, stats=stats)
+    _archive_non_presentable_cases(guardian, apply=apply, stats=stats)
     for label in CASE_LABELS:
         case = cases.get(label)
         if not case:
