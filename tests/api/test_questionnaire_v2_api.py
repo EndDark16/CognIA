@@ -2149,6 +2149,14 @@ def test_questionnaire_v2_cases_filters_and_metrics(client, app):
     assert by_q.status_code == 200
     assert by_q.json["pagination"]["total"] >= 1
 
+    page_one = client.get("/api/v2/questionnaires/cases?page=1&page_size=1", headers=headers)
+    page_two = client.get("/api/v2/questionnaires/cases?page=2&page_size=1", headers=headers)
+    assert page_one.status_code == 200
+    assert page_two.status_code == 200
+    assert page_one.json["summary"] == page_two.json["summary"]
+    assert page_one.json["charts"] == page_two.json["charts"]
+    assert page_one.json["aggregation"]["uses_current_page_only"] is False
+
 
 def test_questionnaire_v2_history_filters_by_case_label_tag_domain_and_alert(client, app):
     _, token = _user_token(app, "history_filters_owner_qv2")
@@ -2204,6 +2212,62 @@ def test_questionnaire_v2_history_filters_by_case_label_tag_domain_and_alert(cli
     by_alert = client.get("/api/v2/questionnaires/history?alert_level=low", headers=headers)
     assert by_alert.status_code == 200
     assert any(item["session_id"] == session_id for item in by_alert.json["items"])
+
+
+def test_questionnaire_v2_history_summary_and_charts_are_full_set_not_page_bound(client, app):
+    _, token = _user_token(app, "history_agg_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created_ids = []
+    for idx in range(3):
+        create_payload = {
+            "mode": "short",
+            "role": "guardian",
+            "child_age_years": 9,
+        }
+        if idx < 2:
+            create_payload["case_label"] = "hijo 1"
+        created = client.post(
+            "/api/v2/questionnaires/sessions",
+            json=create_payload,
+            headers=headers,
+        )
+        assert created.status_code == 201
+        sid = created.json["session"]["session_id"]
+        created_ids.append(sid)
+        page = client.get(f"/api/v2/questionnaires/sessions/{sid}/page?page=1&page_size=1", headers=headers)
+        qid = page.json["pages"][0]["questions"][0]["question_id"]
+        assert client.patch(
+            f"/api/v2/questionnaires/sessions/{sid}/answers",
+            json={"answers": [{"question_id": qid, "answer": 1}]},
+            headers=headers,
+        ).status_code == 200
+        assert client.post(
+            f"/api/v2/questionnaires/sessions/{sid}/submit",
+            json={},
+            headers=headers,
+        ).status_code == 200
+
+    page_1 = client.get("/api/v2/questionnaires/history?page=1&page_size=1", headers=headers)
+    page_2 = client.get("/api/v2/questionnaires/history?page=2&page_size=1", headers=headers)
+    assert page_1.status_code == 200
+    assert page_2.status_code == 200
+    payload_1 = page_1.json
+    payload_2 = page_2.json
+    assert payload_1["pagination"]["total"] == 3
+    assert payload_2["pagination"]["total"] == 3
+    assert len(payload_1["items"]) == 1
+    assert len(payload_2["items"]) == 1
+    assert payload_1["summary"] == payload_2["summary"]
+    assert payload_1["charts"] == payload_2["charts"]
+    assert payload_1["aggregation"]["uses_current_page_only"] is False
+    assert payload_1["summary"]["total_records"] == 3
+    assert payload_1["summary"]["processed_count"] == 3
+    assert payload_1["summary"]["without_case_count"] == 1
+    assert payload_1["charts"]["activity_over_time"]["unit"] == "questionnaire_count"
+    assert payload_1["charts"]["by_case"]["unit"] == "questionnaire_count"
+    assert payload_1["charts"]["by_domain"]["unit"] == "questionnaire_count"
+    assert payload_1["charts"]["by_alert_level"]["unit"] == "questionnaire_count"
 
 
 def test_questionnaire_v2_psychologist_dashboard_aggregates_use_full_filtered_set(client, app):
@@ -2320,10 +2384,21 @@ def test_questionnaire_v2_psychologist_share_requests_charts_use_full_filtered_s
     assert response.status_code == 200
     payload = response.json
     assert payload["pagination"]["total"] == 3
+    assert payload["summary"]["total"] == 3
+    assert payload["aggregation"]["uses_current_page_only"] is False
     by_status = {row["label"]: row["value"] for row in payload["charts"]["by_status"]}
     assert by_status.get("Pendientes", 0) >= 1
     assert by_status.get("Aceptadas", 0) >= 1
     assert by_status.get("Rechazadas", 0) >= 1
+    assert payload["chart_units"]["by_status"]["unit"] == "request_count"
+
+    page_two = client.get(
+        "/api/v2/questionnaires/psychologist/share-requests?status=all&page=2&page_size=1",
+        headers=psych_headers,
+    )
+    assert page_two.status_code == 200
+    assert page_two.json["summary"] == payload["summary"]
+    assert page_two.json["charts"] == payload["charts"]
 
 
 def test_questionnaire_v2_case_detail_endpoint(client, app):
@@ -2344,6 +2419,58 @@ def test_questionnaire_v2_case_detail_endpoint(client, app):
     by_public_filter = client.get(f"/api/v2/questionnaires/cases?case_public_id={case_public_id}", headers=headers)
     assert by_public_filter.status_code == 200
     assert by_public_filter.json["pagination"]["total"] == 1
+
+
+def test_questionnaire_v2_case_detail_charts_are_case_scoped(client, app):
+    _, token = _user_token(app, "case_scope_owner_qv2")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created_case_1 = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "hijo 1", "child_age_years": 9},
+        headers=headers,
+    )
+    created_case_2 = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "hijo 2", "child_age_years": 9},
+        headers=headers,
+    )
+    assert created_case_1.status_code == 201
+    assert created_case_2.status_code == 201
+    session_ids_case_1 = [created_case_1.json["session"]["session_id"]]
+    case_1_id = created_case_1.json["session"]["case"]["case_id"]
+
+    second_session_case_1 = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "hijo 1", "child_age_years": 10},
+        headers=headers,
+    )
+    assert second_session_case_1.status_code == 201
+    session_ids_case_1.append(second_session_case_1.json["session"]["session_id"])
+
+    for sid in session_ids_case_1 + [created_case_2.json["session"]["session_id"]]:
+        page = client.get(f"/api/v2/questionnaires/sessions/{sid}/page?page=1&page_size=1", headers=headers)
+        qid = page.json["pages"][0]["questions"][0]["question_id"]
+        assert client.patch(
+            f"/api/v2/questionnaires/sessions/{sid}/answers",
+            json={"answers": [{"question_id": qid, "answer": 1}]},
+            headers=headers,
+        ).status_code == 200
+        assert client.post(
+            f"/api/v2/questionnaires/sessions/{sid}/submit",
+            json={},
+            headers=headers,
+        ).status_code == 200
+
+    detail = client.get(f"/api/v2/questionnaires/cases/{case_1_id}", headers=headers)
+    assert detail.status_code == 200
+    payload = detail.json
+    assert payload["aggregation"]["scope"] == "case_only"
+    assert payload["summary"]["questionnaires_count"] == 2
+    trend_session_ids = {item["session_id"] for item in payload["trend"]}
+    assert trend_session_ids == set(session_ids_case_1)
+    assert payload["charts"]["domain_summary"]["unit"] == "percentage"
+    assert payload["charts"]["alerts_by_level"]["unit"] == "alert_count"
 
 
 def test_questionnaire_v2_history_status_in_progress_lists_partial_sessions(client, app):
