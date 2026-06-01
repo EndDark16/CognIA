@@ -1039,7 +1039,7 @@ paths:
 
         - Parametros de ruta: unsubscribe_id (obligatorio), id (obligatorio).
 
-        - Query params: no aplica.
+        - Query params: `status`, `case_id`, `case_public_id`, `case_label`, `tag`, `q`, `date_from`, `date_to`, `domain`, `alert_level`, `needs_professional_review`, `page`, `page_size`.
 
         - Headers adicionales: no aplica.
 
@@ -1050,7 +1050,9 @@ paths:
 
         - Codigos de exito documentados: 200.
 
-        - La respuesta representa el estado procesado por el backend y mantiene compatibilidad con el esquema documentado.
+        - Retorna `items` paginados, `summary` agregado sobre el conjunto filtrado completo y `charts` agregados sobre el conjunto filtrado completo.
+        - Incluye `aggregation.uses_current_page_only=false` para indicar que KPIs y graficas no dependen de la pagina actual.
+        - Cada grafica expone `unit` y `unit_label`.
 
 
         **Errores posibles y causa funcional**
@@ -21844,7 +21846,8 @@ paths:
         Metodo `GET /api/v2/cases` con filtros `status`, `q`, `label`, `case_public_id`, `has_sessions`, `latest_alert_level`, `date_from`, `date_to`, `page`, `page_size`.
 
         **Resultado exitoso**
-        Responde `200` con `items`, labels compactos, conteos, permisos y paginacion.
+        Responde `200` con `items` paginados, `summary`, `charts`, `aggregation`, labels compactos, conteos y permisos.
+        Los agregados no dependen de la pagina actual (`uses_current_page_only=false`).
 
         **Errores posibles y causa funcional**
         `400 validation_error`, `403 cases_list_forbidden`, `500 cases_list_failed`.
@@ -21886,7 +21889,8 @@ paths:
         Metodo `GET /api/v2/questionnaires/cases/{case_id}` con `case_id` UUID valido.
 
         **Resultado exitoso**
-        Responde `200` con `case`, `sessions`, `domain_summary` y `trend`.
+        Responde `200` con `case`, `summary`, `charts`, `sessions`, `tags`, `domain_summary`, `trend` y `aggregation`.
+        `summary` y `charts` usan solo sesiones del caso (`aggregation.scope=case_only`).
 
         **Errores posibles y causa funcional**
         `403 case_forbidden`, `404 case_not_found`, `500 case_detail_failed`.
@@ -21971,7 +21975,8 @@ paths:
         Metodo `GET /api/v2/cases/{case_id}` con `case_id` UUID valido.
 
         **Resultado exitoso**
-        Responde `200` con `case`, `sessions`, `domain_summary`, `trend`, tags y permisos.
+        Responde `200` con `case`, `summary`, `charts`, `sessions`, `tags`, `domain_summary`, `trend` y `aggregation`.
+        `summary` y `charts` usan solo sesiones del caso (`aggregation.scope=case_only`).
 
         **Errores posibles y causa funcional**
         `400 invalid_case_id`, `403 case_forbidden`, `404 case_not_found`, `500 case_detail_failed`.
@@ -22058,7 +22063,8 @@ paths:
         Metodo `GET /api/v2/questionnaires/guardian/dashboard` con `months` o rango `date_from`/`date_to`, y filtros opcionales `case_id`, `case_public_id`, `case_label`, `q`, `domain`, `alert_level`.
 
         **Resultado exitoso**
-        Responde `200` con `summary`, `charts`, `cases`, `period` y `filters`.
+        Responde `200` con `summary`, `charts`, `chart_units`, `cases`, `period`, `filters` y `aggregation`.
+        `summary`/`charts` se calculan en backend sobre todo el conjunto filtrado, no sobre la pagina.
 
         **Errores posibles y causa funcional**
         `400 guardian_dashboard_invalid_period`, `403 guardian_dashboard_forbidden`, `404 guardian_dashboard_case_not_found`, `500 guardian_dashboard_failed`.
@@ -22267,7 +22273,9 @@ paths:
         Metodo `GET /api/v2/questionnaires/psychologist/share-requests` con `status`, `q`, `date_from`, `date_to`, `page`, `page_size`.
 
         **Resultado exitoso**
-        Retorna `200` con `items`, `summary` y `pagination`. Cada item incluye `request_status_label` y permisos efectivos para ver, descargar PDF o etiquetar tras aceptar.
+        Retorna `200` con `items`, `summary`, `charts`, `chart_units`, `pagination` y `aggregation`.
+        `summary`/`charts` se calculan sobre el conjunto filtrado completo (`uses_current_page_only=false`), independientes de `page`/`page_size`.
+        Cada item incluye `request_status_label` y permisos efectivos para ver, descargar PDF o etiquetar tras aceptar.
 
         **Errores posibles y causa funcional**
         `400 psychologist_share_requests_invalid_filter`, `403 psychologist_share_requests_requires_psychologist`, `500 psychologist_share_requests_failed`.

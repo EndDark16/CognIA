@@ -1,4 +1,4 @@
-import json
+﻿import json
 import os
 import re
 import secrets
@@ -322,7 +322,7 @@ def _compact_case_label(label: str | None, *, max_len: int = 34) -> str:
     text = re.sub(r"^QA\s+Dashboard\s*[·:\-]\s*", "", text, flags=re.IGNORECASE)
     if not text:
         return "Caso"
-    return text if len(text) <= max_len else f"{text[: max_len - 1].rstrip()}…"
+    return text if len(text) <= max_len else f"{text[: max_len - 1].rstrip()}..."
 
 
 def _case_permissions(is_owner: bool) -> dict[str, bool]:
@@ -411,7 +411,7 @@ def _answer_positive(value: Any, max_value: float | None = None) -> bool:
         if max_value is not None:
             return numeric >= max_value
         return numeric > 0
-    return str(value or "").strip().lower() in {"si", "sí", "true", "yes", "y", "1"}
+    return str(value or "").strip().lower() in {"si", "sÃ­", "true", "yes", "y", "1"}
 
 
 def _application_trace_payload(session: QuestionnaireSession) -> dict[str, Any]:
@@ -469,7 +469,7 @@ def _detect_safety_and_consistency(session: QuestionnaireSession, feature_map: d
                 "morir",
                 "desaparecer",
                 "hacerse dano",
-                "hacerse daño",
+                "hacerse daÃ±o",
                 "autoles",
                 "suicid",
                 "self harm",
@@ -2924,37 +2924,48 @@ def list_history(
 
     total = len(rows)
     paged_rows = rows[(page - 1) * page_size : (page - 1) * page_size + page_size]
-    session_ids = [session.id for session in paged_rows]
-    case_ids = [session.case_id for session in paged_rows if session.case_id]
+    all_session_ids = [session.id for session in rows]
+    paged_session_ids = [session.id for session in paged_rows]
+    all_case_ids = list({session.case_id for session in rows if session.case_id})
 
     summary_by_session_id: dict[uuid.UUID, tuple[str | None, bool | None]] = {}
-    if session_ids:
+    needs_review_session_ids: set[uuid.UUID] = set()
+    if all_session_ids:
         result_rows = QuestionnaireSessionResult.query.filter(
-            QuestionnaireSessionResult.session_id.in_(session_ids)
+            QuestionnaireSessionResult.session_id.in_(all_session_ids)
         ).all()
         summary_by_session_id = {
             row.session_id: (row.summary_text, row.needs_professional_review)
             for row in result_rows
         }
+        needs_review_session_ids = {
+            row.session_id
+            for row in result_rows
+            if bool(row.needs_professional_review)
+        }
 
-    case_by_id = {
-        row.id: row
-        for row in QuestionnaireCase.query.filter(QuestionnaireCase.id.in_(case_ids)).all()
-    } if case_ids else {}
+    case_by_id = (
+        {
+            row.id: row
+            for row in QuestionnaireCase.query.filter(QuestionnaireCase.id.in_(all_case_ids)).all()
+        }
+        if all_case_ids
+        else {}
+    )
 
     domain_by_session: dict[uuid.UUID, list[QuestionnaireSessionResultDomain]] = defaultdict(list)
-    if session_ids:
+    if all_session_ids:
         for row in QuestionnaireSessionResultDomain.query.filter(
-            QuestionnaireSessionResultDomain.session_id.in_(session_ids)
+            QuestionnaireSessionResultDomain.session_id.in_(all_session_ids)
         ).all():
             domain_by_session[row.session_id].append(row)
 
     tags_by_session: dict[uuid.UUID, list[dict[str, Any]]] = defaultdict(list)
-    if session_ids:
+    if paged_session_ids:
         tag_rows = (
             db.session.query(QuestionnaireSessionTag.session_id, QuestionnaireTag)
             .join(QuestionnaireTag, QuestionnaireTag.id == QuestionnaireSessionTag.tag_id)
-            .filter(QuestionnaireSessionTag.session_id.in_(session_ids))
+            .filter(QuestionnaireSessionTag.session_id.in_(paged_session_ids))
             .all()
         )
         for sid, tag_row in tag_rows:
@@ -2999,13 +3010,173 @@ def list_history(
         item["questionnaire_session_id"] = str(session.id)
         items.append(item)
 
+    by_month_counter: Counter = Counter()
+    by_case_counter: Counter = Counter()
+    by_domain_counter: Counter = Counter()
+    by_alert_counter: Counter = Counter()
+    dominant_domain_counter: Counter = Counter()
+    highest_alert_counter: Counter = Counter()
+
+    with_alert_count = 0
+    for session in rows:
+        event_dt = session.processed_at or session.submitted_at or session.updated_at or session.created_at
+        by_month_counter[event_dt.strftime("%Y-%m")] += 1
+        if session.case_id:
+            by_case_counter[session.case_id] += 1
+
+        session_domains = domain_by_session.get(session.id, [])
+        if not session_domains:
+            continue
+
+        dominant_domain = _session_dominant_domain(session_domains)
+        if dominant_domain:
+            dominant_domain_counter[dominant_domain] += 1
+            by_domain_counter[dominant_domain] += 1
+
+        highest_alert = _pick_highest_alert([row.alert_level for row in session_domains])
+        if highest_alert:
+            highest_alert_counter[highest_alert] += 1
+            by_alert_counter[highest_alert] += 1
+            if _alert_rank(highest_alert) >= _alert_rank("elevated"):
+                with_alert_count += 1
+
+    dominant_domain_payload = None
+    if dominant_domain_counter:
+        dominant_domain_code, dominant_domain_count = dominant_domain_counter.most_common(1)[0]
+        dominant_domain_payload = {
+            "code": dominant_domain_code,
+            "label": _domain_label(dominant_domain_code),
+            "count": int(dominant_domain_count),
+        }
+
+    highest_alert_payload = None
+    if highest_alert_counter:
+        highest_alert_code, highest_alert_count = sorted(
+            highest_alert_counter.items(),
+            key=lambda item: (_alert_rank(item[0]), item[1]),
+            reverse=True,
+        )[0]
+        highest_alert_payload = {
+            "code": highest_alert_code,
+            "label": _pdf_alert_label(highest_alert_code),
+            "count": int(highest_alert_count),
+        }
+
+    accepted_share_count = 0
+    if all_session_ids:
+        accepted_share_count = int(
+            db.session.query(func.count(func.distinct(QuestionnaireAccessGrant.session_id)))
+            .filter(
+                QuestionnaireAccessGrant.session_id.in_(all_session_ids),
+                QuestionnaireAccessGrant.request_status == "accepted",
+                QuestionnaireAccessGrant.revoked_at.is_(None),
+            )
+            .scalar()
+            or 0
+        )
+
+    professional_review_count = 0
+    if all_session_ids:
+        professional_review_count = int(
+            db.session.query(func.count(func.distinct(QuestionnaireProfessionalReview.session_id)))
+            .filter(QuestionnaireProfessionalReview.session_id.in_(all_session_ids))
+            .scalar()
+            or 0
+        )
+
+    summary_payload = {
+        "total_records": total,
+        "processed_count": sum(1 for row in rows if row.status == "processed"),
+        "with_alert_count": with_alert_count,
+        "needs_review_count": len(needs_review_session_ids),
+        "without_case_count": sum(1 for row in rows if row.case_id is None),
+        "accepted_share_count": accepted_share_count,
+        "professional_review_count": professional_review_count,
+        "dominant_domain": dominant_domain_payload,
+        "highest_alert_level": highest_alert_payload,
+    }
+
+    charts_payload = {
+        "activity_over_time": {
+            "unit": "questionnaire_count",
+            "unit_label": "Cuestionarios",
+            "items": [
+                {
+                    "period": period,
+                    "label": period,
+                    "count": int(count),
+                }
+                for period, count in sorted(by_month_counter.items())
+            ],
+        },
+        "by_case": {
+            "unit": "questionnaire_count",
+            "unit_label": "Cuestionarios por caso",
+            "items": sorted(
+                [
+                    {
+                        "case_id": str(case_id),
+                        "case_public_id": case_by_id.get(case_id).case_public_id if case_by_id.get(case_id) else None,
+                        "label": (
+                            _compact_case_label(_case_display_label(case_by_id[case_id], user_id))
+                            if case_by_id.get(case_id)
+                            else "Caso"
+                        ),
+                        "count": int(count),
+                    }
+                    for case_id, count in by_case_counter.items()
+                ],
+                key=lambda row: row["count"],
+                reverse=True,
+            ),
+        },
+        "by_domain": {
+            "unit": "questionnaire_count",
+            "unit_label": "Cuestionarios por dominio",
+            "items": sorted(
+                [
+                    {
+                        "code": code,
+                        "label": _domain_label(code),
+                        "count": int(count),
+                    }
+                    for code, count in by_domain_counter.items()
+                ],
+                key=lambda row: row["count"],
+                reverse=True,
+            ),
+        },
+        "by_alert_level": {
+            "unit": "questionnaire_count",
+            "unit_label": "Cuestionarios por nivel de alerta",
+            "items": [
+                {
+                    "code": code,
+                    "label": _pdf_alert_label(code),
+                    "count": int(count),
+                }
+                for code, count in sorted(by_alert_counter.items(), key=lambda item: _alert_rank(item[0]))
+            ],
+        },
+    }
+
     return {
         "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
         "pagination": {
             "page": page,
             "page_size": page_size,
             "total": total,
             "pages": max(1, (total + page_size - 1) // page_size),
+        },
+        "summary": summary_payload,
+        "charts": charts_payload,
+        "aggregation": {
+            "source": "backend",
+            "scope": "filtered_result_set",
+            "uses_current_page_only": False,
         },
     }
 
@@ -3195,8 +3366,87 @@ def list_cases(
 
     total = len(prepared_items)
     paged_items = prepared_items[(page - 1) * page_size : (page - 1) * page_size + page_size]
+    cases_with_alert_count = sum(
+        1 for item in prepared_items if _alert_rank(item.get("latest_alert_level")) >= _alert_rank("elevated")
+    )
+    highest_alert_level = None
+    if prepared_items:
+        highest_alert_level = max(
+            (item.get("latest_alert_level") for item in prepared_items if item.get("latest_alert_level")),
+            key=_alert_rank,
+            default=None,
+        )
+    dominant_domain_counter: Counter = Counter(
+        str(item.get("latest_domain") or "").strip().lower()
+        for item in prepared_items
+        if str(item.get("latest_domain") or "").strip()
+    )
+    dominant_domain = dominant_domain_counter.most_common(1)[0][0] if dominant_domain_counter else None
+    charts_payload = {
+        "cases_by_alert_level": {
+            "unit": "case_count",
+            "unit_label": "Casos por nivel de alerta",
+            "items": [
+                {
+                    "code": level,
+                    "label": _pdf_alert_label(level),
+                    "count": int(count),
+                }
+                for level, count in sorted(
+                    Counter(
+                        str(item.get("latest_alert_level") or "low").strip().lower()
+                        for item in prepared_items
+                    ).items(),
+                    key=lambda row: _alert_rank(row[0]),
+                )
+            ],
+        },
+        "activity_by_case": {
+            "unit": "questionnaire_count",
+            "unit_label": "Cuestionarios por caso",
+            "items": sorted(
+                [
+                    {
+                        "case_id": item.get("case_id"),
+                        "case_public_id": item.get("case_public_id"),
+                        "label": item.get("compact_label") or item.get("display_label") or "Caso",
+                        "count": int(item.get("questionnaire_count") or 0),
+                    }
+                    for item in prepared_items
+                ],
+                key=lambda row: row["count"],
+                reverse=True,
+            )[:10],
+        },
+    }
+
     return {
         "items": paged_items,
+        "summary": {
+            "total_cases": total,
+            "total_questionnaires": sum(int(item.get("questionnaire_count") or 0) for item in prepared_items),
+            "processed_questionnaires": sum(int(item.get("processed_count") or 0) for item in prepared_items),
+            "cases_with_alert": cases_with_alert_count,
+            "needs_professional_review": sum(
+                1 for item in prepared_items if str(item.get("latest_alert_level") or "").lower() == "critical_review"
+            ),
+            "highest_alert_level": (
+                {"code": highest_alert_level, "label": _pdf_alert_label(highest_alert_level)}
+                if highest_alert_level
+                else None
+            ),
+            "dominant_domain": (
+                {"code": dominant_domain, "label": _domain_label(dominant_domain)}
+                if dominant_domain
+                else None
+            ),
+        },
+        "charts": charts_payload,
+        "aggregation": {
+            "source": "backend",
+            "scope": "filtered_result_set",
+            "uses_current_page_only": False,
+        },
         "pagination": {
             "page": page,
             "page_size": page_size,
@@ -3272,10 +3522,19 @@ def get_case_detail(case: QuestionnaireCase, owner_user_id: uuid.UUID) -> dict[s
     domain_summary: dict[str, dict[str, Any]] = {}
     trend: list[dict[str, Any]] = []
     session_payloads: list[dict[str, Any]] = []
+    alerts_by_month_counter: dict[str, Counter] = defaultdict(Counter)
+    alerts_by_level_counter: Counter = Counter()
+    session_count_by_domain: Counter = Counter()
+    dominant_domain_counter: Counter = Counter()
+    highest_alert_counter: Counter = Counter()
+    case_tags: dict[str, dict[str, Any]] = {}
+
     for session in sessions:
         session_domains = domains_by_session.get(session.id, [])
         highest_alert = _pick_highest_alert([row.alert_level for row in session_domains])
         dominant_domain = _session_dominant_domain(session_domains)
+        if dominant_domain:
+            dominant_domain_counter[dominant_domain] += 1
         trend.append(
             {
                 "date": (session.processed_at or session.created_at or _utcnow()).date().isoformat(),
@@ -3298,26 +3557,165 @@ def get_case_detail(case: QuestionnaireCase, owner_user_id: uuid.UUID) -> dict[s
         result_row = result_by_session.get(session.id)
         payload["needs_professional_review"] = result_row.needs_professional_review if result_row else None
         session_payloads.append(payload)
+        for tag_item in payload["tags"]:
+            case_tags[tag_item["tag_id"]] = tag_item
+
+        event_month = (session.processed_at or session.submitted_at or session.updated_at or session.created_at).strftime("%Y-%m")
+        if highest_alert:
+            alerts_by_level_counter[highest_alert] += 1
+            highest_alert_counter[highest_alert] += 1
+            if _alert_rank(highest_alert) >= _alert_rank("elevated"):
+                alerts_by_month_counter[event_month]["alerts"] += 1
+                alerts_by_month_counter[event_month][highest_alert] += 1
+
         for row in session_domains:
+            session_count_by_domain[row.domain] += 1
             item = domain_summary.setdefault(
                 row.domain,
                 {
                     "domain": row.domain,
+                    "domain_code": row.domain,
+                    "domain_label": _domain_label(row.domain),
                     "latest_probability": row.probability,
+                    "latest_percentage": round(float(row.probability or 0.0) * 100.0, 1),
                     "latest_alert_level": row.alert_level,
+                    "latest_alert_label": _pdf_alert_label(row.alert_level),
                     "max_probability": row.probability,
+                    "max_percentage": round(float(row.probability or 0.0) * 100.0, 1),
                     "sessions_with_alert": 0,
                 },
             )
             item["max_probability"] = max(float(item["max_probability"]), float(row.probability))
+            item["max_percentage"] = round(float(item["max_probability"]) * 100.0, 1)
+            item["latest_percentage"] = round(float(item["latest_probability"] or 0.0) * 100.0, 1)
+            item["latest_alert_label"] = _pdf_alert_label(item.get("latest_alert_level"))
             if row.alert_level in {"elevated", "high", "critical_review"}:
                 item["sessions_with_alert"] += 1
 
+    case_payload = _case_payload(case, viewer_user_id=owner_user_id)
+    case_payload["status_label"] = {
+        "active": "Activo",
+        "archived": "Archivado",
+        "closed": "Cerrado",
+    }.get(str(case.status or "").strip().lower(), str(case.status or "").strip() or "No definido")
+    case_payload["association_type"] = "direct"
+    case_payload["association_label"] = "Asociado directamente al caso"
+
+    highest_alert_level = None
+    if highest_alert_counter:
+        highest_alert_level = sorted(
+            highest_alert_counter.items(),
+            key=lambda item: (_alert_rank(item[0]), item[1]),
+            reverse=True,
+        )[0][0]
+
+    dominant_domain = dominant_domain_counter.most_common(1)[0][0] if dominant_domain_counter else None
+    summary_payload = {
+        "questionnaires_count": len(sessions),
+        "processed_count": sum(1 for row in sessions if row.status == "processed"),
+        "last_activity_at": (
+            (sessions[0].processed_at or sessions[0].submitted_at or sessions[0].updated_at or sessions[0].created_at).isoformat()
+            if sessions
+            else case_payload.get("latest_activity_at")
+        ),
+        "highest_alert_level": (
+            {
+                "code": highest_alert_level,
+                "label": _pdf_alert_label(highest_alert_level),
+            }
+            if highest_alert_level
+            else None
+        ),
+        "dominant_domain": (
+            {
+                "code": dominant_domain,
+                "label": _domain_label(dominant_domain),
+            }
+            if dominant_domain
+            else None
+        ),
+    }
+
+    alerts_by_month_items = [
+        {
+            "period": month,
+            "label": month,
+            "count": int(counter.get("alerts", 0)),
+            "elevated": int(counter.get("elevated", 0)),
+            "high": int(counter.get("high", 0)),
+            "critical_review": int(counter.get("critical_review", 0)),
+        }
+        for month, counter in sorted(alerts_by_month_counter.items())
+    ]
+    trend_items = sorted(
+        [
+            {
+                "date": row["date"],
+                "percentage": round(
+                    max((float(dom.get("probability") or 0.0) for dom in row.get("domains", [])), default=0.0) * 100.0,
+                    1,
+                ),
+                "alert_level": (
+                    _pick_highest_alert([str(dom.get("alert_level") or "") for dom in row.get("domains", [])])
+                    or "low"
+                ),
+            }
+            for row in trend
+        ],
+        key=lambda item: item["date"],
+    )
+    for row in trend_items:
+        row["alert_label"] = _pdf_alert_label(row["alert_level"])
+
+    charts_payload = {
+        "domain_summary": {
+            "unit": "percentage",
+            "unit_label": "Carga sintomatica",
+            "items": sorted(
+                list(domain_summary.values()),
+                key=lambda item: float(item.get("max_probability") or 0.0),
+                reverse=True,
+            ),
+        },
+        "alerts_by_month": {
+            "unit": "alert_count",
+            "unit_label": "Alertas",
+            "items": alerts_by_month_items,
+            "empty_state": (
+                "Este caso tiene cuestionarios procesados, pero no registra alertas en el periodo."
+                if summary_payload["processed_count"] > 0 and not alerts_by_month_items
+                else None
+            ),
+        },
+        "trend": {
+            "unit": "percentage",
+            "unit_label": "Carga sintomatica",
+            "aggregation": "monthly_last",
+            "items": trend_items,
+        },
+        "alerts_by_level": {
+            "unit": "alert_count",
+            "unit_label": "Alertas por nivel",
+            "items": [
+                {
+                    "code": key,
+                    "label": _pdf_alert_label(key),
+                    "count": int(value),
+                }
+                for key, value in sorted(alerts_by_level_counter.items(), key=lambda item: _alert_rank(item[0]))
+            ],
+        },
+    }
+
     return {
-        "case": _case_payload(case, viewer_user_id=owner_user_id),
+        "case": case_payload,
+        "summary": summary_payload,
+        "charts": charts_payload,
         "sessions": session_payloads,
         "domain_summary": list(domain_summary.values()),
         "trend": trend,
+        "tags": list(case_tags.values()),
+        "aggregation": {"source": "backend", "scope": "case_only"},
     }
 
 
@@ -3549,6 +3947,16 @@ def guardian_dashboard(
         "highest_alert_level": highest_alert,
         "most_frequent_domain": most_frequent_domain,
     }
+    summary_payload["total_questionnaires"] = summary_payload["total_sessions"]
+    summary_payload["processed_questionnaires"] = summary_payload["processed_sessions"]
+    summary_payload["cases_with_alert"] = summary_payload["cases_with_alerts"]
+    summary_payload["needs_professional_review"] = summary_payload["cases_needing_professional_review"]
+    summary_payload["dominant_domain"] = (
+        {"code": most_frequent_domain, "label": _domain_label(most_frequent_domain)}
+        if most_frequent_domain
+        else None
+    )
+    summary_payload["highest_alert_level_label"] = _pdf_alert_label(highest_alert)
     dashboard_warnings: list[str] = []
     if summary_payload["total_sessions"] > 0 and not alerts_by_month:
         dashboard_warnings.append("alerts_by_month_empty_with_nonzero_sessions")
@@ -3665,6 +4073,18 @@ def guardian_dashboard(
             "alerts_by_level": alerts_by_level,
             "sessions_by_case": sessions_by_case_chart,
             "cases_by_alert_level": cases_by_alert_level,
+        },
+        "chart_units": {
+            "alerts_by_month": {"unit": "alert_count", "unit_label": "Alertas"},
+            "alerts_by_domain": {"unit": "alert_count", "unit_label": "Alertas registradas"},
+            "alerts_by_level": {"unit": "alert_count", "unit_label": "Alertas por nivel"},
+            "sessions_by_case": {"unit": "questionnaire_count", "unit_label": "Cuestionarios por caso"},
+            "cases_by_alert_level": {"unit": "case_count", "unit_label": "Casos por nivel de alerta"},
+        },
+        "aggregation": {
+            "source": "backend",
+            "scope": "guardian_all_cases",
+            "uses_visible_cases_only": False,
         },
         "items": [item["case"] | {"summary": item["summary"]} for item in case_items],
         "pagination": {"page": 1, "page_size": len(case_items), "total": len(case_items), "pages": 1},
@@ -4723,16 +5143,7 @@ def list_psychologist_share_requests(
     )
     items = [_share_request_payload(row) for row in rows]
 
-    counts_rows = (
-        db.session.query(QuestionnaireAccessGrant.request_status, func.count(QuestionnaireAccessGrant.id))
-        .filter(
-            QuestionnaireAccessGrant.grantee_user_id == psychologist_user_id,
-            QuestionnaireAccessGrant.revoked_at.is_(None),
-        )
-        .group_by(QuestionnaireAccessGrant.request_status)
-        .all()
-    )
-    counters = {str(key or "accepted"): int(value) for key, value in counts_rows}
+    counters = Counter(str(row.request_status or "accepted").strip().lower() for row in filtered_rows)
     by_status = [
         {"label": "Pendientes", "value": counters.get("pending", 0)},
         {"label": "Aceptadas", "value": counters.get("accepted", 0)},
@@ -4740,13 +5151,22 @@ def list_psychologist_share_requests(
     ]
     by_alert_counter: Counter = Counter()
     by_domain_counter: Counter = Counter()
+    by_domain_code_counter: Counter = Counter()
     over_time_counter: Counter = Counter()
     pending_age_counter: Counter = Counter()
+    reviewed_session_ids: set[uuid.UUID] = set()
     if filtered_rows:
         session_ids = [row.session_id for row in filtered_rows]
         domain_rows = QuestionnaireSessionResultDomain.query.filter(
             QuestionnaireSessionResultDomain.session_id.in_(session_ids)
         ).all()
+        reviewed_session_ids = {
+            row.session_id
+            for row in QuestionnaireProfessionalReview.query.filter(
+                QuestionnaireProfessionalReview.session_id.in_(session_ids),
+                QuestionnaireProfessionalReview.psychologist_user_id == psychologist_user_id,
+            ).all()
+        }
         by_session: dict[uuid.UUID, list[QuestionnaireSessionResultDomain]] = defaultdict(list)
         for row in domain_rows:
             by_session[row.session_id].append(row)
@@ -4756,6 +5176,7 @@ def list_psychologist_share_requests(
             if dom_rows:
                 top = max(dom_rows, key=lambda item: float(item.probability or 0.0))
                 by_domain_counter[_domain_label(top.domain)] += 1
+                by_domain_code_counter[str(top.domain or "").strip().lower()] += 1
                 by_alert_counter[_pdf_alert_label(top.alert_level)] += 1
             req_at = grant.requested_at or grant.created_at or now
             if getattr(req_at, "tzinfo", None) is None:
@@ -4770,6 +5191,13 @@ def list_psychologist_share_requests(
                 else:
                     pending_age_counter["8+ dias"] += 1
 
+    dominant_domain_code = None
+    if by_domain_code_counter:
+        dominant_domain_code = by_domain_code_counter.most_common(1)[0][0]
+    dominant_alert = None
+    if by_alert_counter:
+        dominant_alert = sorted(by_alert_counter.items(), key=lambda item: item[1], reverse=True)[0][0]
+
     return {
         "items": items,
         "pagination": {
@@ -4782,7 +5210,21 @@ def list_psychologist_share_requests(
             "pending_count": counters.get("pending", 0),
             "accepted_count": counters.get("accepted", 0),
             "rejected_count": counters.get("rejected", 0),
-            "total": counters.get("pending", 0) + counters.get("accepted", 0) + counters.get("rejected", 0),
+            "pending": counters.get("pending", 0),
+            "accepted": counters.get("accepted", 0),
+            "rejected": counters.get("rejected", 0),
+            "reviewed": len(reviewed_session_ids),
+            "total": len(filtered_rows),
+            "dominant_alert_level": (
+                {"code": dominant_alert, "label": dominant_alert}
+                if dominant_alert
+                else None
+            ),
+            "dominant_domain": (
+                {"code": dominant_domain_code, "label": _domain_label(dominant_domain_code)}
+                if dominant_domain_code
+                else None
+            ),
         },
         "charts": {
             "by_status": by_status,
@@ -4790,6 +5232,18 @@ def list_psychologist_share_requests(
             "by_domain": [{"label": key, "value": int(value)} for key, value in sorted(by_domain_counter.items())],
             "over_time": [{"date": key, "value": int(value)} for key, value in sorted(over_time_counter.items())],
             "pending_age": [{"label": key, "value": int(value)} for key, value in sorted(pending_age_counter.items())],
+        },
+        "chart_units": {
+            "by_status": {"unit": "request_count", "unit_label": "Solicitudes por estado"},
+            "by_alert_level": {"unit": "request_count", "unit_label": "Solicitudes por nivel de alerta"},
+            "by_domain": {"unit": "request_count", "unit_label": "Solicitudes por dominio"},
+            "over_time": {"unit": "request_count", "unit_label": "Solicitudes por fecha"},
+            "pending_age": {"unit": "request_count", "unit_label": "Antiguedad de pendientes"},
+        },
+        "aggregation": {
+            "source": "backend",
+            "scope": "filtered_result_set",
+            "uses_current_page_only": False,
         },
     }
 
