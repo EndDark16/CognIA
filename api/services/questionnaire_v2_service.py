@@ -313,7 +313,9 @@ def _safe_display_name(user: AppUser | None) -> str:
 
 def _case_display_label(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None) -> str:
     if viewer_user_id and viewer_user_id == case.owner_user_id and case.private_label:
-        return _decrypt_text_safe(case.private_label, "questionnaire_case.private_label") or f"Caso {case.case_public_id}"
+        return _sanitize_visible_text(
+            _decrypt_text_safe(case.private_label, "questionnaire_case.private_label")
+        ) or f"Caso {case.case_public_id}"
     return f"Caso {case.case_public_id}"
 
 
@@ -326,6 +328,7 @@ def _sanitize_visible_text(value: str | None) -> str | None:
     text = re.sub(r"(?i)^qa\\s*dashboard\\s*[·:\\-]*\\s*", "", text).strip()
     text = re.sub(r"(?i)\\bqa\\s*dashboard\\b", "", text).strip()
     text = re.sub(r"(?i)\\bsint[eé]tico\\b", "orientativo", text)
+    text = re.sub(r"(?i)\\bsint.{0,1}tico\\b", "orientativo", text)
     text = re.sub(r"\\s{2,}", " ", text).strip()
     return text
 
@@ -352,8 +355,10 @@ def _case_permissions(is_owner: bool) -> dict[str, bool]:
 
 def _case_payload(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None = None) -> dict[str, Any]:
     private_label = _decrypt_text_safe(case.private_label, "questionnaire_case.private_label") if case.private_label else None
+    private_label = _sanitize_visible_text(private_label)
     is_owner = bool(viewer_user_id and viewer_user_id == case.owner_user_id)
     display_label = private_label if (is_owner and private_label) else f"Caso {case.case_public_id}"
+    display_label = _sanitize_visible_text(display_label) or f"Caso {case.case_public_id}"
     payload: dict[str, Any] = {
         "case_id": str(case.id),
         "case_public_id": case.case_public_id,
