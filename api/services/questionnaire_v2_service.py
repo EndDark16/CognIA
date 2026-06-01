@@ -307,14 +307,27 @@ def _safe_display_name(user: AppUser | None) -> str:
         return "Usuario"
     name = str(user.full_name or "").strip()
     if name:
-        return name
-    return str(user.username or "Usuario")
+        return _sanitize_visible_text(name) or "Usuario"
+    return _sanitize_visible_text(str(user.username or "Usuario")) or "Usuario"
 
 
 def _case_display_label(case: QuestionnaireCase, viewer_user_id: uuid.UUID | None) -> str:
     if viewer_user_id and viewer_user_id == case.owner_user_id and case.private_label:
         return _decrypt_text_safe(case.private_label, "questionnaire_case.private_label") or f"Caso {case.case_public_id}"
     return f"Caso {case.case_public_id}"
+
+
+def _sanitize_visible_text(value: str | None) -> str | None:
+    if value is None:
+        return None
+    text = str(value)
+    if not text:
+        return text
+    text = re.sub(r"(?i)^qa\\s*dashboard\\s*[·:\\-]*\\s*", "", text).strip()
+    text = re.sub(r"(?i)\\bqa\\s*dashboard\\b", "", text).strip()
+    text = re.sub(r"(?i)\\bsint[eé]tico\\b", "orientativo", text)
+    text = re.sub(r"\\s{2,}", " ", text).strip()
+    return text
 
 
 def _compact_case_label(label: str | None, *, max_len: int = 34) -> str:
@@ -1004,7 +1017,7 @@ def _public_user_payload(user: AppUser | None) -> dict[str, Any] | None:
         "user_id": str(user.id),
         "username": user.username,
         "display_name": _safe_display_name(user),
-        "full_name": user.full_name,
+        "full_name": _sanitize_visible_text(user.full_name),
         "email": user.email,
         "department": department,
         "city": city,
@@ -1681,6 +1694,7 @@ def _professional_flow_payload(session: QuestionnaireSession, viewer_user_id: uu
             latest_review.initial_concept,
             "questionnaire_professional_review.initial_concept",
         )
+        latest_preview = _sanitize_visible_text(latest_preview)
     review_status = latest_review.review_status if latest_review else None
     can_send = session.owner_user_id == viewer_user_id
     can_view_reviews = session.owner_user_id == viewer_user_id or any(
@@ -2993,7 +3007,7 @@ def list_history(
 
         summary_info = summary_by_session_id.get(session.id)
         if summary_info is not None:
-            item["summary"] = summary_info[0]
+            item["summary"] = _sanitize_visible_text(summary_info[0])
             item["needs_professional_review"] = summary_info[1]
         else:
             item["needs_professional_review"] = None
