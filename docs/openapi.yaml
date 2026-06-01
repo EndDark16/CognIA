@@ -556,7 +556,9 @@ paths:
 
         - Codigos de exito documentados: 200.
 
-        - La respuesta representa el estado procesado por el backend y mantiene compatibilidad con el esquema documentado.
+        - La respuesta incluye `items` paginados y agregados backend reales en `summary`/`charts`.
+        - `summary` y `charts` se calculan sobre el conjunto filtrado completo (`aggregation.uses_current_page_only=false`).
+        - `items` es lista visible paginada y no debe usarse para recomponer KPIs globales.
         Para flujo directo se envia `grantee_user_id` o alias `psychologist_user_id`, `recipient_user_id`, `grantee_id`; esto crea `grant.request_status=pending`, notificacion al psicologo y no requiere usar `share_code`.
 
 
@@ -21763,7 +21765,9 @@ paths:
         Metodo `GET /api/v2/questionnaires/cases` con filtros opcionales `status`, `q`, `label`, `case_public_id`, `has_sessions`, `latest_alert_level`, `date_from`, `date_to`, `page`, `page_size`.
 
         **Resultado exitoso**
-        Responde `200` con `items` paginados y metadata de cada caso.
+        Responde `200` con `items` paginados, `summary`, `charts` y `aggregation`.
+        `charts.activity_by_case` (unit=`questionnaire_count`) y `charts.alerts_by_case` (unit=`alert_count`)
+        tienen semanticas diferentes y no deben intercambiarse.
 
         **Errores posibles y causa funcional**
         `403 cases_list_forbidden`, `500 cases_list_failed`.
@@ -21889,8 +21893,9 @@ paths:
         Metodo `GET /api/v2/questionnaires/cases/{case_id}` con `case_id` UUID valido.
 
         **Resultado exitoso**
-        Responde `200` con `case`, `summary`, `charts`, `sessions`, `tags`, `domain_summary`, `trend` y `aggregation`.
+        Responde `200` con `case`, `summary`, `charts`, `sessions`, `tags`, `domain_summary`, `trend`, `delta_from_previous` y `aggregation`.
         `summary` y `charts` usan solo sesiones del caso (`aggregation.scope=case_only`).
+        `charts.trend.aggregation=session_points` y cada item incluye timestamps completos (`processed_at`, `submitted_at`, `applied_at`).
 
         **Errores posibles y causa funcional**
         `403 case_forbidden`, `404 case_not_found`, `500 case_detail_failed`.
@@ -22065,6 +22070,8 @@ paths:
         **Resultado exitoso**
         Responde `200` con `summary`, `charts`, `chart_units`, `cases`, `period`, `filters` y `aggregation`.
         `summary`/`charts` se calculan en backend sobre todo el conjunto filtrado, no sobre la pagina.
+        `charts` incluye series estandar para frontend: `alerts_by_month`, `alerts_by_domain`, `domain_load_summary`,
+        `alerts_by_level`, `alerts_by_case` y `activity_by_case`.
 
         **Errores posibles y causa funcional**
         `400 guardian_dashboard_invalid_period`, `403 guardian_dashboard_forbidden`, `404 guardian_dashboard_case_not_found`, `500 guardian_dashboard_failed`.
