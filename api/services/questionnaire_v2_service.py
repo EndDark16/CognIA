@@ -662,9 +662,24 @@ def _truthy_env_flag(value: Any) -> bool:
     return str(value).strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _is_production_environment() -> bool:
+    env_keys = ["ENV", "FLASK_ENV", "APP_ENV", "DEPLOYMENT_ENV", "ENVIRONMENT"]
+    for key in env_keys:
+        raw = current_app.config.get(key)
+        if raw is None:
+            raw = os.getenv(key)
+        if isinstance(raw, bool):
+            continue
+        if str(raw or "").strip().lower() in {"production", "prod"}:
+            return True
+    return False
+
+
 def _allow_testing_heuristic_fallback() -> bool:
     if bool(current_app.config.get("TESTING")):
         return True
+    if _is_production_environment():
+        return False
     cfg_value = current_app.config.get("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS")
     if _truthy_env_flag(cfg_value):
         return True

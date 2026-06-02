@@ -539,9 +539,24 @@ def _resolve_mode_key(role: str, mode: str) -> str:
     raise ValueError(f"invalid role/mode pair: {role}/{mode}")
 
 
+def _is_production_environment() -> bool:
+    env_keys = ["ENV", "FLASK_ENV", "APP_ENV", "DEPLOYMENT_ENV", "ENVIRONMENT"]
+    for key in env_keys:
+        raw = current_app.config.get(key)
+        if raw is None:
+            raw = os.getenv(key)
+        if isinstance(raw, bool):
+            continue
+        if str(raw or "").strip().lower() in {"production", "prod"}:
+            return True
+    return False
+
+
 def _allow_legacy_model_fallback_for_tests() -> bool:
     if bool(current_app.config.get("TESTING")):
         return True
+    if _is_production_environment():
+        return False
     raw = current_app.config.get("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS")
     if raw is None:
         raw = os.getenv("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS")

@@ -9,10 +9,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from api.app import create_app
-from api.services import questionnaire_v2_service as qv2
-from app.models import ModelVersion
-from config.settings import TestingConfig
+from api.app import create_app  # noqa: E402
+from api.services import questionnaire_v2_service as qv2  # noqa: E402
+from app.models import ModelVersion  # noqa: E402
+from config.settings import TestingConfig  # noqa: E402
 
 
 class StrictConfig(TestingConfig):
@@ -99,6 +99,25 @@ def test_testing_mode_can_use_explicit_fallback_and_skip_coverage_fail(tmp_path,
         prob = qv2._model_probability(version, {"f1": 1, "f2": 2}, "adhd")
     assert 0.0 <= prob <= 1.0
     monkeypatch.delenv("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS", raising=False)
+
+
+def test_production_environment_blocks_legacy_model_fallback(tmp_path, monkeypatch):
+    app = create_app(StrictConfig)
+    fallback_path = _write_model(tmp_path / "fallback-prod" / "pipeline.joblib")
+    version = ModelVersion(
+        model_registry_id=uuid.uuid4(),
+        model_version_tag="test-v17-production-fallback",
+        artifact_path=str(tmp_path / "missing-prod" / "pipeline.joblib"),
+        fallback_artifact_path=fallback_path,
+        metadata_json={"feature_columns": [f"f{i}" for i in range(1, 11)]},
+    )
+    monkeypatch.setenv("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS", "true")
+    monkeypatch.setenv("APP_ENV", "production")
+    with app.app_context():
+        with pytest.raises(qv2.RuntimeArtifactResolutionError):
+            qv2._model_probability(version, {"f1": 1, "f2": 2}, "adhd")
+    monkeypatch.delenv("ALLOW_LEGACY_MODEL_FALLBACK_FOR_TESTS", raising=False)
+    monkeypatch.delenv("APP_ENV", raising=False)
 
 
 def test_active_model_artifact_accepts_backslash_relative_path(tmp_path):
