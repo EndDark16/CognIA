@@ -1713,6 +1713,65 @@ def test_questionnaire_v2_professional_review_visibility_rules(client, app):
     assert flow["professional_review_status_label"]
 
 
+def test_questionnaire_v2_secure_history_includes_professional_reviews(client, app):
+    _, owner_token = _user_token(app, "history_owner_qv2")
+    psych_id, psych_token = _user_token(app, "history_psych_qv2", user_type="psychologist")
+    owner_headers = {"Authorization": f"Bearer {owner_token}"}
+    psych_headers = {"Authorization": f"Bearer {psych_token}"}
+
+    created = client.post(
+        "/api/v2/questionnaires/sessions",
+        json={"mode": "short", "role": "guardian", "case_label": "Caso history review", "child_age_years": 10},
+        headers=owner_headers,
+    )
+    assert created.status_code == 201
+    session_id = created.json["session"]["session_id"]
+
+    shared = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/share",
+        json={"grantee_user_id": str(psych_id)},
+        headers=owner_headers,
+    )
+    assert shared.status_code == 201
+    grant_id = shared.json["grant"]["grant_id"]
+
+    accepted = client.post(
+        f"/api/v2/questionnaires/psychologist/share-requests/{grant_id}/accept",
+        json={"message": "Acepto"},
+        headers=psych_headers,
+    )
+    assert accepted.status_code == 200
+
+    visible_review = client.post(
+        f"/api/v2/questionnaires/history/{session_id}/professional-reviews",
+        json={
+            "review_status": "reviewed",
+            "initial_concept": "Concepto orientativo inicial",
+            "recommendation": "Recomendacion de seguimiento",
+            "visible_to_guardian": True,
+        },
+        headers=psych_headers,
+    )
+    assert visible_review.status_code == 201
+
+    history_secure = client.post(
+        "/api/v2/questionnaires/history/secure",
+        json={"page": 1, "page_size": 10},
+        headers=owner_headers,
+    )
+    assert history_secure.status_code == 200
+    assert isinstance(history_secure.json.get("items"), list)
+    assert len(history_secure.json["items"]) == 1
+    item = history_secure.json["items"][0]
+    assert isinstance(item.get("professional_reviews"), list)
+    assert len(item["professional_reviews"]) == 1
+    assert item["professional_reviews"][0]["visible_to_guardian"] is True
+    assert item["professional_reviews"][0]["review_id"]
+    assert item.get("latest_review") is not None
+    assert item["latest_review"]["review_id"] == item["professional_reviews"][0]["review_id"]
+    assert item.get("professional_review") == item["latest_review"]
+
+
 def test_questionnaire_v2_report_preview_for_granted_psychologist_hides_private_label(client, app):
     _, owner_token = _user_token(app, "preview_owner_qv2")
     psych_id, psych_token = _user_token(app, "preview_psych_qv2", user_type="psychologist")
