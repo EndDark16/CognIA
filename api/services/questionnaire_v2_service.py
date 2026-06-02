@@ -3070,6 +3070,10 @@ def list_history(
         item["processed_at"] = session.processed_at.isoformat() if session.processed_at else None
         item["id"] = str(session.id)
         item["questionnaire_session_id"] = str(session.id)
+        reviews = list_professional_reviews(session, user_id)
+        item["professional_reviews"] = reviews
+        item["latest_review"] = reviews[-1] if reviews else None
+        item["professional_review"] = item["latest_review"]
         items.append(item)
 
     by_month_counter: Counter = Counter()
