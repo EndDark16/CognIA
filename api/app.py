@@ -55,6 +55,7 @@ def create_app(config_class=DevelopmentConfig):
         static_folder=os.path.join(PROJECT_ROOT, "static"),
     )
     app.config.from_object(config_class)
+    app.json.ensure_ascii = False
 
     request_id_re = re.compile(r"^[A-Za-z0-9._:-]{8,128}$")
 
@@ -237,7 +238,19 @@ def create_app(config_class=DevelopmentConfig):
     )
 
     def _json_error(message: str, error_code: str, status_code: int, details=None):
-        payload = {"msg": message, "error": error_code}
+        request_id = getattr(g, "request_id", None)
+        payload = {
+            "msg": message,
+            "error": error_code,
+            "request_id": request_id,
+            "error_detail": {
+                "code": error_code,
+                "message": message,
+                "details": details or {},
+                "request_id": request_id,
+                "retryable": status_code in {429, 500, 503},
+            },
+        }
         if details is not None:
             payload["details"] = details
         return jsonify(payload), status_code
