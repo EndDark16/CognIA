@@ -1,4 +1,12 @@
-﻿# CognIA Backend (`EndDark16/CognIA`)
+﻿<!-- technical-overview: EndDark16/CognIA -->
+
+**Introduccion tecnica**
+
+Backend API Flask para cuestionarios, autenticacion, operacion de modelos Random Forest e informes de screening infantil. Usa SQLAlchemy y Alembic para persistencia y migraciones, y mantiene contratos OpenAPI; sus resultados son apoyo profesional, no diagnostico clinico.
+
+---
+
+# CognIA Backend (`EndDark16/CognIA`)
 
 Backend de CognIA para cuestionarios, inferencia y operacion API en salud mental infantil (6-11 anos), con enfoque de screening/apoyo profesional en entorno simulado.
 
